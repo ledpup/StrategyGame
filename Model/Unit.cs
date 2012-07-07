@@ -56,6 +56,7 @@ namespace Model
     [Flags]
     public enum UnitType
     {
+        None = 0,
         Melee = 1 << 0,
         Cavalry = 1 << 1,
         Ranged = 1 << 2,
@@ -65,23 +66,113 @@ namespace Model
         Aquatic = 1 << 6,
     }
 
+    public struct UnitInitialValues
+    {
+        public static UnitInitialValues DefaultValues()
+        {
+            var initialValues = new UnitInitialValues();
+
+            initialValues.Size = 0.01f;
+            initialValues.Quantity = 1f;
+            initialValues.Stamina = 1f;
+            initialValues.Morale = 1f;
+            initialValues.MovementSpeed = 2;
+
+            return initialValues;
+        }
+
+        public float Size;
+        public float Quantity;
+        public float Quality;
+        public float Stamina;
+        public float Morale;
+        public short MovementSpeed;
+    }
+
     public abstract class Unit
     {
+        public Unit(UnitType unitType)
+            : this(unitType, UnitInitialValues.DefaultValues())
+        { 
+        }
+
+        public Unit(UnitType unitType, UnitInitialValues initialValues)
+        {
+            UnitType = unitType;
+            Size = initialValues.Size;
+            Quality = initialValues.Quality;
+            Quantity = initialValues.Quantity;
+            Stamina = initialValues.Stamina;
+            Morale = initialValues.Morale;
+            _movementSpeed = initialValues.MovementSpeed;
+        }
+
         public UnitType UnitType;
         public TerrainType MoveOver;
         public TerrainType StopOver;
         public TerrainType StopOn;
         public TerrainType TerrainCombatBonus;
+
+        public float Size;
+        public float Quantity;
+        public float Quality;
+        public float Stamina;
+        public float Morale;
+
+        public virtual short MovementSpeed
+        {
+            get
+            {
+                if (Stamina == 0)
+                    return 0;
+                
+                return _movementSpeed;
+            }
+        }
+        protected short _movementSpeed;
+
+        public virtual short ForcedMovementSpeed
+        {
+            get
+            {
+                if (Stamina == 0)
+                    return 0;
+
+                var speed = (short)((float)_movementSpeed * .4);
+
+                return speed < (short)1 ? (short)1 : speed;
+            }
+        }
+
+        public bool IsTransporter;
+
+        public float CombatStrength
+        {
+            get 
+            {
+                return Quality * Quantity * Stamina * Morale;
+            }
+        }
+
+        public float TransportSize
+        {
+            get { return Quantity * Size; }
+        }
     }
 
     public class LandUnit : Unit
     {
-        public LandUnit(UnitType unitType)
+        public LandUnit(UnitType unitType) : this(unitType, UnitInitialValues.DefaultValues())
+        { 
+
+        }
+
+        public LandUnit(UnitType unitType, UnitInitialValues initialValues)
+            : base(unitType, initialValues)
         {
             if (unitType.HasFlag(UnitType.Airborne) || unitType.HasFlag(UnitType.Amphibious) || unitType.HasFlag(UnitType.Aquatic))
                 throw new ArgumentException(string.Format("Unit type '{0}' is not a land unit.", unitType.ToString()), "unitType");
 
-            UnitType = unitType;
             MoveOver = Terrain.All_Land_But_Mountain_And_Lake;
             StopOn = Terrain.All_Rough_Land;
             StopOver = Terrain.All_Land_But_Mountain_And_Lake;
@@ -91,8 +182,14 @@ namespace Model
     public class AirborneUnit : Unit
     {
         public AirborneUnit()
+            : this(UnitInitialValues.DefaultValues())
         {
-            UnitType = UnitType.Airborne;
+
+        }
+
+        public AirborneUnit(UnitInitialValues initialValues)
+            : base(UnitType.Airborne, initialValues)
+        {
             MoveOver = Terrain.All_Terrain;
             StopOn = Terrain.Nothing;
             StopOver = Terrain.All_Land_But_Mountain_And_Lake;
@@ -102,22 +199,48 @@ namespace Model
     public class AmphibiousUnit : Unit
     {
         public AmphibiousUnit()
+            : base(UnitType.Airborne)
         {
-            UnitType = UnitType.Amphibious;
             MoveOver = Terrain.All_Land_But_Mountain;
-            StopOn = Terrain.All_Rough_Land;
+            StopOn = Terrain.All_Rough_Land ^ TerrainType.Wetland;
             StopOver = Terrain.All_Land_But_Mountain;
         }
     }
 
     public class AquaticUnit : Unit
     {
-        public AquaticUnit()
+        public AquaticUnit(UnitInitialValues initialValues)
+            : base(UnitType.Aquatic, initialValues)
         {
-            UnitType = UnitType.Aquatic;
             MoveOver = Terrain.All_Water;
             StopOn = TerrainType.Reef;
             StopOver = Terrain.All_Water;
+        }
+    }
+
+    public class UndeadUnit : Unit
+    {
+        public UndeadUnit(UnitType unitType, UnitInitialValues initialValues)
+            : base(unitType, initialValues)
+        {
+            Stamina = 0;
+            Morale = 0;
+        }
+
+        public override short MovementSpeed
+        {
+            get
+            {
+                return _movementSpeed;
+            }
+        }
+
+        public override short ForcedMovementSpeed
+        {
+            get
+            {
+                return 0;
+            }
         }
     }
 }

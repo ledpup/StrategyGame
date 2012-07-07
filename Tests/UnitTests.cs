@@ -42,5 +42,30 @@ namespace Tests
         {
             new LandUnit(UnitType.Airborne);
         }
+
+        [TestMethod]
+        public void MovementSpeed_FatiguedLandUnit_CantMove()
+        {
+            var initialValues = new UnitInitialValues { MovementSpeed = 3 };
+
+            var unit = new LandUnit(UnitType.Ranged, initialValues);
+            unit.Stamina = 0;
+            Assert.AreEqual(0, unit.MovementSpeed);
+            Assert.AreEqual(0, unit.ForcedMovementSpeed);
+            unit.Stamina = 1;
+            Assert.AreEqual(3, unit.MovementSpeed);
+            Assert.AreEqual(1, unit.ForcedMovementSpeed);
+        }
+
+        [TestMethod]
+        public void MovementSpeed_UndeadUnit_CanMove()
+        {
+            var initialValues = new UnitInitialValues { MovementSpeed = 3 };
+
+            var unit = new UndeadUnit(UnitType.Ranged, initialValues);
+                        
+            Assert.AreEqual(3, unit.MovementSpeed);
+            Assert.AreEqual(0, unit.ForcedMovementSpeed);
+        }
     }
 }

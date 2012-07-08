@@ -46,9 +46,9 @@ namespace Tests
         [TestMethod]
         public void MovementSpeed_FatiguedLandUnit_CantMove()
         {
-            var initialValues = new UnitInitialValues { MovementSpeed = 3 };
+            var initialValues = new UnitInitialValues { MovementSpeed = 3, ForcedMovementSpeed = 1 };
 
-            var unit = new LandUnit(UnitType.Ranged, initialValues);
+            var unit = new LandUnit(UnitType.Ranged, UnitModifier.None, initialValues);
             unit.Stamina = 0;
             Assert.AreEqual(0, unit.MovementSpeed);
             Assert.AreEqual(0, unit.ForcedMovementSpeed);
@@ -62,7 +62,7 @@ namespace Tests
         {
             var initialValues = new UnitInitialValues { MovementSpeed = 3 };
 
-            var unit = new UndeadUnit(UnitType.Ranged, initialValues);
+            var unit = new LandUnit(UnitType.Ranged, UnitInitialValues.Undead, initialValues);
                         
             Assert.AreEqual(3, unit.MovementSpeed);
             Assert.AreEqual(0, unit.ForcedMovementSpeed);

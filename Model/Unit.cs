@@ -77,6 +77,7 @@ namespace Model
             initialValues.Stamina = 1f;
             initialValues.Morale = 1f;
             initialValues.MovementSpeed = 2;
+            initialValues.ForcedMovementSpeed = 1;
 
             return initialValues;
         }
@@ -87,27 +88,47 @@ namespace Model
         public float Stamina;
         public float Morale;
         public short MovementSpeed;
+        public short ForcedMovementSpeed;
+
+        public static UnitModifier Undead = UnitModifier.NoStamina | UnitModifier.NoForcedMarch | UnitModifier.NoMorale;
+    }
+
+    public enum UnitModifier
+    {
+        None = 0,
+        NoStamina = 1 << 0,
+        NoMorale = 1 << 1,
+        ColdResistant = 1 << 2,
+        NoForcedMarch = 1 << 3,
+        //Airborne = 1 << 4,
+        //Amphibious = 1 << 5,
+        //Aquatic = 1 << 6,
+        //Undead = 1 << 7,
     }
 
     public abstract class Unit
     {
         public Unit(UnitType unitType)
-            : this(unitType, UnitInitialValues.DefaultValues())
+            : this(unitType, UnitModifier.None, UnitInitialValues.DefaultValues())
         { 
         }
 
-        public Unit(UnitType unitType, UnitInitialValues initialValues)
+        public Unit(UnitType unitType, UnitModifier unitModifiers, UnitInitialValues initialValues)
         {
             UnitType = unitType;
+            UnitModifiers = unitModifiers;
             Size = initialValues.Size;
             Quality = initialValues.Quality;
             Quantity = initialValues.Quantity;
             Stamina = initialValues.Stamina;
             Morale = initialValues.Morale;
+
             _movementSpeed = initialValues.MovementSpeed;
+            _forcedMovementSpeed = initialValues.ForcedMovementSpeed;
         }
 
         public UnitType UnitType;
+        public UnitModifier UnitModifiers;
         public TerrainType MoveOver;
         public TerrainType StopOver;
         public TerrainType StopOn;
@@ -119,30 +140,32 @@ namespace Model
         public float Stamina;
         public float Morale;
 
-        public virtual short MovementSpeed
+        public short MovementSpeed
         {
             get
             {
-                if (Stamina == 0)
+                if (!UnitModifiers.HasFlag(UnitModifier.NoStamina) && Stamina == 0)
                     return 0;
                 
                 return _movementSpeed;
             }
         }
-        protected short _movementSpeed;
+        short _movementSpeed;
 
-        public virtual short ForcedMovementSpeed
+        public short ForcedMovementSpeed
         {
             get
             {
+                if (UnitModifiers.HasFlag(UnitModifier.NoForcedMarch))
+                    return 0;
+
                 if (Stamina == 0)
                     return 0;
 
-                var speed = (short)((float)_movementSpeed * .4);
-
-                return speed < (short)1 ? (short)1 : speed;
+                return _forcedMovementSpeed;
             }
         }
+        short _forcedMovementSpeed;
 
         public bool IsTransporter;
 
@@ -162,13 +185,13 @@ namespace Model
 
     public class LandUnit : Unit
     {
-        public LandUnit(UnitType unitType) : this(unitType, UnitInitialValues.DefaultValues())
+        public LandUnit(UnitType unitType) : this(unitType, UnitModifier.None, UnitInitialValues.DefaultValues())
         { 
 
         }
 
-        public LandUnit(UnitType unitType, UnitInitialValues initialValues)
-            : base(unitType, initialValues)
+        public LandUnit(UnitType unitType, UnitModifier unitModifiers, UnitInitialValues initialValues)
+            : base(unitType, unitModifiers, initialValues)
         {
             if (unitType.HasFlag(UnitType.Airborne) || unitType.HasFlag(UnitType.Amphibious) || unitType.HasFlag(UnitType.Aquatic))
                 throw new ArgumentException(string.Format("Unit type '{0}' is not a land unit.", unitType.ToString()), "unitType");
@@ -188,7 +211,7 @@ namespace Model
         }
 
         public AirborneUnit(UnitInitialValues initialValues)
-            : base(UnitType.Airborne, initialValues)
+            : base(UnitType.Airborne, UnitModifier.None, initialValues)
         {
             MoveOver = Terrain.All_Terrain;
             StopOn = Terrain.Nothing;
@@ -210,37 +233,11 @@ namespace Model
     public class AquaticUnit : Unit
     {
         public AquaticUnit(UnitInitialValues initialValues)
-            : base(UnitType.Aquatic, initialValues)
+            : base(UnitType.Aquatic, UnitModifier.None, initialValues)
         {
             MoveOver = Terrain.All_Water;
             StopOn = TerrainType.Reef;
             StopOver = Terrain.All_Water;
-        }
-    }
-
-    public class UndeadUnit : Unit
-    {
-        public UndeadUnit(UnitType unitType, UnitInitialValues initialValues)
-            : base(unitType, initialValues)
-        {
-            Stamina = 0;
-            Morale = 0;
-        }
-
-        public override short MovementSpeed
-        {
-            get
-            {
-                return _movementSpeed;
-            }
-        }
-
-        public override short ForcedMovementSpeed
-        {
-            get
-            {
-                return 0;
-            }
         }
     }
 }

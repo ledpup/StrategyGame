@@ -42,7 +42,7 @@ namespace Model
 
                 _isCoastalDiscovered = true;
 
-                return _isCoastal = BaseTerrainType.HasFlag(Terrain.All_Land) && AdjacentTiles.Any(x => x.BaseTerrainType.HasFlag(Terrain.All_Water));
+                return _isCoastal = Terrain.All_Land.HasFlag(BaseTerrainType) && AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType));
             }
         }
         bool _isCoastal;

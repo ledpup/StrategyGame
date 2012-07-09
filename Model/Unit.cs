@@ -18,7 +18,7 @@ namespace Model
         Lake = 1 << 6,
         Sea = 1 << 7,
         Reef = 1 << 8,
-        Coastal = 1 << 9, // This is not a base terrain type but calculated. Any land hex adjacent to sea or reef is coastal.
+        Coastal = 1 << 9, // This is a calculated terrain type. Any land hex adjacent to sea or reef is coastal.
     }
 
     public static class Terrain
@@ -55,29 +55,9 @@ namespace Model
                 case 'R':
                     return TerrainType.Reef;
             }
-            throw new Exception("Unknown terrain type");
+            throw new Exception(string.Format("{0} is an unknown terrain type.", character));
         }
 
-    }
-
-    [Flags]
-    public enum StopOver
-    {
-        All_Land = 0,
-        All_Water = 1 << 0,
-        Lake = 1 << 1,
-        Coastal = 1 << 2,
-    }
-
-    [Flags]
-    public enum StopOn
-    {
-        Nothing = 0,
-
-        All_Rough = 1 << 0,
-        All_Water = 1 << 1,
-        Lake = 1 << 2,
-        Coastal = 1 << 3,
     }
 
     [Flags]
@@ -249,7 +229,7 @@ namespace Model
     public class AmphibiousUnit : Unit
     {
         public AmphibiousUnit()
-            : base(UnitType.Airborne)
+            : base(UnitType.Amphibious)
         {
             MoveOver = Terrain.All_Land_But_Mountain;
             StopOn = Terrain.All_Rough_Land ^ TerrainType.Wetland;

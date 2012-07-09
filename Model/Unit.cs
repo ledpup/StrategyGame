@@ -31,6 +31,33 @@ namespace Model
         public static TerrainType All_Rough_Land = All_Land_But_Lake ^ TerrainType.Grassland;
         public static TerrainType All_Terrain = Terrain.All_Land ^ Terrain.All_Water;
         public static TerrainType Nothing = 0;
+
+        public static TerrainType ConvertCharToTerrainType(char character)
+        {
+            switch (character)
+            {
+                case 'G':
+                    return TerrainType.Grassland;
+                case 'F':
+                    return TerrainType.Forest;
+                case 'A':
+                    return TerrainType.Arid;
+                case 'M':
+                    return TerrainType.Mountain;
+                case 'H':
+                    return TerrainType.Hill;
+                case 'W':
+                    return TerrainType.Wetland;
+                case 'L':
+                    return TerrainType.Lake;
+                case 'S':
+                    return TerrainType.Sea;
+                case 'R':
+                    return TerrainType.Reef;
+            }
+            throw new Exception("Unknown terrain type");
+        }
+
     }
 
     [Flags]

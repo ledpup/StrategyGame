@@ -20,7 +20,7 @@ namespace Model
 
             _tiles = InitialiseTiles(Width, Height, data);
 
-            Tiles.ToList().ForEach(x => x.AdjacentTiles = Board.GetAdjacentTiles(Width, Height, this, this[x.X, x.Y]));
+            Tiles.ToList().ForEach(x => x.SetAdjacentTiles(this));
         }
 
         private static Tile[,] InitialiseTiles(int width, int height, string[] data)
@@ -63,55 +63,6 @@ namespace Model
                     for (var j = 0; j < Height; j++)
                         yield return _tiles[i, j];
             }
-        }
-
-        public static IEnumerable<Tile> GetAdjacentTiles(int width, int height, Board board, Tile origin)
-        {
-            var adjacentTiles = new List<Tile>();
-
-            if (origin.Y - 1 >= 0)
-                adjacentTiles.Add(board[origin.X, origin.Y - 1]);
-
-            if (origin.Y + 1 < height)
-                adjacentTiles.Add(board[origin.X, origin.Y + 1]);
-
-            if (origin.X - 1 >= 0)
-            {
-                if (origin.X % 2 == 0)
-                {
-                    if (origin.Y - 1 >= 0)
-                        adjacentTiles.Add(board[origin.X - 1, origin.Y - 1]);
-
-                    adjacentTiles.Add(board[origin.X - 1, origin.Y]);
-                }
-                else
-                {
-                    adjacentTiles.Add(board[origin.X - 1, origin.Y]);
-
-                    if (origin.Y + 1 < height)
-                        adjacentTiles.Add(board[origin.X - 1, origin.Y + 1]);
-                }
-            }
-            if (origin.X + 1 < width)
-            {
-                if (origin.X % 2 == 0)
-                {
-                    if (origin.Y - 1 >= 0)
-                        adjacentTiles.Add(board[origin.X + 1, origin.Y - 1]);
-
-                    adjacentTiles.Add(board[origin.X + 1, origin.Y]);
-
-                }
-                else
-                {
-                    adjacentTiles.Add(board[origin.X + 1, origin.Y]);
-
-                    if (origin.Y + 1 < height)
-                        adjacentTiles.Add(board[origin.X + 1, origin.Y + 1]);
-                }
-            }
-
-            return adjacentTiles;
         }
     }
 }

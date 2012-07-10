@@ -29,7 +29,7 @@ namespace Model
                 }
                 return _adjacentTiles;
             }
-            set { _adjacentTiles = value; }
+            private set { _adjacentTiles = value; }
         }
         private IEnumerable<Tile> _adjacentTiles;
 
@@ -47,6 +47,59 @@ namespace Model
         }
         bool _isCoastal;
         bool _isCoastalDiscovered;
+
+        public void SetAdjacentTiles(Board board)
+        {
+            if (_adjacentTiles != null)
+                throw new Exception("Adjacent tiles have already be calculated");
+
+            var adjacentTiles = new List<Tile>();
+
+            var possibleExits = X % 2 == 0 ? AdjacentEvenTiles : AdjacentOddTiles;
+
+            foreach (var vector in possibleExits)
+            {
+                var neighbourX = X + vector.X;
+                var neighbourY = Y + vector.Y;
+
+                if (neighbourX >= 0 && neighbourX < board.Width && neighbourY >= 0 && neighbourY < board.Height)
+                    adjacentTiles.Add(board[neighbourX, neighbourY]);
+            }
+
+            AdjacentTiles = adjacentTiles;
+        }
+
+        static List<Point> AdjacentEvenTiles
+        {
+            get
+            {
+                return new List<Point>
+                {
+                    new Point(0, 1),
+                    new Point(1, 1),
+                    new Point(1, 0),
+                    new Point(0, -1),
+                    new Point(-1, 0),
+                    new Point(-1, 1),
+                };
+            }
+        }
+
+        static List<Point> AdjacentOddTiles
+        {
+            get
+            {
+                return new List<Point>
+                {
+                    new Point(0, 1),
+                    new Point(1, 0),
+                    new Point(1, -1),
+                    new Point(0, -1),
+                    new Point(-1, 0),
+                    new Point(-1, -1),
+                };
+            }
+        }
 
         //public int StackLimit
         //{

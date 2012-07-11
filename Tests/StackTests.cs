@@ -40,5 +40,20 @@ namespace Tests
             var transporting = stack.Transporting();
             Assert.AreEqual(UnitType.Aquatic, transporting);
         }
+
+        [TestMethod]
+        public void MovementTest()
+        {
+            var board = Board.LoadBoard(BoardTests.GameBoard);
+
+            var unit = new LandUnit(UnitType.Melee);
+
+            unit.Location = board[1, 1];
+
+            var moveList = Stack.UnitMoveList(unit);
+
+            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
+            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
+        }
     }
 }

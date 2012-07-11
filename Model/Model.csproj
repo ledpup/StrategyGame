@@ -42,6 +42,7 @@
     <Compile Include="Board.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Stack.cs" />
+    <Compile Include="Terrain.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

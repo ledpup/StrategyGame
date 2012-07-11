@@ -55,12 +55,12 @@ namespace Model
 
             var adjacentTiles = new List<Tile>();
 
-            var possibleExits = X % 2 == 0 ? AdjacentEvenTiles : AdjacentOddTiles;
+            var potentialTiles = X % 2 == 0 ? AdjacentEvenTiles : AdjacentOddTiles;
 
-            foreach (var vector in possibleExits)
+            foreach (var tile in potentialTiles)
             {
-                var neighbourX = X + vector.X;
-                var neighbourY = Y + vector.Y;
+                var neighbourX = X + tile.X;
+                var neighbourY = Y + tile.Y;
 
                 if (neighbourX >= 0 && neighbourX < board.Width && neighbourY >= 0 && neighbourY < board.Height)
                     adjacentTiles.Add(board[neighbourX, neighbourY]);

@@ -39,5 +39,30 @@ namespace Model
             }
             return UnitType.None;
         }
+
+        public static IEnumerable<Tile> UnitMoveList(Unit unit)
+        {
+            var visitedTiles = new List<Tile> { unit.Location };
+            var moveList = new List<Tile>();
+
+            var tilesToExplore = new List<Tile> { unit.Location };
+
+            var move = 0;
+
+            while (move < unit.MovementSpeed)
+            {
+                var potentialTiles = new List<Tile>();
+
+                tilesToExplore.ForEach(t => potentialTiles.AddRange(t.AdjacentTiles.Where(x => !visitedTiles.Contains(x))));
+                var validMoves = potentialTiles.Where(x => unit.MoveOver.HasFlag(x.BaseTerrainType));
+
+                moveList.AddRange(validMoves);
+
+                visitedTiles.AddRange(potentialTiles);
+
+                move++;
+            }
+            return moveList;
+        }
     }
 }

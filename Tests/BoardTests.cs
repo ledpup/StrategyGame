@@ -11,18 +11,23 @@ namespace Tests
     [TestClass]
     public class BoardTests
     {
-        public static string GameBoard = "SSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSFFGGGAASSFFGGGAASSFFGGGAAS\r\nSGFGMHGASSGGGMHGASSGGGMHGAS\r\nSGMMGGAASSGMMGGAASSGMMGGAAS\r\nSMGGLLGGSSMGGLLGGSSMGGLLGGS\r\nSSSFFWGGSSSSFFWGGSSSSFFWGGS\r\nSGMSFWGGSSGMSFWGGSSGMSFWGGS\r\nSGRRSGSGSSGSSSGSGSSGSSSGSGS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSFFGGGAASSFFGGGAASSFFGGGAAS\r\nSGGGMHGASSGGGMHGASSGGGMHGAS\r\nSGMMGGAASSGMMGGAASSGMMGGAAS\r\nSMGGLLGGSSMGGLLGGSSMGGLLGGS\r\nSSSFFWGGSSSSFFWGGSSSSFFWGGS\r\nSGMSFWGGSSGMSFWGGSSGMSFWGGS\r\nSGSSSGSGSSGSSSGSGSSGSSSGSGS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS";
+        public static string GameBoard = "SSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSFFGGGDDSSFFGGGDDSSFFGGGDDS\r\nSGFGMHGDSSGGGMHGDSSGGGMHGDS\r\nSGMMGGDDSSGMMGGDDSSGMMGGDDS\r\nSMGGLLGGSSMGGLLGGSSMGGLLGGS\r\nSSSFFWGGSSSSFFWGGSSSSFFWGGS\r\nSGMSFWGGSSGMSFWGGSSGMSFWGGS\r\nSGRRSGSGSSGSSSGSGSSGSSSGSGS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSFFGGGDDSSFFGGGDDSSFFGGGDDS\r\nSGGGMHGDSSGGGMHGDSSGGGMHGDS\r\nSGMMGGDDSSGMMGGDDSSGMMGGDDS\r\nSMGGLLGGSSMGGLLGGSSMGGLLGGS\r\nSSSFFWGGSSSSFFWGGSSSSFFWGGS\r\nSGMSFWGGSSGMSFWGGSSGMSFWGGS\r\nSGSSSGSGSSGSSSGSGSSGSSSGSGS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS";
+        public static string TileEdges = "20,21,River";
 
         [TestMethod]
         public void LoadBoard_AdjacentTilesAndCoastal_NoNullTilesAndCoasts()
         {
-            var board = Board.LoadBoard(GameBoard);
+            var board = Board.LoadBoard(GameBoard, TileEdges);
+
+            var tiles = board.Tiles.ToList();
+
+            tiles.ForEach(t => Assert.AreEqual(1, tiles.Count(x => x.Id == t.Id)));
 
             // Ensure that adjacent tiles have been populated correctly
-            board.Tiles.ToList().ForEach(t => Assert.IsFalse(t.AdjacentTiles.Any(at => at == null)));
+            tiles.ForEach(t => Assert.IsFalse(t.AdjacentTiles.Any(at => at == null)));
             
             // Ensure that some tiles are coastal.
-            var coastal = board.Tiles.ToList().Count(t => t.IsCoastal);
+            var coastal = tiles.Count(t => t.IsCoastal);
             Assert.AreNotEqual(0, coastal);
         }
     }

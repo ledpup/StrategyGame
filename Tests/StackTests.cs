@@ -44,7 +44,7 @@ namespace Tests
         [TestMethod]
         public void MovementTest()
         {
-            var board = Board.LoadBoard(BoardTests.GameBoard);
+            var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
 
             var unit = new LandUnit(UnitType.Melee);
 
@@ -52,8 +52,11 @@ namespace Tests
 
             var moveList = Stack.UnitMoveList(unit);
 
+            Assert.AreEqual(3, moveList.Count());
             Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
             Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
+
+            moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
         }
     }
 }

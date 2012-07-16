@@ -16,5 +16,16 @@ namespace Model
 
         public int X;
         public int Y;
+
+        //public override int GetHashCode()
+        //{
+        //    return X * Y;
+        //}
+
+        public override bool Equals(object obj)
+        {
+            var otherPoint = (Point)obj;
+            return X == otherPoint.X && Y == otherPoint.Y;
+        }
     }
 }

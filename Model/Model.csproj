@@ -44,6 +44,7 @@
     <Compile Include="Stack.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="Tile.cs" />
+    <Compile Include="TileEdge.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

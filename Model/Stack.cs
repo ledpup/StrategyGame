@@ -42,9 +42,7 @@ namespace Model
 
         public static IEnumerable<Tile> UnitMoveList(Unit unit)
         {
-            var visitedTiles = new List<Tile> { unit.Location };
             var moveList = new List<Tile>();
-
             var tilesToExplore = new List<Tile> { unit.Location };
 
             var move = 0;
@@ -53,16 +51,51 @@ namespace Model
             {
                 var potentialTiles = new List<Tile>();
 
-                tilesToExplore.ForEach(t => potentialTiles.AddRange(t.AdjacentTiles.Where(x => !visitedTiles.Contains(x))));
-                var validMoves = potentialTiles.Where(x => unit.MoveOver.HasFlag(x.BaseTerrainType));
+                tilesToExplore.ForEach(t => potentialTiles.AddRange(t.AdjacentTiles.Where(
+                    a => a != unit.Location 
+                    && !potentialTiles.Contains(a)
+                    && !moveList.Contains(a)
+                    && CanCrossEdge(unit.MoveOverEdge, t, a)
+                    )));
+                var validMoves = potentialTiles.Where(x => unit.MoveOver.HasFlag(x.BaseTerrainType)).ToList();
 
                 moveList.AddRange(validMoves);
 
-                visitedTiles.AddRange(potentialTiles);
+                var movesThatDontStopUnit = validMoves.Where(x => !unit.StopOn.HasFlag(x.BaseTerrainType));
+
+                tilesToExplore = new List<Tile>();
+                tilesToExplore.AddRange(movesThatDontStopUnit);
 
                 move++;
             }
             return moveList;
+        }
+
+        private static bool CanCrossEdge(EdgeType moveOverEdge, Tile tile, Tile adjacentTile)
+        {
+            var adjacentTileEdge = tile.AdjacentTileEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
+
+            if (adjacentTileEdge == null)
+                return true;
+
+            if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.River))
+            {
+                if (moveOverEdge.HasFlag(EdgeType.River))
+                    return true;
+
+                if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.Road))
+                {
+                    if (moveOverEdge.HasFlag(EdgeType.Road))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static IEnumerable<Tile> StackMoveLost(List<Unit> units)
+        {
+            return null;
         }
     }
 }

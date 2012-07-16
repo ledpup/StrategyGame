@@ -25,15 +25,20 @@ namespace Model
         {
             var initialValues = new UnitInitialValues();
 
+            initialValues.UnitModifiers = UnitModifier.None;
+            initialValues.MoveOverEdge = EdgeType.Normal;
+
             initialValues.Size = 0.01f;
             initialValues.Quantity = 1f;
             initialValues.Stamina = 1f;
             initialValues.Morale = 1f;
             initialValues.MovementSpeed = 2;
-            initialValues.ForcedMovementSpeed = 1;
 
             return initialValues;
         }
+
+        public UnitModifier UnitModifiers;
+        public EdgeType MoveOverEdge;
 
         public float Size;
         public float Quantity;
@@ -41,9 +46,11 @@ namespace Model
         public float Stamina;
         public float Morale;
         public short MovementSpeed;
-        public short ForcedMovementSpeed;
 
-        public static UnitModifier Undead = UnitModifier.NoStamina | UnitModifier.NoForcedMarch | UnitModifier.NoMorale;
+        public static UnitModifier Undead = UnitModifier.NoStamina | UnitModifier.NoMorale;
+        //public static UnitModifier Airborne = UnitModifier.CanCrossRivers;
+        //public static UnitModifier Amphibious = UnitModifier.CanUseRoads | UnitModifier.CanCrossRivers;
+        //public static UnitModifier LandUnit = UnitModifier.CanUseRoads;
     }
 
     public enum UnitModifier
@@ -52,7 +59,6 @@ namespace Model
         NoStamina = 1 << 0,
         NoMorale = 1 << 1,
         ColdResistant = 1 << 2,
-        NoForcedMarch = 1 << 3,
         //Airborne = 1 << 4,
         //Amphibious = 1 << 5,
         //Aquatic = 1 << 6,
@@ -62,14 +68,15 @@ namespace Model
     public abstract class Unit
     {
         public Unit(UnitType unitType)
-            : this(unitType, UnitModifier.None, UnitInitialValues.DefaultValues())
+            : this(unitType, UnitInitialValues.DefaultValues())
         { 
         }
 
-        public Unit(UnitType unitType, UnitModifier unitModifiers, UnitInitialValues initialValues)
+        public Unit(UnitType unitType, UnitInitialValues initialValues)
         {
             UnitType = unitType;
-            UnitModifiers = unitModifiers;
+            UnitModifiers = initialValues.UnitModifiers;
+            MoveOverEdge = initialValues.MoveOverEdge;
             Size = initialValues.Size;
             Quality = initialValues.Quality;
             Quantity = initialValues.Quantity;
@@ -77,7 +84,6 @@ namespace Model
             Morale = initialValues.Morale;
 
             _movementSpeed = initialValues.MovementSpeed;
-            _forcedMovementSpeed = initialValues.ForcedMovementSpeed;
         }
 
         public Tile Location;
@@ -87,6 +93,7 @@ namespace Model
         public TerrainType StopOver;
         public TerrainType StopOn;
         public TerrainType TerrainCombatBonus;
+        public EdgeType MoveOverEdge;
 
         public float Size;
         public float Quantity;
@@ -106,21 +113,6 @@ namespace Model
         }
         short _movementSpeed;
 
-        public short ForcedMovementSpeed
-        {
-            get
-            {
-                if (UnitModifiers.HasFlag(UnitModifier.NoForcedMarch))
-                    return 0;
-
-                if (Stamina == 0)
-                    return 0;
-
-                return _forcedMovementSpeed;
-            }
-        }
-        short _forcedMovementSpeed;
-
         public bool IsTransporter;
 
         public float CombatStrength
@@ -139,13 +131,13 @@ namespace Model
 
     public class LandUnit : Unit
     {
-        public LandUnit(UnitType unitType) : this(unitType, UnitModifier.None, UnitInitialValues.DefaultValues())
-        { 
-
+        public LandUnit(UnitType unitType) : this(unitType, UnitInitialValues.DefaultValues())
+        {
+            MoveOverEdge = EdgeType.Road;
         }
 
-        public LandUnit(UnitType unitType, UnitModifier unitModifiers, UnitInitialValues initialValues)
-            : base(unitType, unitModifiers, initialValues)
+        public LandUnit(UnitType unitType, UnitInitialValues initialValues)
+            : base(unitType, initialValues)
         {
             if (unitType.HasFlag(UnitType.Airborne) || unitType.HasFlag(UnitType.Amphibious) || unitType.HasFlag(UnitType.Aquatic))
                 throw new ArgumentException(string.Format("Unit type '{0}' is not a land unit.", unitType.ToString()), "unitType");
@@ -165,9 +157,10 @@ namespace Model
         }
 
         public AirborneUnit(UnitInitialValues initialValues)
-            : base(UnitType.Airborne, UnitModifier.None, initialValues)
+            : base(UnitType.Airborne, initialValues)
         {
             MoveOver = Terrain.All_Terrain;
+            MoveOverEdge = EdgeType.River;
             StopOn = Terrain.Nothing;
             StopOver = Terrain.All_Land_But_Mountain_And_Lake;
         }
@@ -176,9 +169,10 @@ namespace Model
     public class AmphibiousUnit : Unit
     {
         public AmphibiousUnit()
-            : base(UnitType.Amphibious)
+            : base(UnitType.Amphibious, UnitInitialValues.DefaultValues())
         {
             MoveOver = Terrain.All_Land_But_Mountain;
+            MoveOverEdge = EdgeType.Road | EdgeType.River;
             StopOn = Terrain.All_Rough_Land ^ TerrainType.Wetland;
             StopOver = Terrain.All_Land_But_Mountain;
         }
@@ -187,7 +181,7 @@ namespace Model
     public class AquaticUnit : Unit
     {
         public AquaticUnit(UnitInitialValues initialValues)
-            : base(UnitType.Aquatic, UnitModifier.None, initialValues)
+            : base(UnitType.Aquatic, initialValues)
         {
             MoveOver = Terrain.All_Water;
             StopOn = TerrainType.Reef;

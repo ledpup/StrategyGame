@@ -14,7 +14,7 @@ namespace Tests
         [TestMethod]
         public void TerrainTypeTests()
         {
-            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Arid));
+            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Desert));
             Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Hill));
 
             Assert.IsFalse(Terrain.All_Land_But_Mountain.HasFlag(TerrainType.Mountain));
@@ -46,26 +46,27 @@ namespace Tests
         [TestMethod]
         public void MovementSpeed_FatiguedLandUnit_CantMove()
         {
-            var initialValues = new UnitInitialValues { MovementSpeed = 3, ForcedMovementSpeed = 1 };
+            var initialValues = new UnitInitialValues { MovementSpeed = 3, };
 
-            var unit = new LandUnit(UnitType.Ranged, UnitModifier.None, initialValues);
+            var unit = new LandUnit(UnitType.Ranged, initialValues);
             unit.Stamina = 0;
             Assert.AreEqual(0, unit.MovementSpeed);
-            Assert.AreEqual(0, unit.ForcedMovementSpeed);
             unit.Stamina = 1;
             Assert.AreEqual(3, unit.MovementSpeed);
-            Assert.AreEqual(1, unit.ForcedMovementSpeed);
         }
 
         [TestMethod]
         public void MovementSpeed_UndeadUnit_CanMove()
         {
-            var initialValues = new UnitInitialValues { MovementSpeed = 3 };
+            var initialValues = new UnitInitialValues
+            { 
+                UnitModifiers = UnitInitialValues.Undead,
+                MovementSpeed = 3 
+            };
 
-            var unit = new LandUnit(UnitType.Ranged, UnitInitialValues.Undead, initialValues);
+            var unit = new LandUnit(UnitType.Ranged, initialValues);
                         
             Assert.AreEqual(3, unit.MovementSpeed);
-            Assert.AreEqual(0, unit.ForcedMovementSpeed);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Model
     {
         Grassland = 1 << 0,
         Forest = 1 << 1,
-        Arid = 1 << 2,
+        Desert = 1 << 2,
         Hill = 1 << 3,
         Mountain = 1 << 4,
         Wetland = 1 << 5,
@@ -23,7 +23,7 @@ namespace Model
 
     public static class Terrain
     {
-        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Arid | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland | TerrainType.Lake;
+        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Desert | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland | TerrainType.Lake;
         public static TerrainType All_Water = TerrainType.Sea | TerrainType.Reef | TerrainType.Coastal;
         public static TerrainType All_Land_But_Mountain = All_Land ^ TerrainType.Mountain;
         public static TerrainType All_Land_But_Lake = All_Land ^ TerrainType.Lake;
@@ -40,8 +40,8 @@ namespace Model
                     return TerrainType.Grassland;
                 case 'F':
                     return TerrainType.Forest;
-                case 'A':
-                    return TerrainType.Arid;
+                case 'D':
+                    return TerrainType.Desert;
                 case 'M':
                     return TerrainType.Mountain;
                 case 'H':

@@ -8,16 +8,32 @@ namespace Model
 {
     public class Tile
     {
-        public ushort X;
-        public ushort Y;
+        public int Id { get; private set; }
+        public Point Location { get; private set; }
+        public int X { get { return Location.X; } }
+        public int Y { get { return Location.Y; } }
         public TerrainType BaseTerrainType;
 
-        public Tile(ushort x, ushort y, TerrainType terrainType)
+        public Tile(int id, int x, int y, TerrainType terrainType)
         {
-            X = x;
-            Y = y;
+            Id = id;
+            Location = new Point(x, y);
             BaseTerrainType = terrainType;
         }
+
+        public IEnumerable<TileEdge> AdjacentTileEdges
+        {
+            get
+            {
+                if (_adjacentTileEdges == null)
+                {
+                    throw new Exception();
+                }
+                return _adjacentTileEdges;
+            }
+            private set { _adjacentTileEdges = value; }
+        }
+        private IEnumerable<TileEdge> _adjacentTileEdges;
 
         public IEnumerable<Tile> AdjacentTiles
         {
@@ -29,7 +45,25 @@ namespace Model
                 }
                 return _adjacentTiles;
             }
-            private set { _adjacentTiles = value; }
+            private set 
+            { 
+                _adjacentTiles = value;
+            }
+        }
+
+        private IEnumerable<TileEdge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
+        {
+            var adjacentTileEdges = new List<TileEdge>();
+            _adjacentTiles.ToList().ForEach(x => 
+                {
+                    var edge = Board.TileEdges.SingleOrDefault(r => r.Tiles.Contains(this) && r.Tiles.Contains(x)); 
+                    
+                    if (edge == null)
+                        return;
+
+                    adjacentTileEdges.Add(edge);
+                });
+            return adjacentTileEdges;
         }
         private IEnumerable<Tile> _adjacentTiles;
 
@@ -42,7 +76,12 @@ namespace Model
 
                 _isCoastalDiscovered = true;
 
-                return _isCoastal = Terrain.All_Land.HasFlag(BaseTerrainType) && AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType));
+                _isCoastal = Terrain.All_Land.HasFlag(BaseTerrainType) && AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType));
+
+                if (_isCoastal)
+                    BaseTerrainType |= TerrainType.Coastal;
+
+                return _isCoastal;
             }
         }
         bool _isCoastal;
@@ -67,7 +106,18 @@ namespace Model
             }
 
             AdjacentTiles = adjacentTiles;
+            AdjacentTileEdges = BuildAdjacentEdgeTiles(adjacentTiles);
         }
+
+        //public override bool Equals(object obj)
+        //{
+        //    return this.Location.Equals(((Tile)obj).Location);
+        //}
+
+        //public override int GetHasCode()
+        //{
+        //    return Location.GetHashCode();
+        //}
 
         static List<Point> AdjacentEvenTiles
         {

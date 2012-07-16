@@ -13,14 +13,36 @@ namespace Model
         public int Width;
         public int Height;
 
-        public Board(string[] data)
+        public Board(string[] tiles, string[] tilesEdges)
         {
-            Width = data[0].Length;
-            Height = data.Length;
+            if (tilesEdges == null)
+                throw new ArgumentNullException("tileEdges");
 
-            _tiles = InitialiseTiles(Width, Height, data);
+            Width = tiles[0].Length;
+            Height = tiles.Length;
+
+            _tiles = InitialiseTiles(Width, Height, tiles);
+            TileEdges = IntitaliseTileEdges(tilesEdges);
 
             Tiles.ToList().ForEach(x => x.SetAdjacentTiles(this));
+        }
+
+        private List<TileEdge> IntitaliseTileEdges(string[] tilesEdges)
+        {
+            var tileEdgesList = new List<TileEdge>();
+            tilesEdges.ToList().ForEach(
+                x => 
+                {
+                    var columns = x.Split(',');
+
+                    var tiles = new List<Tile> { 
+                        Tiles.Single(t => t.Id == int.Parse(columns[0])),
+                        Tiles.Single(t => t.Id == int.Parse(columns[1]))};
+
+                    tileEdgesList.Add(new TileEdge(columns[2], tiles));
+                }
+            );
+            return tileEdgesList;
         }
 
         private static Tile[,] InitialiseTiles(int width, int height, string[] data)
@@ -31,16 +53,17 @@ namespace Model
                 for (ushort y = 0; y < height; y++)
                 {
                     var terrainType = Terrain.ConvertCharToTerrainType(char.Parse(data[y].Substring(x, 1)));
-                    tiles[x, y] = new Tile(x, y, terrainType);
+                    tiles[x, y] = new Tile(x * height + y, x, y, terrainType);
                 }
             
             return tiles;
         }
 
-        public static Board LoadBoard(string data)
+        public static Board LoadBoard(string tileData, string tileEdgesData)
         {
-            var lines = data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            return new Board(lines);
+            var tileRows = tileData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var tileEdgesRows = tileEdgesData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            return new Board(tileRows, tileEdgesRows);
         }
 
         public Tile this[int x, int y]
@@ -64,5 +87,7 @@ namespace Model
                         yield return _tiles[i, j];
             }
         }
+
+        public static List<TileEdge> TileEdges;
     }
 }

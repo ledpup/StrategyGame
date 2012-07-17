@@ -127,7 +127,61 @@ namespace Model
         {
             get { return Quantity * Size; }
         }
+
+        public static IEnumerable<Tile> MoveList(Unit unit)
+        {
+            var moveList = new List<Tile>();
+            var exploringTiles = new List<Tile> { unit.Location };
+
+            var move = 0;
+
+            while (move < unit.MovementSpeed)
+            {
+                var potentialTiles = new List<Tile>();
+
+                exploringTiles.ForEach(t => potentialTiles.AddRange(t.AdjacentTiles.Where(
+                    a => a != unit.Location
+                    && !potentialTiles.Contains(a)
+                    && !moveList.Contains(a)
+                    && CanCrossEdge(unit.MoveOverEdge, t, a)
+                    )));
+                
+                var moveOverTiles = potentialTiles.Where(x => unit.MoveOver.HasFlag(x.BaseTerrainType)).ToList();
+
+                var validMoves = moveOverTiles.Where(x => unit.StopOver.HasFlag(x.BaseTerrainType)).ToList();
+
+                moveList.AddRange(validMoves);
+
+                exploringTiles = moveOverTiles.Where(x => !unit.StopOn.HasFlag(x.BaseTerrainType)).ToList();
+
+                move++;
+            }
+            return moveList;
+        }
+
+        private static bool CanCrossEdge(EdgeType moveOverEdge, Tile tile, Tile adjacentTile)
+        {
+            var adjacentTileEdge = tile.AdjacentTileEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
+
+            if (adjacentTileEdge == null)
+                return true;
+
+            if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.River))
+            {
+                if (moveOverEdge.HasFlag(EdgeType.River))
+                    return true;
+
+                if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.Road))
+                {
+                    if (moveOverEdge.HasFlag(EdgeType.Road))
+                        return true;
+                }
+            }
+
+            return false;
+        }
     }
+
 
     public class LandUnit : Unit
     {

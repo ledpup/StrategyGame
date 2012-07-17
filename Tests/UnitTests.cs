@@ -68,5 +68,25 @@ namespace Tests
                         
             Assert.AreEqual(3, unit.MovementSpeed);
         }
+
+
+        [TestMethod]
+        public void UnitMoveList_LandUnit_ThreeMovesOnCorrectTerrain()
+        {
+            var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new LandUnit(UnitType.Melee);
+
+            unit.Location = board[1, 1];
+
+            var moveList = Unit.MoveList(unit);
+
+            Assert.AreEqual(3, moveList.Count());
+
+            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
+            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
+
+            moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
+        }
     }
 }

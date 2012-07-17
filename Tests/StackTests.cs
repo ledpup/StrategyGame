@@ -42,21 +42,47 @@ namespace Tests
         }
 
         [TestMethod]
-        public void MovementTest()
+        public void StackMoveList_LandUnits_ThreeMovesOnCorrectTerrain()
         {
             var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new LandUnit(UnitType.Melee);
+            var units = new List<Unit> 
+            { 
+                new LandUnit(UnitType.Melee),
+                new AmphibiousUnit(),
+            };
+            units.ForEach(x => x.Location = board[1, 1]);
 
-            unit.Location = board[1, 1];
 
-            var moveList = Stack.UnitMoveList(unit);
+            var stack = new Stack(units);
 
+            var amphibiousMoveList = Unit.MoveList(units[1]);
+            Assert.AreEqual(4, amphibiousMoveList.Count());
+
+            var moveList = stack.MoveList();
             Assert.AreEqual(3, moveList.Count());
-            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
-            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
+        }
 
-            moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
+        [TestMethod]
+        public void StackMoveList_TransportingUnits_ThreeMovesOnCorrectTerrain()
+        {
+            var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<Unit> 
+            { 
+                new LandUnit(UnitType.Melee),
+                new AirborneUnit(),
+            };
+            units.ForEach(x => x.Location = board[1, 1]);
+
+            var stack = new Stack(units);
+
+            Assert.AreEqual(UnitType.Airborne, stack.Transporting());
+
+            var moveList = stack.MoveList().ToList();
+
+            Assert.AreEqual(6, moveList.Count);
+            moveList.ForEach(x => Assert.IsFalse(x.BaseTerrainType.HasFlag(Terrain.All_Water)));
         }
     }
 }

@@ -14,9 +14,11 @@ namespace Model
         Road = 1 << 1,
     }
 
-    public class TileEdge
+    public class Edge
     {
-        public TileEdge(string edgeType, List<Tile> tiles)
+        public static EdgeType AllEdges = EdgeType.River | EdgeType.Road;
+
+        public Edge(string edgeType, List<Tile> tiles)
         {
             EdgeType = (EdgeType)Enum.Parse(typeof(EdgeType), edgeType);
 

@@ -40,7 +40,7 @@ namespace Model
             return UnitType.None;
         }
 
-        public IEnumerable<Tile> MoveList()
+        public IEnumerable<Move> MoveList()
         {
             var units = Units.ToArray();
 
@@ -50,13 +50,13 @@ namespace Model
                 units = Units.Where(x => x.UnitType == transporting).ToArray();
             }
 
-            var tiles = Unit.MoveList(units[0]);
+            var moves = Unit.MoveList(units[0]);
             for (var i = 1; i < units.Length; i++)
             {
-                tiles = tiles.Intersect(Unit.MoveList(units[i]));
+                moves = moves.Intersect(Unit.MoveList(units[i]));
             }
 
-            return tiles;
+            return moves;
         }
     }
 }

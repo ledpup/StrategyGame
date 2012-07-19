@@ -81,12 +81,37 @@ namespace Tests
 
             var moveList = Unit.MoveList(unit);
 
-            Assert.AreEqual(3, moveList.Count());
+            Assert.AreEqual(4, moveList.Count());
 
             Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
-            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
+            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.Destination.BaseTerrainType)));
 
             moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
+
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
+                Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 2]));
+                    Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 1]));
+        }
+
+        [TestMethod]
+        public void UnitMoveList_AirborneUnit_SixMovesOnCorrectTerrain()
+        {
+            var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new AirborneUnit();
+
+            unit.Location = board[1, 1];
+
+            var moveList = Unit.MoveList(unit);
+
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 3]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 1]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 1]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
+            
         }
     }
 }

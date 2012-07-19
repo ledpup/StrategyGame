@@ -128,35 +128,53 @@ namespace Model
             get { return Quantity * Size; }
         }
 
-        public static IEnumerable<Tile> MoveList(Unit unit)
+        public static IEnumerable<Move> MoveList(Unit unit)
         {
-            var moveList = new List<Tile>();
-            var exploringTiles = new List<Tile> { unit.Location };
-
+            var moveList = new List<Move>();
+            var exploringMoves = new List<Move> { new Move(null, unit.Location) };
             var move = 0;
 
             while (move < unit.MovementSpeed)
             {
-                var potentialTiles = new List<Tile>();
-
-                exploringTiles.ForEach(t => potentialTiles.AddRange(t.AdjacentTiles.Where(
-                    a => a != unit.Location
-                    && !potentialTiles.Contains(a)
-                    && !moveList.Contains(a)
-                    && CanCrossEdge(unit.MoveOverEdge, t, a)
-                    )));
-                
-                var moveOverTiles = potentialTiles.Where(x => unit.MoveOver.HasFlag(x.BaseTerrainType)).ToList();
-
-                var validMoves = moveOverTiles.Where(x => unit.StopOver.HasFlag(x.BaseTerrainType)).ToList();
-
+                var moves = GenerateMoves(unit, moveList, exploringMoves);
+                var validMoves = moves.Where(x => unit.StopOver.HasFlag(x.Destination.BaseTerrainType)).ToList();
                 moveList.AddRange(validMoves);
-
-                exploringTiles = moveOverTiles.Where(x => !unit.StopOn.HasFlag(x.BaseTerrainType)).ToList();
+                exploringMoves = moves.Where(x => !unit.StopOn.HasFlag(x.Destination.BaseTerrainType) || Move.IsAllOnRoad(x)).ToList();
 
                 move++;
             }
+
+            // If all moves have been on road, you a bonus move
+            if (unit.MoveOverEdge.HasFlag(EdgeType.Road))
+            {
+                var roadsToExplore = exploringMoves.Where(x => Move.IsAllOnRoad(x)).ToList();
+                var roadMoves = GenerateMoves(unit, moveList, roadsToExplore);
+                var validRoadMoves = roadMoves.Where(x => unit.StopOver.HasFlag(x.Destination.BaseTerrainType) && Move.IsAllOnRoad(x)).ToList();
+                moveList.AddRange(validRoadMoves);
+            }
+            
             return moveList;
+        }
+
+
+
+        private static List<Move> GenerateMoves(Unit unit, List<Move> moveList, List<Move> exploringMoves)
+        {
+            var potentialMoves = new List<Move>();
+
+            foreach (var exploringMove in exploringMoves)
+            {
+                var origin = exploringMove.Destination;
+
+                var destinations = origin.AdjacentTiles.Where(dest => dest != unit.Location
+                                        && !potentialMoves.Any(x => x.Destination == dest)
+                                        && !moveList.Any(x => x.Destination == dest)
+                                        && CanCrossEdge(unit.MoveOverEdge, origin, dest)).ToList();
+
+                destinations.ForEach(dest => potentialMoves.Add(new Move(exploringMove, dest)));
+            }
+
+            return potentialMoves.Where(x => unit.MoveOver.HasFlag(x.Destination.BaseTerrainType)).ToList();
         }
 
         private static bool CanCrossEdge(EdgeType moveOverEdge, Tile tile, Tile adjacentTile)
@@ -166,16 +184,13 @@ namespace Model
             if (adjacentTileEdge == null)
                 return true;
 
-            if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.River))
-            {
-                if (moveOverEdge.HasFlag(EdgeType.River))
-                    return true;
+            if (moveOverEdge.HasFlag(adjacentTileEdge.EdgeType))
+                return true;
 
-                if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.Road))
-                {
-                    if (moveOverEdge.HasFlag(EdgeType.Road))
-                        return true;
-                }
+            if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.River | EdgeType.Road))
+            {
+                if (moveOverEdge.HasFlag(EdgeType.Road))
+                    return true;
             }
 
             return false;
@@ -186,9 +201,7 @@ namespace Model
     public class LandUnit : Unit
     {
         public LandUnit(UnitType unitType) : this(unitType, UnitInitialValues.DefaultValues())
-        {
-            MoveOverEdge = EdgeType.Road;
-        }
+        {}
 
         public LandUnit(UnitType unitType, UnitInitialValues initialValues)
             : base(unitType, initialValues)
@@ -197,6 +210,7 @@ namespace Model
                 throw new ArgumentException(string.Format("Unit type '{0}' is not a land unit.", unitType.ToString()), "unitType");
 
             MoveOver = Terrain.All_Land_But_Mountain_And_Lake;
+            MoveOverEdge = EdgeType.Road;
             StopOn = Terrain.All_Rough_Land;
             StopOver = Terrain.All_Land_But_Mountain_And_Lake;
         }
@@ -206,15 +220,13 @@ namespace Model
     {
         public AirborneUnit()
             : this(UnitInitialValues.DefaultValues())
-        {
-
-        }
+        {}
 
         public AirborneUnit(UnitInitialValues initialValues)
             : base(UnitType.Airborne, initialValues)
         {
             MoveOver = Terrain.All_Terrain;
-            MoveOverEdge = EdgeType.River;
+            MoveOverEdge = Edge.AllEdges;
             StopOn = Terrain.Nothing;
             StopOver = Terrain.All_Land_But_Mountain_And_Lake;
         }

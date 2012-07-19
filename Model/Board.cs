@@ -27,9 +27,9 @@ namespace Model
             Tiles.ToList().ForEach(x => x.SetAdjacentTiles(this));
         }
 
-        private List<TileEdge> IntitaliseTileEdges(string[] tilesEdges)
+        private List<Edge> IntitaliseTileEdges(string[] tilesEdges)
         {
-            var tileEdgesList = new List<TileEdge>();
+            var tileEdgesList = new List<Edge>();
             tilesEdges.ToList().ForEach(
                 x => 
                 {
@@ -39,7 +39,7 @@ namespace Model
                         Tiles.Single(t => t.Id == int.Parse(columns[0])),
                         Tiles.Single(t => t.Id == int.Parse(columns[1]))};
 
-                    tileEdgesList.Add(new TileEdge(columns[2], tiles));
+                    tileEdgesList.Add(new Edge(columns[2], tiles));
                 }
             );
             return tileEdgesList;
@@ -88,6 +88,13 @@ namespace Model
             }
         }
 
-        public static List<TileEdge> TileEdges;
+        public static List<Edge> TileEdges;
+
+        public static bool EdgeHasRoad(Tile tile, Tile adjacentTile)
+        {
+            var tileEdge = tile.AdjacentTileEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
+
+            return tileEdge == null ? false : tileEdge.EdgeType == EdgeType.Road;
+        }
     }
 }

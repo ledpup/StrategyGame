@@ -57,7 +57,7 @@ namespace Tests
             var stack = new Stack(units);
 
             var amphibiousMoveList = Unit.MoveList(units[1]);
-            Assert.AreEqual(4, amphibiousMoveList.Count());
+            Assert.AreEqual(5, amphibiousMoveList.Count());
 
             var moveList = stack.MoveList();
             Assert.AreEqual(3, moveList.Count());
@@ -82,7 +82,7 @@ namespace Tests
             var moveList = stack.MoveList().ToList();
 
             Assert.AreEqual(6, moveList.Count);
-            moveList.ForEach(x => Assert.IsFalse(x.BaseTerrainType.HasFlag(Terrain.All_Water)));
+            moveList.ForEach(x => Assert.IsFalse(x.Destination.BaseTerrainType.HasFlag(Terrain.All_Water)));
         }
     }
 }

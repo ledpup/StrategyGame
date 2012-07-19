@@ -21,7 +21,7 @@ namespace Model
             BaseTerrainType = terrainType;
         }
 
-        public IEnumerable<TileEdge> AdjacentTileEdges
+        public IEnumerable<Edge> AdjacentTileEdges
         {
             get
             {
@@ -33,7 +33,7 @@ namespace Model
             }
             private set { _adjacentTileEdges = value; }
         }
-        private IEnumerable<TileEdge> _adjacentTileEdges;
+        private IEnumerable<Edge> _adjacentTileEdges;
 
         public IEnumerable<Tile> AdjacentTiles
         {
@@ -51,9 +51,9 @@ namespace Model
             }
         }
 
-        private IEnumerable<TileEdge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
+        private IEnumerable<Edge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
         {
-            var adjacentTileEdges = new List<TileEdge>();
+            var adjacentTileEdges = new List<Edge>();
             _adjacentTiles.ToList().ForEach(x => 
                 {
                     var edge = Board.TileEdges.SingleOrDefault(r => r.Tiles.Contains(this) && r.Tiles.Contains(x)); 

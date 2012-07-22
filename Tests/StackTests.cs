@@ -15,12 +15,12 @@ namespace Tests
         public void CanTransport_Airborne_CanTransport()
         {
             var units = new List<Unit> {
-                                            new LandUnit(UnitType.Cavalry),
-                                            new AirborneUnit(),
+                                            new Unit(BaseUnitType.Land),
+                                            new Unit(BaseUnitType.Airborne),
                                         };
 
             var stack = new Stack(units);
-            Assert.IsTrue(stack.CanTransport(UnitType.Airborne));
+            Assert.IsTrue(stack.CanTransport(BaseUnitType.Airborne));
         }
 
         [TestMethod]
@@ -30,9 +30,9 @@ namespace Tests
             aquatic.Size = 1f;
 
             var units = new List<Unit> {
-                                            new LandUnit(UnitType.Cavalry),
-                                            new AirborneUnit(),
-                                            new AquaticUnit(aquatic),
+                                            new Unit(BaseUnitType.Land),
+                                            new Unit(BaseUnitType.Airborne),
+                                            new Unit(BaseUnitType.Aquatic, aquatic),
                                         };
 
             var stack = new Stack(units);
@@ -48,8 +48,8 @@ namespace Tests
 
             var units = new List<Unit> 
             { 
-                new LandUnit(UnitType.Melee),
-                new AmphibiousUnit(),
+                new Unit(BaseUnitType.Land),
+                new Unit(BaseUnitType.Land),
             };
             units.ForEach(x => x.Location = board[1, 1]);
 
@@ -70,8 +70,8 @@ namespace Tests
 
             var units = new List<Unit> 
             { 
-                new LandUnit(UnitType.Melee),
-                new AirborneUnit(),
+                new Unit(BaseUnitType.Land),
+                new Unit(BaseUnitType.Airborne),
             };
             units.ForEach(x => x.Location = board[1, 1]);
 

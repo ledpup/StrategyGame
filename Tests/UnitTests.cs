@@ -23,7 +23,7 @@ namespace Tests
         [TestMethod]
         public void NewUnit_Airborne_HasCorrectMovement()
         {
-            var airborneUnit = new AirborneUnit();
+            var airborneUnit = new Unit(BaseUnitType.Airborne);
 
             Assert.IsTrue(airborneUnit.MoveOver.HasFlag(TerrainType.Forest));
             Assert.IsTrue(airborneUnit.MoveOver.HasFlag(TerrainType.Lake));
@@ -37,18 +37,11 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void NewUnit_Land_InvalidUnitType()
-        {
-            new LandUnit(UnitType.Airborne);
-        }
-
-        [TestMethod]
         public void MovementSpeed_FatiguedLandUnit_CantMove()
         {
             var initialValues = new UnitInitialValues { MovementSpeed = 3, };
 
-            var unit = new LandUnit(UnitType.Ranged, initialValues);
+            var unit = new Unit(BaseUnitType.Land, initialValues);
             unit.Stamina = 0;
             Assert.AreEqual(0, unit.MovementSpeed);
             unit.Stamina = 1;
@@ -64,7 +57,7 @@ namespace Tests
                 MovementSpeed = 3 
             };
 
-            var unit = new LandUnit(UnitType.Ranged, initialValues);
+            var unit = new Unit(BaseUnitType.Land, initialValues);
                         
             Assert.AreEqual(3, unit.MovementSpeed);
         }
@@ -75,7 +68,7 @@ namespace Tests
         {
             var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new LandUnit(UnitType.Melee);
+            var unit = new Unit(BaseUnitType.Land);
 
             unit.Location = board[1, 1];
 
@@ -99,7 +92,7 @@ namespace Tests
         {
             var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new AirborneUnit();
+            var unit = new Unit(BaseUnitType.Airborne);
 
             unit.Location = board[1, 1];
 

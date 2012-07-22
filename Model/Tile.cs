@@ -14,11 +14,19 @@ namespace Model
         public int Y { get { return Location.Y; } }
         public TerrainType BaseTerrainType;
 
+        public Tile()
+        { }
+
         public Tile(int id, int x, int y, TerrainType terrainType)
         {
             Id = id;
             Location = new Point(x, y);
             BaseTerrainType = terrainType;
+        }
+
+        public override string ToString()
+        {
+            return Location.ToString();
         }
 
         public IEnumerable<Edge> AdjacentTileEdges

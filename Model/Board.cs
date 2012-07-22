@@ -12,6 +12,7 @@ namespace Model
 
         public int Width;
         public int Height;
+        public List<Unit> Units;
 
         public Board(string[] tiles, string[] tilesEdges)
         {
@@ -25,6 +26,13 @@ namespace Model
             TileEdges = IntitaliseTileEdges(tilesEdges);
 
             Tiles.ToList().ForEach(x => x.SetAdjacentTiles(this));
+        }
+
+        public static Board LoadBoard(string tileData, string tileEdgesData)
+        {
+            var tileRows = tileData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var tileEdgesRows = tileEdgesData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            return new Board(tileRows, tileEdgesRows);
         }
 
         private List<Edge> IntitaliseTileEdges(string[] tilesEdges)
@@ -59,11 +67,12 @@ namespace Model
             return tiles;
         }
 
-        public static Board LoadBoard(string tileData, string tileEdgesData)
+        public Tile this[int index]
         {
-            var tileRows = tileData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            var tileEdgesRows = tileEdgesData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            return new Board(tileRows, tileEdgesRows);
+            get
+            {
+                return Tiles.Single(x => x.Id == index);
+            }
         }
 
         public Tile this[int x, int y]
@@ -95,6 +104,56 @@ namespace Model
             var tileEdge = tile.AdjacentTileEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
 
             return tileEdge == null ? false : tileEdge.EdgeType == EdgeType.Road;
+        }
+
+        public void ResolveMoves(List<MoveOrder> moveOrders)
+        {
+            var movingUnits = moveOrders.Select(x => x.Unit).ToList();
+            var maxMovementSpeed = movingUnits.Max(x => x.MovementSpeed);
+
+            var unitStepRate = new Dictionary<Unit, int>();
+            movingUnits.ForEach(x => unitStepRate.Add(x, maxMovementSpeed / x.MovementSpeed));
+
+            for (var step = 1; step <= maxMovementSpeed; step++)
+            {
+                MoveUnitsOneStep(moveOrders, unitStepRate, step);
+
+                // Remove conflicting units from move orders
+                var conflictedUnits = DetectConflictedUnits(movingUnits, Units);
+                moveOrders.RemoveAll(x => conflictedUnits.Contains(x.Unit));
+            }
+        }
+
+        public static IEnumerable<Unit> DetectConflictedUnits(List<Unit> movingUnits, List<Unit> allUnits)
+        {
+            var conflictedUnits = new List<Unit>();
+            movingUnits.ForEach(x =>
+            {
+                if (conflictedUnits.Contains(x))
+                    return;
+
+                var conflicted = allUnits.Any(u => u.Owner != x.Owner && u.Location == x.Location && u.BaseUnitType == x.BaseUnitType);
+
+                if (conflicted)
+                {
+                    conflictedUnits.Add(x);
+                }
+            });
+
+            return conflictedUnits;
+        }
+
+        private static void MoveUnitsOneStep(List<MoveOrder> moveOrders, Dictionary<Unit, int> unitStepRate, int step)
+        {
+            foreach (var moveOrder in moveOrders)
+            {
+                if (step % unitStepRate[moveOrder.Unit] == 0)
+                {
+                    var moveIndex = step / unitStepRate[moveOrder.Unit] - 1;
+                    if (moveOrder.Moves.Length > moveIndex)
+                        moveOrder.Unit.Location = moveOrder.Moves[moveIndex];
+                }
+            }
         }
     }
 }

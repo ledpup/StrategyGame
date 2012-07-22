@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace Model
 {
+
+    [Flags]
+    public enum BaseUnitType
+    {
+        Land = 1 << 0,
+        Aquatic = 1 << 1,
+        Airborne = 1 << 2,
+    }
+
     [Flags]
     public enum UnitType
     {
@@ -15,8 +24,8 @@ namespace Model
         Ranged = 1 << 2,
         Siege = 1 << 3,
         Airborne = 1 << 4,
-        Amphibious = 1 << 5,
-        Aquatic = 1 << 6,
+        Aquatic = 1 << 5,
+        Amphibious = 1 << 6,
     }
 
     public struct UnitInitialValues
@@ -26,7 +35,6 @@ namespace Model
             var initialValues = new UnitInitialValues();
 
             initialValues.UnitModifiers = UnitModifier.None;
-            initialValues.MoveOverEdge = EdgeType.Normal;
 
             initialValues.Size = 0.01f;
             initialValues.Quantity = 1f;
@@ -37,8 +45,8 @@ namespace Model
             return initialValues;
         }
 
+        public UnitType UnitType;
         public UnitModifier UnitModifiers;
-        public EdgeType MoveOverEdge;
 
         public float Size;
         public float Quantity;
@@ -65,18 +73,18 @@ namespace Model
         //Undead = 1 << 7,
     }
 
-    public abstract class Unit
+    public class Unit
     {
-        public Unit(UnitType unitType)
-            : this(unitType, UnitInitialValues.DefaultValues())
-        { 
-        }
+        public Unit(BaseUnitType baseUnitType) : this(baseUnitType, UnitInitialValues.DefaultValues())
+        {}
 
-        public Unit(UnitType unitType, UnitInitialValues initialValues)
+        public Unit(BaseUnitType baseUnitType, UnitInitialValues initialValues)
         {
-            UnitType = unitType;
+            BaseUnitType = baseUnitType;
+            InitialValues = initialValues;
+
+            UnitType = initialValues.UnitType;
             UnitModifiers = initialValues.UnitModifiers;
-            MoveOverEdge = initialValues.MoveOverEdge;
             Size = initialValues.Size;
             Quality = initialValues.Quality;
             Quantity = initialValues.Quantity;
@@ -84,9 +92,65 @@ namespace Model
             Morale = initialValues.Morale;
 
             _movementSpeed = initialValues.MovementSpeed;
+
+            switch (BaseUnitType)
+            {
+                case BaseUnitType.Land:
+                    LandUnit();
+                    break;
+                case BaseUnitType.Airborne:
+                    AirborneUnit();
+                    break;
+                case BaseUnitType.Aquatic:
+                    AquaticUnit();
+                    break;
+            }
+
+            switch (UnitType)
+            {
+                case UnitType.Amphibious:
+                    AmphibiousUnit();
+                    break;
+            }
         }
 
+        void LandUnit()
+        {
+            MoveOver = Terrain.All_Land_But_Mountain_And_Lake;
+            MoveOverEdge = EdgeType.Road;
+            StopOn = Terrain.All_Rough_Land;
+            StopOver = Terrain.All_Land_But_Mountain_And_Lake;
+        }
+
+        void AmphibiousUnit()
+        {
+            MoveOver = Terrain.All_Land_But_Mountain;
+            MoveOverEdge = EdgeType.Road | EdgeType.River;
+            StopOn = Terrain.All_Rough_Land ^ TerrainType.Wetland;
+            StopOver = Terrain.All_Land_But_Mountain;
+        }
+
+        void AirborneUnit()
+        {
+            MoveOver = Terrain.All_Terrain;
+            MoveOverEdge = Edge.AllEdges;
+            StopOn = Terrain.Nothing;
+            StopOver = Terrain.All_Land_But_Mountain_And_Lake;
+        }
+
+        void AquaticUnit()
+        {
+            MoveOver = Terrain.All_Water;
+            MoveOverEdge = EdgeType.Normal;
+            StopOn = TerrainType.Reef;
+            StopOver = Terrain.All_Water;
+        }
+
+        public int Id;
+        public UnitInitialValues InitialValues;
+        public Player Owner;
         public Tile Location;
+        public BaseUnitType BaseUnitType;
         public UnitType UnitType;
         public UnitModifier UnitModifiers;
         public TerrainType MoveOver;
@@ -100,6 +164,11 @@ namespace Model
         public float Quality;
         public float Stamina;
         public float Morale;
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
 
         public short MovementSpeed
         {
@@ -194,64 +263,6 @@ namespace Model
             }
 
             return false;
-        }
-    }
-
-
-    public class LandUnit : Unit
-    {
-        public LandUnit(UnitType unitType) : this(unitType, UnitInitialValues.DefaultValues())
-        {}
-
-        public LandUnit(UnitType unitType, UnitInitialValues initialValues)
-            : base(unitType, initialValues)
-        {
-            if (unitType.HasFlag(UnitType.Airborne) || unitType.HasFlag(UnitType.Amphibious) || unitType.HasFlag(UnitType.Aquatic))
-                throw new ArgumentException(string.Format("Unit type '{0}' is not a land unit.", unitType.ToString()), "unitType");
-
-            MoveOver = Terrain.All_Land_But_Mountain_And_Lake;
-            MoveOverEdge = EdgeType.Road;
-            StopOn = Terrain.All_Rough_Land;
-            StopOver = Terrain.All_Land_But_Mountain_And_Lake;
-        }
-    }
-    
-    public class AirborneUnit : Unit
-    {
-        public AirborneUnit()
-            : this(UnitInitialValues.DefaultValues())
-        {}
-
-        public AirborneUnit(UnitInitialValues initialValues)
-            : base(UnitType.Airborne, initialValues)
-        {
-            MoveOver = Terrain.All_Terrain;
-            MoveOverEdge = Edge.AllEdges;
-            StopOn = Terrain.Nothing;
-            StopOver = Terrain.All_Land_But_Mountain_And_Lake;
-        }
-    }
-
-    public class AmphibiousUnit : Unit
-    {
-        public AmphibiousUnit()
-            : base(UnitType.Amphibious, UnitInitialValues.DefaultValues())
-        {
-            MoveOver = Terrain.All_Land_But_Mountain;
-            MoveOverEdge = EdgeType.Road | EdgeType.River;
-            StopOn = Terrain.All_Rough_Land ^ TerrainType.Wetland;
-            StopOver = Terrain.All_Land_But_Mountain;
-        }
-    }
-
-    public class AquaticUnit : Unit
-    {
-        public AquaticUnit(UnitInitialValues initialValues)
-            : base(UnitType.Aquatic, initialValues)
-        {
-            MoveOver = Terrain.All_Water;
-            StopOn = TerrainType.Reef;
-            StopOver = Terrain.All_Water;
         }
     }
 }

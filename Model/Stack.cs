@@ -15,26 +15,26 @@ namespace Model
             Units = units;
         }
 
-        public bool CanTransport(UnitType transportUnitType)
+        public bool CanTransport(BaseUnitType transportUnitType)
         {
-            if (!transportUnitType.HasFlag(UnitType.Airborne) && !transportUnitType.HasFlag(UnitType.Aquatic))
+            if (transportUnitType.HasFlag(BaseUnitType.Land))
                 throw new Exception("Transportation can only be undertaken by airborne or aquatic units.");
 
-            var transporterSize = Units.Where(x => x.UnitType == transportUnitType).Sum(x => x.TransportSize);
-            var transporteeSize = Units.Where(x => x.UnitType != transportUnitType).Sum(x => x.TransportSize);
+            var transporterSize = Units.Where(x => x.BaseUnitType.HasFlag(transportUnitType)).Sum(x => x.TransportSize);
+            var transporteeSize = Units.Where(x => !x.BaseUnitType.HasFlag(transportUnitType)).Sum(x => x.TransportSize);
             return transporterSize >= transporteeSize;
         }
 
         public UnitType Transporting()
         {
-            if (Units.Any(x => x is AquaticUnit))
+            if (Units.Any(x => x.BaseUnitType == BaseUnitType.Aquatic))
             {
-                if (CanTransport(UnitType.Aquatic))
+                if (CanTransport(BaseUnitType.Aquatic))
                     return UnitType.Aquatic;
             }
-            else if (Units.Any(x => x is AirborneUnit))
+            else if (Units.Any(x => x.BaseUnitType == BaseUnitType.Airborne))
             {
-                if (CanTransport(UnitType.Airborne))
+                if (CanTransport(BaseUnitType.Airborne))
                     return UnitType.Airborne;
             }
             return UnitType.None;

@@ -11,11 +11,23 @@ namespace Model
         public Move(Move previousMove, Tile destination)
         {
             PreviousMove = previousMove;
-            Destination = destination;
-            
+            Destination = destination; 
         }
         public Move PreviousMove;
         public Tile Destination;
+
+        public Tile[] Moves()
+        {
+            var moves = new List<Tile>();
+            var move = this;
+            while (move != null)
+            {
+                moves.Add(move.Destination);
+                move = move.PreviousMove;
+            }
+            moves.Reverse();
+            return moves.ToArray();
+        }
 
         public static bool IsAllOnRoad(Move move)
         {
@@ -31,5 +43,7 @@ namespace Model
             }
             return true;
         }
+
+        
     }
 }

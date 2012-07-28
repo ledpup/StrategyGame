@@ -114,6 +114,8 @@ namespace Model
             }
         }
 
+        public static Func<Unit, Unit, bool> IsConflict = (p, o) => p.Player != o.Player && p.Location == o.Location && p.BaseUnitType == o.BaseUnitType;
+
         void LandUnit()
         {
             MoveOver = Terrain.All_Land_But_Mountain_And_Lake;
@@ -148,8 +150,7 @@ namespace Model
 
         public int Id;
         public UnitInitialValues InitialValues;
-        public Player Owner;
-        public Tile Location;
+        public Player Player;
         public BaseUnitType BaseUnitType;
         public UnitType UnitType;
         public UnitModifier UnitModifiers;
@@ -164,6 +165,20 @@ namespace Model
         public float Quality;
         public float Stamina;
         public float Morale;
+
+        public Tile Location 
+        { 
+            get { return _location; } 
+            set 
+            {
+                if (_location != null)
+                    _location.Units.Remove(this);
+
+                _location = value;
+                _location.Units.Add(this);
+            } 
+        }
+        Tile _location;
 
         public override int GetHashCode()
         {
@@ -224,8 +239,6 @@ namespace Model
             
             return moveList;
         }
-
-
 
         private static List<Move> GenerateMoves(Unit unit, List<Move> moveList, List<Move> exploringMoves)
         {

@@ -43,6 +43,7 @@
     <Compile Include="BoardTests.cs" />
     <Compile Include="MoveTests.cs" />
     <Compile Include="StackTests.cs" />
+    <Compile Include="TileTests.cs" />
     <Compile Include="UnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

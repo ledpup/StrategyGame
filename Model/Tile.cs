@@ -13,11 +13,14 @@ namespace Model
         public int X { get { return Location.X; } }
         public int Y { get { return Location.Y; } }
         public TerrainType BaseTerrainType;
+        public List<Unit> Units;
 
         public Tile()
-        { }
+        {
+            Units = new List<Unit>();
+        }
 
-        public Tile(int id, int x, int y, TerrainType terrainType)
+        public Tile(int id, int x, int y, TerrainType terrainType) : this()
         {
             Id = id;
             Location = new Point(x, y);
@@ -175,6 +178,17 @@ namespace Model
         //}
 
 
-        
+        static Func<Unit, Unit, bool> IsConflictFunc = (p, o) => p.Player != o.Player && p.BaseUnitType == o.BaseUnitType;
+
+        public bool IsConflict
+        {
+            get
+            {
+                foreach (var unit in Units)
+                    if (Units.Where(x => x != unit).Any(x => IsConflictFunc(x, unit)))
+                        return true;
+                return false;
+            }
+        }
     }
 }

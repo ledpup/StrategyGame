@@ -13,6 +13,7 @@ namespace Model
         public int Width;
         public int Height;
         public List<Unit> Units;
+        public Dictionary<int, List<MoveOrder>> MoveOrders;
 
         public Board(string[] tiles, string[] tilesEdges)
         {
@@ -26,6 +27,8 @@ namespace Model
             TileEdges = IntitaliseTileEdges(tilesEdges);
 
             Tiles.ToList().ForEach(x => x.SetAdjacentTiles(this));
+
+            MoveOrders = new Dictionary<int, List<MoveOrder>>();
         }
 
         public static Board LoadBoard(string tileData, string tileEdgesData)
@@ -106,8 +109,13 @@ namespace Model
             return tileEdge == null ? false : tileEdge.EdgeType == EdgeType.Road;
         }
 
-        public void ResolveMoves(List<MoveOrder> moveOrders)
+        public void ResolveMoves(int turn, List<MoveOrder> moveOrders)
         {
+            MoveOrders[turn] = moveOrders;
+
+            if (moveOrders.Any(x => x.Turn != turn))
+                throw new Exception(string.Format("Move order is not for the current turn ({0}).", turn));
+
             var movingUnits = moveOrders.Select(x => x.Unit).ToList();
             var maxMovementSpeed = movingUnits.Max(x => x.MovementSpeed);
 
@@ -124,17 +132,15 @@ namespace Model
             }
         }
 
-        public static IEnumerable<Unit> DetectConflictedUnits(List<Unit> movingUnits, List<Unit> allUnits)
+        public static IEnumerable<Unit> DetectConflictedUnits(List<Unit> setOfUnits, List<Unit> allUnits)
         {
             var conflictedUnits = new List<Unit>();
-            movingUnits.ForEach(x =>
+            setOfUnits.ForEach(x =>
             {
                 if (conflictedUnits.Contains(x))
                     return;
 
-                var conflicted = allUnits.Any(u => u.Owner != x.Owner && u.Location == x.Location && u.BaseUnitType == x.BaseUnitType);
-
-                if (conflicted)
+                if (allUnits.Any(u => Unit.IsConflict(u, x)))
                 {
                     conflictedUnits.Add(x);
                 }
@@ -154,6 +160,18 @@ namespace Model
                         moveOrder.Unit.Location = moveOrder.Moves[moveIndex];
                 }
             }
+        }
+
+        public List<Battle> ConductBattles()
+        {
+            var battles = new List<Battle>();
+            Tiles.ToList().ForEach(x =>
+            {
+                if (x.IsConflict)
+                    battles.Add(new Battle());
+            });
+
+            return battles;
         }
     }
 }

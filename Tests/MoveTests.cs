@@ -11,13 +11,10 @@ namespace Tests
     [TestClass]
     public class MoveTests
     {
-        public string TileEdges = "19,20,Road\r\n20,38,Road";
-
-
-
+        public static string TileEdges = "19,20,Road\r\n20,38,Road";
 
         [TestMethod]
-        public void dkjsh()
+        public void IsAllOnRoad()
         {
             var board = Board.LoadBoard(BoardTests.GameBoard, TileEdges);
 
@@ -65,11 +62,11 @@ namespace Tests
 
             var moveOrders = new List<MoveOrder> 
             { 
-                new MoveOrder { Turn = 0, Moves = move3.Moves(), Unit = board.Units[0] },
-                new MoveOrder { Turn = 0, Moves = move2.Moves(), Unit = board.Units[1] },
+                new MoveOrder { Moves = move3.Moves(), Unit = board.Units[0] },
+                new MoveOrder { Moves = move2.Moves(), Unit = board.Units[1] },
             };
 
-            board.ResolveMoves(moveOrders);
+            board.ResolveMoves(0, moveOrders);
 
             Assert.AreEqual(board[3, 2], board.Units[0].Location);
             Assert.AreEqual(board[2, 2], board.Units[1].Location);
@@ -78,6 +75,14 @@ namespace Tests
         [TestMethod]
         public void ResolveMove_ConflictArrises_ConflictedUnitsStop()
         {
+            var board = UnitsMoveIntoConflict();
+
+            Assert.AreEqual(board[2, 2], board.Units[0].Location);
+            Assert.AreEqual(board[2, 2], board.Units[1].Location);
+        }
+
+        public static Board UnitsMoveIntoConflict()
+        {
             var board = Board.LoadBoard(BoardTests.GameBoard, TileEdges);
 
             var init1 = UnitInitialValues.DefaultValues();
@@ -85,8 +90,8 @@ namespace Tests
 
             board.Units = new List<Unit>
             { 
-                new Unit(BaseUnitType.Land, init1) { Id = 0, Owner = new Player(), Location = board[1, 1] }, 
-                new Unit(BaseUnitType.Land) { Id = 1, Owner = new Player(), Location = board[2, 3] },
+                new Unit(BaseUnitType.Land, init1) { Id = 0, Player = new Player(), Location = board[1, 1] }, 
+                new Unit(BaseUnitType.Land) { Id = 1, Player = new Player(), Location = board[2, 3] },
             };
 
             var move1 = new Move(null, board[1, 2]);
@@ -102,10 +107,8 @@ namespace Tests
                 new MoveOrder { Moves = move5.Moves(), Unit = board.Units[1] },
             };
 
-            board.ResolveMoves(moveOrders);
-
-            Assert.AreEqual(board[2, 2], board.Units[0].Location);
-            Assert.AreEqual(board[2, 2], board.Units[1].Location);
+            board.ResolveMoves(0, moveOrders);
+            return board;
         }
 
         [TestMethod]
@@ -116,9 +119,9 @@ namespace Tests
             
             var units = new List<Unit> 
             { 
-                            new Unit(BaseUnitType.Land) { Owner = player, Location = tile1, }, 
-                            new Unit(BaseUnitType.Land) { Owner = new Player(), Location = tile1, },
-                            new Unit(BaseUnitType.Land) { Owner = player, Location = new Tile(), },
+                            new Unit(BaseUnitType.Land) { Player = player, Location = tile1, }, 
+                            new Unit(BaseUnitType.Land) { Player = new Player(), Location = tile1, },
+                            new Unit(BaseUnitType.Land) { Player = player, Location = new Tile(), },
             };
 
             var movingUnits = new List<Unit> 
@@ -131,6 +134,5 @@ namespace Tests
 
             Assert.AreEqual(1, conflictedUnits.Count());
         }
-
     }
 }

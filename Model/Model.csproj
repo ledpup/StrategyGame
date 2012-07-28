@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Battle.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="MoveOrder.cs" />
     <Compile Include="Move.cs" />

@@ -41,6 +41,11 @@
   <ItemGroup>
     <Compile Include="Battle.cs" />
     <Compile Include="Board.cs" />
+    <Compile Include="AffectUnitCommand.cs" />
+    <Compile Include="ChangeStaminaCommand.cs" />
+    <Compile Include="ChangeQuantityCommand.cs" />
+    <Compile Include="ChangeMoraleCommand.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="MoveOrder.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="MoveOrderDto.cs" />

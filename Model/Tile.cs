@@ -12,7 +12,7 @@ namespace Model
         public Point Location { get; private set; }
         public int X { get { return Location.X; } }
         public int Y { get { return Location.Y; } }
-        public TerrainType BaseTerrainType;
+        public TerrainType TerrainType;
         public List<Unit> Units;
 
         public Tile()
@@ -24,7 +24,7 @@ namespace Model
         {
             Id = id;
             Location = new Point(x, y);
-            BaseTerrainType = terrainType;
+            TerrainType = terrainType;
         }
 
         public override string ToString()
@@ -87,10 +87,10 @@ namespace Model
 
                 _isCoastalDiscovered = true;
 
-                _isCoastal = Terrain.All_Land.HasFlag(BaseTerrainType) && AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType));
+                _isCoastal = Terrain.All_Land.HasFlag(TerrainType) && AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.TerrainType));
 
                 if (_isCoastal)
-                    BaseTerrainType |= TerrainType.Coastal;
+                    TerrainType |= TerrainType.Coastal;
 
                 return _isCoastal;
             }

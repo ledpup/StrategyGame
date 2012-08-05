@@ -37,7 +37,8 @@ namespace Model
             initialValues.UnitModifiers = UnitModifier.None;
 
             initialValues.Size = 0.01f;
-            initialValues.Quantity = 1f;
+            initialValues.Quality = 0.01f;
+            initialValues.Quantity = 500;
             initialValues.Stamina = 1f;
             initialValues.Morale = 1f;
             initialValues.MovementSpeed = 2;
@@ -49,13 +50,14 @@ namespace Model
         public UnitModifier UnitModifiers;
 
         public float Size;
-        public float Quantity;
+        public short Quantity;
         public float Quality;
         public float Stamina;
         public float Morale;
         public short MovementSpeed;
 
         public static UnitModifier Undead = UnitModifier.NoStamina | UnitModifier.NoMorale;
+        public TerrainType TerrainCombatBonus;
         //public static UnitModifier Airborne = UnitModifier.CanCrossRivers;
         //public static UnitModifier Amphibious = UnitModifier.CanUseRoads | UnitModifier.CanCrossRivers;
         //public static UnitModifier LandUnit = UnitModifier.CanUseRoads;
@@ -85,6 +87,7 @@ namespace Model
 
             UnitType = initialValues.UnitType;
             UnitModifiers = initialValues.UnitModifiers;
+            TerrainCombatBonus = initialValues.TerrainCombatBonus;
             Size = initialValues.Size;
             Quality = initialValues.Quality;
             Quantity = initialValues.Quantity;
@@ -114,7 +117,7 @@ namespace Model
             }
         }
 
-        public static Func<Unit, Unit, bool> IsConflict = (p, o) => p.Player != o.Player && p.Location == o.Location && p.BaseUnitType == o.BaseUnitType;
+        public static Func<Unit, Unit, bool> IsConflict = (p, o) => p.Player != o.Player && p.Tile == o.Tile && p.BaseUnitType == o.BaseUnitType;
 
         void LandUnit()
         {
@@ -161,24 +164,24 @@ namespace Model
         public EdgeType MoveOverEdge;
 
         public float Size;
-        public float Quantity;
+        public short Quantity;
         public float Quality;
         public float Stamina;
         public float Morale;
 
-        public Tile Location 
+        public Tile Tile 
         { 
-            get { return _location; } 
+            get { return _tile; } 
             set 
             {
-                if (_location != null)
-                    _location.Units.Remove(this);
+                if (_tile != null)
+                    _tile.Units.Remove(this);
 
-                _location = value;
-                _location.Units.Add(this);
+                _tile = value;
+                _tile.Units.Add(this);
             } 
         }
-        Tile _location;
+        Tile _tile;
 
         public override int GetHashCode()
         {
@@ -199,11 +202,24 @@ namespace Model
 
         public bool IsTransporter;
 
+        public float BaseCombatStrength
+        {
+            get
+            {
+                return Quality * Quantity * Stamina * Morale;
+            }
+        }
+
         public float CombatStrength
         {
             get 
             {
-                return Quality * Quantity * Stamina * Morale;
+                var baseStrength = BaseCombatStrength;
+                
+                if (TerrainCombatBonus.HasFlag(Tile.TerrainType))
+                    return baseStrength * 2f;
+                
+                return baseStrength;
             }
         }
 
@@ -212,18 +228,23 @@ namespace Model
             get { return Quantity * Size; }
         }
 
+        public bool IsAlive
+        {
+            get { return (float)Quantity / InitialValues.Quantity > .1f; }
+        }
+
         public static IEnumerable<Move> MoveList(Unit unit)
         {
             var moveList = new List<Move>();
-            var exploringMoves = new List<Move> { new Move(null, unit.Location) };
+            var exploringMoves = new List<Move> { new Move(null, unit.Tile) };
             var move = 0;
 
             while (move < unit.MovementSpeed)
             {
                 var moves = GenerateMoves(unit, moveList, exploringMoves);
-                var validMoves = moves.Where(x => unit.StopOver.HasFlag(x.Destination.BaseTerrainType)).ToList();
+                var validMoves = moves.Where(x => unit.StopOver.HasFlag(x.Destination.TerrainType)).ToList();
                 moveList.AddRange(validMoves);
-                exploringMoves = moves.Where(x => !unit.StopOn.HasFlag(x.Destination.BaseTerrainType) || Move.IsAllOnRoad(x)).ToList();
+                exploringMoves = moves.Where(x => !unit.StopOn.HasFlag(x.Destination.TerrainType) || Move.IsAllOnRoad(x)).ToList();
 
                 move++;
             }
@@ -233,7 +254,7 @@ namespace Model
             {
                 var roadsToExplore = exploringMoves.Where(x => Move.IsAllOnRoad(x)).ToList();
                 var roadMoves = GenerateMoves(unit, moveList, roadsToExplore);
-                var validRoadMoves = roadMoves.Where(x => unit.StopOver.HasFlag(x.Destination.BaseTerrainType) && Move.IsAllOnRoad(x)).ToList();
+                var validRoadMoves = roadMoves.Where(x => unit.StopOver.HasFlag(x.Destination.TerrainType) && Move.IsAllOnRoad(x)).ToList();
                 moveList.AddRange(validRoadMoves);
             }
             
@@ -248,7 +269,7 @@ namespace Model
             {
                 var origin = exploringMove.Destination;
 
-                var destinations = origin.AdjacentTiles.Where(dest => dest != unit.Location
+                var destinations = origin.AdjacentTiles.Where(dest => dest != unit.Tile
                                         && !potentialMoves.Any(x => x.Destination == dest)
                                         && !moveList.Any(x => x.Destination == dest)
                                         && CanCrossEdge(unit.MoveOverEdge, origin, dest)).ToList();
@@ -256,7 +277,7 @@ namespace Model
                 destinations.ForEach(dest => potentialMoves.Add(new Move(exploringMove, dest)));
             }
 
-            return potentialMoves.Where(x => unit.MoveOver.HasFlag(x.Destination.BaseTerrainType)).ToList();
+            return potentialMoves.Where(x => unit.MoveOver.HasFlag(x.Destination.TerrainType)).ToList();
         }
 
         private static bool CanCrossEdge(EdgeType moveOverEdge, Tile tile, Tile adjacentTile)

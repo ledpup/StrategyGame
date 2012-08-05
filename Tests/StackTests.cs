@@ -51,7 +51,7 @@ namespace Tests
                 new Unit(BaseUnitType.Land),
                 new Unit(BaseUnitType.Land),
             };
-            units.ForEach(x => x.Location = board[1, 1]);
+            units.ForEach(x => x.Tile = board[1, 1]);
 
 
             var stack = new Stack(units);
@@ -73,7 +73,7 @@ namespace Tests
                 new Unit(BaseUnitType.Land),
                 new Unit(BaseUnitType.Airborne),
             };
-            units.ForEach(x => x.Location = board[1, 1]);
+            units.ForEach(x => x.Tile = board[1, 1]);
 
             var stack = new Stack(units);
 
@@ -82,7 +82,7 @@ namespace Tests
             var moveList = stack.MoveList().ToList();
 
             Assert.AreEqual(6, moveList.Count);
-            moveList.ForEach(x => Assert.IsFalse(x.Destination.BaseTerrainType.HasFlag(Terrain.All_Water)));
+            moveList.ForEach(x => Assert.IsFalse(x.Destination.TerrainType.HasFlag(Terrain.All_Water)));
         }
     }
 }

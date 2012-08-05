@@ -68,8 +68,8 @@ namespace Tests
 
             board.ResolveMoves(0, moveOrders);
 
-            Assert.AreEqual(board[3, 2], board.Units[0].Location);
-            Assert.AreEqual(board[2, 2], board.Units[1].Location);
+            Assert.AreEqual(board[3, 2], board.Units[0].Tile);
+            Assert.AreEqual(board[2, 2], board.Units[1].Tile);
         }
 
         [TestMethod]
@@ -77,8 +77,8 @@ namespace Tests
         {
             var board = UnitsMoveIntoConflict();
 
-            Assert.AreEqual(board[2, 2], board.Units[0].Location);
-            Assert.AreEqual(board[2, 2], board.Units[1].Location);
+            Assert.AreEqual(board[2, 2], board.Units[0].Tile);
+            Assert.AreEqual(board[2, 2], board.Units[1].Tile);
         }
 
         public static Board UnitsMoveIntoConflict()
@@ -86,12 +86,14 @@ namespace Tests
             var board = Board.LoadBoard(BoardTests.GameBoard, TileEdges);
 
             var init1 = UnitInitialValues.DefaultValues();
+            init1.TerrainCombatBonus = TerrainType.Forest;
+            init1.Quantity = 400;
             init1.MovementSpeed = 5;
 
             board.Units = new List<Unit>
             { 
-                new Unit(BaseUnitType.Land, init1) { Id = 0, Player = new Player(), Location = board[1, 1] }, 
-                new Unit(BaseUnitType.Land) { Id = 1, Player = new Player(), Location = board[2, 3] },
+                new Unit(BaseUnitType.Land, init1) { Id = 0, Player = new Player(), Tile = board[1, 1] }, 
+                new Unit(BaseUnitType.Land) { Id = 1, Player = new Player(), Tile = board[2, 3] },
             };
 
             var move1 = new Move(null, board[1, 2]);
@@ -119,9 +121,9 @@ namespace Tests
             
             var units = new List<Unit> 
             { 
-                            new Unit(BaseUnitType.Land) { Player = player, Location = tile1, }, 
-                            new Unit(BaseUnitType.Land) { Player = new Player(), Location = tile1, },
-                            new Unit(BaseUnitType.Land) { Player = player, Location = new Tile(), },
+                            new Unit(BaseUnitType.Land) { Player = player, Tile = tile1, }, 
+                            new Unit(BaseUnitType.Land) { Player = new Player(), Tile = tile1, },
+                            new Unit(BaseUnitType.Land) { Player = player, Tile = new Tile(), },
             };
 
             var movingUnits = new List<Unit> 

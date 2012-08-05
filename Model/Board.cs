@@ -157,7 +157,7 @@ namespace Model
                 {
                     var moveIndex = step / unitStepRate[moveOrder.Unit] - 1;
                     if (moveOrder.Moves.Length > moveIndex)
-                        moveOrder.Unit.Location = moveOrder.Moves[moveIndex];
+                        moveOrder.Unit.Tile = moveOrder.Moves[moveIndex];
                 }
             }
         }
@@ -168,7 +168,15 @@ namespace Model
             Tiles.ToList().ForEach(x =>
             {
                 if (x.IsConflict)
-                    battles.Add(new Battle());
+                    battles.Add(new Battle(x.Units));
+            });
+
+            battles.ForEach(x => 
+            {
+                x.AssignCasulties();
+                x.ReduceMorale();
+                x.ReduceStamina();
+                x.Events.ForEach(e => e.Execute());
             });
 
             return battles;

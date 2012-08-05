@@ -70,14 +70,14 @@ namespace Tests
 
             var unit = new Unit(BaseUnitType.Land);
 
-            unit.Location = board[1, 1];
+            unit.Tile = board[1, 1];
 
             var moveList = Unit.MoveList(unit);
 
             Assert.AreEqual(4, moveList.Count());
 
-            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.BaseTerrainType)));
-            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.Destination.BaseTerrainType)));
+            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.TerrainType)));
+            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.Destination.TerrainType)));
 
             moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
 
@@ -94,7 +94,7 @@ namespace Tests
 
             var unit = new Unit(BaseUnitType.Airborne);
 
-            unit.Location = board[1, 1];
+            unit.Tile = board[1, 1];
 
             var moveList = Unit.MoveList(unit);
 

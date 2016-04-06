@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Model;
+using GameModel;
 
 namespace Tests
 {
@@ -16,87 +16,60 @@ namespace Tests
         {
             Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Desert));
             Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Hill));
+            Assert.IsTrue(Terrain.Aquatic_Terrain.HasFlag(TerrainType.Coastal));
 
-            Assert.IsFalse(Terrain.All_Land_But_Mountain.HasFlag(TerrainType.Mountain));
+            Assert.IsTrue(!Terrain.Non_Mountainous_Land.HasFlag(TerrainType.Mountain));
         }
 
         [TestMethod]
         public void NewUnit_Airborne_HasCorrectMovement()
         {
-            var airborneUnit = new Unit(BaseUnitType.Airborne);
+            var airborneUnit = new MilitaryUnit() { MovementType = MovementType.Airborne };
 
-            Assert.IsTrue(airborneUnit.MoveOver.HasFlag(TerrainType.Forest));
-            Assert.IsTrue(airborneUnit.MoveOver.HasFlag(TerrainType.Lake));
-            Assert.IsTrue(airborneUnit.MoveOver.HasFlag(TerrainType.Reef));
+            Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Forest));
+            Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Water));
+            Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Reef));
 
-            Assert.IsFalse(airborneUnit.StopOn.HasFlag(TerrainType.Coastal));
+            Assert.IsFalse(airborneUnit.MayStopOn.HasFlag(TerrainType.Water));
+            Assert.IsFalse(airborneUnit.MayStopOn.HasFlag(TerrainType.Mountain));
 
-            Assert.IsFalse(airborneUnit.StopOver.HasFlag(TerrainType.Lake));
-            Assert.IsFalse(airborneUnit.StopOver.HasFlag(TerrainType.Mountain));
-            Assert.IsTrue(airborneUnit.StopOver.HasFlag(TerrainType.Forest));
+            Assert.IsTrue(airborneUnit.MayStopOn.HasFlag(TerrainType.Forest));
         }
-
-        [TestMethod]
-        public void MovementSpeed_FatiguedLandUnit_CantMove()
-        {
-            var initialValues = new UnitInitialValues { MovementSpeed = 3, };
-
-            var unit = new Unit(BaseUnitType.Land, initialValues);
-            unit.Stamina = 0;
-            Assert.AreEqual(0, unit.MovementSpeed);
-            unit.Stamina = 1;
-            Assert.AreEqual(3, unit.MovementSpeed);
-        }
-
-        [TestMethod]
-        public void MovementSpeed_UndeadUnit_CanMove()
-        {
-            var initialValues = new UnitInitialValues
-            { 
-                UnitModifiers = UnitInitialValues.Undead,
-                MovementSpeed = 3 
-            };
-
-            var unit = new Unit(BaseUnitType.Land, initialValues);
-                        
-            Assert.AreEqual(3, unit.MovementSpeed);
-        }
-
 
         [TestMethod]
         public void UnitMoveList_LandUnit_ThreeMovesOnCorrectTerrain()
         {
-            var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new Unit(BaseUnitType.Land);
+            var unit = new MilitaryUnit();
 
             unit.Tile = board[1, 1];
 
-            var moveList = Unit.MoveList(unit);
+            var moveList = MilitaryUnit.MoveList(unit);
 
             Assert.AreEqual(4, moveList.Count());
 
-            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.TerrainType)));
-            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.Destination.TerrainType)));
+            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.Aquatic_Terrain.HasFlag(x.TerrainType)));
+            Assert.IsFalse(moveList.Any(x => Terrain.Water_Terrain.HasFlag(x.Destination.TerrainType)));
 
             moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
 
             Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
-                Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 2]));
-                    Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
             Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 1]));
         }
 
         [TestMethod]
         public void UnitMoveList_AirborneUnit_SixMovesOnCorrectTerrain()
         {
-            var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new Unit(BaseUnitType.Airborne);
+            var unit = new MilitaryUnit() { MovementType = MovementType.Airborne };
 
             unit.Tile = board[1, 1];
 
-            var moveList = Unit.MoveList(unit);
+            var moveList = MilitaryUnit.MoveList(unit);
 
             Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 3]));

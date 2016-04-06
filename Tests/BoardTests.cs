@@ -4,20 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Model;
+using GameModel;
+using System.IO;
+using NLog;
 
 namespace Tests
 {
     [TestClass]
     public class BoardTests
     {
-        public static string GameBoard = "SSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSFFGGGDDSSFFGGGDDSSFFGGGDDS\r\nSGFGMHGDSSGGGMHGDSSGGGMHGDS\r\nSGMMGGDDSSGMMGGDDSSGMMGGDDS\r\nSMGGLLGGSSMGGLLGGSSMGGLLGGS\r\nSSSFFWGGSSSSFFWGGSSSSFFWGGS\r\nSGMSFWGGSSGMSFWGGSSGMSFWGGS\r\nSGRRSGSGSSGSSSGSGSSGSSSGSGS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS\r\nSFFGGGDDSSFFGGGDDSSFFGGGDDS\r\nSGGGMHGDSSGGGMHGDSSGGGMHGDS\r\nSGMMGGDDSSGMMGGDDSSGMMGGDDS\r\nSMGGLLGGSSMGGLLGGSSMGGLLGGS\r\nSSSFFWGGSSSSFFWGGSSSSFFWGGS\r\nSGMSFWGGSSGMSFWGGSSGMSFWGGS\r\nSGSSSGSGSSGSSSGSGSSGSSSGSGS\r\nSSSSSSSSSSSSSSSSSSSSSSSSSSS";
-        public static string TileEdges = "20,21,River\r\n19,20,Road\r\n20,38,Road\r\n38,56,Road";
+        public static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
+        public static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
 
         [TestMethod]
         public void LoadBoard_AdjacentTilesAndCoastal_NoNullTilesAndCoasts()
         {
-            var board = Board.LoadBoard(GameBoard, TileEdges);
+            var board = new Board(GameBoard, TileEdges);
 
             var tiles = board.Tiles.ToList();
 
@@ -29,6 +31,24 @@ namespace Tests
             // Ensure that some tiles are coastal.
             var coastal = tiles.Count(t => t.IsCoastal);
             Assert.AreNotEqual(0, coastal);
+
+            Assert.IsTrue(!board[9, 9].IsCoastal);
+        }
+
+        [TestMethod]
+        public void IsSeaTest()
+        {
+            var board = new Board(GameBoard, TileEdges);
+
+            Assert.IsTrue(board[9, 9].IsSea);
+        }
+
+        [TestMethod]
+        public void IsLakeTest()
+        {
+            var board = new Board(GameBoard, TileEdges);
+
+            Assert.IsTrue(board[14, 4].IsLake);
         }
     }
 }

@@ -4,19 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Model;
+using GameModel;
 
 namespace Tests
 {
     [TestClass]
     public class MoveTests
     {
-        public static string TileEdges = "19,20,Road\r\n20,38,Road";
-
         [TestMethod]
         public void IsAllOnRoad()
         {
-            var board = Board.LoadBoard(BoardTests.GameBoard, TileEdges);
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
             var move1 = new Move(null, board[1, 2]);
             var move2 = new Move(move1, board[2, 2]);
@@ -29,7 +27,7 @@ namespace Tests
         [TestMethod]
         public void Moves()
         {
-            var board = Board.LoadBoard(BoardTests.GameBoard, TileEdges);
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
             var move1 = new Move(null, board[1, 2]);
             var move2 = new Move(move1, board[2, 2]);
@@ -45,15 +43,12 @@ namespace Tests
         [TestMethod]
         public void ResolveMove()
         {
-            var board = Board.LoadBoard(BoardTests.GameBoard, TileEdges);
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var init = UnitInitialValues.DefaultValues();
-            init.MovementSpeed = 5;
-
-            board.Units = new List<Unit>
+            board.Units = new List<MilitaryUnit>
             { 
-                new Unit(BaseUnitType.Land, init),
-                new Unit(BaseUnitType.Land),
+                new MilitaryUnit() { BaseMovementPoints = 5 },
+                new MilitaryUnit(),
             };
 
             var move1 = new Move(null, board[1, 2]);
@@ -83,17 +78,12 @@ namespace Tests
 
         public static Board UnitsMoveIntoConflict()
         {
-            var board = Board.LoadBoard(BoardTests.GameBoard, TileEdges);
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var init1 = UnitInitialValues.DefaultValues();
-            init1.TerrainCombatBonus = TerrainType.Forest;
-            init1.Quantity = 400;
-            init1.MovementSpeed = 5;
-
-            board.Units = new List<Unit>
+            board.Units = new List<MilitaryUnit>
             { 
-                new Unit(BaseUnitType.Land, init1) { Id = 0, Player = new Player(), Tile = board[1, 1] }, 
-                new Unit(BaseUnitType.Land) { Id = 1, Player = new Player(), Tile = board[2, 3] },
+                new MilitaryUnit() { BaseMovementPoints = 5, Tile = board[1, 1] }, 
+                new MilitaryUnit() { OwnerId = 2, Tile = board[2, 3] },
             };
 
             var move1 = new Move(null, board[1, 2]);
@@ -116,17 +106,17 @@ namespace Tests
         [TestMethod]
         public void ConflictTest()
         {
-            var player = new Player();
-            var tile1 = new Tile();
-            
-            var units = new List<Unit> 
+            var tile1 = new Tile(1, 1, 1);
+            var tile2 = new Tile(2, 1, 2);
+
+            var units = new List<MilitaryUnit> 
             { 
-                            new Unit(BaseUnitType.Land) { Player = player, Tile = tile1, }, 
-                            new Unit(BaseUnitType.Land) { Player = new Player(), Tile = tile1, },
-                            new Unit(BaseUnitType.Land) { Player = player, Tile = new Tile(), },
+                            new MilitaryUnit() { Tile = tile1, }, 
+                            new MilitaryUnit() { OwnerId = 2, Tile = tile1, },
+                            new MilitaryUnit() { Tile = tile2, },
             };
 
-            var movingUnits = new List<Unit> 
+            var movingUnits = new List<MilitaryUnit> 
             {
                 units[0],
                 units[2],

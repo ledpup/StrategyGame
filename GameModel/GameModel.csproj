@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E14BF1B2-2E57-42DB-A316-A4442EB301CA}</ProjectGuid>
+    <ProjectGuid>{4C5F1B73-0737-4624-8E1C-F6F180067D88}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tests</RootNamespace>
-    <AssemblyName>Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>GameModel</RootNamespace>
+    <AssemblyName>GameModel</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -31,7 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
@@ -45,45 +44,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoardTests.cs" />
-    <Compile Include="MoveTests.cs" />
-    <Compile Include="VisualiseTests.cs" />
-    <Compile Include="PathFindTests.cs" />
-    <Compile Include="StackTests.cs" />
-    <Compile Include="TileTests.cs" />
-    <Compile Include="UnitTests.cs" />
+    <Compile Include="BattleReport.cs" />
+    <Compile Include="Board.cs" />
+    <Compile Include="CasualtyLogEntry.cs" />
+    <Compile Include="CombatantInBattle.cs" />
+    <Compile Include="MoraleChangeEvent.cs" />
+    <Compile Include="MoveOrder.cs" />
+    <Compile Include="Move.cs" />
+    <Compile Include="MoveOrderDto.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="QuantityChangeEvent.cs" />
+    <Compile Include="PathFindTile.cs" />
+    <Compile Include="Stack.cs" />
+    <Compile Include="Terrain.cs" />
+    <Compile Include="Tile.cs" />
+    <Compile Include="Edge.cs" />
+    <Compile Include="MilitaryUnit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GameModel\GameModel.csproj">
-      <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
-      <Name>GameModel</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PathFind\PathFind.csproj">
       <Project>{2caef444-6049-4d0e-b492-d3fe21800ea4}</Project>
       <Name>PathFind</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Visualise\Visualise.csproj">
-      <Project>{922935d8-0781-4c27-8019-10d84c6797a0}</Project>
-      <Name>Visualise</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="BasicBoard.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BasicBoardEdges.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NLog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

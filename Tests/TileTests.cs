@@ -18,7 +18,6 @@ namespace Tests
             var battles = board.ConductBattles();
 
             Assert.AreEqual(1, battles.Count());
-            Assert.AreEqual(6, battles[0].Events.Count);
         }
     }
 }

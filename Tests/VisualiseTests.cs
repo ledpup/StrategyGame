@@ -42,7 +42,16 @@ namespace Tests
 
             vectors.AddRange(FindPath(pathFindTiles, new Point(10, 3), new Point(13, 6)));
 
-            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board, vectors);
+            var labels = new string[board.Width, board.Height];
+            for (var x = 0; x < board.Width; x++)
+            {
+                for (var y = 0; y < board.Height; y++)
+                {
+                    labels[x, y] = board[x, y].Id.ToString();
+                }
+            }
+
+            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board, labels, vectors);
         }
 
         private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)

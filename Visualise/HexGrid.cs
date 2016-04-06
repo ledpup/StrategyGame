@@ -16,7 +16,7 @@ namespace Visualise
 
 
 
-        public static void DrawLine(Graphics graphics, GameModel.Point origin, GameModel.Point destination, Pen pen, int boardWidth, BaseEdgeType baseEdgeType)
+        public static void DrawLine(Graphics graphics, GameModel.Point origin, GameModel.Point destination, Pen pen, BaseEdgeType baseEdgeType)
         {
             PointF pt1, pt2;
             if (baseEdgeType == BaseEdgeType.CentreToCentre)
@@ -125,7 +125,7 @@ namespace Visualise
             return new PointF(x, y);
         }
 
-        public static void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours, int boardWidth)
+        public static void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours, string[,] labels)
         {
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
@@ -137,7 +137,7 @@ namespace Visualise
             }
 
             // Draw the grid.
-            DrawHexGrid(graphics, Pens.Black, 0, width, 0, height, HexWidth, HexHeight, boardWidth);
+            DrawHexGrid(graphics, Pens.Black, 0, width, 0, height, HexWidth, HexHeight, labels);
 
             //#if FIG34
             //            // Draw the selected rectangles for Figures 3 and 4.
@@ -151,7 +151,7 @@ namespace Visualise
             //            }
             //#endif
         }
-        private static void DrawHexGrid(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, float hexWidth, float hexHeight, int boardWidth)
+        private static void DrawHexGrid(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, float hexWidth, float hexHeight, string[,] labels)
         {
             var font = new Font("Arial", (int)(HexHeight * .2));
 
@@ -178,16 +178,21 @@ namespace Visualise
                         graphics.DrawPolygon(pen, points);
 
                         // Label the hexagon
-                        using (StringFormat sf = new StringFormat())
+                        if (labels != null)
                         {
-                            sf.Alignment = StringAlignment.Center;
-                            sf.LineAlignment = StringAlignment.Center;
-                            var x = (points[0].X + points[3].X) / 2;
-                            var y = ((points[1].Y + points[4].Y) / 2) - (hexHeight * .15f);
-                            var label = (row * boardWidth + col).ToString();
-                            //var label = "(" + col.ToString() + ", " + row.ToString() + ")";
-
-                            graphics.DrawString(label, font, Brushes.Black, x, y, sf);
+                            using (StringFormat sf = new StringFormat())
+                            {
+                                sf.Alignment = StringAlignment.Center;
+                                sf.LineAlignment = StringAlignment.Center;
+                                var x = (points[0].X + points[3].X) / 2;
+                                var y = ((points[1].Y + points[4].Y) / 2) - (hexHeight * .15f);
+                                
+                                if (col <= labels.GetUpperBound(0) && row <= labels.GetUpperBound(1))
+                                {
+                                    var label = labels[col, row];
+                                    graphics.DrawString(label, font, Brushes.Black, x, y, sf);
+                                }
+                            }
                         }
                     }
                 }

@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="BoardTests.cs" />
     <Compile Include="MoveTests.cs" />
+    <Compile Include="TemperatureTests.cs" />
     <Compile Include="VisualiseTests.cs" />
     <Compile Include="PathFindTests.cs" />
     <Compile Include="StackTests.cs" />

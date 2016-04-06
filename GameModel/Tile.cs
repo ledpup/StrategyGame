@@ -243,5 +243,7 @@ namespace GameModel
         }
 
         public bool IsEdgeOfMap { get; private set; }
+        public double Temperature { get; set; }
+        public int DistanceFromWater { get; internal set; }
     }
 }

@@ -37,6 +37,7 @@ namespace GameModel
 
             InitialiseTiles(Width, Height, tiles);
             CalculateAdjacentTiles();
+            CalculateTileDistanceFromTheSea();
             TileEdges = IntitaliseTileEdges(tilesEdges);
 
             Logger = logger;
@@ -47,7 +48,66 @@ namespace GameModel
 
             MoveOrders = new Dictionary<int, List<MoveOrder>>();
 
+            TerrainTemperatureModifiers = new Dictionary<TerrainType, double>();
+            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
+            {
+                TerrainTemperatureModifiers.Add(terrainType, 0);
+            }
+            TerrainTemperatureModifiers[TerrainType.Mountain] = -10;
+            TerrainTemperatureModifiers[TerrainType.Hill] = -5;
             
+
+            CalculateTemperature();
+        }
+
+        private void CalculateTileDistanceFromTheSea()
+        {
+            Tiles.ToList().ForEach(x =>
+            {
+                var searched = new List<Tile>();
+                x.DistanceFromWater = GetWaterDistanceToSea(x, 0, ref searched);
+            });
+        }
+
+        private int GetWaterDistanceToSea(Tile tile, int distance, ref List<Tile> searched)
+        {
+            searched.Add(tile);
+            if (tile.IsSea)
+            {
+                return distance;
+            }
+            distance += 1;
+            if (tile.AdjacentTiles.Any(x => x.IsSea))
+            {
+                return distance;
+            }
+                      
+            var minDistance = 100;
+            foreach (var neighbour in tile.AdjacentTiles)
+            {
+                if (!searched.Contains(neighbour))
+                {
+                    var result = GetWaterDistanceToSea(neighbour, distance, ref searched);
+                    if (result < minDistance)
+                        minDistance = result;
+                }
+            }
+            return minDistance;
+        }
+
+        public void CalculateTemperature(int turn = 0)
+        {
+            for (var x = 0; x < Width; x++)
+            {
+                for (var y = 0; y < Height; y++)
+                {
+                    var heightProportion = Height / 30D;
+                    const double seasonRate = .5;
+                    const double temperatureShiftPerMonth = 10;
+
+                    this[x, y].Temperature = y * heightProportion + TerrainTemperatureModifiers[this[x, y].TerrainType] - this[x, y].DistanceFromWater + Math.Sin(turn * seasonRate) * temperatureShiftPerMonth;
+                }
+            }
         }
 
         public void CalculateAdjacentTiles()
@@ -163,6 +223,8 @@ namespace GameModel
                 return _tiles1d;
             }
         }
+
+        public Dictionary<TerrainType, double> TerrainTemperatureModifiers { get; private set; }
 
         public static List<Edge> TileEdges;
 

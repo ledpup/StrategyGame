@@ -11,7 +11,7 @@ namespace Visualise
 
     public class Integration
     {
-        public static void DrawHexagonImage(string fileName, Board board, List<Vector> lines = null)
+        public static void DrawHexagonImage(string fileName, Board board, string[,] labels = null, List<Vector> lines = null)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
             board.Tiles.ToList().ForEach(x => hexagonColours.Add(new PointF(x.X, x.Y), GetBrush(x.TerrainType)));
@@ -22,7 +22,8 @@ namespace Visualise
             if (lines != null)
                 vectors.AddRange(lines);
 
-            DrawHexagonImage(fileName, hexagonColours, vectors, board.Width);
+
+            DrawHexagonImage(fileName, hexagonColours, vectors, labels);
         }
 
         private static ArgbColour EdgeToColour(Edge x)
@@ -44,14 +45,14 @@ namespace Visualise
             }
         }
 
-        private static void DrawHexagonImage(string fileName, Dictionary<PointF, Brush> hexagonColours, List<Vector> vectors, int boardWidth, int imageWidth = 1200, int imageHeight = 1000)
+        private static void DrawHexagonImage(string fileName, Dictionary<PointF, Brush> hexagonColours, List<Vector> vectors, string[,] labels, int imageWidth = 1200, int imageHeight = 1000)
         {
             var bitmap = new Bitmap(imageWidth, imageHeight);
             var graphics = Graphics.FromImage(bitmap);
 
-            HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, boardWidth);
+            HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, labels);
 
-            vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road ? 10 : 3), boardWidth, x.BaseEdgeType));
+            vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road ? 10 : 3), x.BaseEdgeType));
 
 
             bitmap.Save(fileName);

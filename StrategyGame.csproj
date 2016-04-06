@@ -7,8 +7,8 @@
     <ProjectGuid>{23513C47-9C45-429F-AD07-854C12E478E9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StrategyWargame2016</RootNamespace>
-    <AssemblyName>StrategyWargame2016</AssemblyName>
+    <RootNamespace>StrategyGame</RootNamespace>
+    <AssemblyName>StrategyGame</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

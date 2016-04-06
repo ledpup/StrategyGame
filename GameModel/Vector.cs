@@ -22,6 +22,7 @@ namespace GameModel
         public Point Origin;
         public Point Destination;
         public BaseEdgeType BaseEdgeType;
+        public EdgeType EdgeType;
         public ArgbColour Colour;
     }
 }

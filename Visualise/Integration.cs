@@ -17,7 +17,7 @@ namespace Visualise
             board.Tiles.ToList().ForEach(x => hexagonColours.Add(new PointF(x.X, x.Y), GetBrush(x.TerrainType)));
 
             var vectors = new List<Vector>();
-            Board.TileEdges.ForEach(x => vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x), x.BaseEdgeType)));
+            Board.TileEdges.ForEach(x => vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x), x.BaseEdgeType) { EdgeType = x.EdgeType }));
 
             if (lines != null)
                 vectors.AddRange(lines);
@@ -45,7 +45,7 @@ namespace Visualise
 
             HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, boardWidth);
 
-            vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), 3), boardWidth, x.BaseEdgeType));
+            vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road ? 10 : 3), boardWidth, x.BaseEdgeType));
 
 
             bitmap.Save(fileName);

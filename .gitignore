@@ -130,6 +130,12 @@ Thumbs.db
 # Folder config file
 Desktop.ini
 
+############
+## Github
+############
+
+/packages/
+!packages/repositories.config
 
 #############
 ## Python

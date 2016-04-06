@@ -101,11 +101,10 @@ namespace GameModel
             {
                 for (var y = 0; y < Height; y++)
                 {
-                    var heightProportion = Height / 30D;
-                    const double seasonRate = .5;
-                    const double temperatureShiftPerMonth = 10;
-
-                    this[x, y].Temperature = y * heightProportion + TerrainTemperatureModifiers[this[x, y].TerrainType] - this[x, y].DistanceFromWater + Math.Sin(turn * seasonRate) * temperatureShiftPerMonth;
+                    const double seasonRate = .3;
+                    const double temperatureShiftPerMonth = 8;
+                    
+                    this[x, y].Temperature = y * .5 + 5 + TerrainTemperatureModifiers[this[x, y].TerrainType] - this[x, y].DistanceFromWater + Math.Sin(turn * seasonRate) * temperatureShiftPerMonth;
                 }
             }
         }

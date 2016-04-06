@@ -11,10 +11,10 @@ namespace Visualise
 
     public class Integration
     {
-        public static void DrawHexagonImage(string fileName, Board board, string[,] labels = null, List<Vector> lines = null)
+        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, string[,] labels = null, List<Vector> lines = null)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
-            board.Tiles.ToList().ForEach(x => hexagonColours.Add(new PointF(x.X, x.Y), GetBrush(x.TerrainType)));
+            tiles.ToList().ForEach(x => hexagonColours.Add(new PointF(x.X, x.Y), GetBrush(x.TerrainType)));
 
             var vectors = new List<Vector>();
             Board.TileEdges.ForEach(x => vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x), x.BaseEdgeType) { EdgeType = x.EdgeType }));

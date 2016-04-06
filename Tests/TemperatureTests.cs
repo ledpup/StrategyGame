@@ -20,10 +20,12 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < 30; i++)
             {
 
                 board.CalculateTemperature(i);
+                var tiles = new List<Tile>();
+                board.Tiles.ToList().ForEach(x => tiles.Add(new Tile(x.Id, x.X, x.Y, x.GetTerrainTypeByTemperature(x.Temperature))));
 
                 var labels = new string[board.Width, board.Height];
                 for (var x = 0; x < board.Width; x++)
@@ -34,7 +36,7 @@ namespace Tests
                     }
                 }
 
-                Visualise.Integration.DrawHexagonImage("BasicBoardTemp" + i + ".png", board, labels);
+                Visualise.Integration.DrawHexagonImage("BasicBoardTemp" + i + ".png", tiles, labels);
             }
         }
     }

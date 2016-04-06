@@ -24,7 +24,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board);
+            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board.Tiles);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace Tests
                 }
             }
 
-            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board, labels, vectors);
+            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board.Tiles, labels, vectors);
         }
 
         private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)

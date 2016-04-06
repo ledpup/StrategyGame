@@ -30,7 +30,7 @@ namespace GameModel
         public override string ToString()
         {
             var subTerrain = IsLake ? " (Lake)" : IsSea ? " (Sea)" : "";
-            return Id + " " + Location.ToString() + " " + TerrainType + subTerrain;
+            return Id + " " + Location.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
         }
 
         public List<Edge> AdjacentTileEdges
@@ -213,6 +213,50 @@ namespace GameModel
             }
         }
 
+        public TerrainType GetTerrainTypeByTemperature(double temperature)
+        {
+            switch (TerrainType)
+            {
+                case TerrainType.Mountain:
+                case TerrainType.Hill:
+                case TerrainType.Forest:
+                case TerrainType.Reef:
+                    return TerrainType;
+
+                case TerrainType.Grassland:
+                    if (temperature < 5)
+                    {
+                        return TerrainType.Wetland;
+                    }
+                    if (temperature > 20)
+                    {
+                        return TerrainType.Desert;
+                    }
+                    return TerrainType.Grassland;
+
+                case TerrainType.Water:
+                    if (IsLake)
+                    {
+                        if (temperature > 20)
+                            return TerrainType.Wetland;
+                    }
+                    return TerrainType.Water;
+
+                case TerrainType.Desert:
+                    if (temperature < 5)
+                        return TerrainType.Grassland;
+                    return TerrainType.Desert;
+
+                case TerrainType.Wetland:
+                    if (temperature < 5)
+                        return TerrainType.Water;
+                    if (temperature > 20)
+                        return TerrainType.Grassland;
+                    return TerrainType.Wetland;
+            }
+            throw new Exception("Can got resolve terrain type based on temperature given base type of " + TerrainType);
+        }
+
         //public int StackLimit
         //{
         //    get
@@ -245,5 +289,6 @@ namespace GameModel
         public bool IsEdgeOfMap { get; private set; }
         public double Temperature { get; set; }
         public int DistanceFromWater { get; internal set; }
+        public TerrainType TemperatureAdjustedTerrainType { get; set; }
     }
 }

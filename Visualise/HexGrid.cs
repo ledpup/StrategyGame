@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameModel;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -15,12 +16,96 @@ namespace Visualise
 
 
 
-        public static void DrawLine(Graphics graphics, PointF origin, PointF destination, Pen pen, int boardWidth)
+        public static void DrawLine(Graphics graphics, GameModel.Point origin, GameModel.Point destination, Pen pen, int boardWidth, BaseEdgeType baseEdgeType)
         {
-            var originPoint = HexCentre(HexWidth, HexHeight, origin.Y, origin.X);
-            var destPoint = HexCentre(HexWidth, HexHeight, destination.Y, destination.X);
+            PointF pt1, pt2;
+            if (baseEdgeType == BaseEdgeType.CentreToCentre)
+            {
+                pt1 = HexCentre(HexWidth, HexHeight, origin.Y, origin.X);
+                pt2 = HexCentre(HexWidth, HexHeight, destination.Y, destination.X);
+            }
+            else
+            {
+                var direction = new GameModel.Point(destination.X - origin.X, destination.Y - origin.Y);
+                var points = HexToPoints(HexWidth, HexHeight, origin.Y, origin.X);
+                if (origin.X % 2 == 1)
+                {
+                    if (direction.X == -1 && direction.Y == 0)
+                    {
+                        pt1 = points[0];
+                        pt2 = points[1];
+                    }
+                    else if (direction.X == 0 && direction.Y == -1)
+                    {
+                        pt1 = points[1];
+                        pt2 = points[2];
+                    }
+                    else if (direction.X == 1 && direction.Y == 0)
+                    {
+                        pt1 = points[2];
+                        pt2 = points[3];
+                    }
+                    else if (direction.X == 1 && direction.Y == 1)
+                    {
+                        pt1 = points[3];
+                        pt2 = points[4];
+                    }
+                    else if (direction.X == 0 && direction.Y == 1)
+                    {
+                        pt1 = points[4];
+                        pt2 = points[5];
+                    }
+                    else if (direction.X == -1 && direction.Y == 1)
+                    {
+                        pt1 = points[5];
+                        pt2 = points[0];
+                    }
+                    else
+                    {
+                        throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
+                    }
+                }
+                else
+                {
 
-            graphics.DrawLine(pen, originPoint, destPoint);
+                    if (direction.X == -1 && direction.Y == 0)
+                    {
+                        pt1 = points[5];
+                        pt2 = points[0];
+                    }
+                    else if (direction.X == 0 && direction.Y == -1)
+                    {
+                        pt1 = points[1];
+                        pt2 = points[2];
+                    }
+                    else if (direction.X == 1 && direction.Y == 0)
+                    {
+                        pt1 = points[3];
+                        pt2 = points[4];
+                    }
+                    else if (direction.X == 1 && direction.Y == -1)
+                    {
+                        pt1 = points[2];
+                        pt2 = points[3];
+                    }
+                    else if (direction.X == 0 && direction.Y == 1)
+                    {
+                        pt1 = points[4];
+                        pt2 = points[5];
+                    }
+                    else if (direction.X == -1 && direction.Y == -1)
+                    {
+                        pt1 = points[0];
+                        pt2 = points[1];
+                    }
+                    else
+                    {
+                        throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
+                    }
+                }
+            }
+
+            graphics.DrawLine(pen, pt1, pt2);
         }
 
         private static PointF HexCentre(float hexWidth, float hexHeight, float row, float col)

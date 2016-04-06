@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace GameModel
 {
+    public enum BaseEdgeType
+    {
+        Hexside,
+        CentreToCentre,
+    }
+
     [Flags]
     public enum EdgeType
     { 
-        Normal = 0,
-        River = 1 << 0,
-        Road = 1 << 1,
+        Normal = 1 << 0,
+        River = 1 << 1,
+        Road = 1 << 2,
         Forest = 1 << 3,
         Hill = 1 << 4,
         Mountain = 1 << 5,
@@ -23,14 +29,25 @@ namespace GameModel
     {
         public static EdgeType AllEdges = EdgeType.River | EdgeType.Road;
 
-        public Edge(string edgeType, List<Tile> tiles)
+        public Edge(string edgeType, Tile[] tiles)
         {
             EdgeType = (EdgeType)Enum.Parse(typeof(EdgeType), edgeType);
+
+            switch (EdgeType)
+            {
+                case EdgeType.Road:
+                    BaseEdgeType = BaseEdgeType.CentreToCentre;
+                    break;
+                default:
+                    BaseEdgeType = BaseEdgeType.Hexside;
+                    break;
+            }
 
             Tiles = tiles;
         }
 
-        public IEnumerable<Tile> Tiles;
+        public Tile[] Tiles;
         public EdgeType EdgeType;
+        public BaseEdgeType BaseEdgeType;
     }
 }

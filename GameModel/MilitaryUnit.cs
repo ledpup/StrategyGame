@@ -237,7 +237,6 @@ namespace GameModel
         {
             TerrainMovementCosts[TerrainType.Water] = 1;
             TerrainMovementCosts[TerrainType.Reef] = 2;
-            TerrainMovementCosts[TerrainType.Coastal] = 1;
 
             CanMoveOver = Terrain.Aquatic_Terrain;
             CanMoveOverEdge = EdgeType.Normal;

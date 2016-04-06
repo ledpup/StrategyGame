@@ -19,6 +19,7 @@ namespace GameModel
         public Tile(int id, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
         {
             Units = new List<MilitaryUnit>();
+            AdjacentTileEdges = new List<Edge>();
 
             Id = id;
             Location = new Point(x, y);
@@ -29,38 +30,32 @@ namespace GameModel
         public override string ToString()
         {
             var subTerrain = IsLake ? " (Lake)" : IsSea ? " (Sea)" : "";
-            return Location.ToString() + " " + TerrainType + subTerrain;
+            return Id + " " + Location.ToString() + " " + TerrainType + subTerrain;
         }
 
-        public IEnumerable<Edge> AdjacentTileEdges
+        public List<Edge> AdjacentTileEdges
         {
-            get
-            {
-                if (_adjacentTileEdges == null)
-                {
-                    throw new Exception();
-                }
-                return _adjacentTileEdges;
-            }
-            private set { _adjacentTileEdges = value; }
+            get; set;
         }
-        private IEnumerable<Edge> _adjacentTileEdges;
 
         public double CalculateMoveCost(MilitaryUnit unit, Tile destination)
         {
             var edge = AdjacentTileEdges.SingleOrDefault(x => x.Tiles.Contains(destination));
-
             if (edge != null)
             {
                 if (edge.EdgeType.HasFlag(unit.CanMoveOverEdge))
                 {
                     return 1;
                 }
+                return 100;
             }
 
-            if (unit.TerrainMovementCosts[destination.TerrainType] != null)
+            if (unit.TerrainMovementCosts[TerrainType] != null)
             {
-                return (double)unit.TerrainMovementCosts[destination.TerrainType];
+                if (unit.TerrainMovementCosts[destination.TerrainType] != null)
+                {
+                    return (double)unit.TerrainMovementCosts[destination.TerrainType];
+                }
             }
             
             return 100;
@@ -70,33 +65,30 @@ namespace GameModel
         {
             get
             {
-                if (_adjacentTiles == null)
-                {
-                    throw new Exception();
-                }
                 return _adjacentTiles;
             }
-            private set 
+            set 
             { 
                 _adjacentTiles = value;
             }
         }
-
-        private IEnumerable<Edge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
-        {
-            var adjacentTileEdges = new List<Edge>();
-            _adjacentTiles.ToList().ForEach(x => 
-                {
-                    var edge = Board.TileEdges.SingleOrDefault(r => r.Tiles.Contains(this) && r.Tiles.Contains(x)); 
-                    
-                    if (edge == null)
-                        return;
-
-                    adjacentTileEdges.Add(edge);
-                });
-            return adjacentTileEdges;
-        }
         private IEnumerable<Tile> _adjacentTiles;
+
+        //public IEnumerable<Edge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
+        //{
+        //    var adjacentTileEdges = new List<Edge>();
+        //    _adjacentTiles.ToList().ForEach(x => 
+        //        {
+        //            var edge = Board.TileEdges.SingleOrDefault(r => r.Tiles.Contains(this) && r.Tiles.Contains(x)); 
+
+        //            if (edge == null)
+        //                return;
+
+        //            adjacentTileEdges.Add(edge);
+        //        });
+        //    return adjacentTileEdges;
+        //}
+        //
 
         public bool IsCoastal
         {
@@ -108,9 +100,6 @@ namespace GameModel
                 _isTileSearchedForCoastal = true;
 
                 _isCoastal = Terrain.All_Land.HasFlag(TerrainType) && AdjacentTiles.Any(x => Terrain.Aquatic_Terrain.HasFlag(x.TerrainType));
-
-                if (_isCoastal)
-                    TerrainType |= TerrainType.Coastal;
 
                 return _isCoastal;
             }
@@ -129,9 +118,6 @@ namespace GameModel
 
                 _isSea = Terrain.Water_Terrain.HasFlag(TerrainType) && (AdjacentTiles.Any(x => x.IsSea) || IsEdgeOfMap);
 
-                if (_isSea)
-                    TerrainType |= TerrainType.Sea;
-
                 return _isSea;
             }
         }
@@ -149,36 +135,13 @@ namespace GameModel
 
                 _isLake = Terrain.Water_Terrain.HasFlag(TerrainType) && !IsEdgeOfMap && !AdjacentTiles.Any(x => x.IsSea);
 
-                if (_isLake)
-                    TerrainType |= TerrainType.Lake;
-
                 return _isLake;
             }
         }
         bool _isLake;
         bool _isTileSearchedForLake;
 
-        public void SetAdjacentTiles(Board board)
-        {
-            if (_adjacentTiles != null)
-                throw new Exception("Adjacent tiles have already be calculated");
 
-            var adjacentTiles = new List<Tile>();
-
-            var potentialTiles = X % 2 == 0 ? AdjacentEvenTiles : AdjacentOddTiles;
-
-            foreach (var tile in potentialTiles)
-            {
-                var neighbourX = X + tile.X;
-                var neighbourY = Y + tile.Y;
-
-                if (neighbourX >= 0 && neighbourX < board.Width && neighbourY >= 0 && neighbourY < board.Height)
-                    adjacentTiles.Add(board[neighbourX, neighbourY]);
-            }
-
-            AdjacentTiles = adjacentTiles;
-            AdjacentTileEdges = BuildAdjacentEdgeTiles(adjacentTiles);
-        }
 
         //public override bool Equals(object obj)
         //{
@@ -197,10 +160,12 @@ namespace GameModel
 
         public static IEnumerable<Tile> ValidAdjacentMoves(MilitaryUnit unit, Tile tile)
         {
-            return tile.AdjacentTiles.Where(x => unit.TerrainMovementCosts[x.TerrainType] != null);
+            return tile
+                    .AdjacentTiles
+                    .Where(x => tile.AdjacentTileEdges.Any(y => unit.CanMoveOverEdge.HasFlag(y.EdgeType)) || unit.TerrainMovementCosts[x.TerrainType] != null);
         }
 
-        static List<Point> AdjacentOddTiles
+        public static List<Point> AdjacentOddTiles
         {
             get
             {
@@ -216,7 +181,7 @@ namespace GameModel
             }
         }
 
-        static List<Point> AdjacentEvenTiles
+        public static List<Point> AdjacentEvenTiles
         {
             get
             {

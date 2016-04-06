@@ -17,12 +17,25 @@ namespace Visualise
             board.Tiles.ToList().ForEach(x => hexagonColours.Add(new PointF(x.X, x.Y), GetBrush(x.TerrainType)));
 
             var vectors = new List<Vector>();
-            Board.TileEdges.ForEach(x => vectors.Add(new Vector { Origin = new GameModel.Point(x.Tiles.First().X, x.Tiles.First().Y), Destination = new GameModel.Point(x.Tiles.Last().X, x.Tiles.Last().Y) }));
+            Board.TileEdges.ForEach(x => vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x), x.BaseEdgeType)));
 
             if (lines != null)
                 vectors.AddRange(lines);
 
             DrawHexagonImage(fileName, hexagonColours, vectors, board.Width);
+        }
+
+        private static ArgbColour EdgeToColour(Edge x)
+        {
+            switch (x.EdgeType)
+            {
+                case EdgeType.Road:
+                    return ArgbColour.SaddleBrown;
+                case EdgeType.River:
+                    return ArgbColour.DodgerBlue;
+                default:
+                    return ArgbColour.Black;
+            }
         }
 
         private static void DrawHexagonImage(string fileName, Dictionary<PointF, Brush> hexagonColours, List<Vector> vectors, int boardWidth, int imageWidth = 1200, int imageHeight = 1000)
@@ -32,8 +45,7 @@ namespace Visualise
 
             HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, boardWidth);
 
-            Pen blackPen = new Pen(Color.FromArgb(255, 0, 0, 0), 3);
-            vectors.ForEach(x => HexGrid.DrawLine(graphics, new PointF(x.Origin.X, x.Origin.Y), new PointF(x.Destination.X, x.Destination.Y), blackPen, boardWidth));
+            vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), 3), boardWidth, x.BaseEdgeType));
 
 
             bitmap.Save(fileName);
@@ -53,8 +65,6 @@ namespace Visualise
                     return Brushes.SandyBrown;
                 case TerrainType.Mountain:
                     return Brushes.Brown;
-                case TerrainType.Lake:
-                    return Brushes.Blue;
                 case TerrainType.Water:
                     return Brushes.LightBlue;
                 case TerrainType.Wetland:

@@ -6,15 +6,22 @@ using System.Threading.Tasks;
 
 namespace GameModel
 {
-    public struct Vector
+    
+
+    public class Vector
     {
-        public Vector(Point origin, Point destination)
+        
+        public Vector(Point origin, Point destination, ArgbColour colour, BaseEdgeType baseEdgeType = BaseEdgeType.CentreToCentre)
         {
             Origin = origin;
             Destination = destination;
+            BaseEdgeType = baseEdgeType;
+            Colour = colour;
         }
 
         public Point Origin;
         public Point Destination;
+        public BaseEdgeType BaseEdgeType;
+        public ArgbColour Colour;
     }
 }

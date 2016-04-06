@@ -36,9 +36,8 @@ namespace GameModel
             Height = tiles.Length;
 
             InitialiseTiles(Width, Height, tiles);
+            CalculateAdjacentTiles();
             TileEdges = IntitaliseTileEdges(tilesEdges);
-
-            Tiles.ToList().ForEach(x => x.SetAdjacentTiles(this));
 
             Logger = logger;
             if (Logger == null)
@@ -47,6 +46,33 @@ namespace GameModel
             }
 
             MoveOrders = new Dictionary<int, List<MoveOrder>>();
+
+            
+        }
+
+        public void CalculateAdjacentTiles()
+        {
+            foreach (var tile in Tiles)
+            {
+                if (tile.AdjacentTiles != null)
+                    throw new Exception("Adjacent tiles have already be calculated");
+
+                var adjacentTiles = new List<Tile>();
+
+                var potentialTiles = tile.X % 2 == 0 ? Tile.AdjacentEvenTiles : Tile.AdjacentOddTiles;
+
+                foreach (var potientialTile in potentialTiles)
+                {
+                    var neighbourX = tile.X + potientialTile.X;
+                    var neighbourY = tile.Y + potientialTile.Y;
+
+                    if (neighbourX >= 0 && neighbourX < Width && neighbourY >= 0 && neighbourY < Height)
+                        adjacentTiles.Add(this[neighbourX, neighbourY]);
+                }
+
+                tile.AdjacentTiles = adjacentTiles;
+                
+            }
         }
 
         private List<Edge> IntitaliseTileEdges(string[] tilesEdges)
@@ -57,11 +83,28 @@ namespace GameModel
                 {
                     var columns = x.Split(',');
 
-                    var tiles = new List<Tile> {
-                        Tiles.Single(t => t.Id == int.Parse(columns[0])),
-                        Tiles.Single(t => t.Id == int.Parse(columns[1]))};
+                    var tileIndexes = new List<int> { int.Parse(columns[0]), int.Parse(columns[1]) };
 
-                    tileEdgesList.Add(new Edge(columns[2], tiles));
+                    var firstTile = tileIndexes.Min();
+                    var secondTile = tileIndexes.Max();
+
+                    if (firstTile == secondTile)
+                        throw new Exception("Must create an edge between two different tiles");
+
+                    var t1 = TileArray[firstTile];
+                    var t2 = TileArray[secondTile];
+
+                    if (!t1.AdjacentTiles.Contains(t2))
+                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {2} because they are not neighbours", t1.Id, t2.Id));
+
+
+                    var tiles = new Tile[] { t1, t2 };
+                    var edge = new Edge(columns[2], tiles);
+
+                    t1.AdjacentTileEdges.Add(edge);
+                    t2.AdjacentTileEdges.Add(edge);
+
+                    tileEdgesList.Add(edge);
                 }
             );
             return tileEdgesList;
@@ -102,6 +145,14 @@ namespace GameModel
             set
             {
                 _tiles[x, y] = value;
+            }
+        }
+
+        public Tile[] TileArray
+        {
+            get
+            {
+                return _tiles1d;
             }
         }
 

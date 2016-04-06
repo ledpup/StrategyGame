@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgbColour.cs" />
     <Compile Include="BattleReport.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="CasualtyLogEntry.cs" />

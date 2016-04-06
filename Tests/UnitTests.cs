@@ -16,7 +16,6 @@ namespace Tests
         {
             Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Desert));
             Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Hill));
-            Assert.IsTrue(Terrain.Aquatic_Terrain.HasFlag(TerrainType.Coastal));
 
             Assert.IsTrue(!Terrain.Non_Mountainous_Land.HasFlag(TerrainType.Mountain));
         }

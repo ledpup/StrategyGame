@@ -29,10 +29,16 @@ namespace Visualise
         {
             switch (x.EdgeType)
             {
-                case EdgeType.Road:
-                    return ArgbColour.SaddleBrown;
                 case EdgeType.River:
                     return ArgbColour.DodgerBlue;
+                case EdgeType.Road:
+                    return ArgbColour.SaddleBrown;
+                case EdgeType.Forest:
+                    return ArgbColour.DarkGreen;
+                case EdgeType.Hill:
+                    return ArgbColour.SandyBrown;
+                case EdgeType.Mountain:
+                    return ArgbColour.Brown;
                 default:
                     return ArgbColour.Black;
             }

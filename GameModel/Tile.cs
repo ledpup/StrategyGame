@@ -40,25 +40,41 @@ namespace GameModel
 
         public double CalculateMoveCost(MilitaryUnit unit, Tile destination)
         {
+            var costChanged = false;
+            var cost = 100D;
+
             var edge = AdjacentTileEdges.SingleOrDefault(x => x.Tiles.Contains(destination));
             if (edge != null)
             {
-                if (edge.EdgeType.HasFlag(unit.CanMoveOverEdge))
+                if (unit.CanMoveOverEdge.HasFlag(edge.EdgeType))
                 {
-                    return 1;
+                    costChanged = true;
+                    cost = 2;
+                    if (edge.EdgeType == EdgeType.Road)
+                        return 1;
                 }
-                return 100;
+                else
+                {
+                    return 100;
+                }
             }
 
             if (unit.TerrainMovementCosts[TerrainType] != null)
             {
                 if (unit.TerrainMovementCosts[destination.TerrainType] != null)
                 {
-                    return (double)unit.TerrainMovementCosts[destination.TerrainType];
+                    if (costChanged)
+                    {
+                        cost += (double)unit.TerrainMovementCosts[destination.TerrainType];
+                    }
+                    else
+                    {
+                        cost = (double)unit.TerrainMovementCosts[destination.TerrainType];
+                    }
                 }
             }
             
-            return 100;
+            return cost;
         }
 
         public IEnumerable<Tile> AdjacentTiles

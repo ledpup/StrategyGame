@@ -200,7 +200,7 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Wetland] = 2;
 
             CanMoveOver = Terrain.Non_Mountainous_Land;
-            CanMoveOverEdge = EdgeType.Road;
+            CanMoveOverEdge = EdgeType.Road | EdgeType.Forest | EdgeType.Hill;
             MayStopOn = Terrain.Non_Mountainous_Land;
         }
 
@@ -229,7 +229,7 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Reef] = 1;
 
             CanMoveOver = Terrain.All_Terrain;
-            CanMoveOverEdge = Edge.AllEdges;
+            CanMoveOverEdge = Edge.All_Edges;
             MayStopOn = Terrain.Non_Mountainous_Land;
         }
 

@@ -27,7 +27,7 @@ namespace GameModel
 
     public class Edge
     {
-        public static EdgeType AllEdges = EdgeType.River | EdgeType.Road;
+        public static EdgeType All_Edges = EdgeType.River | EdgeType.Road | EdgeType.Forest | EdgeType.Hill | EdgeType.Mountain | EdgeType.Reef | EdgeType.Wall;
 
         public Edge(string edgeType, Tile[] tiles)
         {

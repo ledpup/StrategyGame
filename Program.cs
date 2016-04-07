@@ -26,7 +26,7 @@ namespace StrategyGame
                     BaseQuality = 2,
                     InitialQuantity = 347,
                     InitialMorale = 3,
-                    TerrainTypeBattleModifier = new Dictionary<TerrainType, double> { { TerrainType.Mountain, 1 }, { TerrainType.Hill, 1 }, { TerrainType.Desert, -1 } }
+                    TerrainTypeBattleModifier = new Dictionary<TerrainType, double> { { TerrainType.Mountain, 1 }, { TerrainType.Hill, 1 }, { TerrainType.Steppe, -1 } }
                 },
                 new MilitaryUnit()
                 {

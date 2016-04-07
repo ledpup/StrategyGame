@@ -64,7 +64,7 @@ namespace Visualise
             {
                 case TerrainType.Grassland:
                     return Brushes.GreenYellow;
-                case TerrainType.Desert:
+                case TerrainType.Steppe:
                     return Brushes.Yellow;
                 case TerrainType.Forest:
                     return Brushes.DarkGreen;

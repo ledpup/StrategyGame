@@ -29,10 +29,10 @@ namespace Tests
             tiles.ForEach(t => Assert.IsFalse(t.AdjacentTiles.Any(at => at == null)));
             
             // Ensure that some tiles are coastal.
-            var coastal = tiles.Count(t => t.IsCoastal);
+            var coastal = tiles.Count(t => t.IsCoast);
             Assert.AreNotEqual(0, coastal);
 
-            Assert.IsTrue(!board[9, 9].IsCoastal);
+            Assert.IsTrue(!board[9, 9].IsCoast);
         }
 
         [TestMethod]
@@ -49,6 +49,13 @@ namespace Tests
             var board = new Board(GameBoard, TileEdges);
 
             Assert.IsTrue(board[14, 4].IsLake);
+        }
+
+        [TestMethod]
+        public void CoordsTests()
+        {
+            Assert.AreEqual(29, Point.PointToIndex(2, 1, 27));
+            Assert.AreEqual(new Point(2, 1), Point.IndexToPoint(29, 27));
         }
     }
 }

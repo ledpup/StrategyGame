@@ -57,6 +57,7 @@
     <Compile Include="QuantityChangeEvent.cs" />
     <Compile Include="PathFindTile.cs" />
     <Compile Include="Stack.cs" />
+    <Compile Include="Structure.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Edge.cs" />

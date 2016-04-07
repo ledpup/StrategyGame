@@ -32,5 +32,15 @@ namespace GameModel
             var otherPoint = (Point)obj;
             return X == otherPoint.X && Y == otherPoint.Y;
         }
+
+        public static int PointToIndex(int x, int y, int width)
+        {
+            return y * width + x;
+        }
+
+        public static Point IndexToPoint(int index, int width)
+        {
+            return new Point(index % width, index / width);
+        }
     }
 }

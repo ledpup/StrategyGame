@@ -194,7 +194,7 @@ namespace GameModel
         void LandUnit()
         {
             TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Desert] = 2;
+            TerrainMovementCosts[TerrainType.Steppe] = 2;
             TerrainMovementCosts[TerrainType.Forest] = 2;
             TerrainMovementCosts[TerrainType.Hill] = 2;
             TerrainMovementCosts[TerrainType.Wetland] = 2;
@@ -207,7 +207,7 @@ namespace GameModel
         void AmphibiousUnit()
         {
             TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Desert] = 2;
+            TerrainMovementCosts[TerrainType.Steppe] = 2;
             TerrainMovementCosts[TerrainType.Forest] = 2;
             TerrainMovementCosts[TerrainType.Hill] = 2;
             TerrainMovementCosts[TerrainType.Wetland] = 1;
@@ -220,7 +220,7 @@ namespace GameModel
         void AirborneUnit()
         {
             TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Desert] = 1;
+            TerrainMovementCosts[TerrainType.Steppe] = 1;
             TerrainMovementCosts[TerrainType.Forest] = 1;
             TerrainMovementCosts[TerrainType.Hill] = 1;
             TerrainMovementCosts[TerrainType.Mountain] = 1;
@@ -238,9 +238,9 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Water] = 1;
             TerrainMovementCosts[TerrainType.Reef] = 2;
 
-            CanMoveOver = Terrain.Aquatic_Terrain;
+            CanMoveOver = Terrain.All_Water;
             CanMoveOverEdge = EdgeType.Normal;
-            MayStopOn = Terrain.Aquatic_Terrain;
+            MayStopOn = Terrain.All_Water;
         }        
         //public TerrainType StopOn;
         public TerrainType TerrainCombatBonus;

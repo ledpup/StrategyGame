@@ -14,7 +14,7 @@ namespace Tests
         [TestMethod]
         public void TerrainTypeTests()
         {
-            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Desert));
+            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Steppe));
             Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Hill));
 
             Assert.IsTrue(!Terrain.Non_Mountainous_Land.HasFlag(TerrainType.Mountain));
@@ -48,8 +48,8 @@ namespace Tests
 
             Assert.AreEqual(4, moveList.Count());
 
-            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.Aquatic_Terrain.HasFlag(x.TerrainType)));
-            Assert.IsFalse(moveList.Any(x => Terrain.Water_Terrain.HasFlag(x.Destination.TerrainType)));
+            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.TerrainType)));
+            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.Destination.TerrainType)));
 
             moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
 

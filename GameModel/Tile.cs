@@ -106,22 +106,22 @@ namespace GameModel
         //}
         //
 
-        public bool IsCoastal
+        public bool IsCoast
         {
             get
             {
-                if (_isTileSearchedForCoastal)
-                    return _isCoastal;
+                if (_isTileSearchedForCoast)
+                    return _isCoast;
 
-                _isTileSearchedForCoastal = true;
+                _isTileSearchedForCoast = true;
 
-                _isCoastal = Terrain.All_Land.HasFlag(TerrainType) && AdjacentTiles.Any(x => Terrain.Aquatic_Terrain.HasFlag(x.TerrainType));
+                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && AdjacentTiles.Any(x => Terrain.All_Land.HasFlag(x.TerrainType));
 
-                return _isCoastal;
+                return _isCoast;
             }
         }
-        bool _isCoastal;
-        bool _isTileSearchedForCoastal;
+        bool _isCoast;
+        bool _isTileSearchedForCoast;
 
         public bool IsSea
         {
@@ -132,7 +132,7 @@ namespace GameModel
 
                 _isTileSearchedForSea = true;
 
-                _isSea = Terrain.Water_Terrain.HasFlag(TerrainType) && (AdjacentTiles.Any(x => x.IsSea) || IsEdgeOfMap);
+                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (AdjacentTiles.Any(x => x.IsSea) || IsEdgeOfMap);
 
                 return _isSea;
             }
@@ -149,7 +149,7 @@ namespace GameModel
 
                 _isTileSearchedForLake = true;
 
-                _isLake = Terrain.Water_Terrain.HasFlag(TerrainType) && !IsEdgeOfMap && !AdjacentTiles.Any(x => x.IsSea);
+                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !AdjacentTiles.Any(x => x.IsSea);
 
                 return _isLake;
             }
@@ -224,33 +224,33 @@ namespace GameModel
                     return TerrainType;
 
                 case TerrainType.Grassland:
-                    if (temperature < 5)
+                    if (temperature < 10)
                     {
                         return TerrainType.Wetland;
                     }
-                    if (temperature > 20)
+                    if (temperature > 30)
                     {
-                        return TerrainType.Desert;
+                        return TerrainType.Steppe;
                     }
                     return TerrainType.Grassland;
 
                 case TerrainType.Water:
                     if (IsLake)
                     {
-                        if (temperature > 20)
+                        if (temperature > 30)
                             return TerrainType.Wetland;
                     }
                     return TerrainType.Water;
 
-                case TerrainType.Desert:
-                    if (temperature < 5)
+                case TerrainType.Steppe:
+                    if (temperature < 10)
                         return TerrainType.Grassland;
-                    return TerrainType.Desert;
+                    return TerrainType.Steppe;
 
                 case TerrainType.Wetland:
-                    if (temperature < 5)
+                    if (temperature < 10)
                         return TerrainType.Water;
-                    if (temperature > 20)
+                    if (temperature > 30)
                         return TerrainType.Grassland;
                     return TerrainType.Wetland;
             }
@@ -290,5 +290,6 @@ namespace GameModel
         public double Temperature { get; set; }
         public int DistanceFromWater { get; internal set; }
         public TerrainType TemperatureAdjustedTerrainType { get; set; }
+        public Structure Structure { get; set; }
     }
 }

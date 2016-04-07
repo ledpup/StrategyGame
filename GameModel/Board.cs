@@ -27,11 +27,10 @@ namespace GameModel
         public static Dictionary<string, double> StructureDefenceModifiers;
         public static Logger Logger;
 
-        public Board(string[] tiles, string[] tilesEdges, Logger logger = null)
-        {
-            if (tilesEdges == null)
-                throw new ArgumentNullException("tileEdges");
+        public List<Structure> TilePoints;
 
+        public Board(string[] tiles, string[] tilesEdges = null, string[] tilePoints = null, Logger logger = null)
+        {
             Width = tiles[0].Length;
             Height = tiles.Length;
 
@@ -39,6 +38,7 @@ namespace GameModel
             CalculateAdjacentTiles();
             CalculateTileDistanceFromTheSea();
             TileEdges = IntitaliseTileEdges(tilesEdges);
+            TilePoints = IntitaliseTilePoints(tilePoints);
 
             Logger = logger;
             if (Logger == null)
@@ -58,6 +58,23 @@ namespace GameModel
             
 
             CalculateTemperature();
+        }
+
+        private List<Structure> IntitaliseTilePoints(string[] tilePoints)
+        {
+            var structures = new List<Structure>();
+
+            if (tilePoints == null)
+                return structures;
+            foreach (var point in tilePoints)
+            {
+                var id = int.Parse(point.Split(',')[0]);
+                var structure = new Structure(id, point.Split(',')[1]);
+
+                TileArray[structure.Id].Structure = structure;
+                structures.Add(structure);
+            }
+            return structures;
         }
 
         private void CalculateTileDistanceFromTheSea()
@@ -104,7 +121,7 @@ namespace GameModel
                     const double seasonRate = .3;
                     const double temperatureShiftPerMonth = 8;
                     
-                    this[x, y].Temperature = y * .5 + 5 + TerrainTemperatureModifiers[this[x, y].TerrainType] - this[x, y].DistanceFromWater + Math.Sin(turn * seasonRate) * temperatureShiftPerMonth;
+                    this[x, y].Temperature = y * .5 + 10 + TerrainTemperatureModifiers[this[x, y].TerrainType] - this[x, y].DistanceFromWater + Math.Sin(turn * seasonRate) * temperatureShiftPerMonth;
                 }
             }
         }
@@ -137,6 +154,10 @@ namespace GameModel
         private List<Edge> IntitaliseTileEdges(string[] tilesEdges)
         {
             var tileEdgesList = new List<Edge>();
+
+            if (tilesEdges == null)
+                return tileEdgesList;
+
             tilesEdges.ToList().ForEach(
                 x =>
                 {
@@ -180,7 +201,7 @@ namespace GameModel
                 {
                     var terrainType = Terrain.ConvertCharToTerrainType(char.Parse(data[y].Substring(x, 1)));
                     var isEdge = x == 0 || y == 0 || x == width || y == height ? true : false;
-                    var tile = new Tile(y * width + x, x, y, terrainType, isEdge);
+                    var tile = new Tile(Point.PointToIndex(x, y, width), x, y, terrainType, isEdge);
                     _tiles[x, y] = tile;
                     _tiles1d[y * width + x] = tile;
                 }

@@ -16,6 +16,7 @@ namespace Tests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
         static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
+        static string[] TileStructures = File.ReadAllLines("BasicBoardPoints.txt");
 
         Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
 
@@ -25,6 +26,23 @@ namespace Tests
             var board = new Board(GameBoard, TileEdges);
 
             Visualise.Integration.DrawHexagonImage("BasicBoard.png", board.Tiles);
+        }
+
+        [TestMethod]
+        public void VisualiseBoardStructureTest()
+        {
+            var board = new Board(GameBoard, TileEdges, TileStructures);            
+
+            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board.Tiles, null, null, board.TileStructures);
+        }
+
+        [TestMethod]
+        public void VisualiseUnitOnBoardTest()
+        {
+            var board = new Board(GameBoard, TileEdges);
+
+            var unit = new MilitaryUnit() { Tile = board[1, 1] };
+
         }
 
         [TestMethod]

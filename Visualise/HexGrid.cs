@@ -13,7 +13,7 @@ namespace Visualise
     {
         const float HexHeight = 50;
         static float HexWidth = (float)(4 * (HexHeight / 2 / Math.Sqrt(3)));
-
+        const float StructureWidth = 10;
 
 
         public static void DrawLine(Graphics graphics, GameModel.Point origin, GameModel.Point destination, Pen pen, BaseEdgeType baseEdgeType)
@@ -108,6 +108,22 @@ namespace Visualise
             graphics.DrawLine(pen, pt1, pt2);
         }
 
+        internal static void DrawRectangle(Graphics graphics, GameModel.Point location, Pen pen)
+        {
+            var hexCentre = HexCentre(HexWidth, HexHeight, location.Y, location.X);
+
+            var points = new PointF[] 
+                {
+                    new PointF(hexCentre.X - (StructureWidth / 2), hexCentre.Y - (StructureWidth / 2)),
+                    new PointF(hexCentre.X + (StructureWidth / 2), hexCentre.Y - (StructureWidth / 2)),
+                    new PointF(hexCentre.X + (StructureWidth / 2), hexCentre.Y + (StructureWidth / 2)),
+                    new PointF(hexCentre.X - (StructureWidth / 2), hexCentre.Y + (StructureWidth / 2)),
+                };
+
+            graphics.DrawRectangle(pen, points[0].X, points[0].Y, StructureWidth, StructureWidth);
+            graphics.FillPolygon(Brushes.Red, points);
+        }
+
         private static PointF HexCentre(float hexWidth, float hexHeight, float row, float col)
         {
             float y = hexHeight / 2;
@@ -125,7 +141,7 @@ namespace Visualise
             return new PointF(x, y);
         }
 
-        public static void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours, string[,] labels)
+        public static void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours, string[,] labels, List<Structure> tileStructures)
         {
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
@@ -139,6 +155,7 @@ namespace Visualise
             // Draw the grid.
             DrawHexGrid(graphics, Pens.Black, 0, width, 0, height, HexWidth, HexHeight, labels);
 
+            
             //#if FIG34
             //            // Draw the selected rectangles for Figures 3 and 4.
             //            using (Pen pen = new Pen(Color.Red, 3))

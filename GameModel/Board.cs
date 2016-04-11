@@ -27,7 +27,7 @@ namespace GameModel
         public static Dictionary<string, double> StructureDefenceModifiers;
         public static Logger Logger;
 
-        public List<Structure> TilePoints;
+        public List<Structure> TileStructures;
 
         public Board(string[] tiles, string[] tilesEdges = null, string[] tilePoints = null, Logger logger = null)
         {
@@ -38,7 +38,7 @@ namespace GameModel
             CalculateAdjacentTiles();
             CalculateTileDistanceFromTheSea();
             TileEdges = IntitaliseTileEdges(tilesEdges);
-            TilePoints = IntitaliseTilePoints(tilePoints);
+            TileStructures = IntitaliseTilePoints(tilePoints);
 
             Logger = logger;
             if (Logger == null)
@@ -69,7 +69,7 @@ namespace GameModel
             foreach (var point in tilePoints)
             {
                 var id = int.Parse(point.Split(',')[0]);
-                var structure = new Structure(id, point.Split(',')[1]);
+                var structure = new Structure(id, Point.IndexToPoint(id, Width), point.Split(',')[1]);
 
                 TileArray[structure.Id].Structure = structure;
                 structures.Add(structure);

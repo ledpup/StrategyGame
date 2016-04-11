@@ -11,7 +11,7 @@ namespace Visualise
 
     public class Integration
     {
-        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, string[,] labels = null, List<Vector> lines = null)
+        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, string[,] labels = null, List<Vector> lines = null, List<Structure> tileStructures = null, int imageWidth = 1200, int imageHeight = 1000)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
             tiles.ToList().ForEach(x => hexagonColours.Add(new PointF(x.X, x.Y), GetBrush(x.TerrainType)));
@@ -23,7 +23,17 @@ namespace Visualise
                 vectors.AddRange(lines);
 
 
-            DrawHexagonImage(fileName, hexagonColours, vectors, labels);
+            var bitmap = new Bitmap(imageWidth, imageHeight);
+            var graphics = Graphics.FromImage(bitmap);
+
+            HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, labels, tileStructures);
+
+            vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road ? 10 : 3), x.BaseEdgeType));
+
+            if (tileStructures != null)
+                tileStructures.ForEach(x => HexGrid.DrawRectangle(graphics, x.Location, Pens.Red));
+
+            bitmap.Save(fileName);
         }
 
         private static ArgbColour EdgeToColour(Edge x)
@@ -43,19 +53,6 @@ namespace Visualise
                 default:
                     return ArgbColour.Black;
             }
-        }
-
-        private static void DrawHexagonImage(string fileName, Dictionary<PointF, Brush> hexagonColours, List<Vector> vectors, string[,] labels, int imageWidth = 1200, int imageHeight = 1000)
-        {
-            var bitmap = new Bitmap(imageWidth, imageHeight);
-            var graphics = Graphics.FromImage(bitmap);
-
-            HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, labels);
-
-            vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road ? 10 : 3), x.BaseEdgeType));
-
-
-            bitmap.Save(fileName);
         }
 
         private static Brush GetBrush(TerrainType terrainType)

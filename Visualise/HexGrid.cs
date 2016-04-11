@@ -108,20 +108,30 @@ namespace Visualise
             graphics.DrawLine(pen, pt1, pt2);
         }
 
-        internal static void DrawRectangle(Graphics graphics, GameModel.Point location, Pen pen)
+        public static void DrawCircle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)
+        {
+            const float Radius = 15;
+
+            var hexCentre = HexCentre(HexWidth, HexHeight, location.Y, location.X);
+
+            var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
+            var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
+
+            var xOffset = (xOnCircle - (StructureWidth / 2));
+            var yOffset = (yOnCircle - (StructureWidth / 2));
+
+            graphics.FillEllipse(brush, xOffset, yOffset, StructureWidth, StructureWidth);
+
+        }
+
+        internal static void DrawRectangle(Graphics graphics, GameModel.Point location, SolidBrush brush)
         {
             var hexCentre = HexCentre(HexWidth, HexHeight, location.Y, location.X);
 
-            var points = new PointF[] 
-                {
-                    new PointF(hexCentre.X - (StructureWidth / 2), hexCentre.Y - (StructureWidth / 2)),
-                    new PointF(hexCentre.X + (StructureWidth / 2), hexCentre.Y - (StructureWidth / 2)),
-                    new PointF(hexCentre.X + (StructureWidth / 2), hexCentre.Y + (StructureWidth / 2)),
-                    new PointF(hexCentre.X - (StructureWidth / 2), hexCentre.Y + (StructureWidth / 2)),
-                };
+            var x = hexCentre.X - (StructureWidth / 2);
+            var y = hexCentre.Y - (StructureWidth / 2);
 
-            graphics.DrawRectangle(pen, points[0].X, points[0].Y, StructureWidth, StructureWidth);
-            graphics.FillPolygon(Brushes.Red, points);
+            graphics.FillRectangle(brush, x, y, StructureWidth, StructureWidth);
         }
 
         private static PointF HexCentre(float hexWidth, float hexHeight, float row, float col)

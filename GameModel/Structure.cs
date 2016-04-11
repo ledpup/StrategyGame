@@ -14,15 +14,16 @@ namespace GameModel
     public class Structure
     {
         public int Id;
+        public Point Location;
 
-        public Structure(int id, string structureType)
+        public Structure(int id, Point location, string structureType)
         {
             Id = id;
+            Location = location;
             StructureType = (StructureType)Enum.Parse(typeof(StructureType), structureType);
 
         }
 
         public StructureType StructureType { get; set;}
-        Tile Tile { get; set; }
     }
 }

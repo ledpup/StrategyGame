@@ -33,7 +33,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, TileStructures);            
 
-            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board.Tiles, null, null, board.TileStructures);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithStructures.png", board.Tiles, null, null, board.TileStructures);
         }
 
         [TestMethod]
@@ -41,8 +41,15 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit() { Tile = board[1, 1] };
+            var units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit() { Tile = board[1, 1] },
+                new MilitaryUnit() { Tile = board[1, 1] },
+                new MilitaryUnit() { Tile = board[1, 1] },
+                new MilitaryUnit() { Tile = board[1, 1], OwnerId = 2 }
+            };
 
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, null, null, board.TileStructures, units);
         }
 
         [TestMethod]
@@ -69,7 +76,7 @@ namespace Tests
                 }
             }
 
-            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board.Tiles, labels, vectors);
+            Visualise.Integration.DrawHexagonImage("BasicBoardPathFind.png", board.Tiles, labels, vectors);
         }
 
         private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)

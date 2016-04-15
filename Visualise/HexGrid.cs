@@ -212,7 +212,7 @@ namespace Visualise
                                 sf.Alignment = StringAlignment.Center;
                                 sf.LineAlignment = StringAlignment.Center;
                                 var x = (points[0].X + points[3].X) / 2;
-                                var y = ((points[1].Y + points[4].Y) / 2) - (hexHeight * .15f);
+                                var y = ((points[1].Y + points[4].Y) / 2);
                                 
                                 if (col <= labels.GetUpperBound(0) && row <= labels.GetUpperBound(1))
                                 {

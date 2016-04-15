@@ -34,7 +34,6 @@ namespace GameModel
             return new Hex(a.q + b.q, a.r + b.r, a.s + b.s);
         }
 
-
         static public Hex Subtract(Hex a, Hex b)
         {
             return new Hex(a.q - b.q, a.r - b.r, a.s - b.s);
@@ -53,10 +52,24 @@ namespace GameModel
             return Hex.directions[direction];
         }
 
+        public static int CubeToIndex(Hex hex, int offset, int boardWidth)
+        {
+            return hex.r + ((hex.q + offset * (hex.q & 1)) / 2) * boardWidth + hex.q;
+        }
+
+        public static List<Hex> Neighbours(Hex hex)
+        {
+            var neighbours = new List<Hex>();
+            for (var i = 0; i < 6; i++)
+            {
+                neighbours.Add(Add(hex, Direction(i)));
+            }
+            return neighbours;
+        }
 
         static public Hex Neighbor(Hex hex, int direction)
         {
-            return Hex.Add(hex, Hex.Direction(direction));
+            return Add(hex, Direction(direction));
         }
 
         static public List<Hex> diagonals = new List<Hex> { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
@@ -78,6 +91,10 @@ namespace GameModel
             return Hex.Length(Hex.Subtract(a, b));
         }
 
+        public override string ToString()
+        {
+            return "(" + q + ", " + r + ", " + s + ")";
+        }
     }
 
     public struct FractionalHex
@@ -137,6 +154,9 @@ namespace GameModel
 
     }
 
+    /// <summary>
+    /// There are four offset types: odd-r, even-r, odd-q, even-q. The “r” types are used with with pointy top hexagons and the “q” types are used with flat top. Whether it’s even or odd can be encoded as +1 or -1.
+    /// </summary>
     public struct OffsetCoord
     {
         public OffsetCoord(int col, int row)
@@ -149,39 +169,47 @@ namespace GameModel
         static public int EVEN = 1;
         static public int ODD = -1;
 
-        static public OffsetCoord QoffsetFromCube(int offset, Hex h)
+        public static OffsetCoord QoffsetFromCube(Hex h)
+        {
+            return QoffsetFromCube(ODD, h);
+        }
+
+        static OffsetCoord QoffsetFromCube(int offset, Hex h)
         {
             int col = h.q;
-            int row = h.r + (int)((h.q + offset * (h.q & 1)) / 2);
+            int row = h.r + ((h.q + offset * (h.q & 1)) / 2);
             return new OffsetCoord(col, row);
         }
 
-
-        static public Hex QoffsetToCube(int offset, OffsetCoord h)
+        public static Hex QoffsetToCube(OffsetCoord o)
         {
-            int q = h.col;
-            int r = h.row - (int)((h.col + offset * (h.col & 1)) / 2);
+            return QoffsetToCube(ODD, o); // Always using the odd layout
+        }
+
+        static Hex QoffsetToCube(int offset, OffsetCoord o)
+        {
+            int q = o.col;
+            int r = o.row - ((o.col + offset * (o.col & 1)) / 2);
             int s = -q - r;
             return new Hex(q, r, s);
         }
 
+        // Not using pointy hex orientation for this game
 
-        static public OffsetCoord RoffsetFromCube(int offset, Hex h)
-        {
-            int col = h.q + (int)((h.r + offset * (h.r & 1)) / 2);
-            int row = h.r;
-            return new OffsetCoord(col, row);
-        }
+        //static public OffsetCoord RoffsetFromCube(int offset, Hex h)
+        //{
+        //    int col = h.q + ((h.r + offset * (h.r & 1)) / 2);
+        //    int row = h.r;
+        //    return new OffsetCoord(col, row);
+        //}
 
-
-        static public Hex RoffsetToCube(int offset, OffsetCoord h)
-        {
-            int q = h.col - (int)((h.row + offset * (h.row & 1)) / 2);
-            int r = h.row;
-            int s = -q - r;
-            return new Hex(q, r, s);
-        }
-
+        //static public Hex RoffsetToCube(int offset, OffsetCoord h)
+        //{
+        //    int q = h.col - ((h.row + offset * (h.row & 1)) / 2);
+        //    int r = h.row;
+        //    int s = -q - r;
+        //    return new Hex(q, r, s);
+        //}
     }
 
     public struct Orientation
@@ -266,14 +294,5 @@ namespace GameModel
             }
             return corners;
         }
-
     }
-
-
-
-    // Tests
-
-
-    
-
 }

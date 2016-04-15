@@ -16,6 +16,8 @@ namespace GameModel
         public TerrainType TerrainType;
         public List<MilitaryUnit> Units;
 
+        public Hex Hex;
+
         public Tile(int id, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
         {
             Units = new List<MilitaryUnit>();
@@ -23,6 +25,9 @@ namespace GameModel
 
             Id = id;
             Location = new Point(x, y);
+
+            Hex = OffsetCoord.QoffsetToCube(new OffsetCoord(x, y));
+
             TerrainType = terrainType;
             IsEdgeOfMap = isEdge;
         }
@@ -77,18 +82,7 @@ namespace GameModel
             return cost;
         }
 
-        public IEnumerable<Tile> AdjacentTiles
-        {
-            get
-            {
-                return _adjacentTiles;
-            }
-            set 
-            { 
-                _adjacentTiles = value;
-            }
-        }
-        private IEnumerable<Tile> _adjacentTiles;
+        public IEnumerable<Tile> Neighbours { get; set; }
 
         //public IEnumerable<Edge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
         //{
@@ -115,7 +109,7 @@ namespace GameModel
 
                 _isTileSearchedForCoast = true;
 
-                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && AdjacentTiles.Any(x => Terrain.All_Land.HasFlag(x.TerrainType));
+                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.TerrainType));
 
                 return _isCoast;
             }
@@ -132,7 +126,7 @@ namespace GameModel
 
                 _isTileSearchedForSea = true;
 
-                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (AdjacentTiles.Any(x => x.IsSea) || IsEdgeOfMap);
+                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.IsSea) || IsEdgeOfMap);
 
                 return _isSea;
             }
@@ -149,7 +143,7 @@ namespace GameModel
 
                 _isTileSearchedForLake = true;
 
-                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !AdjacentTiles.Any(x => x.IsSea);
+                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.IsSea);
 
                 return _isLake;
             }
@@ -177,40 +171,8 @@ namespace GameModel
         public static IEnumerable<Tile> ValidAdjacentMoves(MilitaryUnit unit, Tile tile)
         {
             return tile
-                    .AdjacentTiles
+                    .Neighbours
                     .Where(x => tile.AdjacentTileEdges.Any(y => unit.CanMoveOverEdge.HasFlag(y.EdgeType)) || unit.TerrainMovementCosts[x.TerrainType] != null);
-        }
-
-        public static List<Point> AdjacentOddTiles
-        {
-            get
-            {
-                return new List<Point>
-                {
-                    new Point(0, 1),
-                    new Point(1, 1),
-                    new Point(1, 0),
-                    new Point(0, -1),
-                    new Point(-1, 0),
-                    new Point(-1, 1),
-                };
-            }
-        }
-
-        public static List<Point> AdjacentEvenTiles
-        {
-            get
-            {
-                return new List<Point>
-                {
-                    new Point(0, 1),
-                    new Point(1, 0),
-                    new Point(1, -1),
-                    new Point(0, -1),
-                    new Point(-1, 0),
-                    new Point(-1, -1),
-                };
-            }
         }
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)

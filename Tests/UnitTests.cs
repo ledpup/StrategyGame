@@ -48,7 +48,7 @@ namespace Tests
 
             Assert.AreEqual(4, moveList.Count());
 
-            Assert.IsTrue(board[1, 1].AdjacentTiles.Any(x => Terrain.All_Water.HasFlag(x.TerrainType)));
+            Assert.IsTrue(board[1, 1].Neighbours.Any(x => Terrain.All_Water.HasFlag(x.TerrainType)));
             Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.Destination.TerrainType)));
 
             moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));

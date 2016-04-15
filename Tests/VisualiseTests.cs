@@ -29,6 +29,18 @@ namespace Tests
         }
 
         [TestMethod]
+        public void VisualiseBoardWithNewCoordsTest()
+        {
+            var board = new Board(GameBoard, TileEdges);
+
+            var labels = new string[board.Width, board.Height];
+
+            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithNewCoords.png", board.Tiles, labels);
+        }
+
+        [TestMethod]
         public void VisualiseBoardStructureTest()
         {
             var board = new Board(GameBoard, TileEdges, TileStructures);            

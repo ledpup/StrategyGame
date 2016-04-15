@@ -94,13 +94,13 @@ namespace GameModel
                 return distance;
             }
             distance += 1;
-            if (tile.AdjacentTiles.Any(x => x.IsSea))
+            if (tile.Neighbours.Any(x => x.IsSea))
             {
                 return distance;
             }
                       
             var minDistance = 100;
-            foreach (var neighbour in tile.AdjacentTiles)
+            foreach (var neighbour in tile.Neighbours)
             {
                 if (!searched.Contains(neighbour))
                 {
@@ -130,23 +130,25 @@ namespace GameModel
         {
             foreach (var tile in Tiles)
             {
-                if (tile.AdjacentTiles != null)
+                if (tile.Neighbours != null)
                     throw new Exception("Adjacent tiles have already be calculated");
 
-                var adjacentTiles = new List<Tile>();
+                var neighbours = new List<Tile>();
 
-                var potentialTiles = tile.X % 2 == 0 ? Tile.AdjacentEvenTiles : Tile.AdjacentOddTiles;
+                var potentialTiles = Hex.Neighbours(tile.Hex); // tile.X % 2 == 0 ? Tile.AdjacentEvenTiles : Tile.AdjacentOddTiles;
 
                 foreach (var potientialTile in potentialTiles)
                 {
-                    var neighbourX = tile.X + potientialTile.X;
-                    var neighbourY = tile.Y + potientialTile.Y;
+                    //var neighbour = Hex.Add(tile.Hex, potientialTile);
+
+                    var neighbourX = OffsetCoord.QoffsetFromCube(potientialTile).col;// tile.X + potientialTile.X;
+                    var neighbourY = OffsetCoord.QoffsetFromCube(potientialTile).row;// tile.Y + potientialTile.Y;
 
                     if (neighbourX >= 0 && neighbourX < Width && neighbourY >= 0 && neighbourY < Height)
-                        adjacentTiles.Add(this[neighbourX, neighbourY]);
+                        neighbours.Add(this[neighbourX, neighbourY]);
                 }
 
-                tile.AdjacentTiles = adjacentTiles;
+                tile.Neighbours = neighbours;
                 
             }
         }
@@ -174,7 +176,7 @@ namespace GameModel
                     var t1 = TileArray[firstTile];
                     var t2 = TileArray[secondTile];
 
-                    if (!t1.AdjacentTiles.Contains(t2))
+                    if (!t1.Neighbours.Contains(t2))
                         throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {2} because they are not neighbours", t1.Id, t2.Id));
 
 

@@ -332,7 +332,7 @@ namespace GameModel
             {
                 var origin = exploringMove.Destination;
 
-                var destinations = origin.AdjacentTiles.Where(dest => dest != unit.Tile
+                var destinations = origin.Neighbours.Where(dest => dest != unit.Tile
                                         && !potentialMoves.Any(x => x.Destination == dest)
                                         && !moveList.Any(x => x.Destination == dest)
                                         && CanCrossEdge(unit.CanMoveOverEdge, origin, dest)).ToList();

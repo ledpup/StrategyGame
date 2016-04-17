@@ -11,8 +11,8 @@ namespace Visualise
 {
     public class HexGrid
     {
-        const float HexHeight = 50;
-        static float HexWidth = (float)(4 * (HexHeight / 2 / Math.Sqrt(3)));
+        public const float HexHeight = 50;
+        public static float HexWidth = (float)(4 * (HexHeight / 2 / Math.Sqrt(3)));
         const float StructureWidth = 10;
 
 
@@ -180,8 +180,6 @@ namespace Visualise
         }
         private static void DrawHexGrid(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, float hexWidth, float hexHeight, string[,] labels)
         {
-            var font = new Font("Arial", (int)(HexHeight * .2));
-
             for (int row = 0; ; row++)
             {
                 PointF[] points = HexToPoints(hexWidth, hexHeight, row, 0);
@@ -189,7 +187,6 @@ namespace Visualise
                 if (points[4].Y > yMax)
                     break;
 
-                // Draw the row.
                 for (int col = 0; ; col++)
                 {
                     points = HexToPoints(hexWidth, hexHeight, row, col);
@@ -203,7 +200,34 @@ namespace Visualise
                     if (points[4].Y <= yMax)
                     {
                         graphics.DrawPolygon(pen, points);
+                    }
+                }
+            }
+        }
 
+        public static void LabelHexes(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, float hexWidth, float hexHeight, string[,] labels)
+        {
+            var font = new Font("Arial", (int)(hexHeight * .2));
+
+            for (int row = 0; ; row++)
+            {
+                PointF[] points = HexToPoints(hexWidth, hexHeight, row, 0);
+
+                if (points[4].Y > yMax)
+                    break;
+
+                for (int col = 0; ; col++)
+                {
+                    points = HexToPoints(hexWidth, hexHeight, row, col);
+
+                    // If it doesn't fit horizontally,
+                    // we're done with this row.
+                    if (points[3].X > xMax)
+                        break;
+
+                    // If it fits vertically, draw it.
+                    if (points[4].Y <= yMax)
+                    {
                         // Label the hexagon
                         if (labels != null)
                         {
@@ -213,7 +237,7 @@ namespace Visualise
                                 sf.LineAlignment = StringAlignment.Center;
                                 var x = (points[0].X + points[3].X) / 2;
                                 var y = ((points[1].Y + points[4].Y) / 2);
-                                
+
                                 if (col <= labels.GetUpperBound(0) && row <= labels.GetUpperBound(1))
                                 {
                                     var label = labels[col, row];

@@ -100,7 +100,7 @@ namespace GameModel
 
         public int TurnCreated { get; set; }
 
-        public MilitaryUnit(string name = "Unamed unit", int ownerId = 1, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turn = 0)
+        public MilitaryUnit(string name = "Unamed unit", int ownerId = 1, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turn = 0)
         {
             IsAlive = true;
             BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>
@@ -121,6 +121,7 @@ namespace GameModel
 
             Name = name;
             OwnerId = ownerId;
+            Tile = location;
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
             UnitType = unitType;

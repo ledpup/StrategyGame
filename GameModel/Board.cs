@@ -21,13 +21,14 @@ namespace GameModel
 
         public int Width;
         public int Height;
-        public List<MilitaryUnit> Units;
+        public List<MilitaryUnit> Units { get; set; }
+
         public Dictionary<int, List<MoveOrder>> MoveOrders;
 
         public static Dictionary<string, double> StructureDefenceModifiers;
         public static Logger Logger;
 
-        public List<Structure> TileStructures;
+        public List<Structure> Structures;
 
         public Board(string[] tiles, string[] tilesEdges = null, string[] tilePoints = null, Logger logger = null)
         {
@@ -38,7 +39,8 @@ namespace GameModel
             CalculateAdjacentTiles();
             CalculateTileDistanceFromTheSea();
             TileEdges = IntitaliseTileEdges(tilesEdges);
-            TileStructures = IntitaliseTilePoints(tilePoints);
+            Structures = IntitaliseTilePoints(tilePoints);
+            InitialiseSupply();
 
             Logger = logger;
             if (Logger == null)
@@ -60,6 +62,85 @@ namespace GameModel
             CalculateTemperature();
         }
 
+        public void InitialiseSupply()
+        {
+            Tiles.ToList().ForEach(x => x.Supply = null);
+            var supplyCalculated = new List<Tile>();
+            foreach (var structure in Structures)
+            {
+                CalculateSupply(this[structure.Id], structure.OwnerId, structure.Supply, supplyCalculated);
+            }
+        }
+
+        private void CalculateSupply(Tile tile, int ownerId, float supply, List<Tile> supplyCalculated)
+        {
+            if (supplyCalculated.Contains(tile))
+            {
+                if (tile.Supply < supply)
+                {
+                    tile.Supply = supply;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                supplyCalculated.Add(tile);
+                tile.Supply = supply;
+            }
+            
+            if (supply > 1)
+            {
+                foreach (var neighbour in tile.Neighbours)
+                {
+                    float neighbourSupply = 0;
+                    if (neighbour.OwnerId == ownerId || neighbour.OwnerId == null)
+                    {
+                        var tileEdge = TileEdges.SingleOrDefault(x => x.Tiles.All(y => y == tile || y == neighbour));
+                        if (tileEdge != null)
+                        {
+                            if (tileEdge.EdgeType == EdgeType.Road && !Terrain.All_Water.HasFlag(neighbour.TerrainType))
+                            {
+                                neighbourSupply = supply - .5f;
+                            }
+                            else if (tileEdge.EdgeType != EdgeType.Mountain)
+                            {
+                                var edgeModifier = tileEdge.EdgeType == EdgeType.Wall ? 0 : 0.5f;
+                                if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.TerrainType))
+                                {
+                                    if (Terrain.Rough_Land.HasFlag(neighbour.TerrainType))
+                                    {
+                                        neighbourSupply = supply - 1.5f - edgeModifier;
+                                    }
+                                    else
+                                    {
+                                        neighbourSupply = supply - 1f - edgeModifier;
+                                    }
+                                }
+                            }
+                        }
+                        else if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.TerrainType))
+                        {
+                            if (Terrain.Rough_Land.HasFlag(neighbour.TerrainType))
+                            {
+                                neighbourSupply = supply - 1.5f;
+                            }
+                            else
+                            {
+                                neighbourSupply = supply - 1;
+                            }
+                        }
+                        if (neighbourSupply >= 1)
+                        {
+                            CalculateSupply(neighbour, ownerId, neighbourSupply, supplyCalculated);
+                        }
+                    }
+                }
+            }
+        }
+
         private List<Structure> IntitaliseTilePoints(string[] tilePoints)
         {
             var structures = new List<Structure>();
@@ -68,8 +149,9 @@ namespace GameModel
                 return structures;
             foreach (var point in tilePoints)
             {
-                var id = int.Parse(point.Split(',')[0]);
-                var structure = new Structure(id, Point.IndexToPoint(id, Width), point.Split(',')[1]);
+                var structureProperties = point.Split(',');
+                var id = int.Parse(structureProperties[0]);
+                var structure = new Structure(id, Point.IndexToPoint(id, Width), structureProperties[1], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
 
                 TileArray[structure.Id].Structure = structure;
                 structures.Add(structure);

@@ -37,7 +37,7 @@ namespace Tests
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithNewCoords.png", board.Tiles, labels);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithCubeCoords.png", board.Tiles, labels);
         }
 
         [TestMethod]
@@ -45,7 +45,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, TileStructures);            
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithStructures.png", board.Tiles, null, null, board.TileStructures);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithStructures.png", board.Tiles, null, null, board.Structures);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace Tests
                 new MilitaryUnit() { Tile = board[1, 1], OwnerId = 2 }
             };
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, null, null, board.TileStructures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, null, null, board.Structures, units);
         }
 
         [TestMethod]

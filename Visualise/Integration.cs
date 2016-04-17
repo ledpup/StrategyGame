@@ -50,6 +50,8 @@ namespace Visualise
                 
             }
 
+            HexGrid.LabelHexes(graphics, Pens.Black, 0, bitmap.Width, 0, bitmap.Height, HexGrid.HexWidth, HexGrid.HexHeight, labels);
+
             bitmap.Save(fileName);
         }
 

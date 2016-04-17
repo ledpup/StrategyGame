@@ -43,6 +43,8 @@ namespace GameModel
             get; set;
         }
 
+        public float? Supply { get; set; }
+
         public double CalculateMoveCost(MilitaryUnit unit, Tile destination)
         {
             var costChanged = false;
@@ -82,7 +84,7 @@ namespace GameModel
             return cost;
         }
 
-        public IEnumerable<Tile> Neighbours { get; set; }
+        public List<Tile> Neighbours { get; set; }
 
         //public IEnumerable<Edge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
         //{
@@ -253,5 +255,6 @@ namespace GameModel
         public int DistanceFromWater { get; internal set; }
         public TerrainType TemperatureAdjustedTerrainType { get; set; }
         public Structure Structure { get; set; }
+        public int? OwnerId { get; set; }
     }
 }

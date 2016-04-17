@@ -20,7 +20,6 @@ namespace Tests
         public void ReadPointsTest()
         {
             var board = new Board(GameBoard, null, TilePoints) ;
-            
         }
     }
 }

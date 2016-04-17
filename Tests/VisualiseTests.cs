@@ -103,7 +103,7 @@ namespace Tests
             var vectors = new List<Vector>();
             for (var i = 0; i < path.Length - 1; i++)
             {
-                vectors.Add(new Vector(path[i].Point, path[i + 1].Point, ArgbColour.Black));
+                vectors.Add(new Vector(path[i].Point, path[i + 1].Point, Colours.Black));
             }
 
             return vectors;

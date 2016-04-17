@@ -8,46 +8,22 @@ namespace GameModel
 {
     public class Move
     {
-        public Move(Move from, Tile destination)
+        public Move(Tile origin, Tile destination)
         {
-            MoveFrom = from;
+            Origin = origin;
             Destination = destination; 
         }
-        public Move MoveFrom;
+        public Tile Origin;
         public Tile Destination;
 
-        public Tile[] Moves()
+        public static bool IsAllOnRoad(List<Move> moves)
         {
-            var moves = new List<Tile>();
-            var move = this;
-            while (move != null)
-            {
-                moves.Add(move.Destination);
-                move = move.MoveFrom;
-            }
-            moves.Reverse();
-            return moves.ToArray();
-        }
-
-        public static bool IsAllOnRoad(Move move)
-        {
-            var movePosition = move;
-
-            while (movePosition.MoveFrom != null)
-            {
-                var isRoad = Board.EdgeHasRoad(movePosition.Destination, movePosition.MoveFrom.Destination);
-                if (!isRoad)
-                    return false;
-
-                movePosition = movePosition.MoveFrom;
-            }
-            return true;
+            return moves.All(x => Board.EdgeHasRoad(x.Origin, x.Destination));
         }
 
         public override string ToString()
         {
-            var from = MoveFrom == null ? "" : "From: " + MoveFrom.Destination;
-            return from + " To: " + Destination;
+            return "From: " + Origin + " To: " + Destination;
         }
     }
 }

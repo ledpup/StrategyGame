@@ -10,7 +10,6 @@ namespace GameModel
 
     public class Vector
     {
-        
         public Vector(Point origin, Point destination, ArgbColour colour, BaseEdgeType baseEdgeType = BaseEdgeType.CentreToCentre)
         {
             Origin = origin;

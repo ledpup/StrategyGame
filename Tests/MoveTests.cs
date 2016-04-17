@@ -16,12 +16,13 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var move1 = new Move(null, board[1, 2]);
-            var move2 = new Move(move1, board[2, 2]);
+            var moves = new List<Move>
+            {
+                new Move(board[1, 1], board[1, 2]),
+                new Move(board[1, 2], board[2, 2]),
+            };
 
-            var road = Move.IsAllOnRoad(move2);
-
-            Assert.IsTrue(road);
+            Assert.IsTrue(Move.IsAllOnRoad(moves));
         }
         
         [TestMethod]
@@ -29,15 +30,16 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var move1 = new Move(null, board[1, 2]);
-            var move2 = new Move(move1, board[2, 2]);
-            var move3 = new Move(move2, board[3, 2]);
+            var moves = new Move[]
+            {
+                new Move(board[1, 1], board[1, 2]),
+                new Move(board[1, 2], board[2, 2]),
+                new Move(board[2, 2], board[3, 2]),
+            };
 
-            var moveList = move3.Moves();
-
-            Assert.AreEqual(board[20], moveList[0]);
-            Assert.AreEqual(board[38], moveList[1]);
-            Assert.AreEqual(board[56], moveList[2]);
+            Assert.AreEqual(board[20], moves[0]);
+            Assert.AreEqual(board[38], moves[1]);
+            Assert.AreEqual(board[56], moves[2]);
         }
 
         [TestMethod]
@@ -51,14 +53,27 @@ namespace Tests
                 new MilitaryUnit(),
             };
 
-            var move1 = new Move(null, board[1, 2]);
-            var move2 = new Move(move1, board[2, 2]);
-            var move3 = new Move(move2, board[3, 2]);
-
-            var moveOrders = new List<MoveOrder> 
-            { 
-                new MoveOrder { Moves = move3.Moves(), Unit = board.Units[0] },
-                new MoveOrder { Moves = move2.Moves(), Unit = board.Units[1] },
+            var moveOrders = new List<MoveOrder>
+            {
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2]),
+                        new Move(board[1, 2], board[2, 2]),
+                        new Move(board[2, 2], board[3, 2]),
+                    },
+                    Unit = board.Units[0] }
+                ,
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2]),
+                        new Move(board[1, 2], board[2, 2]),
+                    },
+                    Unit = board.Units[1]
+                },
             };
 
             board.ResolveMoves(0, moveOrders);
@@ -70,37 +85,47 @@ namespace Tests
         [TestMethod]
         public void ResolveMove_ConflictArrises_ConflictedUnitsStop()
         {
-            var board = UnitsMoveIntoConflict();
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+            board.Units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit("1st Infantry", 1, board[1, 1]) { BaseMovementPoints = 5 },
+                new MilitaryUnit("2nd Infantry", 2, board[2, 3]),
+            };
+
+            var moveOrders = new List<MoveOrder>
+            {
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2]),
+                        new Move(board[1, 2], board[2, 2]),
+                        new Move(board[2, 2], board[3, 2]),
+                    },
+                    Unit = board.Units[0] }
+                ,
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[2, 3], board[2, 2]),
+                        new Move(board[2, 2], board[2, 1]),
+                    },
+                    Unit = board.Units[1]
+                },
+            };
+
+            var vectors = new List<Vector>();
+            moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitsPreMove.png", board.Tiles, null, vectors, board.Structures, board.Units);
+
+            board.ResolveMoves(0, moveOrders);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitsPostMove.png", board.Tiles, null, null, board.Structures, board.Units);
 
             Assert.AreEqual(board[2, 2], board.Units[0].Tile);
             Assert.AreEqual(board[2, 2], board.Units[1].Tile);
-        }
-
-        public static Board UnitsMoveIntoConflict()
-        {
-            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
-
-            board.Units = new List<MilitaryUnit>
-            { 
-                new MilitaryUnit() { BaseMovementPoints = 5, Tile = board[1, 1] }, 
-                new MilitaryUnit() { OwnerId = 2, Tile = board[2, 3] },
-            };
-
-            var move1 = new Move(null, board[1, 2]);
-            var move2 = new Move(move1, board[2, 2]);
-            var move3 = new Move(move2, board[3, 2]);
-
-            var move4 = new Move(null, board[2, 2]);
-            var move5 = new Move(move4, board[2, 1]);
-
-            var moveOrders = new List<MoveOrder> 
-            { 
-                new MoveOrder { Moves = move3.Moves(), Unit = board.Units[0] },
-                new MoveOrder { Moves = move5.Moves(), Unit = board.Units[1] },
-            };
-
-            board.ResolveMoves(0, moveOrders);
-            return board;
         }
 
         [TestMethod]

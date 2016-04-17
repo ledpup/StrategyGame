@@ -43,7 +43,8 @@ namespace Visualise
 
                     for (var i = 0; i < unitsAtLocation.Count; i ++)
                     {
-                        HexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), unitsAtLocation[i].OwnerId == 1 ? new SolidBrush(Color.Red) : new SolidBrush(Color.Blue));
+                        var colour = Color.FromArgb(unitsAtLocation[i].UnitColour.Alpha, unitsAtLocation[i].UnitColour.Red, unitsAtLocation[i].UnitColour.Green, unitsAtLocation[i].UnitColour.Blue);
+                        HexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), new SolidBrush(colour));
                     }
                 }
 
@@ -60,17 +61,17 @@ namespace Visualise
             switch (x.EdgeType)
             {
                 case EdgeType.River:
-                    return ArgbColour.DodgerBlue;
+                    return Colours.DodgerBlue;
                 case EdgeType.Road:
-                    return ArgbColour.SaddleBrown;
+                    return Colours.SaddleBrown;
                 case EdgeType.Forest:
-                    return ArgbColour.DarkGreen;
+                    return Colours.DarkGreen;
                 case EdgeType.Hill:
-                    return ArgbColour.SandyBrown;
+                    return Colours.SandyBrown;
                 case EdgeType.Mountain:
-                    return ArgbColour.Brown;
+                    return Colours.Brown;
                 default:
-                    return ArgbColour.Black;
+                    return Colours.Black;
             }
         }
 

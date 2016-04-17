@@ -413,7 +413,7 @@ namespace GameModel
                 {
                     var moveIndex = step / unitStepRate[moveOrder.Unit] - 1;
                     if (moveOrder.Moves.Length > moveIndex)
-                        moveOrder.Unit.Tile = moveOrder.Moves[moveIndex];
+                        moveOrder.Unit.Tile = moveOrder.Moves[moveIndex].Destination;
                 }
             }
         }

@@ -297,6 +297,14 @@ namespace GameModel
             get { return (int)Math.Ceiling(Quantity * Size); }
         }
 
+        public ArgbColour UnitColour
+        {
+            get
+            {
+                return OwnerId == 1 ? Colours.Red : Colours.Blue;
+            }
+        }
+
         public static IEnumerable<Move> MoveList(MilitaryUnit unit)
         {
             var moveList = new List<Move>();
@@ -308,19 +316,19 @@ namespace GameModel
                 var moves = GenerateMoves(unit, moveList, exploringMoves);
                 var validDestinations = moves.Where(x => unit.MayStopOn.HasFlag(x.Destination.TerrainType)).ToList();
                 moveList.AddRange(validDestinations);
-                exploringMoves = moves.Where(x => movesTaken + unit.TerrainMovementCosts[x.Destination.TerrainType] < unit.MovementPoints || Move.IsAllOnRoad(x)).ToList();
+                exploringMoves = moves.Where(x => movesTaken + unit.TerrainMovementCosts[x.Destination.TerrainType] < unit.MovementPoints).ToList();
 
                 movesTaken++;
             }
 
-            // If all moves have been on road, you get a bonus move
-            if (unit.CanMoveOverEdge.HasFlag(EdgeType.Road))
-            {
-                var roadsToExplore = exploringMoves.Where(x => Move.IsAllOnRoad(x)).ToList();
-                var roadMoves = GenerateMoves(unit, moveList, roadsToExplore);
-                var validRoadMoves = roadMoves.Where(x => unit.MayStopOn.HasFlag(x.Destination.TerrainType) && Move.IsAllOnRoad(x)).ToList();
-                moveList.AddRange(validRoadMoves);
-            }
+            //// If all moves have been on road, you get a bonus move
+            //if (unit.CanMoveOverEdge.HasFlag(EdgeType.Road))
+            //{
+            //    var roadsToExplore = exploringMoves.Where(x => Move.IsAllOnRoad(x)).ToList();
+            //    var roadMoves = GenerateMoves(unit, moveList, roadsToExplore);
+            //    var validRoadMoves = roadMoves.Where(x => unit.MayStopOn.HasFlag(x.Destination.TerrainType) && Move.IsAllOnRoad(x)).ToList();
+            //    moveList.AddRange(validRoadMoves);
+            //}
             
             return moveList;
         }
@@ -338,7 +346,7 @@ namespace GameModel
                                         && !moveList.Any(x => x.Destination == dest)
                                         && CanCrossEdge(unit.CanMoveOverEdge, origin, dest)).ToList();
 
-                destinations.ForEach(dest => potentialMoves.Add(new Move(exploringMove, dest)));
+                destinations.ForEach(dest => potentialMoves.Add(new Move(exploringMove.Origin, dest)));
             }
 
             return potentialMoves.Where(x => unit.CanMoveOver.HasFlag(x.Destination.TerrainType)).ToList();

@@ -260,7 +260,8 @@ namespace GameModel
                     _tile.Units.Remove(this);
 
                 _tile = value;
-                _tile.Units.Add(this);
+                if (_tile != null)
+                    _tile.Units.Add(this);
             } 
         }
         Tile _tile;

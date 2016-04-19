@@ -373,12 +373,15 @@ namespace GameModel
                 throw new Exception(string.Format("Move order is not for the current turn ({0}).", turn));
 
             var movingUnits = moveOrders.Select(x => x.Unit).ToList();
-            var initialMovementPoints = movingUnits.Max(x => x.MovementPoints);
+            float maxMovementPoints = 12;
+
+            if (moveOrders.Max(x => x.Moves.Length) > maxMovementPoints)
+                throw new Exception(string.Format("The max number of moves is capped at {0}. A move order has exceeded this limit.", maxMovementPoints));
 
             var unitStepRate = new Dictionary<MilitaryUnit, int>();
-            movingUnits.ForEach(x => unitStepRate.Add(x, initialMovementPoints / x.MovementPoints));
+            movingUnits.ForEach(x => unitStepRate.Add(x, (int)Math.Round(maxMovementPoints / x.MovementPoints)));
 
-            for (var step = 1; step <= initialMovementPoints; step++)
+            for (var step = 1; step <= maxMovementPoints; step++)
             {
                 MoveUnitsOneStep(moveOrders, unitStepRate, step);
 

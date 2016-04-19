@@ -25,18 +25,14 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoard.png", board.Tiles);
-        }
-
-        [TestMethod]
-        public void VisualiseBoardWithNewCoordsTest()
-        {
-            var board = new Board(GameBoard, TileEdges);
-
             var labels = new string[board.Width, board.Height];
+            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Id.ToString());
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithArrayIndex.png", board.Tiles, labels);
+
+            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithOffsetCoords.png", board.Tiles, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-
             Visualise.Integration.DrawHexagonImage("BasicBoardWithCubeCoords.png", board.Tiles, labels);
         }
 

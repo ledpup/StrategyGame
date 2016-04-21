@@ -25,5 +25,15 @@
         public static ArgbColour Red { get { return new ArgbColour(255, 255, 42, 42); } }
 
         public static ArgbColour Blue { get { return new ArgbColour(255, 42, 42, 255); } }
+
+        public static ArgbColour LightBlue { get { return new ArgbColour(255, 173, 216, 230); } }
+
+        public static ArgbColour GreenYellow { get { return new ArgbColour(255, 173, 255, 47); } }
+
+        public static ArgbColour Yellow { get { return new ArgbColour(255, 255, 255, 0); } }
+
+        public static ArgbColour DarkGray { get { return new ArgbColour(255, 169, 169, 169); } }
+
+        public static ArgbColour DarkBlue { get { return new ArgbColour(255, 0, 0, 139); } }
     }
 }

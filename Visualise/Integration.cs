@@ -14,7 +14,18 @@ namespace Visualise
         public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, string[,] labels = null, List<Vector> lines = null, List<Structure> tileStructures = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
-            tiles.ToList().ForEach(x => hexagonColours.Add(new PointF(x.X, x.Y), GetBrush(x.TerrainType)));
+            tiles.ToList().ForEach(x => 
+            {
+                var colour = GetColour(x.TerrainType);
+                if (!x.IsSelected)
+                {
+                    colour.Red = (short)(colour.Red * .3);
+                    colour.Green = (short)(colour.Green * .3);
+                    colour.Blue = (short)(colour.Blue * .3);
+                }
+                hexagonColours.Add(new PointF(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+            }
+            );
 
             var vectors = new List<Vector>();
             Board.TileEdges.ForEach(x => vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x), x.BaseEdgeType) { EdgeType = x.EdgeType }));
@@ -75,28 +86,28 @@ namespace Visualise
             }
         }
 
-        private static Brush GetBrush(TerrainType terrainType)
+        private static ArgbColour GetColour(TerrainType terrainType)
         {
             switch (terrainType)
             {
                 case TerrainType.Grassland:
-                    return Brushes.GreenYellow;
+                    return Colours.GreenYellow;
                 case TerrainType.Steppe:
-                    return Brushes.Yellow;
+                    return Colours.Yellow;
                 case TerrainType.Forest:
-                    return Brushes.DarkGreen;
+                    return Colours.DarkGreen;
                 case TerrainType.Hill:
-                    return Brushes.SandyBrown;
+                    return Colours.SandyBrown;
                 case TerrainType.Mountain:
-                    return Brushes.Brown;
+                    return Colours.Brown;
                 case TerrainType.Water:
-                    return Brushes.LightBlue;
+                    return Colours.LightBlue;
                 case TerrainType.Wetland:
-                    return Brushes.DarkGray;
+                    return Colours.DarkGray;
                 case TerrainType.Reef:
-                    return Brushes.DarkBlue;
+                    return Colours.DarkBlue;
             }
-            return Brushes.Black;
+            return Colours.Black;
         }
     }
 }

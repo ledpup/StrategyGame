@@ -17,7 +17,7 @@ namespace GameModel
 
         public IEnumerable<Move> MoveList()
         {
-            return MilitaryUnit.MoveList(Units.First());
+            return MilitaryUnit.PossibleMoveList(Units.First());
         }
     }
 }

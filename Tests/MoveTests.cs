@@ -12,19 +12,105 @@ namespace Tests
     public class MoveTests
     {
         [TestMethod]
-        public void IsAllOnRoad()
+        public void InfantryValidMoveList()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var moves = new List<Move>
-            {
-                new Move(board[1, 1], board[1, 2]),
-                new Move(board[1, 2], board[2, 2]),
-            };
+            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Infantry", 1, board[335], MovementType.Land, 2) };
 
-            Assert.IsTrue(Move.IsAllOnRoad(moves));
+            var moves = units[0].GetPossibleMoveList();
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMoves.png", board.Tiles, null, null, board.Structures, units);
+
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 334));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 361));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 336));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 309));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 310));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 308));
         }
-        
+
+        [TestMethod]
+        public void InfantryValidMoveListWithRoad()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Infantry", 1, board[345], MovementType.Land, 2) };
+
+            var moves = units[0].GetPossibleMoveList();
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMovesOverRoad.png", board.Tiles, null, null, board.Structures, units);
+
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 316));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 317));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 343));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 344));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 318));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 373));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 347));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 374));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 402));
+
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 346));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 371));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 372));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 400));
+        }
+
+        [TestMethod]
+        public void AirborneValidMoveList()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Airborne", 1, board[364], MovementType.Airborne, 3) };
+
+            var moves = units[0].GetPossibleMoveList();
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithAirborneUnitMoves.png", board.Tiles, null, null, board.Structures, units);
+
+            //Assert.AreEqual(12, moves.Count());
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 334));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 308));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 309));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 361));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 335));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 336));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 310));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 311));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 338));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 312));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 389));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 390));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 365));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 339));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 340));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 417));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 366));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 367));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 418));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 419));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 393));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 394));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 445));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 446));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 420));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 421));
+
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 388));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 362));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 337));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 391));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 392));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 416));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 444));
+        }
+
         [TestMethod]
         public void Moves()
         {

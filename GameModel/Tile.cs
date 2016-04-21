@@ -256,5 +256,6 @@ namespace GameModel
         public TerrainType TemperatureAdjustedTerrainType { get; set; }
         public Structure Structure { get; set; }
         public int? OwnerId { get; set; }
+        public bool IsSelected { get; set; }
     }
 }

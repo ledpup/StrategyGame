@@ -227,7 +227,11 @@ namespace GameModel
                     var neighbourY = OffsetCoord.QoffsetFromCube(potientialTile).row;// tile.Y + potientialTile.Y;
 
                     if (neighbourX >= 0 && neighbourX < Width && neighbourY >= 0 && neighbourY < Height)
-                        neighbours.Add(this[neighbourX, neighbourY]);
+                    {
+                        var neighbour = this[neighbourX, neighbourY];
+                        neighbours.Add(neighbour);
+                        //tile.AdjacentTileEdges.Add(new Edge("Normal", new Tile[] { tile, neighbour }));
+                    }
                 }
 
                 tile.Neighbours = neighbours;

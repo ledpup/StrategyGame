@@ -8,18 +8,15 @@ namespace GameModel
 {
     public class Move
     {
-        public Move(Tile origin, Tile destination)
+        public Move(Tile origin, Tile destination, int movesRemaining = 0)
         {
             Origin = origin;
-            Destination = destination; 
+            Destination = destination;
+            MovesRemaining = movesRemaining;
         }
         public Tile Origin;
         public Tile Destination;
-
-        public static bool IsAllOnRoad(List<Move> moves)
-        {
-            return moves.All(x => Board.EdgeHasRoad(x.Origin, x.Destination));
-        }
+        public int MovesRemaining;
 
         public override string ToString()
         {

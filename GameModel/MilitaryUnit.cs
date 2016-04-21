@@ -337,9 +337,9 @@ namespace GameModel
 
         public static IEnumerable<Move> PossibleMoveList(MilitaryUnit unit)
         {
-            var movesAlreadyConsidered = new List<Move>();
+            var movesConsidered = new List<Move>();
 
-            var moves = GenerateStandardMoves(unit, unit.Tile, movesAlreadyConsidered, unit.MovementPoints);
+            var moves = GenerateStandardMoves(unit, unit.Tile, movesConsidered, unit.MovementPoints);
 
             if (unit.RoadMoveBonus > 0)
             {
@@ -352,18 +352,18 @@ namespace GameModel
             return moves;
         }
 
-        private static List<Move> GenerateStandardMoves(MilitaryUnit unit, Tile tile, List<Move> movesAlreadyConsidered, int movementPoints)
+        private static List<Move> GenerateStandardMoves(MilitaryUnit unit, Tile tile, List<Move> movesConsidered, int movementPoints)
         {
             var potentialMoves = new List<Move>();
 
             potentialMoves.AddRange(tile.Neighbours.Where(dest => dest != unit.Tile
-                                        && !movesAlreadyConsidered.Any(x => x.Origin == tile && x.Destination == dest && x.MovesRemaining > movementPoints)
+                                        && !movesConsidered.Any(x => x.Origin == tile && x.Destination == dest && x.MovesRemaining > movementPoints)
                                         && EdgeMovementCost(unit, tile, dest) != null
                                         && unit.TerrainMovementCosts[dest.TerrainType] != null
                                         ).Select(x => new Move(tile, x, movementPoints))
                                         .ToList());
 
-            movesAlreadyConsidered.AddRange(potentialMoves);
+            movesConsidered.AddRange(potentialMoves);
 
             var neighbourMoves = new List<Move>();
 
@@ -373,7 +373,7 @@ namespace GameModel
                 var cost = movementPoints - (int)unit.TerrainMovementCosts[x.Destination.TerrainType] - (int)edgeCost;
 
                 if (cost > 0)
-                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Destination, movesAlreadyConsidered, cost));
+                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Destination, movesConsidered, cost));
 
             });
 
@@ -383,19 +383,23 @@ namespace GameModel
 
         }
 
-        private static List<Move> GenerateRoadBonusMoves(MilitaryUnit unit, Tile tile, List<Move> movesAlreadyConsidered, int movementPoints)
+        private static List<Move> GenerateRoadBonusMoves(MilitaryUnit unit, Tile tile, List<Move> movesConsidered, int movementPoints)
         {
-            var roadMoves = tile.AdjacentTileEdges.Where(x => x.EdgeType == EdgeType.Road && !movesAlreadyConsidered.Any(y => (x.Tiles[0] == tile && x.Tiles[1] == y.Destination) || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination)))
-                .Select(x => new Move(x.Tiles[0], x.Tiles[1])).ToList();
+            var roadMoves = tile.AdjacentTileEdges.Where(x => x.EdgeType == EdgeType.Road && !movesConsidered.Any(y => ((x.Tiles[0] == tile && x.Tiles[1] == y.Destination) || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination)) && y.MovesRemaining > movementPoints))
+                .Select(x => new Move(x.Tiles[0], x.Tiles[1], movementPoints)).ToList();
 
-            movesAlreadyConsidered.AddRange(roadMoves);
+            movesConsidered.AddRange(roadMoves);
+
+            var neighbourMoves = new List<Move>();
 
             foreach (var roadMove in roadMoves)
             {
                 var cost = movementPoints - 1;
                 if (cost > 0)
-                    return GenerateRoadBonusMoves(unit, roadMove.Destination, movesAlreadyConsidered, cost);
+                    neighbourMoves.AddRange(GenerateRoadBonusMoves(unit, roadMove.Destination, movesConsidered, cost));
             }
+
+            roadMoves.AddRange(neighbourMoves);
 
             return roadMoves;
         }

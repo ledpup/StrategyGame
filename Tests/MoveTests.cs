@@ -37,7 +37,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Infantry", 1, board[345], MovementType.Land, 2) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Infantry", 1, board[345], MovementType.Land, 2) { RoadMoveBonus = 2 } };
 
             var moves = units[0].GetPossibleMoveList();
 
@@ -54,6 +54,7 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Destination.Id == 347));
             Assert.IsTrue(moves.Any(x => x.Destination.Id == 374));
             Assert.IsTrue(moves.Any(x => x.Destination.Id == 402));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 429));
 
             Assert.IsFalse(moves.Any(x => x.Destination.Id == 346));
             Assert.IsFalse(moves.Any(x => x.Destination.Id == 371));

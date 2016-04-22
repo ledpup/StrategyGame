@@ -30,7 +30,7 @@ namespace GameModel
 
         public List<Structure> Structures;
 
-        public Board(string[] tiles, string[] tilesEdges = null, string[] tilePoints = null, Logger logger = null)
+        public Board(string[] tiles, string[] edges = null, string[] structures = null, Logger logger = null)
         {
             Width = tiles[0].Length;
             Height = tiles.Length;
@@ -38,8 +38,8 @@ namespace GameModel
             InitialiseTiles(Width, Height, tiles);
             CalculateAdjacentTiles();
             CalculateTileDistanceFromTheSea();
-            TileEdges = IntitaliseTileEdges(tilesEdges);
-            Structures = IntitaliseTilePoints(tilePoints);
+            Edges = IntitaliseTileEdges(edges);
+            Structures = IntitaliseTilePoints(structures);
             InitialiseSupply();
 
             Logger = logger;
@@ -98,7 +98,7 @@ namespace GameModel
                     float neighbourSupply = 0;
                     if (neighbour.OwnerId == ownerId || neighbour.OwnerId == null)
                     {
-                        var tileEdge = TileEdges.SingleOrDefault(x => x.Tiles.All(y => y == tile || y == neighbour));
+                        var tileEdge = Edges.SingleOrDefault(x => x.Tiles.All(y => y == tile || y == neighbour));
                         if (tileEdge != null)
                         {
                             if (tileEdge.EdgeType == EdgeType.Road && !Terrain.All_Water.HasFlag(neighbour.TerrainType))
@@ -230,7 +230,7 @@ namespace GameModel
                     {
                         var neighbour = this[neighbourX, neighbourY];
                         neighbours.Add(neighbour);
-                        //tile.AdjacentTileEdges.Add(new Edge("Normal", new Tile[] { tile, neighbour }));
+                        tile.NeighbourEdges.Add(new Edge("Normal", new Tile[] { tile, neighbour }));
                     }
                 }
 
@@ -267,10 +267,11 @@ namespace GameModel
 
 
                     var tiles = new Tile[] { t1, t2 };
-                    var edge = new Edge(columns[2], tiles);
+                    var edge = t1.NeighbourEdges.Single(y => y.Tiles.Contains(t2));
+                    edge.SetEdgeType(columns[2]);
 
-                    t1.AdjacentTileEdges.Add(edge);
-                    t2.AdjacentTileEdges.Add(edge);
+                    edge = t2.NeighbourEdges.Single(y => y.Tiles.Contains(t1));
+                    edge.SetEdgeType(columns[2]);
 
                     tileEdgesList.Add(edge);
                 }
@@ -334,7 +335,7 @@ namespace GameModel
 
         public Dictionary<TerrainType, double> TerrainTemperatureModifiers { get; private set; }
 
-        public static List<Edge> TileEdges;
+        public static List<Edge> Edges;
 
         public static List<PathFindTile> GetValidMovesWithMoveCostsForUnit(Board board, MilitaryUnit unit)
         {
@@ -364,7 +365,7 @@ namespace GameModel
 
         public static bool EdgeHasRoad(Tile tile, Tile adjacentTile)
         {
-            var tileEdge = tile.AdjacentTileEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
+            var tileEdge = tile.NeighbourEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
 
             return tileEdge == null ? false : tileEdge.EdgeType == EdgeType.Road;
         }

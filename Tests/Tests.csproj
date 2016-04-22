@@ -79,7 +79,7 @@
     <Content Include="BasicBoardEdges.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BasicBoardPoints.txt">
+    <Content Include="BasicBoardStructures.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

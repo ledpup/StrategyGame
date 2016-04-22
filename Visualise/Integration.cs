@@ -11,7 +11,7 @@ namespace Visualise
 
     public class Integration
     {
-        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, string[,] labels = null, List<Vector> lines = null, List<Structure> tileStructures = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
+        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, string[,] labels = null, List<Vector> lines = null, List<Structure> structures = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
 
@@ -31,7 +31,7 @@ namespace Visualise
             );
 
             var vectors = new List<Vector>();
-            Board.TileEdges.ForEach(x => vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x), x.BaseEdgeType) { EdgeType = x.EdgeType }));
+            Board.Edges.ForEach(x => vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x), x.BaseEdgeType) { EdgeType = x.EdgeType }));
 
             if (lines != null)
                 vectors.AddRange(lines);
@@ -40,12 +40,18 @@ namespace Visualise
             var bitmap = new Bitmap(imageWidth, imageHeight);
             var graphics = Graphics.FromImage(bitmap);
 
-            HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, labels, tileStructures);
+            HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, labels, structures);
 
             vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road ? 10 : 3), x.BaseEdgeType));
 
-            if (tileStructures != null)
-                tileStructures.ForEach(x => HexGrid.DrawRectangle(graphics, x.Location, new SolidBrush(Color.Red)));
+            if (structures != null)
+            {
+                structures.ForEach(x =>
+                {
+                    var colour = x.Colour;
+                    HexGrid.DrawRectangle(graphics, x.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                });
+            }
 
             if (units != null)
             {

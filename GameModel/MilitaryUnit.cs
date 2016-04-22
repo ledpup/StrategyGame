@@ -226,6 +226,12 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Hill] = 2;
             TerrainMovementCosts[TerrainType.Wetland] = 1;
 
+            EdgeMovementCosts[EdgeType.Normal] = 0;
+            EdgeMovementCosts[EdgeType.River] = 0;
+            EdgeMovementCosts[EdgeType.Road] = 1;
+            EdgeMovementCosts[EdgeType.Forest] = 1;
+            EdgeMovementCosts[EdgeType.Hill] = 1;
+
             CanMoveOver = Terrain.Non_Mountainous_Land;
             CanMoveOverEdge = EdgeType.Road | EdgeType.River;
             MayStopOn = Terrain.Non_Mountainous_Land;
@@ -251,6 +257,9 @@ namespace GameModel
         {
             TerrainMovementCosts[TerrainType.Water] = 1;
             TerrainMovementCosts[TerrainType.Reef] = 2;
+
+            EdgeMovementCosts[EdgeType.Normal] = 0;
+            EdgeMovementCosts[EdgeType.Reef] = 1;
 
             CanMoveOver = Terrain.All_Water;
             CanMoveOverEdge = EdgeType.Normal;
@@ -315,7 +324,7 @@ namespace GameModel
         {
             get
             {
-                return OwnerId == 1 ? Colours.Red : Colours.Blue;
+                return Player.Colour(OwnerId);
             }
         }
 
@@ -349,7 +358,8 @@ namespace GameModel
 
             potentialMoves.AddRange(tile.Neighbours.Where(dest => dest != unit.Tile
                                         && !movesConsidered.Any(x => x.Origin == tile && x.Destination == dest && x.MovesRemaining > movementPoints)
-                                        && (unit.MovementType == MovementType.Airborne || (GetEdge(tile, dest).EdgeType == EdgeType.Road && EdgeMovementCost(unit, tile, dest) != null || (EdgeMovementCost(unit, tile, dest) != null && unit.TerrainMovementCosts[dest.TerrainType] != null)))
+                                        && (unit.MovementType == MovementType.Airborne 
+                                                || (GetEdge(tile, dest).EdgeType == EdgeType.Road && unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null || (unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null && unit.TerrainMovementCosts[dest.TerrainType] != null)))
                                         ).Select(x => new Move(tile, x, movementPoints))
                                         .ToList());
 
@@ -386,7 +396,7 @@ namespace GameModel
 
         private static List<Move> GenerateRoadBonusMoves(MilitaryUnit unit, Tile tile, List<Move> movesConsidered, int movementPoints)
         {
-            var roadMoves = tile.AdjacentTileEdges.Where(x => x.EdgeType == EdgeType.Road && !movesConsidered.Any(y => (x.Tiles[0] == tile && x.Tiles[1] == y.Destination) || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination)))
+            var roadMoves = tile.NeighbourEdges.Where(x => x.EdgeType == EdgeType.Road && !movesConsidered.Any(y => (x.Tiles[0] == tile && x.Tiles[1] == y.Destination) || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination)))
                 .Select(x => new Move(x.Tiles[0], x.Tiles[1])).ToList();
 
             movesConsidered.AddRange(roadMoves);
@@ -407,84 +417,7 @@ namespace GameModel
 
         private static Edge GetEdge(Tile origin, Tile destination)
         {
-            var edge = origin.AdjacentTileEdges.SingleOrDefault(y => y.Tiles.Contains(destination));
-            if (edge == null)
-                return new Edge("Normal", new Tile[] { origin, destination });
-            return edge;
-        }
-
-        private static float? EdgeMovementCost(MilitaryUnit unit, Tile origin, Tile dest)
-        {
-            var edge = GetEdge(origin, dest);
-
-            return unit.EdgeMovementCosts[edge.EdgeType];
-        }
-
-        //public static IEnumerable<Move> PossibleMoveList(MilitaryUnit unit)
-        //{
-        //    var moveList = new List<Move>();
-        //    var exploringMoves = new List<Move> { new Move(null, unit.Tile) };
-        //    var movesTaken = 0;
-
-        //    while (movesTaken < unit.MovementPoints)
-        //    {
-        //        var moves = GenerateMoves(unit, moveList, exploringMoves);
-        //        var validDestinations = moves.Where(x => unit.MayStopOn.HasFlag(x.Destination.TerrainType)).ToList();
-        //        moveList.AddRange(validDestinations);
-        //        exploringMoves = moves.Where(x => movesTaken + unit.TerrainMovementCosts[x.Destination.TerrainType] <= unit.MovementPoints).ToList();
-
-        //        movesTaken++;
-        //    }
-
-        //    //// If all moves have been on road, you get a bonus move
-        //    //if (unit.CanMoveOverEdge.HasFlag(EdgeType.Road))
-        //    //{
-        //    //    var roadsToExplore = exploringMoves.Where(x => Move.IsAllOnRoad(x)).ToList();
-        //    //    var roadMoves = GenerateMoves(unit, moveList, roadsToExplore);
-        //    //    var validRoadMoves = roadMoves.Where(x => unit.MayStopOn.HasFlag(x.Destination.TerrainType) && Move.IsAllOnRoad(x)).ToList();
-        //    //    moveList.AddRange(validRoadMoves);
-        //    //}
-
-        //    return moveList;
-        //}
-
-        //private static List<Move> GenerateMoves(MilitaryUnit unit, List<Move> moveList, List<Move> exploringMoves)
-        //{
-        //    var potentialMoves = new List<Move>();
-
-        //    foreach (var exploringMove in exploringMoves)
-        //    {
-        //        var origin = exploringMove.Destination;
-
-        //        var destinations = origin.Neighbours.Where(dest => dest != unit.Tile
-        //                                && !potentialMoves.Any(x => x.Destination == dest)
-        //                                && !moveList.Any(x => x.Destination == dest)
-        //                                && CanCrossEdge(unit.CanMoveOverEdge, origin, dest)
-        //                                && unit.CanMoveOver.HasFlag(dest.TerrainType)).ToList();
-
-        //        destinations.ForEach(dest => potentialMoves.Add(new Move(exploringMove.Origin, dest)));
-        //    }
-
-        //    return potentialMoves;
-        //}
-
-        private static bool CanCrossEdge(EdgeType moveOverEdge, Tile tile, Tile adjacentTile)
-        {
-            var adjacentTileEdge = tile.AdjacentTileEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
-
-            if (adjacentTileEdge == null)
-                return true;
-
-            if (moveOverEdge.HasFlag(adjacentTileEdge.EdgeType))
-                return true;
-
-            if (adjacentTileEdge.EdgeType.HasFlag(EdgeType.River | EdgeType.Road))
-            {
-                if (moveOverEdge.HasFlag(EdgeType.Road))
-                    return true;
-            }
-
-            return false;
+            return origin.NeighbourEdges.Single(y => y.Tiles.Contains(destination));
         }
     }
 }

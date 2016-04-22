@@ -49,6 +49,7 @@
     <Compile Include="Board.cs" />
     <Compile Include="CasualtyLogEntry.cs" />
     <Compile Include="CombatantInBattle.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="RedBlobLibrary.cs" />
     <Compile Include="MoraleChangeEvent.cs" />
     <Compile Include="MoveOrder.cs" />

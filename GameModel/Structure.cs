@@ -28,6 +28,7 @@ namespace GameModel
             Supply = supply;
         }
 
+        public ArgbColour Colour { get { return Player.Colour(OwnerId); } }
         public StructureType StructureType { get; set;}
     }
 }

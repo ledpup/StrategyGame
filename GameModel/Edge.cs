@@ -31,6 +31,13 @@ namespace GameModel
 
         public Edge(string edgeType, Tile[] tiles)
         {
+            SetEdgeType(edgeType);
+
+            Tiles = tiles;
+        }
+
+        public void SetEdgeType(string edgeType)
+        {
             EdgeType = (EdgeType)Enum.Parse(typeof(EdgeType), edgeType);
 
             switch (EdgeType)
@@ -42,8 +49,6 @@ namespace GameModel
                     BaseEdgeType = BaseEdgeType.Hexside;
                     break;
             }
-
-            Tiles = tiles;
         }
 
         public Tile[] Tiles;

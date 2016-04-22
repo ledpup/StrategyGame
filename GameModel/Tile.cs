@@ -21,7 +21,7 @@ namespace GameModel
         public Tile(int id, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
         {
             Units = new List<MilitaryUnit>();
-            AdjacentTileEdges = new List<Edge>();
+            NeighbourEdges = new List<Edge>();
 
             Id = id;
             Location = new Point(x, y);
@@ -38,7 +38,7 @@ namespace GameModel
             return Id + " " + Location.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
         }
 
-        public List<Edge> AdjacentTileEdges
+        public List<Edge> NeighbourEdges
         {
             get; set;
         }
@@ -50,7 +50,7 @@ namespace GameModel
             var costChanged = false;
             var cost = 100D;
 
-            var edge = AdjacentTileEdges.SingleOrDefault(x => x.Tiles.Contains(destination));
+            var edge = NeighbourEdges.SingleOrDefault(x => x.Tiles.Contains(destination));
             if (edge != null)
             {
                 if (unit.CanMoveOverEdge.HasFlag(edge.EdgeType))
@@ -174,7 +174,7 @@ namespace GameModel
         {
             return tile
                     .Neighbours
-                    .Where(x => tile.AdjacentTileEdges.Any(y => unit.CanMoveOverEdge.HasFlag(y.EdgeType)) || unit.TerrainMovementCosts[x.TerrainType] != null);
+                    .Where(x => tile.NeighbourEdges.Any(y => unit.CanMoveOverEdge.HasFlag(y.EdgeType)) || unit.TerrainMovementCosts[x.TerrainType] != null);
         }
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)

@@ -13,13 +13,13 @@ namespace Tests
     public class SupplyTests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
-        static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
-        static string[] TilePoints = File.ReadAllLines("BasicBoardPoints.txt");
+        static string[] Edges = File.ReadAllLines("BasicBoardEdges.txt");
+        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
         [TestMethod]
         public void SupplyTest()
         {
-            var board = new Board(GameBoard, TileEdges, TilePoints);
+            var board = new Board(GameBoard, Edges, Structures);
 
             board[3, 4].OwnerId = 2;
             board.Units = new List<MilitaryUnit> { new MilitaryUnit("1st Enemy", 2, board[3, 4]) };

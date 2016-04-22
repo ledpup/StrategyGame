@@ -14,12 +14,12 @@ namespace Tests
     public class StructureTests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
-        static string[] TilePoints = File.ReadAllLines("BasicBoardPoints.txt");
+        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
         [TestMethod]
-        public void ReadPointsTest()
+        public void ReadStructuresTest()
         {
-            var board = new Board(GameBoard, null, TilePoints) ;
+            var board = new Board(GameBoard, null, Structures) ;
         }
     }
 }

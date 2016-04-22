@@ -13,5 +13,10 @@ namespace GameModel
         {
             return Id;
         }
+
+        internal static ArgbColour Colour(int ownerId)
+        {
+            return ownerId == 1 ? Colours.Red : Colours.Blue;
+        }
     }
 }

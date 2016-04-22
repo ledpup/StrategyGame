@@ -14,10 +14,13 @@ namespace Visualise
         public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, string[,] labels = null, List<Vector> lines = null, List<Structure> tileStructures = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
+
+            var displaySelected = tiles.Any(x => x.IsSelected);
+
             tiles.ToList().ForEach(x => 
             {
                 var colour = GetColour(x.TerrainType);
-                if (!x.IsSelected)
+                if (displaySelected && !x.IsSelected)
                 {
                     colour.Red = (short)(colour.Red * .3);
                     colour.Green = (short)(colour.Green * .3);

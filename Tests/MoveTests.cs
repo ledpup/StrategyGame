@@ -63,6 +63,69 @@ namespace Tests
         }
 
         [TestMethod]
+        public void InfantryValidMoveListWithRoadOverMountain()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Infantry", 1, board[85], MovementType.Land, 2) { RoadMoveBonus = 1 } };
+
+            var moves = units[0].GetPossibleMoveList();
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMovesOverRoadOverMountain.png", board.Tiles, null, null, board.Structures, units);
+
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 30));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 56));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 57));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 59));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 86));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 87));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 114));
+
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 58));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 32));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 60));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 83));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 84));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 112));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 113));
+        }
+
+        [TestMethod]
+        public void AirborneValidMoveListWithRoadAndMountain()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Infantry", 1, board[85], MovementType.Airborne, 2) };
+
+            var moves = units[0].GetPossibleMoveList();
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithAirborneUnitMovesWithRoadAndMountain.png", board.Tiles, null, null, board.Structures, units);
+
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 30));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 31));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 32));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 56));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 57));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 59));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 60));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 87));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 110));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 111));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 114));
+
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 58));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 83));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 84));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 86));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 112));
+            Assert.IsFalse(moves.Any(x => x.Destination.Id == 113));
+        }
+
+        [TestMethod]
         public void AirborneValidMoveList()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
@@ -110,6 +173,27 @@ namespace Tests
             Assert.IsFalse(moves.Any(x => x.Destination.Id == 392));
             Assert.IsFalse(moves.Any(x => x.Destination.Id == 416));
             Assert.IsFalse(moves.Any(x => x.Destination.Id == 444));
+        }
+
+        [TestMethod]
+        public void BasicBoardWithLandUnitNearRiverAndRoad()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit> { new MilitaryUnit("1st Infantry", 1, board[1, 1]) };
+
+            var moves = MilitaryUnit.PossibleMoveList(units[0]);
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithLandUnitNearRiverAndRoad.png", board.Tiles, null, null, board.Structures, units);
+
+            Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[2, 1]));
+            Assert.IsTrue(moves.Any(x => x.Destination.Id == 30));
+
+            Assert.IsFalse(moves.Any(x => x.Destination == board[1, 3])); // Can't cross the river
         }
 
         [TestMethod]
@@ -266,3 +350,4 @@ namespace Tests
         }
     }
 }
+

@@ -36,30 +36,6 @@ namespace Tests
         }
 
         [TestMethod]
-        public void UnitMoveList_LandUnit_ThreeMovesOnCorrectTerrain()
-        {
-            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
-
-            var unit = new MilitaryUnit();
-
-            unit.Tile = board[1, 1];
-
-            var moveList = MilitaryUnit.PossibleMoveList(unit);
-
-            Assert.AreEqual(4, moveList.Count());
-
-            Assert.IsTrue(board[1, 1].Neighbours.Any(x => Terrain.All_Water.HasFlag(x.TerrainType)));
-            Assert.IsFalse(moveList.Any(x => Terrain.All_Water.HasFlag(x.Destination.TerrainType)));
-
-            moveList.ToList().ForEach(x => Assert.AreEqual(1, moveList.Count(t => t.Equals(x))));
-
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 2]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 1]));
-        }
-
-        [TestMethod]
         public void UnitMoveList_AirborneUnit_SixMovesOnCorrectTerrain()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);

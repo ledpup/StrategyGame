@@ -18,7 +18,7 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit("1st Infantry", 1, board[1, 1]) { BaseMovementPoints = 5 },
+                new MilitaryUnit("1st Infantry", 1, board[1, 1]) { BaseMovementPoints = 4 },
                 new MilitaryUnit("2nd Infantry", 2, board[2, 3]),
             };
 

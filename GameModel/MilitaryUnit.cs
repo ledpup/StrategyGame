@@ -30,6 +30,7 @@ namespace GameModel
         Terrain,
         Weather,
         UnitType,
+        Structure,
     }
     public class MilitaryUnit
     {
@@ -101,18 +102,32 @@ namespace GameModel
 
         public int TurnCreated { get; set; }
 
-        public MilitaryUnit(string name = "Unamed unit", int ownerId = 1, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turn = 0)
+        public MilitaryUnit(string name = "Unamed unit", int ownerId = 1, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0)
         {
             IsAlive = true;
-            BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>
+            BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>();
+            foreach (BattleQualityModifier battleQualityModifier in Enum.GetValues(typeof(BattleQualityModifier)))
             {
-                { BattleQualityModifier.Terrain, 0 },
-                { BattleQualityModifier.Weather, 0 },
-                { BattleQualityModifier.UnitType, 0 },
-            };
+                BattleQualityModifiers.Add(battleQualityModifier, 0);
+            }
+
             TerrainTypeBattleModifier = new Dictionary<TerrainType, double>();
+            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
+            {
+                TerrainTypeBattleModifier.Add(terrainType, 0);
+            }
+
             WeatherBattleModifier = new Dictionary<Weather, double>();
+            foreach (Weather weather in Enum.GetValues(typeof(Weather)))
+            {
+                WeatherBattleModifier.Add(weather, 0);
+            }
+
             OpponentUnitTypeBattleModifier = new Dictionary<UnitType, double>();
+            foreach (UnitType unitTypeEnum in Enum.GetValues(typeof(UnitType)))
+            {
+                OpponentUnitTypeBattleModifier.Add(unitTypeEnum, 0);
+            }
 
             TerrainMovementCosts = new Dictionary<TerrainType, int?>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
@@ -134,7 +149,7 @@ namespace GameModel
             BaseQuality = baseQuality;
             Size = size;
             CombatInitiative = combatInitiative;
-            TurnCreated = turn;
+            TurnCreated = turnBuilt;
 
             InitialMorale = initialMorale;
             InitialQuantity = initialQuantity;
@@ -329,6 +344,7 @@ namespace GameModel
         }
 
         public int RoadMoveBonus { get; set; }
+        public double StructureBattleModifier { get; set; }
 
         public IEnumerable<Move> GetPossibleMoveList()
         {

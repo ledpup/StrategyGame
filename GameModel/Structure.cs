@@ -8,6 +8,7 @@ namespace GameModel
 {
     public enum StructureType
     {
+        None,
         Outpost,
         Fortress,
         City

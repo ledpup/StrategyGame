@@ -25,7 +25,7 @@ namespace GameModel
 
         public Dictionary<int, List<MoveOrder>> MoveOrders;
 
-        public static Dictionary<string, double> StructureDefenceModifiers;
+        public static Dictionary<StructureType, double> StructureDefenceModifiers;
         public static Logger Logger;
 
         public List<Structure> Structures;
@@ -57,7 +57,12 @@ namespace GameModel
             }
             TerrainTemperatureModifiers[TerrainType.Mountain] = -10;
             TerrainTemperatureModifiers[TerrainType.Hill] = -5;
-            
+
+            StructureDefenceModifiers = new Dictionary<StructureType, double>();
+            StructureDefenceModifiers[StructureType.City] = .4;
+            StructureDefenceModifiers[StructureType.Fortress] = .6;
+            StructureDefenceModifiers[StructureType.Outpost] = .8;
+
 
             CalculateTemperature();
         }
@@ -436,7 +441,7 @@ namespace GameModel
 
                 if (x.IsInConflict)
                 {
-                    ResolveBattle(location, turn, TerrainType.Mountain, Weather.Cold, x.Units, 3, "Fort", 2);
+                    ResolveBattle(location, turn, TerrainType.Mountain, Weather.Cold, x.Units, 3, StructureType.Fortress, 2);
                     battleReports.Add(CreateBattleReport(location, turn, x.Units));
                 }
             });
@@ -444,7 +449,7 @@ namespace GameModel
             return battleReports;
         }
 
-        public static void ResolveBattle(string location, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, string structure = null, int siegeDuration = 1)
+        public static void ResolveBattle(string location, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None , int siegeDuration = 1)
         {
             var groupedUnits = units.GroupBy(x => x.OwnerId);
             if (groupedUnits.Count() == 1)
@@ -452,12 +457,13 @@ namespace GameModel
                 throw new Exception("Battle can not occur because all units in tile are owned by " + units[0].OwnerId);
             }
 
-            Logger.Info("Battle between {0} combatants at {1} on {2} terrain in {3} weather on turn {4}", groupedUnits.Count(), location, terrainType, weather, turn);
+            //Logger.Info("Battle between {0} combatants at {1} on {2} terrain in {3} weather on turn {4}", groupedUnits.Count(), location, terrainType, weather, turn);
 
             units.ForEach(x =>
             {
-                x.BattleQualityModifiers[BattleQualityModifier.Terrain] = x.TerrainTypeBattleModifier.ContainsKey(terrainType) ? x.TerrainTypeBattleModifier[terrainType] : 0;
-                x.BattleQualityModifiers[BattleQualityModifier.Weather] = x.WeatherBattleModifier.ContainsKey(weather) ? x.WeatherBattleModifier[weather] : 0;
+                x.BattleQualityModifiers[BattleQualityModifier.Terrain] = x.TerrainTypeBattleModifier[terrainType];
+                x.BattleQualityModifiers[BattleQualityModifier.Weather] = x.WeatherBattleModifier[weather];
+                x.BattleQualityModifiers[BattleQualityModifier.Structure] = structure != StructureType.None ? x.StructureBattleModifier : 0;
             });
 
 
@@ -482,7 +488,7 @@ namespace GameModel
 
                     combatantInBattle.Units.ForEach(x =>
                     {
-                        x.BattleQualityModifiers[BattleQualityModifier.UnitType] = x.OpponentUnitTypeBattleModifier.ContainsKey(unitType) ? x.OpponentUnitTypeBattleModifier[unitType] * proportion : 0;
+                        x.BattleQualityModifiers[BattleQualityModifier.UnitType] = x.OpponentUnitTypeBattleModifier[unitType] * proportion;
                     });
                 }
 
@@ -505,7 +511,7 @@ namespace GameModel
 
                 combatant.StrengthDamage = opponents.Sum(x => x.UnitStrength) / (numberOfSides - 1) * .8;
 
-                if (residentId == combatant.OwnerId && !string.IsNullOrEmpty(structure))
+                if (residentId == combatant.OwnerId && structure != StructureType.None)
                 {
                     var siegeUnitDamage = 0D;
                     opponents.ForEach(x => siegeUnitDamage += x.UnitStrengthByType[UnitType.Siege]);
@@ -539,7 +545,9 @@ namespace GameModel
 
         public static BattleReport CreateBattleReport(string location, int turn, List<MilitaryUnit> units)
         {
-            var battleReport = new BattleReport
+            var numberOfPlayers = units.GroupBy(x => x.OwnerId).Select(x => x.Key).Count();
+
+            var battleReport = new BattleReport(numberOfPlayers)
             {
                 Location = location,
                 Turn = turn,
@@ -547,7 +555,7 @@ namespace GameModel
 
             foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
             {
-                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByType[unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
+                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerId - 1][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
             }
 
             units.ForEach(x =>

@@ -247,8 +247,8 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             { 
-                new MilitaryUnit() { BaseMovementPoints = 5 },
-                new MilitaryUnit(),
+                new MilitaryUnit() { Tile = board[1, 1], BaseMovementPoints = 5 },
+                new MilitaryUnit() { Tile = board[1, 1] },
             };
 
             var moveOrders = new List<MoveOrder>

@@ -35,12 +35,12 @@ namespace Tests
                 new MilitaryUnit("3rd Infantry", 2, board[168]),
             };
 
-            board.Tiles.ToList().ForEach(x => { x.UnitCountInfluence = new double[numberOfPlayers]; x.UnitStrengthInfluence = new double[numberOfPlayers]; x.UnitCountTension = new double[numberOfPlayers]; });
+            board.Tiles.ToList().ForEach(x => { x.UnitCountInfluence = new double[numberOfPlayers]; x.UnitStrengthInfluence = new double[numberOfPlayers]; x.AggregateInfluence = new double[numberOfPlayers]; });
 
             foreach (var unit in board.Units)
             {
                 var playerIndex = unit.OwnerId - 1;
-                unit.Tile.UnitCountInfluence[playerIndex] = 1;
+                unit.Tile.UnitCountInfluence[playerIndex] += 1;
                 unit.Tile.UnitStrengthInfluence[playerIndex] = unit.Strength;
                 var moves = unit.PossibleMoveList().GroupBy(x => x.Destination);
                 foreach (var move in moves)
@@ -51,9 +51,26 @@ namespace Tests
                 }
             }
 
-            
-
             var labels = new string[board.Width, board.Height];
+
+            foreach (var structure in board.Structures)
+            {
+                structure.Tile.StructureInfluence += 2;
+                for (var i = 1; i < 3; i++)
+                {
+                    var hexesInRing = Hex.HexRing(structure.Tile.Hex, i);
+
+                    hexesInRing.ForEach(x => 
+                    {
+                        var index = Hex.HexToIndex(x, board.Width);
+                        if (index >= 0)
+                            board[index].StructureInfluence += 1D / (i + 1);
+                    });
+                }
+            }
+
+            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.StructureInfluence, 1).ToString());
+            Visualise.Integration.DrawHexagonImage("StructureInfluenceMap.png", board.Tiles, labels, null, board.Structures, board.Units);
 
 
             for (var i = 0; i < numberOfPlayers; i++)
@@ -65,18 +82,18 @@ namespace Tests
 
                 board.Tiles.ToList().ForEach(x => 
                 {
-                    x.UnitCountTension[i] = x.UnitCountInfluence[i];
+                    x.AggregateInfluence[i] = x.UnitCountInfluence[i] - x.StructureInfluence;
                     for (var j = 0; j < numberOfPlayers; j++)
                     {
                         if (i == j)
                             continue;
 
-                        x.UnitCountTension[i] -= x.UnitCountInfluence[j];
+                        x.AggregateInfluence[i] -= x.UnitCountInfluence[j];
                     }
                 });
 
-                board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitCountTension[i].ToString());
-                Visualise.Integration.DrawHexagonImage("UnitCountTensionMapPlayer" + (i + 1) + ".png", board.Tiles, labels, null, board.Structures, board.Units);
+                board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.AggregateInfluence[i], 1).ToString());
+                Visualise.Integration.DrawHexagonImage("AggregateInfluenceMapPlayer" + (i + 1) + ".png", board.Tiles, labels, null, board.Structures, board.Units);
             }
 
             var moveOrders = new List<MoveOrder>();
@@ -85,25 +102,27 @@ namespace Tests
             {
                 var possibleMoves = x.PossibleMoveList();
 
-                var highestTension = possibleMoves.Min(y => y.Destination.UnitCountTension[x.OwnerId - 1]);
+                var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.OwnerId - 1]);
 
-                var bestMove = possibleMoves.Where(y => y.Destination.UnitCountTension[x.OwnerId - 1] == highestTension).First();
+                if (x.Tile.AggregateInfluence[x.OwnerId - 1] > highestTension)
+                {
+                    var bestMove = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.OwnerId - 1] == highestTension).First();
 
-                var moveOrder = bestMove.GetMoveOrder();
+                    var moveOrder = bestMove.GetMoveOrder();
 
-                moveOrder.Unit = x;
-                moveOrders.Add(moveOrder);
-
+                    moveOrder.Unit = x;
+                    moveOrders.Add(moveOrder);
+                }
             });
 
             var vectors = new List<Vector>();
             moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-            Visualise.Integration.DrawHexagonImage("UnitCountTensionDerivedMoveOrders.png", board.Tiles, null, vectors, board.Structures, board.Units);
+            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMoveOrders.png", board.Tiles, null, vectors, board.Structures, board.Units);
 
             board.ResolveMoves(0, moveOrders);
 
-            Visualise.Integration.DrawHexagonImage("UnitCountTensionDerivedMovesResolved.png", board.Tiles, null, null, board.Structures, board.Units);
+            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMovesResolved.png", board.Tiles, null, null, board.Structures, board.Units);
         }
     }
 }

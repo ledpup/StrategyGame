@@ -20,10 +20,10 @@ namespace Tests
 
             var structures = new List<Structure>
             {
-                new Structure(1, new Point(1, 1), StructureType.Fortress, 1),
-                new Structure(1, new Point(1, 1), StructureType.Outpost, 1),
+                new Structure(1, StructureType.Fortress, null, 1),
+                new Structure(1, StructureType.Outpost, null, 1),
 
-                new Structure(1, new Point(1, 2), StructureType.City, 2),
+                new Structure(1, StructureType.City, null, 2),
             };
 
             var units = new List<MilitaryUnit>

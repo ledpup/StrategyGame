@@ -11,114 +11,134 @@ using GameModel;
 namespace Tests
 {
     [TestClass]
-    class Tests
+    public class HexTests
     {
         [TestMethod]
-        static public void EqualHex(String name, Hex a, Hex b)
+        public static void EqualHex(String name, Hex a, Hex b)
         {
             if (!(a.q == b.q && a.s == b.s && a.r == b.r))
             {
-                Tests.Complain(name);
+                HexTests.Complain(name);
             }
         }
 
 
         [TestMethod]
-        static public void EqualOffsetcoord(String name, OffsetCoord a, OffsetCoord b)
+        public void EqualOffsetcoord(String name, OffsetCoord a, OffsetCoord b)
         {
             if (!(a.col == b.col && a.row == b.row))
             {
-                Tests.Complain(name);
+                HexTests.Complain(name);
             }
         }
 
 
         [TestMethod]
-        static public void EqualInt(String name, int a, int b)
+        public static  void EqualInt(String name, int a, int b)
         {
             if (!(a == b))
             {
-                Tests.Complain(name);
+                HexTests.Complain(name);
             }
         }
 
 
         [TestMethod]
-        static public void EqualHexArray(String name, List<Hex> a, List<Hex> b)
+        public static void EqualHexArray(String name, List<Hex> a, List<Hex> b)
         {
-            Tests.EqualInt(name, a.Count, b.Count);
+            HexTests.EqualInt(name, a.Count, b.Count);
             for (int i = 0; i < a.Count; i++)
             {
-                Tests.EqualHex(name, a[i], b[i]);
+                HexTests.EqualHex(name, a[i], b[i]);
             }
         }
 
 
         [TestMethod]
-        static public void TestHexArithmetic()
+        public void TestHexArithmetic()
         {
-            Tests.EqualHex("hex_add", new Hex(4, -10, 6), Hex.Add(new Hex(1, -3, 2), new Hex(3, -7, 4)));
-            Tests.EqualHex("hex_subtract", new Hex(-2, 4, -2), Hex.Subtract(new Hex(1, -3, 2), new Hex(3, -7, 4)));
+            HexTests.EqualHex("hex_add", new Hex(4, -10, 6), Hex.Add(new Hex(1, -3, 2), new Hex(3, -7, 4)));
+            HexTests.EqualHex("hex_subtract", new Hex(-2, 4, -2), Hex.Subtract(new Hex(1, -3, 2), new Hex(3, -7, 4)));
         }
 
 
         [TestMethod]
-        static public void TestHexDirection()
+        public void TestHexDirection()
         {
-            Tests.EqualHex("hex_direction", new Hex(0, -1, 1), Hex.Direction(2));
+            HexTests.EqualHex("hex_direction", new Hex(0, -1, 1), Hex.Direction(2));
         }
 
 
         [TestMethod]
-        static public void TestHexNeighbor()
+        public void TestHexNeighbor()
         {
-            Tests.EqualHex("hex_neighbor", new Hex(1, -3, 2), Hex.Neighbor(new Hex(1, -2, 1), 2));
+            HexTests.EqualHex("hex_neighbor", new Hex(1, -3, 2), Hex.Neighbor(new Hex(1, -2, 1), 2));
         }
 
 
         [TestMethod]
-        static public void TestHexDiagonal()
+        public void TestHexDiagonal()
         {
-            Tests.EqualHex("hex_diagonal", new Hex(-1, -1, 2), Hex.DiagonalNeighbor(new Hex(1, -2, 1), 3));
+            HexTests.EqualHex("hex_diagonal", new Hex(-1, -1, 2), Hex.DiagonalNeighbor(new Hex(1, -2, 1), 3));
         }
 
 
         [TestMethod]
-        static public void TestHexDistance()
+        public void TestHexDistance()
         {
-            Tests.EqualInt("hex_distance", 7, Hex.Distance(new Hex(3, -7, 4), new Hex(0, 0, 0)));
+            HexTests.EqualInt("hex_distance", 7, Hex.Distance(new Hex(3, -7, 4), new Hex(0, 0, 0)));
         }
 
 
         [TestMethod]
-        static public void TestHexRound()
+        public void TestHexRound()
         {
             Hex a = new Hex(0, 0, 0);
             Hex b = new Hex(1, -1, 0);
             Hex c = new Hex(0, -1, 1);
-            Tests.EqualHex("hex_round 1", new Hex(5, -10, 5), FractionalHex.HexRound(FractionalHex.HexLerp(new Hex(0, 0, 0), new Hex(10, -20, 10), 0.5)));
-            Tests.EqualHex("hex_round 2", a, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.499)));
-            Tests.EqualHex("hex_round 3", b, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.501)));
-            Tests.EqualHex("hex_round 4", a, FractionalHex.HexRound(new FractionalHex(a.q * 0.4 + b.q * 0.3 + c.q * 0.3, a.r * 0.4 + b.r * 0.3 + c.r * 0.3, a.s * 0.4 + b.s * 0.3 + c.s * 0.3)));
-            Tests.EqualHex("hex_round 5", c, FractionalHex.HexRound(new FractionalHex(a.q * 0.3 + b.q * 0.3 + c.q * 0.4, a.r * 0.3 + b.r * 0.3 + c.r * 0.4, a.s * 0.3 + b.s * 0.3 + c.s * 0.4)));
+            HexTests.EqualHex("hex_round 1", new Hex(5, -10, 5), FractionalHex.HexRound(FractionalHex.HexLerp(new Hex(0, 0, 0), new Hex(10, -20, 10), 0.5)));
+            HexTests.EqualHex("hex_round 2", a, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.499)));
+            HexTests.EqualHex("hex_round 3", b, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.501)));
+            HexTests.EqualHex("hex_round 4", a, FractionalHex.HexRound(new FractionalHex(a.q * 0.4 + b.q * 0.3 + c.q * 0.3, a.r * 0.4 + b.r * 0.3 + c.r * 0.3, a.s * 0.4 + b.s * 0.3 + c.s * 0.3)));
+            HexTests.EqualHex("hex_round 5", c, FractionalHex.HexRound(new FractionalHex(a.q * 0.3 + b.q * 0.3 + c.q * 0.4, a.r * 0.3 + b.r * 0.3 + c.r * 0.4, a.s * 0.3 + b.s * 0.3 + c.s * 0.4)));
         }
 
 
         [TestMethod]
-        static public void TestHexLinedraw()
+        public void TestHexLinedraw()
         {
-            Tests.EqualHexArray("hex_linedraw", new List<Hex> { new Hex(0, 0, 0), new Hex(0, -1, 1), new Hex(0, -2, 2), new Hex(1, -3, 2), new Hex(1, -4, 3), new Hex(1, -5, 4) }, FractionalHex.HexLinedraw(new Hex(0, 0, 0), new Hex(1, -5, 4)));
+            HexTests.EqualHexArray("hex_linedraw", new List<Hex> { new Hex(0, 0, 0), new Hex(0, -1, 1), new Hex(0, -2, 2), new Hex(1, -3, 2), new Hex(1, -4, 3), new Hex(1, -5, 4) }, FractionalHex.HexLinedraw(new Hex(0, 0, 0), new Hex(1, -5, 4)));
         }
 
 
         [TestMethod]
-        static public void TestLayout()
+        public void TestLayout()
         {
             Hex h = new Hex(3, 4, -7);
             Layout flat = new Layout(Layout.flat, new PointD(10, 15), new PointD(35, 71));
-            Tests.EqualHex("layout", h, FractionalHex.HexRound(Layout.PixelToHex(flat, Layout.HexToPixel(flat, h))));
+            HexTests.EqualHex("layout", h, FractionalHex.HexRound(Layout.PixelToHex(flat, Layout.HexToPixel(flat, h))));
             Layout pointy = new Layout(Layout.pointy, new PointD(10, 15), new PointD(35, 71));
-            Tests.EqualHex("layout", h, FractionalHex.HexRound(Layout.PixelToHex(pointy, Layout.HexToPixel(pointy, h))));
+            HexTests.EqualHex("layout", h, FractionalHex.HexRound(Layout.PixelToHex(pointy, Layout.HexToPixel(pointy, h))));
+        }
+
+        [TestMethod]
+        public void TestHexRing()
+        {
+            var hex = new Hex(1, -3, 2);
+            var results = Hex.HexRing(hex, 1);
+
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(1, -2, 1))));
+
+
+            hex = new Hex(5, 0, -5);
+            results = Hex.HexRing(hex, 1);
+
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(5, -1, -4))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(6, -1, -5))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(6,  0, -6))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(5,  1, -6))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(4,  1, -5))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(4,  0, -4))));
         }
 
 

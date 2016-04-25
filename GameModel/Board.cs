@@ -35,10 +35,10 @@ namespace GameModel
             Height = tiles.Length;
 
             InitialiseTiles(Width, Height, tiles);
-            CalculateAdjacentTiles();
+            FindNeighbours();
             CalculateTileDistanceFromTheSea();
             Edges = IntitaliseTileEdges(edges);
-            Structures = IntitaliseTilePoints(structures);
+            Structures = IntitaliseStructures(structures);
             InitialiseSupply();
 
             Logger = logger;
@@ -56,8 +56,6 @@ namespace GameModel
             }
             TerrainTemperatureModifiers[TerrainType.Mountain] = -10;
             TerrainTemperatureModifiers[TerrainType.Hill] = -5;
-
-
 
 
             CalculateTemperature();
@@ -142,7 +140,7 @@ namespace GameModel
             }
         }
 
-        private List<Structure> IntitaliseTilePoints(string[] tilePoints)
+        private List<Structure> IntitaliseStructures(string[] tilePoints)
         {
             var structures = new List<Structure>();
 
@@ -153,9 +151,9 @@ namespace GameModel
                 var structureProperties = point.Split(',');
                 var id = int.Parse(structureProperties[0]);
                 var structureType = (StructureType)Enum.Parse(typeof(StructureType), structureProperties[2]);
-                var structure = new Structure(id, Point.IndexToPoint(id, Width), structureType, int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
+                var structure = new Structure(id, structureType, TileArray[id], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
 
-                TileArray[structure.Id].Structure = structure;
+                
                 structures.Add(structure);
             }
             return structures;
@@ -210,7 +208,7 @@ namespace GameModel
             }
         }
 
-        public void CalculateAdjacentTiles()
+        public void FindNeighbours()
         {
             foreach (var tile in Tiles)
             {
@@ -219,14 +217,12 @@ namespace GameModel
 
                 var neighbours = new List<Tile>();
 
-                var potentialTiles = Hex.Neighbours(tile.Hex); // tile.X % 2 == 0 ? Tile.AdjacentEvenTiles : Tile.AdjacentOddTiles;
+                var potentialTiles = Hex.Neighbours(tile.Hex);
 
                 foreach (var potientialTile in potentialTiles)
                 {
-                    //var neighbour = Hex.Add(tile.Hex, potientialTile);
-
-                    var neighbourX = OffsetCoord.QoffsetFromCube(potientialTile).col;// tile.X + potientialTile.X;
-                    var neighbourY = OffsetCoord.QoffsetFromCube(potientialTile).row;// tile.Y + potientialTile.Y;
+                    var neighbourX = OffsetCoord.QoffsetFromCube(potientialTile).col;
+                    var neighbourY = OffsetCoord.QoffsetFromCube(potientialTile).row;
 
                     if (neighbourX >= 0 && neighbourX < Width && neighbourY >= 0 && neighbourY < Height)
                     {

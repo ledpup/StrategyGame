@@ -49,7 +49,7 @@ namespace Visualise
                 structures.ForEach(x =>
                 {
                     var colour = x.Colour;
-                    HexGrid.DrawRectangle(graphics, x.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                    HexGrid.DrawRectangle(graphics, x.Tile.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                 });
             }
 

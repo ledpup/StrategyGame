@@ -25,15 +25,15 @@ namespace GameModel
             };
 
         public int Id;
-        public Point Location;
+        public Tile Tile;
         public int OwnerId;
         public float Supply;
 
-        public Structure(int id, Point location, StructureType structureType, int ownerId = 1, int supply = 10)
+        public Structure(int id, StructureType structureType, Tile tile, int ownerId = 1, int supply = 10)
         {
             Id = id;
-            Location = location;
             StructureType = structureType;
+            Tile = tile;
             OwnerId = ownerId;
             Supply = supply;
         }

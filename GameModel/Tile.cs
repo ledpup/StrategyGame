@@ -20,7 +20,8 @@ namespace GameModel
 
         public double[] UnitCountInfluence;
         public double[] UnitStrengthInfluence;
-        public double[] UnitCountTension;
+        public double StructureInfluence;
+        public double[] AggregateInfluence;
 
         public Tile(int id, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
         {
@@ -89,22 +90,6 @@ namespace GameModel
         }
 
         public List<Tile> Neighbours { get; set; }
-
-        //public IEnumerable<Edge> BuildAdjacentEdgeTiles(IEnumerable<Tile> _adjacentTiles)
-        //{
-        //    var adjacentTileEdges = new List<Edge>();
-        //    _adjacentTiles.ToList().ForEach(x => 
-        //        {
-        //            var edge = Board.TileEdges.SingleOrDefault(r => r.Tiles.Contains(this) && r.Tiles.Contains(x)); 
-
-        //            if (edge == null)
-        //                return;
-
-        //            adjacentTileEdges.Add(edge);
-        //        });
-        //    return adjacentTileEdges;
-        //}
-        //
 
         public bool IsCoast
         {
@@ -258,7 +243,6 @@ namespace GameModel
         public double Temperature { get; set; }
         public int DistanceFromWater { get; internal set; }
         public TerrainType TemperatureAdjustedTerrainType { get; set; }
-        public Structure Structure { get; set; }
         public int? OwnerId { get; set; }
         public bool IsSelected { get; set; }
     }

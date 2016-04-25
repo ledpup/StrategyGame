@@ -52,9 +52,17 @@ namespace GameModel
             return Hex.directions[direction];
         }
 
-        public static int CubeToIndex(Hex hex, int offset, int boardWidth)
+        public static int HexToIndex(Hex hex, int boardWidth)
         {
-            return hex.r + ((hex.q + offset * (hex.q & 1)) / 2) * boardWidth + hex.q;
+            return HexToIndex(hex, OffsetCoord.ODD, boardWidth);
+        }
+
+        static int HexToIndex(Hex hex, int offset, int boardWidth)
+        {
+            int col = hex.q;
+            int row = hex.r + ((hex.q + offset * (hex.q & 1)) / 2);
+
+            return row * boardWidth + col;
         }
 
         public static List<Hex> Neighbours(Hex hex)
@@ -94,6 +102,35 @@ namespace GameModel
         public override string ToString()
         {
             return "(" + q + ", " + r + ", " + s + ")";
+        }
+
+        public static List<Hex> HexRing(Hex centreHex, int radius = 1)
+        {
+            if (radius < 1)
+                throw new Exception("Radius of ring must be greater than 0");
+
+            var results = new List<Hex>();
+
+            var cube = Add(centreHex, Scale(Direction(4), radius));
+            for (var i = 0; i < 6; i++)
+            {
+                for (var j = 0; j < radius; j++)
+                {
+                    results.Add(cube);
+                    cube = Neighbor(cube, i);
+                }
+            }
+            return results;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Hex))
+                return false;
+
+            Hex hex = (Hex)obj;
+
+            return (q == hex.q) && (r == hex.r) && (s == hex.s);
         }
     }
 

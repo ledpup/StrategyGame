@@ -85,8 +85,29 @@ namespace Tests
             var point = Point.IndexToPoint(29, boardWidth);
             var hex = OffsetCoord.QoffsetToCube(new OffsetCoord(point.X, point.Y));
             var offsetCoord = OffsetCoord.QoffsetFromCube(hex);
-            var index = Hex.CubeToIndex(hex, OffsetCoord.ODD, boardWidth);
+            var index = Hex.HexToIndex(hex, boardWidth);
             Assert.AreEqual(29, index);
+
+            point = Point.IndexToPoint(25, boardWidth);
+            hex = OffsetCoord.QoffsetToCube(new OffsetCoord(point.X, point.Y));
+            offsetCoord = OffsetCoord.QoffsetFromCube(hex);
+            index = Hex.HexToIndex(hex, boardWidth);
+            Assert.AreEqual(25, index);
+
+
+            point = Point.IndexToPoint(32, boardWidth);
+            hex = OffsetCoord.QoffsetToCube(new OffsetCoord(point.X, point.Y));
+            offsetCoord = OffsetCoord.QoffsetFromCube(hex);
+            index = Hex.HexToIndex(hex, boardWidth);
+            Assert.AreEqual(32, index);
+
+
+            Assert.AreEqual(32, Hex.HexToIndex(new Hex(5, -1, -4), boardWidth));
+            Assert.AreEqual(60, Hex.HexToIndex(new Hex(6, -1, -5), boardWidth));
+            Assert.AreEqual(87, Hex.HexToIndex(new Hex(6, 0, -6), boardWidth));
+            Assert.AreEqual(86, Hex.HexToIndex(new Hex(5, 1, -6), boardWidth));
+            Assert.AreEqual(85, Hex.HexToIndex(new Hex(4, 1, -5), boardWidth));
+            Assert.AreEqual(58, Hex.HexToIndex(new Hex(4, 0, -4), boardWidth));
         }
     }
 }

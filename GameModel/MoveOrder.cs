@@ -7,9 +7,19 @@ namespace GameModel
 {
     public class MoveOrder
     {
-        public int Turn;
         public MilitaryUnit Unit;
         public Move[] Moves;
+
+
+        public MoveOrder()
+        {
+
+        }
+        public MoveOrder(MilitaryUnit unit, Move[] moves)
+        {
+            Unit = unit;
+            Moves = moves;
+        }
 
         public List<Vector> Vectors
         {

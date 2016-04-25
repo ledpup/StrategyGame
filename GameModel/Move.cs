@@ -8,19 +8,39 @@ namespace GameModel
 {
     public class Move
     {
-        public Move(Tile origin, Tile destination, int movesRemaining = 0)
+        public Move(Tile origin, Tile destination, Move previousMove = null, int movesRemaining = 0, int distance = 0)
         {
             Origin = origin;
             Destination = destination;
+            PreviousMove = previousMove;
             MovesRemaining = movesRemaining;
+            Distance = distance;
         }
         public Tile Origin;
         public Tile Destination;
+        public Move PreviousMove;
         public int MovesRemaining;
+        public int Distance;
+        
 
         public override string ToString()
         {
             return "From: " + Origin + " To: " + Destination;
+        }
+
+        public MoveOrder GetMoveOrder()
+        {
+            var moveList = new List<Move>();
+            var currentMove = this;
+            while (currentMove != null)
+            {
+                moveList.Add(currentMove);
+                currentMove = currentMove.PreviousMove;
+            }
+
+            moveList.Reverse();
+
+            return new MoveOrder() { Moves = moveList.ToArray() };
         }
     }
 }

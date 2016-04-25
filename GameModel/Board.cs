@@ -25,7 +25,6 @@ namespace GameModel
 
         public Dictionary<int, List<MoveOrder>> MoveOrders;
 
-        public static Dictionary<StructureType, double> StructureDefenceModifiers;
         public static Logger Logger;
 
         public List<Structure> Structures;
@@ -58,10 +57,7 @@ namespace GameModel
             TerrainTemperatureModifiers[TerrainType.Mountain] = -10;
             TerrainTemperatureModifiers[TerrainType.Hill] = -5;
 
-            StructureDefenceModifiers = new Dictionary<StructureType, double>();
-            StructureDefenceModifiers[StructureType.City] = .4;
-            StructureDefenceModifiers[StructureType.Fortress] = .6;
-            StructureDefenceModifiers[StructureType.Outpost] = .8;
+
 
 
             CalculateTemperature();
@@ -156,7 +152,8 @@ namespace GameModel
             {
                 var structureProperties = point.Split(',');
                 var id = int.Parse(structureProperties[0]);
-                var structure = new Structure(id, Point.IndexToPoint(id, Width), structureProperties[1], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
+                var structureType = (StructureType)Enum.Parse(typeof(StructureType), structureProperties[2]);
+                var structure = new Structure(id, Point.IndexToPoint(id, Width), structureType, int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
 
                 TileArray[structure.Id].Structure = structure;
                 structures.Add(structure);
@@ -379,11 +376,14 @@ namespace GameModel
         {
             MoveOrders[turn] = moveOrders;
 
-            if (moveOrders.Any(x => x.Turn != turn))
-                throw new Exception(string.Format("Move order is not for the current turn ({0}).", turn));
-
             var movingUnits = moveOrders.Select(x => x.Unit).ToList();
             float maxMovementPoints = 12;
+
+            var invalidMoveOrders = moveOrders.Where(x => x.Moves[0].Origin != x.Unit.Tile);
+            if (invalidMoveOrders.Count() > 0)
+            {
+                throw new Exception("The following units received orders to move from a location where they don't currently reside: " + string.Join(", ", invalidMoveOrders.Select(x => x.Unit + ". Ordered " + x.Moves[0])));
+            }
 
             if (moveOrders.Max(x => x.Moves.Length) > maxMovementPoints)
                 throw new Exception(string.Format("The max number of moves is capped at {0}. A move order has exceeded this limit.", maxMovementPoints));
@@ -517,7 +517,7 @@ namespace GameModel
                     opponents.ForEach(x => siegeUnitDamage += x.UnitStrengthByType[UnitType.Siege]);
 
                     combatant.StrengthDamage -= siegeUnitDamage;
-                    combatant.StrengthDamage *= (StructureDefenceModifiers[structure] + (.05 * siegeDuration));
+                    combatant.StrengthDamage *= (Structure.StructureDefenceModifiers[structure] + (.05 * siegeDuration));
                     combatant.StrengthDamage += siegeUnitDamage;
                 }
             }

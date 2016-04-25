@@ -2,11 +2,7 @@
 140,141,River
 85,86,Road
 86,114,Road
-168,169,Wall
-168,142,Wall
 168,141,Mountain
-168,195,Wall
-168,167,Wall
 94,120,Wall
 95,96,Hill
 69,96,Wall

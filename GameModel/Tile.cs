@@ -18,6 +18,10 @@ namespace GameModel
 
         public Hex Hex;
 
+        public double[] UnitCountInfluence;
+        public double[] UnitStrengthInfluence;
+        public double[] UnitCountTension;
+
         public Tile(int id, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
         {
             Units = new List<MilitaryUnit>();

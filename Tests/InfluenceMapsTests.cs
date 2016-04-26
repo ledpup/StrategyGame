@@ -26,28 +26,37 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit("1st Airborne", 1, board[114], MovementType.Airborne, 3),
-                new MilitaryUnit("1st Infantry", 1, board[110], MovementType.Land, 3),
+                new MilitaryUnit(0, "1st Airborne", 0, board[114], MovementType.Airborne, 3),
+                new MilitaryUnit(1, "1st Infantry", 0, board[110], MovementType.Land, 3),
 
-                new MilitaryUnit("1st Infantry", 2, board[111]),
-                new MilitaryUnit("2nd Infantry", 2, board[111]),
+                new MilitaryUnit(2, "1st Infantry", 1, board[111]),
+                new MilitaryUnit(3, "2nd Infantry", 1, board[111]),
 
-                new MilitaryUnit("3rd Infantry", 2, board[168]),
+                new MilitaryUnit(4, "3rd Infantry", 1, board[168]),
             };
 
-            board.Tiles.ToList().ForEach(x => { x.UnitCountInfluence = new double[numberOfPlayers]; x.UnitStrengthInfluence = new double[numberOfPlayers]; x.AggregateInfluence = new double[numberOfPlayers]; });
+            board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
+
+            board.Tiles.ToList().ForEach(x => 
+            {
+                x.UnitCountInfluence = new double[numberOfPlayers];
+                x.UnitStrengthInfluence = new double[numberOfPlayers];
+                x.AggregateInfluence = new double[numberOfPlayers];
+                board.Units.ForEach(y => x.TerrainAndWeatherInfluenceByUnit.Add(y.Index, y.TerrainTypeBattleModifier[x.TerrainType] + y.WeatherBattleModifier[x.Weather]));
+            });
 
             foreach (var unit in board.Units)
             {
-                var playerIndex = unit.OwnerId - 1;
+                var playerIndex = unit.OwnerIndex;
                 unit.Tile.UnitCountInfluence[playerIndex] += 1;
                 unit.Tile.UnitStrengthInfluence[playerIndex] = unit.Strength;
                 var moves = unit.PossibleMoveList().GroupBy(x => x.Destination);
                 foreach (var move in moves)
                 {
                     var minDistance = move.Min(x => x.Distance) + 1;
-                    board[move.Key.Id].UnitCountInfluence[playerIndex] += Math.Round(1D / minDistance, 1);
-                    board[move.Key.Id].UnitStrengthInfluence[playerIndex] += Math.Round(unit.Strength / minDistance, 0);
+                    board[move.Key.Index].UnitCountInfluence[playerIndex] += Math.Round(1D / minDistance, 1);
+                    board[move.Key.Index].UnitStrengthInfluence[playerIndex] += Math.Round(unit.Strength / minDistance, 0);
                 }
             }
 
@@ -102,11 +111,17 @@ namespace Tests
             {
                 var possibleMoves = x.PossibleMoveList();
 
-                var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.OwnerId - 1]);
+                var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.OwnerIndex]);
 
-                if (x.Tile.AggregateInfluence[x.OwnerId - 1] > highestTension)
+                if (x.Tile.AggregateInfluence[x.OwnerIndex] > highestTension)
                 {
-                    var bestMove = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.OwnerId - 1] == highestTension).First();
+                    var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.OwnerIndex] == highestTension);
+
+                    //var minDistance = moves.Min(y => y.Distance);
+
+                    //var bestTerrain = moves.Max(y => y.TerrainAndWeatherModifers(x.Index));
+
+                    var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(x.Index)).ThenBy(y => y.Distance).First();
 
                     var moveOrder = bestMove.GetMoveOrder();
 

@@ -42,5 +42,18 @@ namespace GameModel
 
             return new MoveOrder() { Moves = moveList.ToArray() };
         }
+
+        public double TerrainAndWeatherModifers(int unitIndex)
+        {
+            var mod = 0D;
+            var currentMove = this;
+            while (currentMove != null)
+            {
+                mod += currentMove.Destination.TerrainAndWeatherInfluenceByUnit[unitIndex];
+                currentMove = currentMove.PreviousMove;
+            }
+
+            return mod;
+        }
     }
 }

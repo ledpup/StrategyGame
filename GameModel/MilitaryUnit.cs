@@ -34,9 +34,9 @@ namespace GameModel
     }
     public class MilitaryUnit
     {
-        public int Id;
+        public int Index;
         public string Name { get; set; }
-        public int OwnerId { get; set; }
+        public int OwnerIndex { get; set; }
         public UnitType UnitType { get; set; }
         public MovementType MovementType
         {
@@ -106,7 +106,7 @@ namespace GameModel
         {
             return Name + " (" + Strength + ") at " + Tile.ToString();
         }
-        public MilitaryUnit(string name = "Unamed unit", int ownerId = 1, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0)
+        public MilitaryUnit(int index = 0, string name = "Unamed unit", int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0)
         {
             IsAlive = true;
             BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>();
@@ -144,8 +144,9 @@ namespace GameModel
                 EdgeMovementCosts.Add(edgeType, null);
             }
 
+            Index = index;
             Name = name;
-            OwnerId = ownerId;
+            OwnerIndex = ownerIndex;
             Tile = location;
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
@@ -215,7 +216,7 @@ namespace GameModel
         }
 
 
-        public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerId != o.OwnerId && p.Tile == o.Tile && p.MovementType == o.MovementType;
+        public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Tile == o.Tile && p.MovementType == o.MovementType;
 
         void LandUnit()
         {
@@ -285,7 +286,7 @@ namespace GameModel
             MayStopOn = Terrain.All_Water;
         }
         //public TerrainType StopOn;
-        public TerrainType TerrainCombatBonus;
+        //public TerrainType TerrainCombatBonus;
 
 
         //public IEnumerable<Tile> ValidAdjacentMoves { get { return Tile.AdjacentTiles.Where(x => TerrainMovementCosts[x.TerrainType] != null) ; } }
@@ -309,7 +310,7 @@ namespace GameModel
 
         public override int GetHashCode()
         {
-            return Id;
+            return Index;
         }
 
         public int MovementPoints
@@ -343,7 +344,7 @@ namespace GameModel
         {
             get
             {
-                return Player.Colour(OwnerId);
+                return Player.Colour(OwnerIndex);
             }
         }
 

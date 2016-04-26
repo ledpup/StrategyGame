@@ -24,21 +24,21 @@ namespace GameModel
                 { StructureType.Outpost, .8 },
             };
 
-        public int Id;
+        public int Index;
         public Tile Tile;
-        public int OwnerId;
+        public int OwnerIndex;
         public float Supply;
 
-        public Structure(int id, StructureType structureType, Tile tile, int ownerId = 1, int supply = 10)
+        public Structure(int index, StructureType structureType, Tile tile, int ownerIndex = 0, int supply = 10)
         {
-            Id = id;
+            Index = index;
             StructureType = structureType;
             Tile = tile;
-            OwnerId = ownerId;
+            OwnerIndex = ownerIndex;
             Supply = supply;
         }
 
-        public ArgbColour Colour { get { return Player.Colour(OwnerId); } }
+        public ArgbColour Colour { get { return Player.Colour(OwnerIndex); } }
         public StructureType StructureType { get; set;}
     }
 }

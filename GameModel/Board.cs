@@ -9,8 +9,8 @@ namespace GameModel
 {
     public enum Weather
     {
-        Dry,
         Fine,
+        Dry,
         Wet,
         Cold,
     }
@@ -67,7 +67,7 @@ namespace GameModel
             var supplyCalculated = new List<Tile>();
             foreach (var structure in Structures)
             {
-                CalculateSupply(this[structure.Id], structure.OwnerId, structure.Supply, supplyCalculated);
+                CalculateSupply(this[structure.Index], structure.OwnerIndex, structure.Supply, supplyCalculated);
             }
         }
 
@@ -261,7 +261,7 @@ namespace GameModel
                     var t2 = TileArray[secondTile];
 
                     if (!t1.Neighbours.Contains(t2))
-                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {2} because they are not neighbours", t1.Id, t2.Id));
+                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {2} because they are not neighbours", t1.Index, t2.Index));
 
 
                     var tiles = new Tile[] { t1, t2 };
@@ -338,7 +338,7 @@ namespace GameModel
         public static List<PathFindTile> GetValidMovesWithMoveCostsForUnit(Board board, MilitaryUnit unit)
         {
             var pathFindTiles = new List<PathFindTile>();
-            board.Tiles.ToList().ForEach(x => pathFindTiles.Add(new PathFindTile(x.Id, x.X, x.Y)));
+            board.Tiles.ToList().ForEach(x => pathFindTiles.Add(new PathFindTile(x.Index, x.X, x.Y)));
 
             foreach (var pathFindTile in pathFindTiles)
             {
@@ -363,7 +363,7 @@ namespace GameModel
 
         public static bool EdgeHasRoad(Tile tile, Tile adjacentTile)
         {
-            var tileEdge = tile.NeighbourEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Id == adjacentTile.Id));
+            var tileEdge = tile.NeighbourEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Index == adjacentTile.Index));
 
             return tileEdge == null ? false : tileEdge.EdgeType == EdgeType.Road;
         }
@@ -447,10 +447,10 @@ namespace GameModel
 
         public static void ResolveBattle(string location, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None , int siegeDuration = 1)
         {
-            var groupedUnits = units.GroupBy(x => x.OwnerId);
+            var groupedUnits = units.GroupBy(x => x.OwnerIndex);
             if (groupedUnits.Count() == 1)
             {
-                throw new Exception("Battle can not occur because all units in tile are owned by " + units[0].OwnerId);
+                throw new Exception("Battle can not occur because all units in tile are owned by " + units[0].OwnerIndex);
             }
 
             //Logger.Info("Battle between {0} combatants at {1} on {2} terrain in {3} weather on turn {4}", groupedUnits.Count(), location, terrainType, weather, turn);
@@ -472,7 +472,7 @@ namespace GameModel
                 {
                     OwnerId = group.Key,
                     Units = group.ToList(),
-                    OpponentUnits = units.Where(x => x.OwnerId != group.Key).ToList(),
+                    OpponentUnits = units.Where(x => x.OwnerIndex != group.Key).ToList(),
                 };
 
                 var opponentUnitsCount = (double)combatantInBattle.OpponentUnits.Count;
@@ -541,7 +541,7 @@ namespace GameModel
 
         public static BattleReport CreateBattleReport(string location, int turn, List<MilitaryUnit> units)
         {
-            var numberOfPlayers = units.GroupBy(x => x.OwnerId).Select(x => x.Key).Count();
+            var numberOfPlayers = units.GroupBy(x => x.OwnerIndex).Select(x => x.Key).Count();
 
             var battleReport = new BattleReport(numberOfPlayers)
             {
@@ -551,7 +551,7 @@ namespace GameModel
 
             foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
             {
-                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerId - 1][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
+                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex - 1][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
             }
 
             units.ForEach(x =>
@@ -560,7 +560,7 @@ namespace GameModel
 
                 battleReport.CasualtyLog.Add(new CasualtyLogEntry
                 {
-                    OwnerId = x.OwnerId,
+                    OwnerId = x.OwnerIndex,
                     Text = x.IsAlive ? losses > 1
                                         ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : "", x.Quantity)
                                         : string.Format("{0} no losses", x.Name)

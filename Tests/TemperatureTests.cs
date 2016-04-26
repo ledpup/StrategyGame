@@ -25,7 +25,7 @@ namespace Tests
 
                 board.CalculateTemperature(i);
                 var tiles = new List<Tile>();
-                board.Tiles.ToList().ForEach(x => tiles.Add(new Tile(x.Id, x.X, x.Y, x.GetTerrainTypeByTemperature(x.Temperature))));
+                board.Tiles.ToList().ForEach(x => tiles.Add(new Tile(x.Index, x.X, x.Y, x.GetTerrainTypeByTemperature(x.Temperature))));
 
                 var labels = new string[board.Width, board.Height];
                 for (var x = 0; x < board.Width; x++)

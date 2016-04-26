@@ -23,7 +23,7 @@ namespace Tests
 
             var tiles = board.Tiles.ToList();
 
-            tiles.ForEach(t => Assert.AreEqual(1, tiles.Count(x => x.Id == t.Id)));
+            tiles.ForEach(t => Assert.AreEqual(1, tiles.Count(x => x.Index == t.Index)));
 
             // Ensure that adjacent tiles have been populated correctly
             tiles.ForEach(t => Assert.IsFalse(t.Neighbours.Any(at => at == null)));

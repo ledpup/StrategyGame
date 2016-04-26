@@ -43,7 +43,7 @@ namespace Tests
 
                 new MilitaryUnit()
                 {
-                    OwnerId = 2,
+                    OwnerIndex = 2,
                     UnitType = UnitType.Melee,
                     BaseQuality = 3,
                     InitialQuantity = 245,
@@ -51,7 +51,7 @@ namespace Tests
                 },
                 new MilitaryUnit()
                 {
-                    OwnerId = 2,
+                    OwnerIndex = 2,
                     UnitType = UnitType.Cavalry,
                     BaseQuality = 3,
                     InitialQuantity = 345,
@@ -63,14 +63,14 @@ namespace Tests
 
                 new MilitaryUnit()
                 {
-                    OwnerId = 3,
+                    OwnerIndex = 3,
                     UnitType = UnitType.Cavalry,
                     BaseQuality = 3,
                     InitialQuantity = 165,
                     StructureBattleModifier = -1,
                 },
                 new MilitaryUnit() {
-                    OwnerId = 3,
+                    OwnerIndex = 3,
                     UnitType = UnitType.Ranged,
                     BaseQuality = 3,
                     InitialQuantity = 175,

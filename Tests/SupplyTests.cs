@@ -22,7 +22,7 @@ namespace Tests
             var board = new Board(GameBoard, Edges, Structures);
 
             board[3, 4].OwnerId = 2;
-            board.Units = new List<MilitaryUnit> { new MilitaryUnit("1st Enemy", 2, board[3, 4]) };
+            board.Units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Enemy", 2, board[3, 4]) };
             board.InitialiseSupply();
 
             var labels = new string[board.Width, board.Height];

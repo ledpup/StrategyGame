@@ -59,7 +59,7 @@ namespace Visualise
 
                 foreach (var group in unitsByLocation)
                 {
-                    var unitsAtLocation = group.OrderBy(x => x.OwnerId).ToList();
+                    var unitsAtLocation = group.OrderBy(x => x.OwnerIndex).ToList();
 
                     for (var i = 0; i < unitsAtLocation.Count; i ++)
                     {

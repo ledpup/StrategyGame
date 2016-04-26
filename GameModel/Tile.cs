@@ -9,11 +9,12 @@ namespace GameModel
 {
     public class Tile
     {
-        public int Id { get; private set; }
+        public int Index { get; private set; }
         public Point Location { get; private set; }
         public int X { get { return Location.X; } }
         public int Y { get { return Location.Y; } }
         public TerrainType TerrainType;
+        public Weather Weather;
         public List<MilitaryUnit> Units;
 
         public Hex Hex;
@@ -22,25 +23,28 @@ namespace GameModel
         public double[] UnitStrengthInfluence;
         public double StructureInfluence;
         public double[] AggregateInfluence;
+        public Dictionary<int, double> TerrainAndWeatherInfluenceByUnit;
 
-        public Tile(int id, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
+        public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
         {
             Units = new List<MilitaryUnit>();
             NeighbourEdges = new List<Edge>();
 
-            Id = id;
+            Index = index;
             Location = new Point(x, y);
 
             Hex = OffsetCoord.QoffsetToCube(new OffsetCoord(x, y));
 
             TerrainType = terrainType;
             IsEdgeOfMap = isEdge;
+
+            TerrainAndWeatherInfluenceByUnit = new Dictionary<int, double>();
         }
 
         public override string ToString()
         {
             var subTerrain = IsLake ? " (Lake)" : IsSea ? " (Sea)" : "";
-            return Id + " " + Location.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
+            return Index + " " + Location.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
         }
 
         public List<Edge> NeighbourEdges
@@ -226,7 +230,7 @@ namespace GameModel
         //}
 
 
-        static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictFunc = (p, o) => p.OwnerId != o.OwnerId;
+        static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictFunc = (p, o) => p.OwnerIndex != o.OwnerIndex;
 
         public bool IsInConflict
         {

@@ -31,8 +31,8 @@ namespace GameModel
             ObjectiveFunctionNormalisedParameters = new Dictionary<ObjFuncParameter, double>[players.Length];
             MaxParameterValue = new double[players.Length];
 
-            var structuresByPlayer = structures.GroupBy(x => x.OwnerId).ToList();
-            var unitsByPlayer = units.GroupBy(x => x.OwnerId).ToList();
+            var structuresByPlayer = structures.GroupBy(x => x.OwnerIndex).ToList();
+            var unitsByPlayer = units.GroupBy(x => x.OwnerIndex).ToList();
 
             ObjectiveFunctionParameterWeight = new Dictionary<ObjFuncParameter, double>
             {

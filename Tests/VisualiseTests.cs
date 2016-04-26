@@ -26,7 +26,7 @@ namespace Tests
             var board = new Board(GameBoard, TileEdges);
 
             var labels = new string[board.Width, board.Height];
-            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Id.ToString());
+            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
             Visualise.Integration.DrawHexagonImage("BasicBoardWithArrayIndex.png", board.Tiles, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
@@ -54,7 +54,7 @@ namespace Tests
                 new MilitaryUnit() { Tile = board[1, 1] },
                 new MilitaryUnit() { Tile = board[1, 1] },
                 new MilitaryUnit() { Tile = board[1, 1] },
-                new MilitaryUnit() { Tile = board[1, 1], OwnerId = 2 }
+                new MilitaryUnit() { Tile = board[1, 1], OwnerIndex = 2 }
             };
 
             Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, null, null, board.Structures, units);
@@ -80,7 +80,7 @@ namespace Tests
             {
                 for (var y = 0; y < board.Height; y++)
                 {
-                    labels[x, y] = board[x, y].Id.ToString();
+                    labels[x, y] = board[x, y].Index.ToString();
                 }
             }
 

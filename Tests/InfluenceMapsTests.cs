@@ -79,15 +79,15 @@ namespace Tests
             }
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.StructureInfluence, 1).ToString());
-            Visualise.Integration.DrawHexagonImage("StructureInfluenceMap.png", board.Tiles, labels, null, board.Structures, board.Units);
+            Visualise.Integration.DrawHexagonImage("StructureInfluenceMap.png", board.Tiles, board.Edges, labels, null, board.Structures, board.Units);
 
 
             for (var i = 0; i < numberOfPlayers; i++)
             {
                 board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitCountInfluence[i].ToString());
-                Visualise.Integration.DrawHexagonImage("UnitCountInfluenceMapPlayer" + (i + 1) + ".png", board.Tiles, labels, null, board.Structures, board.Units);
+                Visualise.Integration.DrawHexagonImage("UnitCountInfluenceMapPlayer" + (i + 1) + ".png", board.Tiles, board.Edges, labels, null, board.Structures, board.Units);
                 board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitStrengthInfluence[i].ToString());
-                Visualise.Integration.DrawHexagonImage("UnitStrengthInfluenceMapPlayer" + (i + 1) + ".png", board.Tiles, labels, null, board.Structures, board.Units);
+                Visualise.Integration.DrawHexagonImage("UnitStrengthInfluenceMapPlayer" + (i + 1) + ".png", board.Tiles, board.Edges, labels, null, board.Structures, board.Units);
 
                 board.Tiles.ToList().ForEach(x => 
                 {
@@ -102,7 +102,7 @@ namespace Tests
                 });
 
                 board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.AggregateInfluence[i], 1).ToString());
-                Visualise.Integration.DrawHexagonImage("AggregateInfluenceMapPlayer" + (i + 1) + ".png", board.Tiles, labels, null, board.Structures, board.Units);
+                Visualise.Integration.DrawHexagonImage("AggregateInfluenceMapPlayer" + (i + 1) + ".png", board.Tiles, board.Edges, labels, null, board.Structures, board.Units);
             }
 
             var moveOrders = new List<MoveOrder>();
@@ -133,11 +133,11 @@ namespace Tests
             var vectors = new List<Vector>();
             moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMoveOrders.png", board.Tiles, null, vectors, board.Structures, board.Units);
+            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMoveOrders.png", board.Tiles, board.Edges, null, vectors, board.Structures, board.Units);
 
             board.ResolveMoves(0, moveOrders);
 
-            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMovesResolved.png", board.Tiles, null, null, board.Structures, board.Units);
+            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMovesResolved.png", board.Tiles, board.Edges, null, null, board.Structures, board.Units);
         }
     }
 }

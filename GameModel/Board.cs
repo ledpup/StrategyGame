@@ -100,7 +100,7 @@ namespace GameModel
                         var tileEdge = Edges.SingleOrDefault(x => x.Tiles.All(y => y == tile || y == neighbour));
                         if (tileEdge != null)
                         {
-                            if (tileEdge.EdgeType == EdgeType.Road && !Terrain.All_Water.HasFlag(neighbour.TerrainType))
+                            if (tileEdge.BaseEdgeType == BaseEdgeType.CentreToCentre && !Terrain.All_Water.HasFlag(neighbour.TerrainType))
                             {
                                 neighbourSupply = supply - .5f;
                             }
@@ -261,8 +261,12 @@ namespace GameModel
                     var t2 = TileArray[secondTile];
 
                     if (!t1.Neighbours.Contains(t2))
-                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {2} because they are not neighbours", t1.Index, t2.Index));
+                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because they are not neighbours", t1.Index, t2.Index));
 
+                    var existingEdge = tileEdgesList.Where(y => y.Tiles.Contains(t1) && y.Tiles.Contains(t2));
+
+                    if (existingEdge.Any())
+                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because one already exists of type {2}.", t1.Index, t2.Index, existingEdge.First().EdgeType.ToString()));
 
                     var tiles = new Tile[] { t1, t2 };
                     var edge = t1.NeighbourEdges.Single(y => y.Tiles.Contains(t2));
@@ -333,7 +337,7 @@ namespace GameModel
 
         public Dictionary<TerrainType, double> TerrainTemperatureModifiers { get; private set; }
 
-        public static List<Edge> Edges;
+        public List<Edge> Edges;
 
         public static List<PathFindTile> GetValidMovesWithMoveCostsForUnit(Board board, MilitaryUnit unit)
         {
@@ -359,13 +363,6 @@ namespace GameModel
             }
 
             return pathFindTiles;
-        }
-
-        public static bool EdgeHasRoad(Tile tile, Tile adjacentTile)
-        {
-            var tileEdge = tile.NeighbourEdges.SingleOrDefault(edge => edge.Tiles.Any(x => x.Index == adjacentTile.Index));
-
-            return tileEdge == null ? false : tileEdge.EdgeType == EdgeType.Road;
         }
 
         public void ResolveMoves(int turn, List<MoveOrder> moveOrders)
@@ -551,7 +548,7 @@ namespace GameModel
 
             foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
             {
-                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex - 1][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
+                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
             }
 
             units.ForEach(x =>

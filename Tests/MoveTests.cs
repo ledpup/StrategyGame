@@ -22,7 +22,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMoves.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMoves.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 361));
@@ -43,7 +43,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMovesOverRoad.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMovesOverRoad.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 316));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 317));
@@ -73,7 +73,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMovesOverRoadOverMountain.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitMovesOverRoadOverMountain.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 56));
@@ -103,7 +103,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithAirborneUnitMovesWithRoadAndMountain.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithAirborneUnitMovesWithRoadAndMountain.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 31));
@@ -136,7 +136,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithAirborneUnitMoves.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithAirborneUnitMoves.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             //Assert.AreEqual(12, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
@@ -186,14 +186,36 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithLandUnitNearRiverAndRoad.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithLandUnitNearBrdigeAndRoad.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 1]));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
 
-            Assert.IsFalse(moves.Any(x => x.Destination == board[1, 3])); // Can't cross the river
+            Assert.IsFalse(moves.Any(x => x.Destination == board[1, 3])); // Can't cross river
+        }
+
+        [TestMethod]
+        public void BasicBoardWithLandUnitNearBridgeAndRoad()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[141]) };
+
+            var moves = units[0].PossibleMoveList();
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithLandUnitNearBridgeAndRoad.png", board.Tiles, board.Edges, null, null, board.Structures, units);
+
+            Assert.IsTrue(moves.Any(x => x.Destination == board[114]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[115]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[140]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[168]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[169]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[87]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[88]));
         }
 
         [TestMethod]
@@ -207,7 +229,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithAmphibiousUnitNearRiverAndRoad.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithAmphibiousUnitNearRiverAndRoad.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
@@ -227,7 +249,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithAquaticUnit.png", board.Tiles, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithAquaticUnit.png", board.Tiles, board.Edges, null, null, board.Structures, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 198));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 226));
@@ -339,11 +361,11 @@ namespace Tests
             var vectors = new List<Vector>();
             moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitsPreMove.png", board.Tiles, null, vectors, board.Structures, board.Units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitsPreMove.png", board.Tiles, board.Edges, null, vectors, board.Structures, board.Units);
 
             board.ResolveMoves(0, moveOrders);
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitsPostMove.png", board.Tiles, null, null, board.Structures, board.Units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnitsPostMove.png", board.Tiles, board.Edges, null, null, board.Structures, board.Units);
 
             Assert.AreEqual(board[2, 2], board.Units[0].Tile);
             Assert.AreEqual(board[2, 2], board.Units[1].Tile);

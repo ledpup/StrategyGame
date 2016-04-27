@@ -16,13 +16,14 @@ namespace GameModel
     public enum EdgeType
     { 
         Normal = 1 << 0,
-        River = 1 << 1,
-        Road = 1 << 2,
-        Forest = 1 << 3,
-        Hill = 1 << 4,
-        Mountain = 1 << 5,
-        Reef = 1 << 6,
-        Wall = 1 << 7,
+        Road = 1 << 1,
+        River = 1 << 2,
+        Bridge = 1 << 3,
+        Forest = 1 << 4,
+        Hill = 1 << 5,
+        Mountain = 1 << 6,
+        Reef = 1 << 7,
+        Wall = 1 << 8,
     }
 
     public class Edge
@@ -43,6 +44,7 @@ namespace GameModel
             switch (EdgeType)
             {
                 case EdgeType.Road:
+                case EdgeType.Bridge:
                     BaseEdgeType = BaseEdgeType.CentreToCentre;
                     break;
                 default:

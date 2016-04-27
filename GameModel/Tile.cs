@@ -66,7 +66,7 @@ namespace GameModel
                 {
                     costChanged = true;
                     cost = 2;
-                    if (edge.EdgeType == EdgeType.Road)
+                    if (edge.BaseEdgeType == BaseEdgeType.CentreToCentre)
                         return 1;
                 }
                 else

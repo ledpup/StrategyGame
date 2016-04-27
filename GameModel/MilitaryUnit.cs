@@ -228,13 +228,14 @@ namespace GameModel
 
             EdgeMovementCosts[EdgeType.Normal] = 0;
             EdgeMovementCosts[EdgeType.Road] = 1;
+            EdgeMovementCosts[EdgeType.Bridge] = 1;
             EdgeMovementCosts[EdgeType.Forest] = 1;
             EdgeMovementCosts[EdgeType.Hill] = 1;
 
             RoadMoveBonus = 1;
 
             CanMoveOver = Terrain.Non_Mountainous_Land;
-            CanMoveOverEdge = EdgeType.Road | EdgeType.Forest | EdgeType.Hill;
+            CanMoveOverEdge = EdgeType.Road | EdgeType.Bridge | EdgeType.Forest | EdgeType.Hill;
             MayStopOn = Terrain.Non_Mountainous_Land;
         }
 
@@ -249,6 +250,7 @@ namespace GameModel
             EdgeMovementCosts[EdgeType.Normal] = 0;
             EdgeMovementCosts[EdgeType.River] = 0;
             EdgeMovementCosts[EdgeType.Road] = 1;
+            EdgeMovementCosts[EdgeType.Bridge] = 1;
             EdgeMovementCosts[EdgeType.Forest] = 1;
             EdgeMovementCosts[EdgeType.Hill] = 1;
 
@@ -381,7 +383,7 @@ namespace GameModel
             potentialMoves.AddRange(tile.Neighbours.Where(dest => dest != unit.Tile
                                         && !movesConsidered.Any(x => x.Origin == tile && x.Destination == dest && x.MovesRemaining > movementPoints)
                                         && (unit.MovementType == MovementType.Airborne 
-                                                || (GetEdge(tile, dest).EdgeType == EdgeType.Road && unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null || (unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null && unit.TerrainMovementCosts[dest.TerrainType] != null)))
+                                                || (GetEdge(tile, dest).BaseEdgeType == BaseEdgeType.CentreToCentre && unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null || (unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null && unit.TerrainMovementCosts[dest.TerrainType] != null)))
                                         ).Select(x => new Move(tile, x, previousMove, movementPoints, distance))
                                         .ToList());
 
@@ -396,7 +398,7 @@ namespace GameModel
                 {
                     newMovementPoints = movementPoints - (int)unit.TerrainMovementCosts[x.Destination.TerrainType];
                 }
-                else if (edge.EdgeType == EdgeType.Road && unit.EdgeMovementCosts[edge.EdgeType] != null)
+                else if (edge.BaseEdgeType == BaseEdgeType.CentreToCentre && unit.EdgeMovementCosts[edge.EdgeType] != null)
                 {
                     newMovementPoints = movementPoints - (int)unit.EdgeMovementCosts[edge.EdgeType];
                 }
@@ -418,7 +420,7 @@ namespace GameModel
 
         private static List<Move> GenerateRoadBonusMoves(MilitaryUnit unit, Tile tile, List<Move> movesConsidered, int movementPoints)
         {
-            var roadMoves = tile.NeighbourEdges.Where(x => x.EdgeType == EdgeType.Road && !movesConsidered.Any(y => (x.Tiles[0] == tile && x.Tiles[1] == y.Destination) || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination)))
+            var roadMoves = tile.NeighbourEdges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre && !movesConsidered.Any(y => (x.Tiles[0] == tile && x.Tiles[1] == y.Destination) || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination)))
                 .Select(x => new Move(x.Tiles[0], x.Tiles[1])).ToList();
 
             movesConsidered.AddRange(roadMoves);

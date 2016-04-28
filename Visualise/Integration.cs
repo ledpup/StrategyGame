@@ -11,7 +11,7 @@ namespace Visualise
 
     public class Integration
     {
-        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, string[,] labels = null, List<Vector> lines = null, List<Structure> structures = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
+        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
 

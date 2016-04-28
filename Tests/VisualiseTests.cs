@@ -23,31 +23,23 @@ namespace Tests
         [TestMethod]
         public void VisualiseBoardTest()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new Board(GameBoard, TileEdges, Structures);
 
             var labels = new string[board.Width, board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithArrayIndex.png", board.Tiles, board.Edges, labels);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithArrayIndex.png", board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithOffsetCoords.png", board.Tiles, board.Edges, labels);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithOffsetCoords.png", board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithCubeCoords.png", board.Tiles, board.Edges, labels);
-        }
-
-        [TestMethod]
-        public void VisualiseBoardStructureTest()
-        {
-            var board = new Board(GameBoard, TileEdges, Structures);            
-
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithStructures.png", board.Tiles, board.Edges, null, null, board.Structures);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithCubeCoords.png", board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]
         public void VisualiseUnitOnBoardTest()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new Board(GameBoard, TileEdges, Structures);
 
             var units = new List<MilitaryUnit>
             {
@@ -57,13 +49,13 @@ namespace Tests
                 new MilitaryUnit() { Tile = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, board.Edges, null, null, board.Structures, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, board.Edges, board.Structures, null, null, units);
         }
 
         [TestMethod]
         public void VisualisePathfind()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new Board(GameBoard, TileEdges, Structures);
 
             var unit = new MilitaryUnit() { Tile = board[1, 1] };
 
@@ -84,7 +76,7 @@ namespace Tests
                 }
             }
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardPathFind.png", board.Tiles, board.Edges, labels, vectors);
+            Visualise.Integration.DrawHexagonImage("BasicBoardPathFind.png", board.Tiles, board.Edges, board.Structures, labels, vectors);
         }
 
         private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)

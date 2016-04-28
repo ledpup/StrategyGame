@@ -162,12 +162,15 @@ namespace GameModel
 
         public int InitialQuantity
         {
+            get { return _initialQuantity; }
             set
             {
+                _initialQuantity = value;
+                Quantity = _initialQuantity;
                 QuantityEvents = new List<QuantityChangeEvent>();
-                ChangeQuantity(TurnCreated, value);
             }
         }
+        int _initialQuantity;
 
         public double InitialMorale
         {
@@ -346,7 +349,7 @@ namespace GameModel
         {
             get
             {
-                return Player.Colour(OwnerIndex);
+                return IsAlive ? Player.Colour(OwnerIndex) : Colours.Black;
             }
         }
 
@@ -355,26 +358,24 @@ namespace GameModel
 
         
 
-        public IEnumerable<Move> PossibleMoveList()
+        public IEnumerable<Move> CalculatePossibleMoves()
         {
-            if (_possibleMoves != null)
-                return _possibleMoves;
+            var possibleMoves = new List<Move>();
 
             var movesConsidered = new List<Move>();
 
-            _possibleMoves = GenerateStandardMoves(this, Tile, null, movesConsidered, MovementPoints, 1);
+            possibleMoves = GenerateStandardMoves(this, Tile, null, movesConsidered, MovementPoints, 1);
 
             if (RoadMoveBonus > 0)
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
                 var roadMoves = GenerateRoadBonusMoves(this, Tile, roadMovesAlreadyConsidered, MovementPoints + RoadMoveBonus);
-                var notAlreadySeenRoadMoves = roadMoves.Where(x => !_possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
-                _possibleMoves.AddRange(notAlreadySeenRoadMoves);
+                var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
+                possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }
 
-            return _possibleMoves;
+            return possibleMoves;
         }
-        List<Move> _possibleMoves;
 
         private static List<Move> GenerateStandardMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
         {

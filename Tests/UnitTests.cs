@@ -44,7 +44,7 @@ namespace Tests
 
             unit.Tile = board[1, 1];
 
-            var moveList = unit.PossibleMoveList();
+            var moveList = unit.CalculatePossibleMoves();
 
             Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 3]));

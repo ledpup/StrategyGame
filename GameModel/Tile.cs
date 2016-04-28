@@ -230,15 +230,15 @@ namespace GameModel
         //}
 
 
-        static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictFunc = (p, o) => p.OwnerIndex != o.OwnerIndex;
+        
 
         public bool IsInConflict
         {
             get
             {
-                foreach (var unit in Units)
-                    if (Units.Where(x => x != unit).Any(x => IsInConflictFunc(x, unit)))
-                        return true;
+                var units = Units.Where(x => x.IsAlive).GroupBy(x => x.OwnerIndex);
+                if (units.Count() > 1)
+                    return true;
                 return false;
             }
         }

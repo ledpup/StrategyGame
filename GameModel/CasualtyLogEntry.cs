@@ -2,7 +2,7 @@
 {
     public class CasualtyLogEntry
     {
-        public int OwnerId { get; set; }
+        public int OwnerIndex { get; set; }
         public string Text { get; set; }
     }
 }

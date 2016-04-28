@@ -12,7 +12,7 @@ namespace Tests
     public class GameAnalysisTests
     {
         [TestMethod]
-        public void BasicTest()
+        public void BasicGameAnalysisTest()
         {
             var gameAnalysis = new GameAnalysis();
 

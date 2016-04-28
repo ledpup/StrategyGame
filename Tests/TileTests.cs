@@ -45,7 +45,7 @@ namespace Tests
                 },
             };
 
-            board.ResolveMoves(0, moveOrders);
+            board.ResolveMoves(moveOrders);
 
             var battles = board.ConductBattles();
 

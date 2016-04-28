@@ -29,7 +29,9 @@ namespace GameModel
 
         public List<Structure> Structures;
 
-        public Board(string[] tiles, string[] edges = null, string[] structures = null, Logger logger = null)
+        public int Turn;
+
+        public Board(string[] tiles, string[] edges = null, string[] structures = null, int turn = 0, Logger logger = null)
         {
             Width = tiles[0].Length;
             Height = tiles.Length;
@@ -57,8 +59,9 @@ namespace GameModel
             TerrainTemperatureModifiers[TerrainType.Mountain] = -10;
             TerrainTemperatureModifiers[TerrainType.Hill] = -5;
 
+            Turn = turn;
 
-            CalculateTemperature();
+            CalculateTemperature(Turn);
         }
 
         public void InitialiseSupply()
@@ -140,6 +143,16 @@ namespace GameModel
             }
         }
 
+        public void ChangeStructureOwners()
+        {
+            Structures.ForEach(x => 
+            {
+                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Tile == x.Tile).GroupBy(y => y.OwnerIndex);
+                if (unitsAtStructureByOwner.Count() == 1)
+                    x.OwnerIndex = unitsAtStructureByOwner.First().Key;
+            });
+        }
+
         private List<Structure> IntitaliseStructures(string[] tilePoints)
         {
             var structures = new List<Structure>();
@@ -149,9 +162,9 @@ namespace GameModel
             foreach (var point in tilePoints)
             {
                 var structureProperties = point.Split(',');
-                var id = int.Parse(structureProperties[0]);
+                var index = int.Parse(structureProperties[0]);
                 var structureType = (StructureType)Enum.Parse(typeof(StructureType), structureProperties[2]);
-                var structure = new Structure(id, structureType, TileArray[id], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
+                var structure = new Structure(index, structureType, TileArray[index], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
 
                 
                 structures.Add(structure);
@@ -203,7 +216,7 @@ namespace GameModel
                     const double seasonRate = .3;
                     const double temperatureShiftPerMonth = 8;
                     
-                    this[x, y].Temperature = y * .5 + 10 + TerrainTemperatureModifiers[this[x, y].TerrainType] - this[x, y].DistanceFromWater + Math.Sin(turn * seasonRate) * temperatureShiftPerMonth;
+                    this[x, y].Temperature = y * .5 + 10 + TerrainTemperatureModifiers[this[x, y].TerrainType] - (this[x, y].DistanceFromWater * 2) + Math.Sin(turn * seasonRate) * temperatureShiftPerMonth;
                 }
             }
         }
@@ -365,9 +378,12 @@ namespace GameModel
             return pathFindTiles;
         }
 
-        public void ResolveMoves(int turn, List<MoveOrder> moveOrders)
+        public void ResolveMoves(List<MoveOrder> moveOrders)
         {
-            MoveOrders[turn] = moveOrders;
+            if (moveOrders == null || moveOrders.Count == 0)
+                return;
+
+            MoveOrders[Turn] = moveOrders;
 
             var movingUnits = moveOrders.Select(x => x.Unit).ToList();
             float maxMovementPoints = 12;
@@ -388,13 +404,13 @@ namespace GameModel
             {
                 MoveUnitsOneStep(moveOrders, unitStepRate, step);
 
-                // Remove conflicting units from move orders
-                var conflictedUnits = DetectConflictedUnits(movingUnits, Units);
+                // Remove conflicting units from move orders                
+                var conflictedUnits = DetectConflictedUnits(movingUnits, Units.Where(x => x.IsAlive));
                 moveOrders.RemoveAll(x => conflictedUnits.Contains(x.Unit));
             }
         }
 
-        public static IEnumerable<MilitaryUnit> DetectConflictedUnits(List<MilitaryUnit> setOfUnits, List<MilitaryUnit> allUnits)
+        public static IEnumerable<MilitaryUnit> DetectConflictedUnits(List<MilitaryUnit> setOfUnits, IEnumerable<MilitaryUnit> allUnits)
         {
             var conflictedUnits = new List<MilitaryUnit>();
             setOfUnits.ForEach(x =>
@@ -429,20 +445,17 @@ namespace GameModel
             var battleReports = new List<BattleReport>();
             Tiles.ToList().ForEach(x =>
             {
-                var location = "Tzarian Castle";
-                var turn = 1;
-
                 if (x.IsInConflict)
                 {
-                    ResolveBattle(location, turn, TerrainType.Mountain, Weather.Cold, x.Units, 3, StructureType.Fortress, 2);
-                    battleReports.Add(CreateBattleReport(location, turn, x.Units));
+                    ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, x.Units, 3, StructureType.Fortress, 2);
+                    battleReports.Add(CreateBattleReport(x.ToString(), Turn, x.Units));
                 }
             });
 
             return battleReports;
         }
 
-        public static void ResolveBattle(string location, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None , int siegeDuration = 1)
+        public static void ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None , int siegeDuration = 1)
         {
             var groupedUnits = units.GroupBy(x => x.OwnerIndex);
             if (groupedUnits.Count() == 1)
@@ -557,7 +570,7 @@ namespace GameModel
 
                 battleReport.CasualtyLog.Add(new CasualtyLogEntry
                 {
-                    OwnerId = x.OwnerIndex,
+                    OwnerIndex = x.OwnerIndex,
                     Text = x.IsAlive ? losses > 1
                                         ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : "", x.Quantity)
                                         : string.Format("{0} no losses", x.Name)
@@ -594,13 +607,62 @@ namespace GameModel
                     }
                     else
                     {
-                        var quantityDecrease = (int)(strengthDamageToUnit / unit.Quality);
+                        var quantityDecrease = (int)Math.Ceiling(strengthDamageToUnit / unit.Quality);
                         unit.ChangeQuantity(turn, -quantityDecrease);
                     }
                     assignedStrengthDamage += strengthDamageToUnit;
                 }
                 combatantStrengthDamage -= assignedStrengthDamage;
                 combatantStrengthDamage = Math.Round(combatantStrengthDamage, 0);
+            }
+        }
+
+        public static void GenerateInfluenceMaps(Board board, int numberOfPlayers)
+        {
+            var aliveUnits = board.Units.Where(x => x.IsAlive).ToList();
+
+            board.Tiles.ToList().ForEach(x =>
+            {
+                x.UnitCountInfluence = new double[numberOfPlayers];
+                x.UnitStrengthInfluence = new double[numberOfPlayers];
+                x.AggregateInfluence = new double[numberOfPlayers];
+                aliveUnits.ForEach(y =>
+                {
+                    if (!x.TerrainAndWeatherInfluenceByUnit.ContainsKey(y.Index))
+                        x.TerrainAndWeatherInfluenceByUnit.Add(y.Index, y.TerrainTypeBattleModifier[x.TerrainType] + y.WeatherBattleModifier[x.Weather]);
+                });
+                x.StructureInfluence = 0;
+            });
+
+            foreach (var unit in aliveUnits)
+            {
+                var playerIndex = unit.OwnerIndex;
+                unit.Tile.UnitCountInfluence[playerIndex] += 1;
+                unit.Tile.UnitStrengthInfluence[playerIndex] = unit.Strength;
+                var moves = unit.CalculatePossibleMoves().GroupBy(x => x.Destination);
+                foreach (var move in moves)
+                {
+                    var minDistance = move.Min(x => x.Distance) + 1;
+                    board[move.Key.Index].UnitCountInfluence[playerIndex] += Math.Round(1D / minDistance, 1);
+                    board[move.Key.Index].UnitStrengthInfluence[playerIndex] += Math.Round(unit.Strength / minDistance, 0);
+                }
+            }
+
+            foreach (var structure in board.Structures)
+            {
+                const double structureInfluence = 2;
+                structure.Tile.StructureInfluence += structureInfluence;
+                for (var i = 1; i < 5; i++)
+                {
+                    var hexesInRing = Hex.HexRing(structure.Tile.Hex, i);
+
+                    hexesInRing.ForEach(x =>
+                    {
+                        var index = Hex.HexToIndex(x, board.Width);
+                        if (index >= 0 && index < board.TileArray.Length)
+                            board[index].StructureInfluence += structureInfluence / (i + 1);
+                    });
+                }
             }
         }
     }

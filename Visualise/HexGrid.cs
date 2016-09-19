@@ -105,7 +105,26 @@ namespace Visualise
                 }
             }
 
-            graphics.DrawLine(pen, pt1, pt2);
+            
+            //if (pt2.X - pt1.X == 0 || pt2.Y - pt1.Y == 0 || baseEdgeType == BaseEdgeType.Hexside)
+                graphics.DrawLine(pen, pt1, pt2);
+            //else
+            //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
+        }
+
+        internal static void DrawCirclesAroundHex(Graphics graphics, Tile circles)
+        {
+            if (circles == null)
+                return;
+
+            var points = HexToPoints(HexWidth, HexHeight, circles.X, circles.Y);
+
+            var radius = (points[2].X - points[1].X) / 2;
+
+            foreach (var point in points)
+                graphics.DrawEllipse(Pens.Red, point.X - radius, point.Y - radius, 2 * radius, 2 * radius);
+
+            graphics.DrawEllipse(Pens.Red, points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius);
         }
 
         public static void DrawCircle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)

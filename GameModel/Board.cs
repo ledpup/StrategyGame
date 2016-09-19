@@ -207,8 +207,12 @@ namespace GameModel
             return minDistance;
         }
 
-        public void CalculateTemperature(int turn = 0)
+        public void CalculateTemperature(int? turnParameter = null)
         {
+            var turn = Turn;
+            if (turnParameter != null)
+                turn = (int)turnParameter;
+
             for (var x = 0; x < Width; x++)
             {
                 for (var y = 0; y < Height; y++)
@@ -448,7 +452,7 @@ namespace GameModel
                 if (x.IsInConflict)
                 {
                     ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, x.Units, 3, StructureType.Fortress, 2);
-                    battleReports.Add(CreateBattleReport(x.ToString(), Turn, x.Units));
+                    battleReports.Add(CreateBattleReport(x, Turn, x.Units));
                 }
             });
 
@@ -549,13 +553,13 @@ namespace GameModel
 
         }
 
-        public static BattleReport CreateBattleReport(string location, int turn, List<MilitaryUnit> units)
+        public static BattleReport CreateBattleReport(Tile tile, int turn, List<MilitaryUnit> units)
         {
             var numberOfPlayers = units.GroupBy(x => x.OwnerIndex).Select(x => x.Key).Count();
 
             var battleReport = new BattleReport(numberOfPlayers)
             {
-                Location = location,
+                Tile = tile,
                 Turn = turn,
             };
 
@@ -639,7 +643,7 @@ namespace GameModel
                 var playerIndex = unit.OwnerIndex;
                 unit.Tile.UnitCountInfluence[playerIndex] += 1;
                 unit.Tile.UnitStrengthInfluence[playerIndex] = unit.Strength;
-                var moves = unit.CalculatePossibleMoves().GroupBy(x => x.Destination);
+                var moves = unit.PossibleMoves().GroupBy(x => x.Destination);
                 foreach (var move in moves)
                 {
                     var minDistance = move.Min(x => x.Distance) + 1;

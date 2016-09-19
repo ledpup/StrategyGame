@@ -47,7 +47,7 @@ namespace Tests
 
             board.Units.ForEach(x =>
             {
-                var possibleMoves = x.CalculatePossibleMoves();
+                var possibleMoves = x.PossibleMoves();
 
                 var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.OwnerIndex]);
 

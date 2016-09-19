@@ -16,9 +16,9 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[335], MovementType.Land, 2) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(tile: board[335]) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -37,9 +37,9 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[345], MovementType.Land, 2) { RoadMoveBonus = 2 } };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(tile: board[345], roadMovementBonus: 2) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -67,9 +67,9 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[85], MovementType.Land, 2) { RoadMoveBonus = 1 } };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[85], MovementType.Land, 2) { RoadMovementBonus = 1 } };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -99,7 +99,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[85], MovementType.Airborne, 2) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -132,7 +132,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Airborne", 1, board[364], MovementType.Airborne, 3) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -182,7 +182,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[1, 1]) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -203,7 +203,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[141]) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -225,7 +225,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Amphibious", 1, board[1, 1], MovementType.Amphibious) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
@@ -245,7 +245,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Fleet", 2, board[225], MovementType.Water, 3) };
 
-            var moves = units[0].CalculatePossibleMoves();
+            var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 

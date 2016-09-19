@@ -6,7 +6,7 @@ namespace GameModel
     public class BattleReport
     {
         public Dictionary<UnitType, int>[] CasualtiesByPlayerAndType { get; set; }
-        public string Location { get; set; }
+        public Tile Tile { get; set; }
         public int Turn { get; set; }
         public List<CasualtyLogEntry> CasualtyLog { get; set; }
 

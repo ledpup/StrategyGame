@@ -11,7 +11,7 @@ namespace Visualise
 
     public class Integration
     {
-        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
+        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
 
@@ -31,12 +31,17 @@ namespace Visualise
             );
 
             var vectors = new List<Vector>();
-            edges.ToList().ForEach(x => 
+
+            if (edges != null)
             {
-                if (x.EdgeType == EdgeType.Bridge)
-                    vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
-                vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
-            });
+
+                edges.ToList().ForEach(x =>
+                {
+                    if (x.EdgeType == EdgeType.Bridge)
+                        vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
+                    vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
+                });
+            }
 
             if (lines != null)
                 vectors.AddRange(lines);
@@ -46,6 +51,8 @@ namespace Visualise
             var graphics = Graphics.FromImage(bitmap);
 
             HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, labels, structures);
+
+            HexGrid.DrawCirclesAroundHex(graphics, circles);
 
             vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), x.BaseEdgeType));
 

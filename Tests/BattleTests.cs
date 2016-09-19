@@ -102,7 +102,7 @@ namespace Tests
             var board = new Board(new[] { "S", "S" });
 
             Board.ResolveBattle(location, turn, TerrainType.Mountain, Weather.Cold, units, 3, StructureType.Fortress, 2);
-            var battleReport = Board.CreateBattleReport(location, turn, units);
+            var battleReport = Board.CreateBattleReport(new Tile(0, 1, 1), turn, units);
 
 
 

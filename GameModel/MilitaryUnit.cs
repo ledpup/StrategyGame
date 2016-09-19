@@ -106,7 +106,7 @@ namespace GameModel
         {
             return Name + " (" + Strength + ") at " + Tile.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = "Unamed unit", int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile tile = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0)
         {
             IsAlive = true;
             BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>();
@@ -145,11 +145,16 @@ namespace GameModel
             }
 
             Index = index;
+            if (name == null)
+            {
+                name = "Unit " + index + " (owned by " + ownerIndex + ")";
+            }
             Name = name;
             OwnerIndex = ownerIndex;
-            Tile = location;
+            Tile = tile;
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
+            RoadMovementBonus = roadMovementBonus;
             UnitType = unitType;
             BaseQuality = baseQuality;
             Size = size;
@@ -235,7 +240,7 @@ namespace GameModel
             EdgeMovementCosts[EdgeType.Forest] = 1;
             EdgeMovementCosts[EdgeType.Hill] = 1;
 
-            RoadMoveBonus = 1;
+            RoadMovementBonus = 1;
 
             CanMoveOver = Terrain.Non_Mountainous_Land;
             CanMoveOverEdge = EdgeType.Road | EdgeType.Bridge | EdgeType.Forest | EdgeType.Hill;
@@ -353,12 +358,12 @@ namespace GameModel
             }
         }
 
-        public int RoadMoveBonus { get; set; }
+        public int RoadMovementBonus { get; set; }
         public double StructureBattleModifier { get; set; }
 
         
 
-        public IEnumerable<Move> CalculatePossibleMoves()
+        public IEnumerable<Move> PossibleMoves()
         {
             var possibleMoves = new List<Move>();
 
@@ -366,10 +371,10 @@ namespace GameModel
 
             possibleMoves = GenerateStandardMoves(this, Tile, null, movesConsidered, MovementPoints, 1);
 
-            if (RoadMoveBonus > 0)
+            if (RoadMovementBonus > 0)
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
-                var roadMoves = GenerateRoadBonusMoves(this, Tile, roadMovesAlreadyConsidered, MovementPoints + RoadMoveBonus);
+                var roadMoves = GenerateRoadBonusMoves(this, Tile, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus);
                 var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
                 possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }

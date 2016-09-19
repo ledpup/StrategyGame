@@ -49,7 +49,16 @@ namespace Tests
                 new MilitaryUnit() { Tile = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, board.Edges, board.Structures, units: units);
+        }
+
+        [TestMethod]
+        public void VisualiseCurvedRoadsTest()
+        {
+            var board = new Board(GameBoard, TileEdges, Structures);
+
+
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithCurves.png", board.Tiles, circles: board[1,1]);
         }
 
         [TestMethod]

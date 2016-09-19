@@ -19,6 +19,7 @@ namespace StrategyGame
 
         static void Main(string[] args)
         {
+            File.Delete("logfile.txt");
 
             var board = new Board(GameBoard, Edges, Structures);
 
@@ -26,17 +27,17 @@ namespace StrategyGame
 
             board.Units = new List<MilitaryUnit>
                 {
-                new MilitaryUnit(0, "1st Airborne", 0, board[114], MovementType.Airborne, 3),
-                new MilitaryUnit(1, "1st Infantry", 0, board[110], MovementType.Land, 3),
-                new MilitaryUnit(2, "2nd Infantry", 0, board[31], MovementType.Land),
-                new MilitaryUnit(3, "3rd Infantry", 0, board[56], MovementType.Land),
-                new MilitaryUnit(4, "4th Infantry", 0, board[65], MovementType.Land),
+                new MilitaryUnit(0, tile: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
+                new MilitaryUnit(1, tile: board[110], baseMovementPoints: 3),
+                new MilitaryUnit(2, tile: board[31]),
+                new MilitaryUnit(3, tile: board[56], movementType: MovementType.Amphibious),
+                new MilitaryUnit(4, tile: board[65]),
 
-                new MilitaryUnit(5, "1st Airborne", 1, board[361], MovementType.Airborne, 3),
-                new MilitaryUnit(6, "1st Infantry", 1, board[111]),
-                new MilitaryUnit(7, "2nd Infantry", 1, board[111]),
+                new MilitaryUnit(5, ownerIndex: 1, tile: board[361], movementType: MovementType.Airborne, baseMovementPoints: 3),
+                new MilitaryUnit(6, ownerIndex: 1, tile: board[111]),
+                new MilitaryUnit(7, ownerIndex: 1, tile: board[111]),
 
-                new MilitaryUnit(8, "3rd Infantry", 1, board[168]),
+                new MilitaryUnit(8, ownerIndex: 1, tile: board[168]),
                 };
 
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
@@ -84,7 +85,7 @@ namespace StrategyGame
 
                 board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
                 {
-                    var possibleMoves = x.CalculatePossibleMoves();
+                    var possibleMoves = x.PossibleMoves();
 
                     var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.OwnerIndex]);
 
@@ -113,7 +114,9 @@ namespace StrategyGame
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>
                 {
-                    log.Info(string.Format("Battle occurred at {0} on turn {1}.", x.Location, x.Turn));
+                    var structure = board.Structures.SingleOrDefault(y => y.Tile == x.Tile);
+                    var structureName = structure == null ? "" : " " + structure.StructureType.ToString();
+                    log.Info($"Battle occurred at {x.Tile.ToString()}{structureName} on turn {x.Turn}.");
                     x.CasualtyLog.ForEach(y => log.Info(y.Text));
                 });
 

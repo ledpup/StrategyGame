@@ -655,6 +655,7 @@ namespace GameModel
 
             foreach (var unit in aliveUnits)
             {
+                unit.CalculateStrength();
                 var playerIndex = unit.OwnerIndex;
                 unit.Tile.UnitCountInfluence[unit.MovementType][playerIndex] += 1;
                 unit.Tile.UnitStrengthInfluence[unit.MovementType][playerIndex] += unit.Strength;
@@ -682,6 +683,28 @@ namespace GameModel
                             board[index].StructureInfluence += structureInfluence / (i + 1);
                     });
                 }
+            }
+
+            for (var i = 0; i < numberOfPlayers; i++)
+            {
+                board.Tiles.ToList().ForEach(x =>
+                {
+                    CalculateAggregateInfluenceMap(x, numberOfPlayers, i, MovementType.Airborne);
+                    CalculateAggregateInfluenceMap(x, numberOfPlayers, i, MovementType.Land);
+                    CalculateAggregateInfluenceMap(x, numberOfPlayers, i, MovementType.Water);
+                });
+            }
+        }
+
+        private static void CalculateAggregateInfluenceMap(Tile x, int numberOfPlayers, int i, MovementType movementType)
+        {
+            x.AggregateInfluence[movementType][i] = x.UnitCountInfluence[movementType][i] - x.StructureInfluence;
+            for (var j = 0; j < numberOfPlayers; j++)
+            {
+                if (i == j)
+                    continue;
+
+                x.AggregateInfluence[movementType][i] -= x.UnitCountInfluence[movementType][j];
             }
         }
     }

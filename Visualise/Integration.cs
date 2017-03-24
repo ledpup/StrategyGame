@@ -47,8 +47,6 @@ namespace Visualise
             if (renderUntil == RenderPipeline.Board)
                 return bitmap;
 
-            HexGrid.DrawCirclesAroundHex(graphics, circles);
-
             if (renderBegin <= RenderPipeline.Vectors)
             {
                 var vectors = new List<Vector>();
@@ -67,6 +65,8 @@ namespace Visualise
                     vectors.AddRange(lines);
 
                 vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), x.BaseEdgeType));
+
+                //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
             }
             if (renderUntil == RenderPipeline.Vectors)
                 return bitmap;

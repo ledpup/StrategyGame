@@ -19,9 +19,10 @@ namespace Visualise
     public class Integration
     {
 
-        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
             var graphics = Graphics.FromImage(bitmap);
+            var hexGrid = new HexGrid(bitmap.Width, boardWidth);
 
             if (renderBegin <= RenderPipeline.Board)
             {
@@ -42,7 +43,8 @@ namespace Visualise
                 }
                 );
 
-                HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours);
+                
+                hexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours);
             }
             if (renderUntil == RenderPipeline.Board)
                 return bitmap;
@@ -64,7 +66,7 @@ namespace Visualise
                 if (lines != null)
                     vectors.AddRange(lines);
 
-                vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), x.BaseEdgeType));
+                vectors.ForEach(x => hexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), x.BaseEdgeType));
 
                 //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
             }
@@ -78,7 +80,7 @@ namespace Visualise
                     structures.ForEach(x =>
                     {
                         var colour = x.Colour;
-                        HexGrid.DrawRectangle(graphics, x.Tile.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                        hexGrid.DrawRectangle(graphics, x.Tile.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                     });
                 }
             }
@@ -98,7 +100,7 @@ namespace Visualise
                         for (var i = 0; i < unitsAtLocation.Count; i++)
                         {
                             var colour = Color.FromArgb(unitsAtLocation[i].UnitColour.Alpha, unitsAtLocation[i].UnitColour.Red, unitsAtLocation[i].UnitColour.Green, unitsAtLocation[i].UnitColour.Blue);
-                            HexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), new SolidBrush(colour));
+                            hexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), new SolidBrush(colour));
                         }
                     }
                 }
@@ -108,16 +110,16 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Labels)
             {
-                HexGrid.LabelHexes(graphics, Pens.Black, 0, bitmap.Width, 0, bitmap.Height, HexGrid.HexWidth, HexGrid.HexHeight, labels);
+                hexGrid.LabelHexes(graphics, Pens.Black, 0, bitmap.Width, 0, bitmap.Height, labels);
             }
             
             return bitmap;
         }
 
-        public static void RenderAndSave(string fileName, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
+        public static void RenderAndSave(string fileName, int boardWidth, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
         {
             var bitmap = new Bitmap(imageWidth, imageHeight);
-            bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, tiles, edges, structures, labels, lines, units, circles);
+            bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, boardWidth, tiles, edges, structures, labels, lines, units, circles);
             bitmap.Save(fileName);
         }
 

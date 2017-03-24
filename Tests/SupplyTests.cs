@@ -28,7 +28,7 @@ namespace Tests
             var labels = new string[board.Width, board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Supply.ToString());
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithStructuresAndSupply.png", board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
+            Visualise.Integration.RenderAndSave("BasicBoardWithStructuresAndSupply.png", board.Width, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
         }
     }
 }

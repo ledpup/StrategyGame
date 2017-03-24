@@ -659,12 +659,23 @@ namespace GameModel
                 var playerIndex = unit.OwnerIndex;
                 unit.Tile.UnitCountInfluence[unit.MovementType][playerIndex] += 1;
                 unit.Tile.UnitStrengthInfluence[unit.MovementType][playerIndex] += unit.Strength;
-                var moves = unit.PossibleMoves().GroupBy(x => x.Destination);
-                foreach (var move in moves)
+
+                for (var i = 1; i < 5; i++)
                 {
-                    var minDistance = move.Min(x => x.Distance) + 1;
-                    board[move.Key.Index].UnitCountInfluence[unit.MovementType][playerIndex] += Math.Round(1D / minDistance, 1);
-                    board[move.Key.Index].UnitStrengthInfluence[unit.MovementType][playerIndex] += Math.Round(unit.Strength / minDistance, 0);
+                    var hexesInRing = Hex.HexRing(unit.Tile.Hex, i);
+
+                    hexesInRing.ForEach(x =>
+                    {
+                        var index = Hex.HexToIndex(x, board.Width);
+                        if (index >= 0 && index < board.TileArray.Length)
+                        {
+                            if (unit.CanStopOn.HasFlag(board[index].TerrainType))
+                            {
+                                board[index].UnitCountInfluence[unit.MovementType][playerIndex] += Math.Round(1D / (i + 1), 1);
+                                board[index].UnitStrengthInfluence[unit.MovementType][playerIndex] += Math.Round(unit.Strength / (i + 1), 0);
+                            }
+                        }
+                    });
                 }
             }
 

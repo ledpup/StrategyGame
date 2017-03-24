@@ -11,23 +11,80 @@ namespace Visualise
 {
     public class HexGrid
     {
-        public const float HexHeight = 50;
-        public static float HexWidth = (float)(4 * (HexHeight / 2 / Math.Sqrt(3)));
-        const float StructureWidth = 10;
+        float _hexHeight;
+        float _hexWidth;
+        float _structureWidth;
 
+        public HexGrid(int mapWidth, int numberOfHexes)
+        {
+            _hexHeight = Convert.ToSingle(mapWidth) / (numberOfHexes - 2);
+            _hexWidth = (float)(4 * (_hexHeight / 2 / Math.Sqrt(3)));
+            _structureWidth = _hexHeight / 6;
+        }
 
-        public static void DrawLine(Graphics graphics, GameModel.Point origin, GameModel.Point destination, Pen pen, BaseEdgeType baseEdgeType)
+        public void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours)
+        {
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+            graphics.FillRectangle(Brushes.White, 0, 0, width, height);
+
+            foreach (PointF point in hexagonColours.Keys)
+            {
+                graphics.FillPolygon(hexagonColours[point], HexToPoints(_hexWidth, _hexHeight, point.Y, point.X));
+            }
+
+            float xMax = width;
+            float yMax = height;
+
+            for (int row = 0; ; row++)
+            {
+                PointF[] points = HexToPoints(_hexWidth, _hexHeight, row, 0);
+
+                if (points[4].Y > yMax)
+                    break;
+
+                for (int col = 0; ; col++)
+                {
+                    points = HexToPoints(_hexWidth, _hexHeight, row, col);
+
+                    // If it doesn't fit horizontally,
+                    // we're done with this row.
+                    if (points[3].X > xMax)
+                        break;
+
+                    // If it fits vertically, draw it.
+                    if (points[4].Y <= yMax)
+                    {
+                        graphics.DrawPolygon(Pens.Black, points);
+                    }
+                }
+            }
+
+            //#if FIG34
+            //            // Draw the selected rectangles for Figures 3 and 4.
+            //            using (Pen pen = new Pen(Color.Red, 3))
+            //            {
+            //                pen.DashStyle = DashStyle.Dash;
+            //                foreach (RectangleF rect in TestRects)
+            //                {
+            //                    e.Graphics.DrawRectangle(pen, Rectangle.Round(rect));
+            //                }
+            //            }
+            //#endif
+        }
+
+        public void DrawLine(Graphics graphics, GameModel.Point origin, GameModel.Point destination, Pen pen, BaseEdgeType baseEdgeType)
         {
             PointF pt1, pt2;
             if (baseEdgeType == BaseEdgeType.CentreToCentre)
             {
-                pt1 = HexCentre(HexWidth, HexHeight, origin.Y, origin.X);
-                pt2 = HexCentre(HexWidth, HexHeight, destination.Y, destination.X);
+                pt1 = HexCentre(_hexWidth, _hexHeight, origin.Y, origin.X);
+                pt2 = HexCentre(_hexWidth, _hexHeight, destination.Y, destination.X);
             }
             else
             {
                 var direction = new GameModel.Point(destination.X - origin.X, destination.Y - origin.Y);
-                var points = HexToPoints(HexWidth, HexHeight, origin.Y, origin.X);
+                var points = HexToPoints(_hexWidth, _hexHeight, origin.Y, origin.X);
                 if (origin.X % 2 == 1)
                 {
                     if (direction.X == -1 && direction.Y == 0)
@@ -112,11 +169,11 @@ namespace Visualise
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        internal static void DrawCurvedRoads(Graphics graphics, List<Vector> roads)
+        internal void DrawCurvedRoads(Graphics graphics, List<Vector> roads)
         {
             var tile = roads.First().Origin;
 
-            var points = HexToPoints(HexWidth, HexHeight, tile.X, tile.Y);
+            var points = HexToPoints(_hexWidth, _hexHeight, tile.X, tile.Y);
 
             var radius = (points[2].X - points[1].X) / 2;
 
@@ -136,7 +193,7 @@ namespace Visualise
             //graphics.DrawArc(new Pen(Color.Blue, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 180, 60);
         }
 
-        private static void StraightRoad(Graphics graphics, PointF[] points, float radius, int tileIndex)
+        private void StraightRoad(Graphics graphics, PointF[] points, float radius, int tileIndex)
         {
             var degreesOffset = 0 * 60;
 
@@ -150,37 +207,37 @@ namespace Visualise
             //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X - radius, points[0].Y - radius, 2 * radius, 2 * radius, 0, 60);
 
             graphics.DrawArc(new Pen(Color.Brown, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 120, 60);
-            graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 240, 120);
+            graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (_hexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 240, 120);
             graphics.DrawArc(new Pen(Color.Brown, 2), points[1].X - radius, points[1].Y - radius, 2 * radius, 2 * radius, 60, 60);
         }
 
-        public static void DrawCircle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)
+        public void DrawCircle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)
         {
-            const float Radius = 15;
+            float Radius = _hexHeight / 4;
 
-            var hexCentre = HexCentre(HexWidth, HexHeight, location.Y, location.X);
+            var hexCentre = HexCentre(_hexWidth, _hexHeight, location.Y, location.X);
 
             var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
             var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
 
-            var xOffset = (xOnCircle - (StructureWidth / 2));
-            var yOffset = (yOnCircle - (StructureWidth / 2));
+            var xOffset = (xOnCircle - (_structureWidth / 2));
+            var yOffset = (yOnCircle - (_structureWidth / 2));
 
-            graphics.FillEllipse(brush, xOffset, yOffset, StructureWidth, StructureWidth);
+            graphics.FillEllipse(brush, xOffset, yOffset, _structureWidth, _structureWidth);
 
         }
 
-        internal static void DrawRectangle(Graphics graphics, GameModel.Point location, SolidBrush brush)
+        internal void DrawRectangle(Graphics graphics, GameModel.Point location, SolidBrush brush)
         {
-            var hexCentre = HexCentre(HexWidth, HexHeight, location.Y, location.X);
+            var hexCentre = HexCentre(_hexWidth, _hexHeight, location.Y, location.X);
 
-            var x = hexCentre.X - (StructureWidth / 2);
-            var y = hexCentre.Y - (StructureWidth / 2);
+            var x = hexCentre.X - (_structureWidth / 2);
+            var y = hexCentre.Y - (_structureWidth / 2);
 
-            graphics.FillRectangle(brush, x, y, StructureWidth, StructureWidth);
+            graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
         }
 
-        private static PointF HexCentre(float hexWidth, float hexHeight, float row, float col)
+        private PointF HexCentre(float hexWidth, float hexHeight, float row, float col)
         {
             float y = hexHeight / 2;
             float x = 0;
@@ -192,76 +249,25 @@ namespace Visualise
             if (col % 2 == 1) y += hexHeight / 2;
 
             // Move over for the column number.
-            x += col * (hexWidth * 0.75f) + HexWidth / 2;
+            x += col * (hexWidth * 0.75f) + _hexWidth / 2;
 
             return new PointF(x, y);
         }
 
-        public static void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours)
+        public void LabelHexes(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, string[,] labels)
         {
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-            graphics.FillRectangle(Brushes.White, 0, 0, width, height);
-
-            foreach (PointF point in hexagonColours.Keys)
-            {
-                graphics.FillPolygon(hexagonColours[point], HexToPoints(HexWidth, HexHeight, point.Y, point.X));
-            }
-
-            float xMax = width;
-            float yMax = height;
+            var font = new Font("Arial", (int)(_hexHeight * .2));
 
             for (int row = 0; ; row++)
             {
-                PointF[] points = HexToPoints(HexWidth, HexHeight, row, 0);
+                PointF[] points = HexToPoints(_hexWidth, _hexHeight, row, 0);
 
                 if (points[4].Y > yMax)
                     break;
 
                 for (int col = 0; ; col++)
                 {
-                    points = HexToPoints(HexWidth, HexHeight, row, col);
-
-                    // If it doesn't fit horizontally,
-                    // we're done with this row.
-                    if (points[3].X > xMax)
-                        break;
-
-                    // If it fits vertically, draw it.
-                    if (points[4].Y <= yMax)
-                    {
-                        graphics.DrawPolygon(Pens.Black, points);
-                    }
-                }
-            }
-            
-            //#if FIG34
-            //            // Draw the selected rectangles for Figures 3 and 4.
-            //            using (Pen pen = new Pen(Color.Red, 3))
-            //            {
-            //                pen.DashStyle = DashStyle.Dash;
-            //                foreach (RectangleF rect in TestRects)
-            //                {
-            //                    e.Graphics.DrawRectangle(pen, Rectangle.Round(rect));
-            //                }
-            //            }
-            //#endif
-        }
-
-        public static void LabelHexes(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, float hexWidth, float hexHeight, string[,] labels)
-        {
-            var font = new Font("Arial", (int)(hexHeight * .2));
-
-            for (int row = 0; ; row++)
-            {
-                PointF[] points = HexToPoints(hexWidth, hexHeight, row, 0);
-
-                if (points[4].Y > yMax)
-                    break;
-
-                for (int col = 0; ; col++)
-                {
-                    points = HexToPoints(hexWidth, hexHeight, row, col);
+                    points = HexToPoints(_hexWidth, _hexHeight, row, col);
 
                     // If it doesn't fit horizontally,
                     // we're done with this row.

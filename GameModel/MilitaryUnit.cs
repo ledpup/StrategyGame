@@ -68,7 +68,7 @@ namespace GameModel
         public Dictionary<UnitType, double> OpponentUnitTypeBattleModifier { get; set; }
 
         public TerrainType CanMoveOver;
-        public TerrainType MayStopOn;
+        public TerrainType CanStopOn;
         public EdgeType CanMoveOverEdge;
 
         public Dictionary<TerrainType, int?> TerrainMovementCosts { get; set; }
@@ -243,7 +243,7 @@ namespace GameModel
 
             CanMoveOver = Terrain.Non_Mountainous_Land;
             CanMoveOverEdge = EdgeType.Road | EdgeType.Bridge | EdgeType.Forest | EdgeType.Hill;
-            MayStopOn = Terrain.Non_Mountainous_Land;
+            CanStopOn = Terrain.Non_Mountainous_Land;
         }
 
         void AmphibiousUnit()
@@ -263,7 +263,7 @@ namespace GameModel
 
             CanMoveOver = Terrain.Non_Mountainous_Land;
             CanMoveOverEdge = EdgeType.Road | EdgeType.River;
-            MayStopOn = Terrain.Non_Mountainous_Land;
+            CanStopOn = Terrain.Non_Mountainous_Land;
         }
 
         void AirborneUnit()
@@ -279,7 +279,7 @@ namespace GameModel
 
             CanMoveOver = Terrain.All_Terrain;
             CanMoveOverEdge = Edge.All_Edges;
-            MayStopOn = Terrain.Non_Mountainous_Land;
+            CanStopOn = Terrain.Non_Mountainous_Land;
         }
 
         void WaterUnit()
@@ -292,7 +292,7 @@ namespace GameModel
 
             CanMoveOver = Terrain.All_Water;
             CanMoveOverEdge = EdgeType.Normal;
-            MayStopOn = Terrain.All_Water;
+            CanStopOn = Terrain.All_Water;
         }
         //public TerrainType StopOn;
         //public TerrainType TerrainCombatBonus;
@@ -419,7 +419,7 @@ namespace GameModel
 
             potentialMoves.AddRange(neighbourMoves);
 
-            return potentialMoves.Where(x => unit.MayStopOn.HasFlag(x.Destination.TerrainType)).ToList();
+            return potentialMoves.Where(x => unit.CanStopOn.HasFlag(x.Destination.TerrainType)).ToList();
 
         }
 

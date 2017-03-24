@@ -29,10 +29,10 @@ namespace Tests
             Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Water));
             Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Reef));
 
-            Assert.IsFalse(airborneUnit.MayStopOn.HasFlag(TerrainType.Water));
-            Assert.IsFalse(airborneUnit.MayStopOn.HasFlag(TerrainType.Mountain));
+            Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Water));
+            Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Mountain));
 
-            Assert.IsTrue(airborneUnit.MayStopOn.HasFlag(TerrainType.Forest));
+            Assert.IsTrue(airborneUnit.CanStopOn.HasFlag(TerrainType.Forest));
         }
 
         [TestMethod]

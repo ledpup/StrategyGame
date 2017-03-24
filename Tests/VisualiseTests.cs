@@ -27,13 +27,13 @@ namespace Tests
 
             var labels = new string[board.Width, board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithArrayIndex.png", board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.Integration.RenderAndSave("BasicBoardWithArrayIndex.png", board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithOffsetCoords.png", board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.Integration.RenderAndSave("BasicBoardWithOffsetCoords.png", board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithCubeCoords.png", board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.Integration.RenderAndSave("BasicBoardWithCubeCoords.png", board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace Tests
                 new MilitaryUnit() { Tile = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithUnits.png", board.Tiles, board.Edges, board.Structures, units: units);
+            Visualise.Integration.RenderAndSave("BasicBoardWithUnits.png", board.Tiles, board.Edges, board.Structures, units: units);
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@ namespace Tests
             var board = new Board(GameBoard, TileEdges, Structures);
 
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithCurves.png", board.Tiles, circles: board[1,1]);
+            Visualise.Integration.RenderAndSave("BasicBoardWithCurves.png", board.Tiles, circles: board[1,1]);
         }
 
         [TestMethod]
@@ -85,7 +85,7 @@ namespace Tests
                 }
             }
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardPathFind.png", board.Tiles, board.Edges, board.Structures, labels, vectors);
+            Visualise.Integration.RenderAndSave("BasicBoardPathFind.png", board.Tiles, board.Edges, board.Structures, labels, vectors);
         }
 
         private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)

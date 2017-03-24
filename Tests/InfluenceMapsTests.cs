@@ -49,11 +49,11 @@ namespace Tests
             {
                 var possibleMoves = x.PossibleMoves();
 
-                var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.OwnerIndex]);
+                var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex]);
 
-                if (x.Tile.AggregateInfluence[x.OwnerIndex] > highestTension)
+                if (x.Tile.AggregateInfluence[x.MovementType][x.OwnerIndex] > highestTension)
                 {
-                    var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.OwnerIndex] == highestTension);
+                    var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex] == highestTension);
 
                     var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(x.Index)).ThenBy(y => y.Distance).First();
 
@@ -67,11 +67,11 @@ namespace Tests
             var vectors = new List<Vector>();
             moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMoveOrders.png", board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            Visualise.Integration.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveMoves(moveOrders);
 
-            Visualise.Integration.DrawHexagonImage("AggregateInfluenceMovesResolved.png", board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            Visualise.Integration.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Tiles, board.Edges, board.Structures, null, null, board.Units);
         }
     }
 }

@@ -19,10 +19,10 @@ namespace GameModel
 
         public Hex Hex;
 
-        public double[] UnitCountInfluence;
-        public double[] UnitStrengthInfluence;
         public double StructureInfluence;
-        public double[] AggregateInfluence;
+        public Dictionary<MovementType, double[]> UnitCountInfluence;
+        public Dictionary<MovementType, double[]> UnitStrengthInfluence;
+        public Dictionary<MovementType, double[]> AggregateInfluence;
         public Dictionary<int, double> TerrainAndWeatherInfluenceByUnit;
 
         public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)

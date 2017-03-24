@@ -57,8 +57,9 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, Structures);
 
+            var vectors = new List<Vector>() { new Vector(board[28].Location, board[29].Location, Colours.Black) { EdgeType = EdgeType.Road } };
 
-            Visualise.Integration.DrawHexagonImage("BasicBoardWithCurves.png", board.Tiles, circles: board[1,1]);
+            Visualise.Integration.DrawHexagonImage("BasicBoardWithCurves.png", board.Tiles, null, null, null, vectors);
         }
 
         [TestMethod]

@@ -11,7 +11,7 @@ namespace Visualise
 
     public class Integration
     {
-        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
+        public static void DrawHexagonImage(string fileName, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000)
         {
             var hexagonColours = new Dictionary<PointF, Brush>();
 
@@ -52,7 +52,7 @@ namespace Visualise
 
             HexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours, labels, structures);
 
-            HexGrid.DrawCirclesAroundHex(graphics, circles);
+            HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
 
             vectors.ForEach(x => HexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), x.BaseEdgeType));
 

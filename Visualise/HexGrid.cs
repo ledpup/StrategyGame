@@ -112,19 +112,46 @@ namespace Visualise
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        internal static void DrawCirclesAroundHex(Graphics graphics, Tile circles)
+        internal static void DrawCurvedRoads(Graphics graphics, List<Vector> roads)
         {
-            if (circles == null)
-                return;
+            var tile = roads.First().Origin;
 
-            var points = HexToPoints(HexWidth, HexHeight, circles.X, circles.Y);
+            var points = HexToPoints(HexWidth, HexHeight, tile.X, tile.Y);
 
             var radius = (points[2].X - points[1].X) / 2;
 
-            foreach (var point in points)
-                graphics.DrawEllipse(Pens.Red, point.X - radius, point.Y - radius, 2 * radius, 2 * radius);
+            //var pointsIncludingCentre = new List<PointF> { new PointF(points[0].X + (HexWidth / 2), points[0].Y) };
+            //pointsIncludingCentre.AddRange(points);
 
-            graphics.DrawEllipse(Pens.Red, points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius);
+            //points = pointsIncludingCentre.ToArray();
+
+            //foreach (var point in points)
+            //    graphics.DrawEllipse(Pens.Red, point.X - radius, point.Y - radius, 2 * radius, 2 * radius);
+            //graphics.DrawEllipse(Pens.Red, points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius);
+
+            StraightRoad(graphics, points, radius, 2);
+
+
+            //graphics.DrawArc(new Pen(Color.Blue, 2), points[4].X - radius, points[4].Y - radius, 2 * radius, 2 * radius, 180, 60);
+            //graphics.DrawArc(new Pen(Color.Blue, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 180, 60);
+        }
+
+        private static void StraightRoad(Graphics graphics, PointF[] points, float radius, int tileIndex)
+        {
+            var degreesOffset = 0 * 60;
+
+            //graphics.DrawArc(new Pen(Color.Brown, 2), points[1].X - radius, points[1].Y - radius, 2 * radius, 2 * radius, 0, 60);
+            //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 120, 120);
+            //graphics.DrawArc(new Pen(Color.Brown, 2), points[5].X - radius, points[5].Y - radius, 2 * radius, 2 * radius, 300, 60);
+
+
+            //graphics.DrawArc(new Pen(Color.Brown, 2), points[2].X - radius, points[2].Y - radius, 2 * radius, 2 * radius, 60, 60);
+            //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 180, 120);
+            //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X - radius, points[0].Y - radius, 2 * radius, 2 * radius, 0, 60);
+
+            graphics.DrawArc(new Pen(Color.Brown, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 120, 60);
+            graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 240, 120);
+            graphics.DrawArc(new Pen(Color.Brown, 2), points[1].X - radius, points[1].Y - radius, 2 * radius, 2 * radius, 60, 60);
         }
 
         public static void DrawCircle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)

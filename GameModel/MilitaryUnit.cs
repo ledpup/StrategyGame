@@ -22,7 +22,6 @@ namespace GameModel
         Land,
         Water,
         Airborne,
-        Amphibious,
     }
 
     public enum BattleQualityModifier
@@ -38,30 +37,7 @@ namespace GameModel
         public string Name { get; set; }
         public int OwnerIndex { get; set; }
         public UnitType UnitType { get; set; }
-        public MovementType MovementType
-        {
-            get { return _movementType; }
-            set
-            {
-                _movementType = value;
-                switch (_movementType)
-                {
-                    case MovementType.Land:
-                        LandUnit();
-                        break;
-                    case MovementType.Airborne:
-                        AirborneUnit();
-                        break;
-                    case MovementType.Water:
-                        WaterUnit();
-                        break;
-                    case MovementType.Amphibious:
-                        AmphibiousUnit();
-                        break;
-                }
-            }
-        }
-        MovementType _movementType;
+        public MovementType MovementType { get; set; }
         public int BaseMovementPoints { get; set; }
         public double BaseQuality
         {
@@ -86,6 +62,7 @@ namespace GameModel
         public int Speed { get; set; }
         public bool IsAlive { get; private set; }
 
+        public bool IsAmphibious { get; set; }
         public Dictionary<TerrainType, double> TerrainTypeBattleModifier { get; set; }
         public Dictionary<Weather, double> WeatherBattleModifier { get; set; }
         public Dictionary<UnitType, double> OpponentUnitTypeBattleModifier { get; set; }
@@ -106,9 +83,10 @@ namespace GameModel
         {
             return Name + " (" + Strength + ") at " + Tile.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile tile = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile tile = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false)
         {
             IsAlive = true;
+
             BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>();
             foreach (BattleQualityModifier battleQualityModifier in Enum.GetValues(typeof(BattleQualityModifier)))
             {
@@ -163,6 +141,27 @@ namespace GameModel
 
             InitialMorale = initialMorale;
             InitialQuantity = initialQuantity;
+            IsAmphibious = isAmphibious;
+
+            switch (MovementType)
+            {
+                case MovementType.Land:
+                    if (IsAmphibious)
+                    {
+                        AmphibiousUnit();
+                    }
+                    else
+                    {
+                        LandUnit();
+                    }
+                    break;
+                case MovementType.Airborne:
+                    AirborneUnit();
+                    break;
+                case MovementType.Water:
+                    WaterUnit();
+                    break;
+            }
         }
 
         public int InitialQuantity

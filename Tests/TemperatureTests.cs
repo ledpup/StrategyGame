@@ -36,7 +36,7 @@ namespace Tests
                     }
                 }
 
-                Visualise.Integration.DrawHexagonImage("BasicBoardTemp" + i + ".png", tiles, board.Edges, null, labels);
+                Visualise.Integration.RenderAndSave("BasicBoardTemp" + i + ".png", tiles, board.Edges, null, labels);
             }
         }
     }

@@ -197,7 +197,7 @@ namespace Visualise
             return new PointF(x, y);
         }
 
-        public static void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours, string[,] labels, List<Structure> tileStructures)
+        public static void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours)
         {
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
@@ -208,9 +208,32 @@ namespace Visualise
                 graphics.FillPolygon(hexagonColours[point], HexToPoints(HexWidth, HexHeight, point.Y, point.X));
             }
 
-            // Draw the grid.
-            DrawHexGrid(graphics, Pens.Black, 0, width, 0, height, HexWidth, HexHeight, labels);
+            float xMax = width;
+            float yMax = height;
 
+            for (int row = 0; ; row++)
+            {
+                PointF[] points = HexToPoints(HexWidth, HexHeight, row, 0);
+
+                if (points[4].Y > yMax)
+                    break;
+
+                for (int col = 0; ; col++)
+                {
+                    points = HexToPoints(HexWidth, HexHeight, row, col);
+
+                    // If it doesn't fit horizontally,
+                    // we're done with this row.
+                    if (points[3].X > xMax)
+                        break;
+
+                    // If it fits vertically, draw it.
+                    if (points[4].Y <= yMax)
+                    {
+                        graphics.DrawPolygon(Pens.Black, points);
+                    }
+                }
+            }
             
             //#if FIG34
             //            // Draw the selected rectangles for Figures 3 and 4.
@@ -223,32 +246,6 @@ namespace Visualise
             //                }
             //            }
             //#endif
-        }
-        private static void DrawHexGrid(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, float hexWidth, float hexHeight, string[,] labels)
-        {
-            for (int row = 0; ; row++)
-            {
-                PointF[] points = HexToPoints(hexWidth, hexHeight, row, 0);
-
-                if (points[4].Y > yMax)
-                    break;
-
-                for (int col = 0; ; col++)
-                {
-                    points = HexToPoints(hexWidth, hexHeight, row, col);
-
-                    // If it doesn't fit horizontally,
-                    // we're done with this row.
-                    if (points[3].X > xMax)
-                        break;
-
-                    // If it fits vertically, draw it.
-                    if (points[4].Y <= yMax)
-                    {
-                        graphics.DrawPolygon(pen, points);
-                    }
-                }
-            }
         }
 
         public static void LabelHexes(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, float hexWidth, float hexHeight, string[,] labels)

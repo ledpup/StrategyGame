@@ -627,9 +627,24 @@ namespace GameModel
 
             board.Tiles.ToList().ForEach(x =>
             {
-                x.UnitCountInfluence = new double[numberOfPlayers];
-                x.UnitStrengthInfluence = new double[numberOfPlayers];
-                x.AggregateInfluence = new double[numberOfPlayers];
+                x.UnitCountInfluence = new Dictionary<MovementType, double[]>()
+                {
+                    { MovementType.Airborne, new double[numberOfPlayers] },
+                    { MovementType.Land, new double[numberOfPlayers] },
+                    { MovementType.Water, new double[numberOfPlayers] }
+                };
+                x.UnitStrengthInfluence = new Dictionary<MovementType, double[]>()
+                {
+                    { MovementType.Airborne, new double[numberOfPlayers] },
+                    { MovementType.Land, new double[numberOfPlayers] },
+                    { MovementType.Water, new double[numberOfPlayers] }
+                };
+                x.AggregateInfluence = new Dictionary<MovementType, double[]>()
+                {
+                    { MovementType.Airborne, new double[numberOfPlayers] },
+                    { MovementType.Land, new double[numberOfPlayers] },
+                    { MovementType.Water, new double[numberOfPlayers] }
+                };
                 aliveUnits.ForEach(y =>
                 {
                     if (!x.TerrainAndWeatherInfluenceByUnit.ContainsKey(y.Index))
@@ -641,14 +656,14 @@ namespace GameModel
             foreach (var unit in aliveUnits)
             {
                 var playerIndex = unit.OwnerIndex;
-                unit.Tile.UnitCountInfluence[playerIndex] += 1;
-                unit.Tile.UnitStrengthInfluence[playerIndex] = unit.Strength;
+                unit.Tile.UnitCountInfluence[unit.MovementType][playerIndex] += 1;
+                unit.Tile.UnitStrengthInfluence[unit.MovementType][playerIndex] += unit.Strength;
                 var moves = unit.PossibleMoves().GroupBy(x => x.Destination);
                 foreach (var move in moves)
                 {
                     var minDistance = move.Min(x => x.Distance) + 1;
-                    board[move.Key.Index].UnitCountInfluence[playerIndex] += Math.Round(1D / minDistance, 1);
-                    board[move.Key.Index].UnitStrengthInfluence[playerIndex] += Math.Round(unit.Strength / minDistance, 0);
+                    board[move.Key.Index].UnitCountInfluence[unit.MovementType][playerIndex] += Math.Round(1D / minDistance, 1);
+                    board[move.Key.Index].UnitStrengthInfluence[unit.MovementType][playerIndex] += Math.Round(unit.Strength / minDistance, 0);
                 }
             }
 

@@ -650,7 +650,7 @@ namespace GameModel
                     if (!x.TerrainAndWeatherInfluenceByUnit.ContainsKey(y.Index))
                         x.TerrainAndWeatherInfluenceByUnit.Add(y.Index, y.TerrainTypeBattleModifier[x.TerrainType] + y.WeatherBattleModifier[x.Weather]);
                 });
-                x.StructureInfluence = 0;
+                x.StructureInfluence = new double[numberOfPlayers];
             });
 
             foreach (var unit in aliveUnits)
@@ -679,25 +679,26 @@ namespace GameModel
                 }
             }
 
-            foreach (var structure in board.Structures)
-            {
-                const double structureInfluence = 2;
-                structure.Tile.StructureInfluence += structureInfluence;
-                for (var i = 1; i < 5; i++)
-                {
-                    var hexesInRing = Hex.HexRing(structure.Tile.Hex, i);
-
-                    hexesInRing.ForEach(x =>
-                    {
-                        var index = Hex.HexToIndex(x, board.Width);
-                        if (index >= 0 && index < board.TileArray.Length)
-                            board[index].StructureInfluence += structureInfluence / (i + 1);
-                    });
-                }
-            }
-
             for (var i = 0; i < numberOfPlayers; i++)
             {
+                foreach (var structure in board.Structures)
+                {
+                    const double ownStructureInfluence = 1;
+                    const double enemyStructureInfluence = 1.5;
+                    structure.Tile.StructureInfluence[i] += structure.OwnerIndex == i ? ownStructureInfluence : enemyStructureInfluence;
+                    for (var j = 1; j < 5; j++)
+                    {
+                        var hexesInRing = Hex.HexRing(structure.Tile.Hex, j);
+
+                        hexesInRing.ForEach(x =>
+                        {
+                            var index = Hex.HexToIndex(x, board.Width);
+                            if (index >= 0 && index < board.TileArray.Length)
+                                board[index].StructureInfluence[i] += (structure.OwnerIndex == i ? ownStructureInfluence : enemyStructureInfluence) / (j + 1);
+                        });
+                    }
+                }
+
                 board.Tiles.ToList().ForEach(x =>
                 {
                     CalculateAggregateInfluenceMap(x, numberOfPlayers, i, MovementType.Airborne);
@@ -709,7 +710,7 @@ namespace GameModel
 
         private static void CalculateAggregateInfluenceMap(Tile x, int numberOfPlayers, int i, MovementType movementType)
         {
-            x.AggregateInfluence[movementType][i] = x.UnitCountInfluence[movementType][i] - x.StructureInfluence;
+            x.AggregateInfluence[movementType][i] = x.UnitCountInfluence[movementType][i] - x.StructureInfluence[i];
             for (var j = 0; j < numberOfPlayers; j++)
             {
                 if (i == j)

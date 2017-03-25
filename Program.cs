@@ -54,14 +54,14 @@ namespace StrategyGame
                 Board.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var labels = new string[board.Width, board.Height];
-
-                board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.StructureInfluence, 1).ToString());
                 var bitmap = new Bitmap(1920, 1400);
                 Visualise.Integration.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
-                RenderLabelsAndSave("StructureInfluenceMap.png", new Bitmap(bitmap), board.Width, labels);
-
+                
                 for (var i = 0; i < numberOfPlayers; i++)
                 {
+                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.StructureInfluence[i], 1).ToString());
+                    RenderLabelsAndSave("StructureInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
+
                     board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitCountInfluence[MovementType.Airborne][i].ToString());
                     RenderLabelsAndSave("UnitCountAirborneInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
                     board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitCountInfluence[MovementType.Land][i].ToString());

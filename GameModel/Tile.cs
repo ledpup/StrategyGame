@@ -19,7 +19,7 @@ namespace GameModel
 
         public Hex Hex;
 
-        public double StructureInfluence;
+        public double[] StructureInfluence;
         public Dictionary<MovementType, double[]> UnitCountInfluence;
         public Dictionary<MovementType, double[]> UnitStrengthInfluence;
         public Dictionary<MovementType, double[]> AggregateInfluence;

@@ -12,7 +12,7 @@ namespace Tests
     public class MoveTests
     {
         [TestMethod]
-        public void InfantryValidMoveList()
+        public void InfantryMoveList()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -33,7 +33,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void InfantryValidMoveListWithRoad()
+        public void InfantryMoveListWithRoad()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -63,7 +63,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void InfantryValidMoveListWithRoadOverMountain()
+        public void InfantryMoveListWithRoadOverMountain()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -93,7 +93,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void AirborneValidMoveListWithRoadAndMountain()
+        public void AirborneMoveListWithRoadAndMountain()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -126,7 +126,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void AirborneValidMoveList()
+        public void AirborneMoveList()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -176,7 +176,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void BasicBoardWithLandUnitNearRiverAndRoad()
+        public void LandUnitNearRiverAndRoad()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -197,7 +197,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void BasicBoardWithLandUnitNearBridgeAndRoad()
+        public void LandUnitNearBridgeAndRoad()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -219,7 +219,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void BasicBoardWithAmphibiousUnitNearRiverAndRoad()
+        public void AmphibiousUnitNearRiverAndRoad()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -239,7 +239,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void BasicBoardWithAquaticUnit()
+        public void AquaticUnitMoves()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -300,6 +300,90 @@ namespace Tests
 
             Assert.AreEqual(board[3, 2], board.Units[0].Tile);
             Assert.AreEqual(board[2, 2], board.Units[1].Tile);
+        }
+
+        [TestMethod]
+        public void AdjacentUnitsOfSameStrengthSwapHexes()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            board.Units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(tile: board[1, 1]),
+                new MilitaryUnit(ownerIndex: 1, tile: board[2, 2]),
+            };
+
+            var moveOrders = new List<MoveOrder>
+            {
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[1, 1], board[2, 2]),
+                    },
+                    Unit = board.Units[0] }
+                ,
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[2, 2], board[1, 1]),
+                    },
+                    Unit = board.Units[1]
+                },
+            };
+
+            board.ResolveMoves(moveOrders);
+
+            Assert.AreEqual(board[1, 1], board.Units[0].Tile);
+            Assert.AreEqual(board[2, 2], board.Units[1].Tile);
+        }
+
+        [TestMethod]
+        public void AdjacentUnitsOfDifferentStrengthSwapHexes()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            board.Units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(tile: board[1, 1]),
+                new MilitaryUnit(ownerIndex: 1, tile: board[2, 2]),
+                new MilitaryUnit(ownerIndex: 1, tile: board[2, 2]),
+            };
+
+            var moveOrders = new List<MoveOrder>
+            {
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[1, 1], board[2, 2]),
+                    },
+                    Unit = board.Units[0] }
+                ,
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[2, 2], board[1, 1]),
+                    },
+                    Unit = board.Units[1]
+                },
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[2, 2], board[1, 1]),
+                    },
+                    Unit = board.Units[2]
+                },
+            };
+
+            board.ResolveMoves(moveOrders);
+
+            Assert.AreEqual(board[1, 1], board.Units[0].Tile); // Unit 0 is prevented from moving because a larger army is moving into their hex from the same hexside
+            Assert.AreEqual(board[1, 1], board.Units[1].Tile);
+            Assert.AreEqual(board[1, 1], board.Units[2].Tile);
         }
 
         [TestMethod]

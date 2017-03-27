@@ -406,7 +406,30 @@ namespace GameModel
 
             for (var step = 1; step <= maxMovementPoints; step++)
             {
-                MoveUnitsOneStep(moveOrders, unitStepRate, step);
+                var unitStepMoves = MoveUnitsOneStep(moveOrders, unitStepRate, step);
+
+                // Detect enemy adjacent units attempting to swap tiles
+                var removeUnitMoves = new Dictionary<MilitaryUnit, Move>();
+                foreach (var stepMove in unitStepMoves)
+                {
+                    if (unitStepMoves.Any(x => x.Value.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
+                    {
+                        var originStrength = stepMove.Value.Origin.Units.Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var destinationStrength = stepMove.Value.Destination.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+
+                        if (originStrength <= destinationStrength)
+                        {
+                            removeUnitMoves.Add(stepMove.Key, stepMove.Value);
+                        }
+                    }
+                }
+                removeUnitMoves.Keys.ToList().ForEach(x => unitStepMoves.Remove(x));
+
+                // Move units
+                foreach (var unitStepMove in unitStepMoves)
+                {
+                    unitStepMove.Key.Tile = unitStepMove.Value.Destination;
+                }
 
                 // Remove conflicting units from move orders                
                 var conflictedUnits = DetectConflictedUnits(movingUnits, Units.Where(x => x.IsAlive));
@@ -431,17 +454,20 @@ namespace GameModel
             return conflictedUnits;
         }
 
-        private static void MoveUnitsOneStep(List<MoveOrder> moveOrders, Dictionary<MilitaryUnit, int> unitStepRate, int step)
+        private static Dictionary<MilitaryUnit, Move> MoveUnitsOneStep(List<MoveOrder> moveOrders, Dictionary<MilitaryUnit, int> unitStepRate, int step)
         {
+            var unitStepMoves = new Dictionary<MilitaryUnit, Move>();
             foreach (var moveOrder in moveOrders)
             {
                 if (step % unitStepRate[moveOrder.Unit] == 0)
                 {
                     var moveIndex = step / unitStepRate[moveOrder.Unit] - 1;
                     if (moveOrder.Moves.Length > moveIndex)
-                        moveOrder.Unit.Tile = moveOrder.Moves[moveIndex].Destination;
+                        unitStepMoves.Add(moveOrder.Unit, moveOrder.Moves[moveIndex]);
+                        //moveOrder.Unit.Tile = moveOrder.Moves[moveIndex].Destination;
                 }
             }
+            return unitStepMoves;
         }
 
         public List<BattleReport> ConductBattles()

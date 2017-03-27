@@ -163,6 +163,8 @@ namespace GameModel
             }
 
             RoadMovementBonus = roadMovementBonus;
+
+            CalculateStrength();
         }
 
         public int InitialQuantity

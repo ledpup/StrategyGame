@@ -15,7 +15,7 @@ namespace Tests
         public void CanTransport()
         {
             var inf = new MilitaryUnit();
-            var air = new MilitaryUnit() { MovementType = MovementType.Airborne, IsTransporter = true };
+            var air = new MilitaryUnit(movementType: MovementType.Airborne) { IsTransporter = true };
 
             
             Assert.IsFalse(inf.CanTransport(air));

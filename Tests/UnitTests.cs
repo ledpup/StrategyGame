@@ -23,7 +23,7 @@ namespace Tests
         [TestMethod]
         public void NewUnit_Airborne_HasCorrectMovement()
         {
-            var airborneUnit = new MilitaryUnit() { MovementType = MovementType.Airborne };
+            var airborneUnit = new MilitaryUnit(movementType: MovementType.Airborne);
 
             Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Forest));
             Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Water));
@@ -40,7 +40,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new MilitaryUnit() { MovementType = MovementType.Airborne };
+            var unit = new MilitaryUnit(movementType: MovementType.Airborne);
 
             unit.Tile = board[1, 1];
 

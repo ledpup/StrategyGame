@@ -37,7 +37,7 @@ namespace GameModel
         public string Name { get; set; }
         public int OwnerIndex { get; set; }
         public UnitType UnitType { get; set; }
-        public MovementType MovementType { get; set; }
+        public MovementType MovementType { get; private set; }
         public int BaseMovementPoints { get; set; }
         public double BaseQuality
         {
@@ -132,7 +132,6 @@ namespace GameModel
             Tile = tile;
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
-            RoadMovementBonus = roadMovementBonus;
             UnitType = unitType;
             BaseQuality = baseQuality;
             Size = size;
@@ -162,6 +161,8 @@ namespace GameModel
                     WaterUnit();
                     break;
             }
+
+            RoadMovementBonus = roadMovementBonus;
         }
 
         public int InitialQuantity

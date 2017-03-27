@@ -37,6 +37,9 @@ namespace GameModel
         Offensive,
         Defensive,
         Besieger,
+        Scout,
+        Cluster,
+        Disperse,
     }
     public class MilitaryUnit
     {

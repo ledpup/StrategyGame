@@ -162,6 +162,8 @@ namespace GameModel
                     WaterUnit();
                     break;
             }
+
+            CalculateStrength();
         }
 
         public int InitialQuantity

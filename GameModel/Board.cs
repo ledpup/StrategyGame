@@ -684,7 +684,7 @@ namespace GameModel
                 foreach (var structure in board.Structures)
                 {
                     const double ownStructureInfluence = 1;
-                    const double enemyStructureInfluence = 1.5;
+                    const double enemyStructureInfluence = 1.1;
                     structure.Tile.StructureInfluence[i] += structure.OwnerIndex == i ? ownStructureInfluence : enemyStructureInfluence;
                     for (var j = 1; j < 5; j++)
                     {

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GameModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Visualise
 {
@@ -16,9 +17,8 @@ namespace Visualise
         Units,
         Labels
     }
-    public class Integration
+    public class TwoDimensionalVisualisation
     {
-
         public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
             var graphics = Graphics.FromImage(bitmap);
@@ -100,7 +100,23 @@ namespace Visualise
                         for (var i = 0; i < unitsAtLocation.Count; i++)
                         {
                             var colour = Color.FromArgb(unitsAtLocation[i].UnitColour.Alpha, unitsAtLocation[i].UnitColour.Red, unitsAtLocation[i].UnitColour.Green, unitsAtLocation[i].UnitColour.Blue);
-                            hexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), new SolidBrush(colour));
+                            var brush = new SolidBrush(colour);
+                            switch (unitsAtLocation[i].MovementType)
+                            {
+                                case MovementType.Airborne:
+                                    
+                                    hexGrid.DrawTriangle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    break;
+
+                                case MovementType.Water:
+                                case MovementType.Land:
+                                    colour = Color.FromArgb(unitsAtLocation[i].UnitColour.Alpha, unitsAtLocation[i].UnitColour.Red, unitsAtLocation[i].UnitColour.Green, unitsAtLocation[i].UnitColour.Blue);
+                                    hexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    break;
+                                
+                            }
+
+                            
                         }
                     }
                 }

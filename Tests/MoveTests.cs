@@ -22,7 +22,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 361));
@@ -43,7 +43,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithUnitMovesOverRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitMovesOverRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 316));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 317));
@@ -73,7 +73,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithUnitMovesOverRoadOverMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitMovesOverRoadOverMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 56));
@@ -103,7 +103,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithAirborneUnitMovesWithRoadAndMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAirborneUnitMovesWithRoadAndMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 31));
@@ -136,7 +136,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithAirborneUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAirborneUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             //Assert.AreEqual(12, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
@@ -186,7 +186,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithLandUnitNearBrdigeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithLandUnitNearBrdigeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
@@ -207,7 +207,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithLandUnitNearBridgeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithLandUnitNearBridgeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[114]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[115]));
@@ -229,7 +229,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithAmphibiousUnitNearRiverAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAmphibiousUnitNearRiverAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
@@ -249,7 +249,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithAquaticUnit.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAquaticUnit.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 198));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 226));
@@ -361,11 +361,11 @@ namespace Tests
             var vectors = new List<Vector>();
             moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithUnitsPreMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitsPreMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveMoves(moveOrders);
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithUnitsPostMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitsPostMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             Assert.AreEqual(board[2, 2], board.Units[0].Tile);
             Assert.AreEqual(board[2, 2], board.Units[1].Tile);

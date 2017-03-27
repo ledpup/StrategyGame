@@ -19,7 +19,7 @@ namespace Visualise
         {
             _hexHeight = Convert.ToSingle(mapWidth) / (numberOfHexes - 2);
             _hexWidth = (float)(4 * (_hexHeight / 2 / Math.Sqrt(3)));
-            _structureWidth = _hexHeight / 6;
+            _structureWidth = _hexHeight / 5;
         }
 
         public void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours)
@@ -213,6 +213,13 @@ namespace Visualise
 
         public void DrawCircle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)
         {
+            var topLeftCorner = UnitLocationTopLeftCorner(location, position);
+
+            graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _structureWidth, _structureWidth);
+        }
+
+        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(GameModel.Point location, float position)
+        {
             float Radius = _hexHeight / 4;
 
             var hexCentre = HexCentre(_hexWidth, _hexHeight, location.Y, location.X);
@@ -220,11 +227,24 @@ namespace Visualise
             var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
             var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
 
-            var xOffset = (xOnCircle - (_structureWidth / 2));
-            var yOffset = (yOnCircle - (_structureWidth / 2));
+            var xTopLeft = (xOnCircle - (_structureWidth / 2));
+            var yTopLeft = (yOnCircle - (_structureWidth / 2));
 
-            graphics.FillEllipse(brush, xOffset, yOffset, _structureWidth, _structureWidth);
+            return (xTopLeft, yTopLeft);
+        }
 
+        public void DrawTriangle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)
+        {
+            var topLeftCorner = UnitLocationTopLeftCorner(location, position);
+
+            PointF[] points = 
+            {
+                new PointF(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
+                new PointF(topLeftCorner.xTopLeft + _structureWidth, topLeftCorner.yTopLeft),
+                new PointF(topLeftCorner.xTopLeft + _structureWidth / 2, topLeftCorner.yTopLeft + _structureWidth)
+            };
+
+            graphics.FillPolygon(brush, points);
         }
 
         internal void DrawRectangle(Graphics graphics, GameModel.Point location, SolidBrush brush)

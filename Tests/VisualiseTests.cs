@@ -27,13 +27,13 @@ namespace Tests
 
             var labels = new string[board.Width, board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
-            Visualise.Integration.RenderAndSave("BasicBoardWithArrayIndex.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithArrayIndex.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
-            Visualise.Integration.RenderAndSave("BasicBoardWithOffsetCoords.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithOffsetCoords.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-            Visualise.Integration.RenderAndSave("BasicBoardWithCubeCoords.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithCubeCoords.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace Tests
                 new MilitaryUnit() { Tile = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units);
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace Tests
 
             var vectors = new List<Vector>() { new Vector(board[28].Location, board[29].Location, Colours.Black) { EdgeType = EdgeType.Road } };
 
-            Visualise.Integration.RenderAndSave("BasicBoardWithCurves.png", board.Width, board.Tiles, circles: board[1,1]);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithCurves.png", board.Width, board.Tiles, circles: board[1,1]);
         }
 
         [TestMethod]
@@ -86,7 +86,7 @@ namespace Tests
                 }
             }
 
-            Visualise.Integration.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Tiles, board.Edges, board.Structures, labels, vectors);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Tiles, board.Edges, board.Structures, labels, vectors);
         }
 
         private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)

@@ -55,7 +55,7 @@ namespace StrategyGame
 
                 var labels = new string[board.Width, board.Height];
                 var bitmap = new Bitmap(1920, 1400);
-                Visualise.Integration.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                Visualise.TwoDimensionalVisualisation.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 
                 for (var i = 0; i < numberOfPlayers; i++)
                 {
@@ -92,27 +92,30 @@ namespace StrategyGame
 
                     var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex]);
 
-                    if (x.Tile.AggregateInfluence[x.MovementType][x.OwnerIndex] > highestTension)
-                    {
-                        var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex] == highestTension);
+                    //if (x.Tile.AggregateInfluence[x.MovementType][x.OwnerIndex] < highestTension)
+                    //{
+                        if (x.Tile.AggregateInfluence[x.MovementType][x.OwnerIndex] > highestTension)
+                        {
+                            var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex] == highestTension);
 
-                        var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(x.Index)).ThenBy(y => y.Distance).First();
+                            var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(x.Index)).ThenBy(y => y.Distance).First();
 
-                        var moveOrder = bestMove.GetMoveOrder();
+                            var moveOrder = bestMove.GetMoveOrder();
 
-                        moveOrder.Unit = x;
-                        moveOrders.Add(moveOrder);
-                    }
+                            moveOrder.Unit = x;
+                            moveOrders.Add(moveOrder);
+                        }
+                    //}
                 });
 
                 var vectors = new List<Vector>();
                 moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-                Visualise.Integration.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+                Visualise.TwoDimensionalVisualisation.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
                 board.ResolveMoves(moveOrders);
 
-                Visualise.Integration.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                Visualise.TwoDimensionalVisualisation.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>
@@ -127,7 +130,7 @@ namespace StrategyGame
 
                 if (battleReports.Any())
                 {
-                    Visualise.Integration.RenderAndSave("BattlesConductedTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                    Visualise.TwoDimensionalVisualisation.RenderAndSave("BattlesConductedTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 }
 
                 board.Turn++;
@@ -141,7 +144,7 @@ namespace StrategyGame
 
         private static void RenderLabelsAndSave(string fileName, Bitmap bitmap, int boardWidth, string[,] labels)
         {
-            bitmap = Visualise.Integration.Render(bitmap, Visualise.RenderPipeline.Labels, Visualise.RenderPipeline.Labels, boardWidth, labels: labels);
+            bitmap = Visualise.TwoDimensionalVisualisation.Render(bitmap, Visualise.RenderPipeline.Labels, Visualise.RenderPipeline.Labels, boardWidth, labels: labels);
             bitmap.Save(fileName);
         }
 

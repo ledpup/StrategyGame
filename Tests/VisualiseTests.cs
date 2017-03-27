@@ -27,13 +27,13 @@ namespace Tests
 
             var labels = new string[board.Width, board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithArrayIndex.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("Coords - array.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithOffsetCoords.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("Coords - offset.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithCubeCoords.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("Coords - cube.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]

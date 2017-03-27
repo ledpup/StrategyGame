@@ -42,6 +42,7 @@ namespace GameModel
             Edges = IntitaliseTileEdges(edges);
             Structures = IntitaliseStructures(structures);
             InitialiseSupply();
+            CalculateContiguousRegions();
 
             Logger = logger;
             if (Logger == null)
@@ -62,6 +63,32 @@ namespace GameModel
             Turn = turn;
 
             CalculateTemperature(Turn);
+        }
+
+        private void CalculateContiguousRegions()
+        {
+            var id = 0;
+            foreach (var tile in _tiles)
+            {
+                if (tile.ContiguousRegionId == 0)
+                {
+                    id++;
+                    tile.ContiguousRegionId = id;
+                    AssignContiguousTilesToRegion(tile, id);
+                }
+            }
+        }
+
+        private void AssignContiguousTilesToRegion(Tile tile, int id)
+        {
+            tile.Neighbours
+                .Where(x => x.ContiguousRegionId == 0 && x.BaseTerrainType == tile.BaseTerrainType)
+                .ToList()
+                .ForEach(x => 
+                    {
+                        x.ContiguousRegionId = id;
+                        AssignContiguousTilesToRegion(x, id);
+                    });
         }
 
         public void InitialiseSupply()

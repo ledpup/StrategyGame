@@ -34,6 +34,9 @@ namespace Tests
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
             Visualise.TwoDimensionalVisualisation.RenderAndSave("Coords - cube.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+
+            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.ContiguousRegionId.ToString());
+            Visualise.TwoDimensionalVisualisation.RenderAndSave("ContiguousRegionIds.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]

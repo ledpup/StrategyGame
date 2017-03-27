@@ -13,6 +13,7 @@ namespace GameModel
         public Point Location { get; private set; }
         public int X { get { return Location.X; } }
         public int Y { get { return Location.Y; } }
+        public BaseTerrainType BaseTerrainType;
         public TerrainType TerrainType;
         public Weather Weather;
         public List<MilitaryUnit> Units;
@@ -25,6 +26,8 @@ namespace GameModel
         public Dictionary<MovementType, double[]> AggregateInfluence;
         public Dictionary<int, double> TerrainAndWeatherInfluenceByUnit;
 
+        public int ContiguousRegionId { get; set; }
+
         public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
         {
             Units = new List<MilitaryUnit>();
@@ -35,6 +38,7 @@ namespace GameModel
 
             Hex = OffsetCoord.QoffsetToCube(new OffsetCoord(x, y));
 
+            BaseTerrainType = terrainType.HasFlag(TerrainType.Water) || terrainType.HasFlag(TerrainType.Reef) ? BaseTerrainType.Water : BaseTerrainType.Land;
             TerrainType = terrainType;
             IsEdgeOfMap = isEdge;
 

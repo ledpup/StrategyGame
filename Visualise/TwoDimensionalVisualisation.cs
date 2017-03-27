@@ -104,7 +104,6 @@ namespace Visualise
                             switch (unitsAtLocation[i].MovementType)
                             {
                                 case MovementType.Airborne:
-                                    
                                     hexGrid.DrawTriangle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
                                     break;
 
@@ -113,10 +112,7 @@ namespace Visualise
                                     colour = Color.FromArgb(unitsAtLocation[i].UnitColour.Alpha, unitsAtLocation[i].UnitColour.Red, unitsAtLocation[i].UnitColour.Green, unitsAtLocation[i].UnitColour.Blue);
                                     hexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
                                     break;
-                                
                             }
-
-                            
                         }
                     }
                 }

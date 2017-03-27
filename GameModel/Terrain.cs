@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace GameModel
 {
+    public enum BaseTerrainType
+    {
+        Land,
+        Water,
+    }
+
     [Flags]
     public enum TerrainType
     {

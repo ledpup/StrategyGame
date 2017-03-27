@@ -303,7 +303,44 @@ namespace Tests
         }
 
         [TestMethod]
-        public void AdjacentUnitsSwapHexes()
+        public void AdjacentUnitsOfSameStrengthSwapHexes()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            board.Units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(tile: board[1, 1]),
+                new MilitaryUnit(ownerIndex: 1, tile: board[2, 2]),
+            };
+
+            var moveOrders = new List<MoveOrder>
+            {
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[1, 1], board[2, 2]),
+                    },
+                    Unit = board.Units[0] }
+                ,
+                new MoveOrder
+                {
+                    Moves = new Move[]
+                    {
+                        new Move(board[2, 2], board[1, 1]),
+                    },
+                    Unit = board.Units[1]
+                },
+            };
+
+            board.ResolveMoves(moveOrders);
+
+            Assert.AreEqual(board[1, 1], board.Units[0].Tile);
+            Assert.AreEqual(board[2, 2], board.Units[1].Tile);
+        }
+
+        [TestMethod]
+        public void AdjacentUnitsOfDifferentStrengthSwapHexes()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -344,7 +381,7 @@ namespace Tests
 
             board.ResolveMoves(moveOrders);
 
-            Assert.AreEqual(board[1, 1], board.Units[0].Tile);
+            Assert.AreEqual(board[1, 1], board.Units[0].Tile); // Unit 0 is prevented from moving because a larger army is moving into their hex from the same hexside
             Assert.AreEqual(board[1, 1], board.Units[1].Tile);
             Assert.AreEqual(board[1, 1], board.Units[2].Tile);
         }

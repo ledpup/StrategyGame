@@ -417,7 +417,7 @@ namespace GameModel
                         var originStrength = stepMove.Value.Origin.Units.Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
                         var destinationStrength = stepMove.Value.Destination.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
 
-                        if (originStrength < destinationStrength)
+                        if (originStrength <= destinationStrength)
                         {
                             removeUnitMoves.Add(stepMove.Key, stepMove.Value);
                         }

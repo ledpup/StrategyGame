@@ -48,10 +48,13 @@ namespace StrategyGame
 
             var log = LogManager.GetCurrentClassLogger();
 
+            //var computerPlayer = new ComputerPlayer();
+
             while (!winConditionsMet)
             {
 
-                Board.GenerateInfluenceMaps(board, numberOfPlayers);
+
+                ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var labels = new string[board.Width, board.Height];
                 var bitmap = new Bitmap(1920, 1400);

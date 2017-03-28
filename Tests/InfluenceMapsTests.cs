@@ -41,7 +41,7 @@ namespace Tests
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
 
-            Board.GenerateInfluenceMaps(board, numberOfPlayers);
+            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
             var moveOrders = new List<MoveOrder>();
 

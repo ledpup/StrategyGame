@@ -45,23 +45,11 @@ namespace Tests
 
             var moveOrders = new List<MoveOrder>();
 
-            board.Units.ForEach(x =>
+            board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
             {
-                var possibleMoves = x.PossibleMoves();
-
-                var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex]);
-
-                if (x.Tile.AggregateInfluence[x.MovementType][x.OwnerIndex] > highestTension)
-                {
-                    var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex] == highestTension);
-
-                    var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(x.Index)).ThenBy(y => y.Distance).First();
-
-                    var moveOrder = bestMove.GetMoveOrder();
-
-                    moveOrder.Unit = x;
+                var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(x);
+                if (moveOrder != null)
                     moveOrders.Add(moveOrder);
-                }
             });
 
             var vectors = new List<Vector>();

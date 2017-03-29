@@ -107,7 +107,7 @@ namespace GameModel
         public static List<Hex> HexRing(Hex centreHex, int radius = 1)
         {
             if (radius < 1)
-                throw new Exception("Radius of ring must be greater than 0");
+                return new List<Hex> { centreHex };
 
             var results = new List<Hex>();
 

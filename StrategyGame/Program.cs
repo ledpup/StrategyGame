@@ -28,11 +28,12 @@ namespace StrategyGame
 
             board.Units = new List<MilitaryUnit>
                 {
-                new MilitaryUnit(0, tile: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
+                new MilitaryUnit(0, tile: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3, role: Role.Besieger),
                 new MilitaryUnit(1, tile: board[110], baseMovementPoints: 3),
-                new MilitaryUnit(2, tile: board[31]),
+                new MilitaryUnit(2, tile: board[31], role: Role.Defensive),
                 new MilitaryUnit(3, tile: board[56], movementType: MovementType.Land, isAmphibious: true),
                 new MilitaryUnit(4, tile: board[65]),
+                new MilitaryUnit(4, tile: board[316], role: Role.Offensive),
 
                 new MilitaryUnit(5, ownerIndex: 1, tile: board[361], movementType: MovementType.Airborne, baseMovementPoints: 3),
                 new MilitaryUnit(6, ownerIndex: 1, tile: board[111]),
@@ -62,29 +63,20 @@ namespace StrategyGame
                 
                 for (var i = 0; i < numberOfPlayers; i++)
                 {
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.StructureInfluence[i], 1).ToString());
-                    RenderLabelsAndSave("StructureInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitCountInfluence[MovementType.Airborne][i].ToString());
-                    RenderLabelsAndSave("UnitCountAirborneInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitCountInfluence[MovementType.Land][i].ToString());
-                    RenderLabelsAndSave("UnitCountLandInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitCountInfluence[MovementType.Water][i].ToString());
-                    RenderLabelsAndSave("UnitCountWaterInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitStrengthInfluence[MovementType.Airborne][i].ToString());
-                    RenderLabelsAndSave("UnitStrengthAirborneInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitStrengthInfluence[MovementType.Land][i].ToString());
-                    RenderLabelsAndSave("UnitStrengthLandInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitStrengthInfluence[MovementType.Water][i].ToString());
-                    RenderLabelsAndSave("UnitStrengthWaterInfluenceMapPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.AggregateInfluence[MovementType.Airborne][i], 1).ToString());
-                    RenderLabelsAndSave("AggregateInfluenceMapAirbornePlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.AggregateInfluence[MovementType.Land][i], 1).ToString());
-                    RenderLabelsAndSave("AggregateInfluenceMapLandPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
-                    board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.AggregateInfluence[MovementType.Water][i], 1).ToString());
-                    RenderLabelsAndSave("AggregateInfluenceMapWaterPlayer" + (i + 1) + "Turn" + board.Turn + ".png", new Bitmap(bitmap), board.Width, labels);
+                    MilitaryUnit.Roles.ForEach(x => 
+                    {
+                        board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.StructureInfluence[x][i], 1).ToString());
+                        RenderLabelsAndSave($"StructureInfluenceMap{x.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                    });
+                    
+                    RoleAndMovementType.RolesAndMovementTypes.ForEach(y => 
+                        {
+                            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.UnitInfluence[y][i].ToString());
+                            RenderLabelsAndSave($"UnitInfluenceMap{y.Role.ToString() + y.MovementType.ToString()}Player{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                            
+                            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = Math.Round(x.AggregateInfluence[y][i], 1).ToString());
+                            RenderLabelsAndSave($"AggregateInfluenceMap{y.Role.ToString() + y.MovementType.ToString()}Player{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                        });                   
                 }
 
                 var moveOrders = new List<MoveOrder>();
@@ -93,13 +85,15 @@ namespace StrategyGame
                 {
                     var possibleMoves = x.PossibleMoves();
 
-                    var highestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex]);
+                    var roleAndMovementType = new RoleAndMovementType(x.Role, x.MovementType);
+
+                    var lowestTension = possibleMoves.Min(y => y.Destination.AggregateInfluence[roleAndMovementType][x.OwnerIndex]);
 
                     //if (x.Tile.AggregateInfluence[x.MovementType][x.OwnerIndex] < highestTension)
                     //{
-                        if (x.Tile.AggregateInfluence[x.MovementType][x.OwnerIndex] > highestTension)
+                        if (x.Tile.AggregateInfluence[roleAndMovementType][x.OwnerIndex] > lowestTension)
                         {
-                            var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[x.MovementType][x.OwnerIndex] == highestTension);
+                            var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[roleAndMovementType][x.OwnerIndex] == lowestTension);
 
                             var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(x.Index)).ThenBy(y => y.Distance).First();
 

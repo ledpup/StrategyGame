@@ -7,6 +7,39 @@ using System.Threading.Tasks;
 
 namespace GameModel
 {
+    public struct RoleAndMovementType
+    {
+        public RoleAndMovementType(Role role, MovementType movementType)
+        {
+            Role = role;
+            MovementType = movementType;
+        }
+        public Role Role { get; set; }
+        public MovementType MovementType { get; set; }
+
+        static List<RoleAndMovementType> _rolesAndMovementTypes;
+        public static List<RoleAndMovementType> RolesAndMovementTypes
+        {
+            get
+            {
+                if (_rolesAndMovementTypes == null)
+                {
+                    _rolesAndMovementTypes = new List<RoleAndMovementType>();
+                    foreach (var role in Enum.GetValues(typeof(Role)))
+                    {
+                        foreach (var movementType in Enum.GetValues(typeof(MovementType)))
+                        {
+                            _rolesAndMovementTypes.Add(new RoleAndMovementType((Role)role, (MovementType)movementType));
+                        }
+                    }
+                }
+                return _rolesAndMovementTypes;
+            }
+
+        }
+    }
+
+
     public class Tile
     {
         public int Index { get; private set; }
@@ -20,10 +53,10 @@ namespace GameModel
 
         public Hex Hex;
 
-        public double[] StructureInfluence;
-        public Dictionary<MovementType, double[]> UnitCountInfluence;
-        public Dictionary<MovementType, double[]> UnitStrengthInfluence;
-        public Dictionary<MovementType, double[]> AggregateInfluence;
+        public Dictionary<Role, double[]> StructureInfluence;
+        public Dictionary<RoleAndMovementType, double[]> UnitInfluence;
+        //public Dictionary<MovementType, double[]> UnitStrengthInfluence;
+        public Dictionary<RoleAndMovementType, double[]> AggregateInfluence;
         public Dictionary<int, double> TerrainAndWeatherInfluenceByUnit;
 
         public int ContiguousRegionId { get; set; }

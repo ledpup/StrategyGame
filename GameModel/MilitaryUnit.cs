@@ -38,11 +38,27 @@ namespace GameModel
         Defensive,
         Besieger,
         Scout,
-        Cluster,
-        Disperse,
     }
     public class MilitaryUnit
     {
+
+        public static List<Role> Roles
+        {
+            get
+            {
+                if (_roles == null)
+                {
+                    _roles = new List<Role>();
+                    foreach (var role in Enum.GetValues(typeof(Role)))
+                    {
+                        _roles.Add((Role)role);
+                    }
+                }
+                return _roles;
+            }
+        }
+        static List<Role> _roles;
+
         public int Index;
         public string Name { get; set; }
         public int OwnerIndex { get; set; }
@@ -157,14 +173,7 @@ namespace GameModel
             switch (MovementType)
             {
                 case MovementType.Land:
-                    if (IsAmphibious)
-                    {
-                        AmphibiousUnit();
-                    }
-                    else
-                    {
-                        LandUnit();
-                    }
+                    LandUnit();
                     break;
                 case MovementType.Airborne:
                     AirborneUnit();
@@ -172,6 +181,13 @@ namespace GameModel
                 case MovementType.Water:
                     WaterUnit();
                     break;
+            }
+
+            if (IsAmphibious)
+            {
+                TerrainMovementCosts[TerrainType.Wetland] = 1;
+                EdgeMovementCosts[EdgeType.River] = 0;
+                CanMoveOverEdge |= EdgeType.River;
             }
 
             RoadMovementBonus = roadMovementBonus;
@@ -259,26 +275,6 @@ namespace GameModel
 
             CanMoveOver = Terrain.Non_Mountainous_Land;
             CanMoveOverEdge = EdgeType.Road | EdgeType.Bridge | EdgeType.Forest | EdgeType.Hill;
-            CanStopOn = Terrain.Non_Mountainous_Land;
-        }
-
-        void AmphibiousUnit()
-        {
-            TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Steppe] = 2;
-            TerrainMovementCosts[TerrainType.Forest] = 2;
-            TerrainMovementCosts[TerrainType.Hill] = 2;
-            TerrainMovementCosts[TerrainType.Wetland] = 1;
-
-            EdgeMovementCosts[EdgeType.Normal] = 0;
-            EdgeMovementCosts[EdgeType.River] = 0;
-            EdgeMovementCosts[EdgeType.Road] = 1;
-            EdgeMovementCosts[EdgeType.Bridge] = 1;
-            EdgeMovementCosts[EdgeType.Forest] = 1;
-            EdgeMovementCosts[EdgeType.Hill] = 1;
-
-            CanMoveOver = Terrain.Non_Mountainous_Land;
-            CanMoveOverEdge = EdgeType.Road | EdgeType.River;
             CanStopOn = Terrain.Non_Mountainous_Land;
         }
 

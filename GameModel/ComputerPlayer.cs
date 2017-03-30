@@ -18,9 +18,10 @@ namespace GameModel
                     _friendlyUnitInfluenceModifier = new Dictionary<Role, double>();
                     foreach (var role in Enum.GetValues(typeof(Role)))
                     {
-                        _friendlyUnitInfluenceModifier.Add((Role)role, -1);
+                        _friendlyUnitInfluenceModifier.Add((Role)role, 0.5);
                     }
-                    _friendlyUnitInfluenceModifier[Role.Defensive] = 0.25;
+                    _friendlyUnitInfluenceModifier[Role.Defensive] = 1;
+                    _friendlyUnitInfluenceModifier[Role.Scout] = -0.5;
                 }
                 return _friendlyUnitInfluenceModifier;
             }
@@ -37,7 +38,7 @@ namespace GameModel
                     {
                         _enemyUnitInfluenceModifier.Add((Role)role, 1);
                     }
-                    _enemyUnitInfluenceModifier[Role.Defensive] = -1;
+                    _enemyUnitInfluenceModifier[Role.Defensive] = -0.5;
                     _enemyUnitInfluenceModifier[Role.Offensive] = 1.5;
                     _enemyUnitInfluenceModifier[Role.Scout] = -0.5;
                 }
@@ -58,6 +59,7 @@ namespace GameModel
                         _friendlyStructureInfluence.Add((Role)role, -1);
                     }
                     _friendlyStructureInfluence[Role.Defensive] = 2;
+                    _friendlyStructureInfluence[Role.Scout] = -2;
                 }
                 return _friendlyStructureInfluence;
             }
@@ -75,9 +77,9 @@ namespace GameModel
                     {
                         _enemyStructureInfluence.Add((Role)role, 1);
                     }
-                    _enemyStructureInfluence[Role.Scout] = -1;
-                    _enemyStructureInfluence[Role.Defensive] = -2;
                     _enemyStructureInfluence[Role.Besieger] = 2;
+                    _enemyStructureInfluence[Role.Defensive] = -2;
+                    _enemyStructureInfluence[Role.Scout] = 0.5;
                 }
                 return _enemyStructureInfluence;
             }
@@ -116,7 +118,7 @@ namespace GameModel
             {
                 foreach (var structure in board.Structures)
                 {
-                    for (var distance = 0; distance < 6; distance++)
+                    for (var distance = 0; distance < 5; distance++)
                     {
                         var hexesInRing = Hex.HexRing(structure.Tile.Hex, distance);
 
@@ -183,11 +185,11 @@ namespace GameModel
         {
             var possibleMoves = unit.PossibleMoves();
 
-            var highestInfluence = possibleMoves.Max(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex]);
+            var highestInfluence = possibleMoves.Max(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Tile.Hex) + 1));
 
-            if (unit.Tile.AggregateInfluence[unit.Role][unit.OwnerIndex] < highestInfluence)
+            if (unit.Tile.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) < highestInfluence)
             {
-                var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex] == highestInfluence);
+                var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Tile.Hex) + 1) == highestInfluence);
 
                 var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(unit.Index)).ThenBy(y => y.Distance).First();
 

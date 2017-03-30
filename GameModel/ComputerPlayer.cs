@@ -108,29 +108,8 @@ namespace GameModel
 
             foreach (var unit in aliveUnits)
             {
-                unit.CalculateStrength();
                 var playerIndex = unit.OwnerIndex;
-
-                for (var i = 0; i < 4; i++)
-                {
-                    var hexesInRing = Hex.HexRing(unit.Tile.Hex, i);
-
-                    hexesInRing.ForEach(x =>
-                    {
-                        var index = Hex.HexToIndex(x, board.Width);
-                        if (index >= 0 && index < board.TileArray.Length)
-                        {
-                            board[index].FriendlyUnitInfluence[playerIndex] += 1D / (i + 1);
-                            for (var j = 0; j < numberOfPlayers; j++)
-                            {
-                                if (playerIndex == j)
-                                    continue;
-
-                                board[index].EnemyUnitInfluence[j] += 1D / (i + 1);
-                            }
-                        }
-                    });
-                }
+                CalculateUnitInfluence(board, numberOfPlayers, unit, playerIndex);
             }
 
             for (var i = 0; i < numberOfPlayers; i++)
@@ -159,11 +138,39 @@ namespace GameModel
                 board.Tiles.ToList().ForEach(x =>
                 {
                     MilitaryUnit.Roles
-                        .ForEach(y => CalculateAggregateInfluenceMap(x, i, y));
+                        .ForEach(y => CalculateAggregateInfluence(x, i, y));
                 });
             }
         }
-        private static void CalculateAggregateInfluenceMap(Tile tile, int playerIndex, Role role)
+
+        private static void CalculateUnitInfluence(Board board, int numberOfPlayers, MilitaryUnit unit, int playerIndex)
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                var hexesInRing = Hex.HexRing(unit.Tile.Hex, i);
+
+                hexesInRing.ForEach(x =>
+                {
+                    var index = Hex.HexToIndex(x, board.Width);
+                    if (index >= 0 && index < board.TileArray.Length)
+                    {
+                        if (unit.CanStopOn.HasFlag(board[index].TerrainType))
+                        {
+                            board[index].FriendlyUnitInfluence[playerIndex] += 1D / (i + 1);
+                            for (var j = 0; j < numberOfPlayers; j++)
+                            {
+                                if (playerIndex == j)
+                                    continue;
+
+                                board[index].EnemyUnitInfluence[j] += 1D / (i + 1);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        private static void CalculateAggregateInfluence(Tile tile, int playerIndex, Role role)
         {
             tile.AggregateInfluence[role][playerIndex] = 
                   (tile.FriendlyUnitInfluence[playerIndex] * FriendlyUnitInfluenceModifier[role])

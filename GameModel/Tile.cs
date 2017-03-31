@@ -174,7 +174,8 @@ namespace GameModel
         {
             return tile
                     .Neighbours
-                    .Where(x => tile.NeighbourEdges.Any(y => unit.CanMoveOverEdge.HasFlag(y.EdgeType)) || unit.TerrainMovementCosts[x.TerrainType] != null);
+                    .Where(x => unit.CanMoveOverEdge.HasFlag(tile.NeighbourEdges.Single(y => y.Tiles.Contains(tile) && y.Tiles.Contains(x)).EdgeType) ||
+                                unit.TerrainMovementCosts[x.TerrainType] != null);
         }
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)

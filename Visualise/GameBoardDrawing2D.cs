@@ -1,36 +1,35 @@
-﻿using GameModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GameModel;
 
 namespace Visualise
 {
-    public class HexGrid
+    public class GameBoardDrawing2D
     {
+        Graphics _graphics;
         float _hexHeight;
         float _hexWidth;
         float _structureWidth;
 
-        public HexGrid(int mapWidth, int numberOfHexes)
+        public GameBoardDrawing2D(Bitmap bitmap, int numberOfHexes)
         {
-            _hexHeight = Convert.ToSingle(mapWidth) / (numberOfHexes - 2);
+            _graphics = Graphics.FromImage(bitmap);
+            _hexHeight = Convert.ToSingle(bitmap.Width) / (numberOfHexes - 2);
             _hexWidth = (float)(4 * (_hexHeight / 2 / Math.Sqrt(3)));
             _structureWidth = _hexHeight / 5;
         }
 
-        public void DrawBoard(Graphics graphics, int width, int height, Dictionary<PointF, Brush> hexagonColours)
+        public void DrawBoard(int width, int height, Dictionary<PointF, Brush> hexagonColours)
         {
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            _graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-            graphics.FillRectangle(Brushes.White, 0, 0, width, height);
+            _graphics.FillRectangle(Brushes.White, 0, 0, width, height);
 
             foreach (PointF point in hexagonColours.Keys)
             {
-                graphics.FillPolygon(hexagonColours[point], HexToPoints(_hexWidth, _hexHeight, point.Y, point.X));
+                _graphics.FillPolygon(hexagonColours[point], HexToPoints(_hexWidth, _hexHeight, point.Y, point.X));
             }
 
             float xMax = width;
@@ -55,7 +54,7 @@ namespace Visualise
                     // If it fits vertically, draw it.
                     if (points[4].Y <= yMax)
                     {
-                        graphics.DrawPolygon(Pens.Black, points);
+                        _graphics.DrawPolygon(Pens.Black, points);
                     }
                 }
             }
@@ -73,127 +72,147 @@ namespace Visualise
             //#endif
         }
 
-        public void DrawLine(Graphics graphics, GameModel.Point origin, GameModel.Point destination, Pen pen, BaseEdgeType baseEdgeType)
+        public void DrawEdge(GameModel.Point origin, GameModel.Point destination, Pen pen, bool isCentreToCentre, bool isPort)
         {
-            PointF pt1, pt2;
-            if (baseEdgeType == BaseEdgeType.CentreToCentre)
+            (PointF pt1, PointF pt2) points;
+            if (isCentreToCentre)
             {
-                pt1 = HexCentre(_hexWidth, _hexHeight, origin.Y, origin.X);
-                pt2 = HexCentre(_hexWidth, _hexHeight, destination.Y, destination.X);
+                points.pt1 = HexCentre(_hexWidth, _hexHeight, origin.Y, origin.X);
+                points.pt2 = HexCentre(_hexWidth, _hexHeight, destination.Y, destination.X);
             }
             else
             {
-                var direction = new GameModel.Point(destination.X - origin.X, destination.Y - origin.Y);
-                var points = HexToPoints(_hexWidth, _hexHeight, origin.Y, origin.X);
-                if (origin.X % 2 == 1)
-                {
-                    if (direction.X == -1 && direction.Y == 0)
-                    {
-                        pt1 = points[0];
-                        pt2 = points[1];
-                    }
-                    else if (direction.X == 0 && direction.Y == -1)
-                    {
-                        pt1 = points[1];
-                        pt2 = points[2];
-                    }
-                    else if (direction.X == 1 && direction.Y == 0)
-                    {
-                        pt1 = points[2];
-                        pt2 = points[3];
-                    }
-                    else if (direction.X == 1 && direction.Y == 1)
-                    {
-                        pt1 = points[3];
-                        pt2 = points[4];
-                    }
-                    else if (direction.X == 0 && direction.Y == 1)
-                    {
-                        pt1 = points[4];
-                        pt2 = points[5];
-                    }
-                    else if (direction.X == -1 && direction.Y == 1)
-                    {
-                        pt1 = points[5];
-                        pt2 = points[0];
-                    }
-                    else
-                    {
-                        throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
-                    }
-                }
-                else
-                {
-
-                    if (direction.X == -1 && direction.Y == 0)
-                    {
-                        pt1 = points[5];
-                        pt2 = points[0];
-                    }
-                    else if (direction.X == 0 && direction.Y == -1)
-                    {
-                        pt1 = points[1];
-                        pt2 = points[2];
-                    }
-                    else if (direction.X == 1 && direction.Y == 0)
-                    {
-                        pt1 = points[3];
-                        pt2 = points[4];
-                    }
-                    else if (direction.X == 1 && direction.Y == -1)
-                    {
-                        pt1 = points[2];
-                        pt2 = points[3];
-                    }
-                    else if (direction.X == 0 && direction.Y == 1)
-                    {
-                        pt1 = points[4];
-                        pt2 = points[5];
-                    }
-                    else if (direction.X == -1 && direction.Y == -1)
-                    {
-                        pt1 = points[0];
-                        pt2 = points[1];
-                    }
-                    else
-                    {
-                        throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
-                    }
-                }
+                points = HexSidePoints(origin, destination, _hexWidth, _hexHeight);
             }
 
-            
-            //if (pt2.X - pt1.X == 0 || pt2.Y - pt1.Y == 0 || baseEdgeType == BaseEdgeType.Hexside)
-                graphics.DrawLine(pen, pt1, pt2);
+            if (isPort)
+            {
+                using (StringFormat sf = new StringFormat())
+                {
+                    sf.Alignment = StringAlignment.Center;
+                    sf.LineAlignment = StringAlignment.Center;
+                    var x = (points.pt1.X + points.pt2.X) / 2;
+                    var y = (points.pt1.Y + points.pt2.Y) / 2;
+
+                    var font = new Font("Arial", (int)(_hexHeight * .3));
+                    _graphics.DrawString("P", font, pen.Brush, x, y, sf);
+                }
+            }
+            else
+                _graphics.DrawLine(pen, points.pt1, points.pt2);
             //else
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        internal void DrawCurvedRoads(Graphics graphics, List<Vector> roads)
+        private static (PointF pt1, PointF pt2) HexSidePoints(GameModel.Point origin, GameModel.Point destination, float hexWidth, float hexHeight)
         {
-            var tile = roads.First().Origin;
+            var direction = new GameModel.Point(destination.X - origin.X, destination.Y - origin.Y);
+            var points = HexToPoints(hexWidth, hexHeight, origin.Y, origin.X);
+            PointF pt1, pt2;
+            if (origin.X % 2 == 1)
+            {
+                if (direction.X == -1 && direction.Y == 0)
+                {
+                    pt1 = points[0];
+                    pt2 = points[1];
+                }
+                else if (direction.X == 0 && direction.Y == -1)
+                {
+                    pt1 = points[1];
+                    pt2 = points[2];
+                }
+                else if (direction.X == 1 && direction.Y == 0)
+                {
+                    pt1 = points[2];
+                    pt2 = points[3];
+                }
+                else if (direction.X == 1 && direction.Y == 1)
+                {
+                    pt1 = points[3];
+                    pt2 = points[4];
+                }
+                else if (direction.X == 0 && direction.Y == 1)
+                {
+                    pt1 = points[4];
+                    pt2 = points[5];
+                }
+                else if (direction.X == -1 && direction.Y == 1)
+                {
+                    pt1 = points[5];
+                    pt2 = points[0];
+                }
+                else
+                {
+                    throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
+                }
+            }
+            else
+            {
 
-            var points = HexToPoints(_hexWidth, _hexHeight, tile.X, tile.Y);
-
-            var radius = (points[2].X - points[1].X) / 2;
-
-            //var pointsIncludingCentre = new List<PointF> { new PointF(points[0].X + (HexWidth / 2), points[0].Y) };
-            //pointsIncludingCentre.AddRange(points);
-
-            //points = pointsIncludingCentre.ToArray();
-
-            //foreach (var point in points)
-            //    graphics.DrawEllipse(Pens.Red, point.X - radius, point.Y - radius, 2 * radius, 2 * radius);
-            //graphics.DrawEllipse(Pens.Red, points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius);
-
-            StraightRoad(graphics, points, radius, 2);
-
-
-            //graphics.DrawArc(new Pen(Color.Blue, 2), points[4].X - radius, points[4].Y - radius, 2 * radius, 2 * radius, 180, 60);
-            //graphics.DrawArc(new Pen(Color.Blue, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 180, 60);
+                if (direction.X == -1 && direction.Y == 0)
+                {
+                    pt1 = points[5];
+                    pt2 = points[0];
+                }
+                else if (direction.X == 0 && direction.Y == -1)
+                {
+                    pt1 = points[1];
+                    pt2 = points[2];
+                }
+                else if (direction.X == 1 && direction.Y == 0)
+                {
+                    pt1 = points[3];
+                    pt2 = points[4];
+                }
+                else if (direction.X == 1 && direction.Y == -1)
+                {
+                    pt1 = points[2];
+                    pt2 = points[3];
+                }
+                else if (direction.X == 0 && direction.Y == 1)
+                {
+                    pt1 = points[4];
+                    pt2 = points[5];
+                }
+                else if (direction.X == -1 && direction.Y == -1)
+                {
+                    pt1 = points[0];
+                    pt2 = points[1];
+                }
+                else
+                {
+                    throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
+                }
+            }
+            return (pt1, pt2);
         }
 
-        private void StraightRoad(Graphics graphics, PointF[] points, float radius, int tileIndex)
+
+        //internal void DrawCurvedRoads(Graphics graphics, List<Vector> roads)
+        //{
+        //    var tile = roads.First().Origin;
+
+        //    var points = HexToPoints(_hexWidth, _hexHeight, tile.X, tile.Y);
+
+        //    var radius = (points[2].X - points[1].X) / 2;
+
+        //    //var pointsIncludingCentre = new List<PointF> { new PointF(points[0].X + (HexWidth / 2), points[0].Y) };
+        //    //pointsIncludingCentre.AddRange(points);
+
+        //    //points = pointsIncludingCentre.ToArray();
+
+        //    //foreach (var point in points)
+        //    //    graphics.DrawEllipse(Pens.Red, point.X - radius, point.Y - radius, 2 * radius, 2 * radius);
+        //    //graphics.DrawEllipse(Pens.Red, points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius);
+
+        //    StraightRoad(graphics, points, radius, 2);
+
+
+        //    //graphics.DrawArc(new Pen(Color.Blue, 2), points[4].X - radius, points[4].Y - radius, 2 * radius, 2 * radius, 180, 60);
+        //    //graphics.DrawArc(new Pen(Color.Blue, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 180, 60);
+        //}
+
+        private void StraightRoad(PointF[] points, float radius, int tileIndex)
         {
             var degreesOffset = 0 * 60;
 
@@ -206,16 +225,16 @@ namespace Visualise
             //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 180, 120);
             //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X - radius, points[0].Y - radius, 2 * radius, 2 * radius, 0, 60);
 
-            graphics.DrawArc(new Pen(Color.Brown, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 120, 60);
-            graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (_hexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 240, 120);
-            graphics.DrawArc(new Pen(Color.Brown, 2), points[1].X - radius, points[1].Y - radius, 2 * radius, 2 * radius, 60, 60);
+            _graphics.DrawArc(new Pen(Color.Brown, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 120, 60);
+            _graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (_hexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 240, 120);
+            _graphics.DrawArc(new Pen(Color.Brown, 2), points[1].X - radius, points[1].Y - radius, 2 * radius, 2 * radius, 60, 60);
         }
 
-        public void DrawCircle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)
+        public void DrawCircle(GameModel.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
-            graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _structureWidth, _structureWidth);
+            _graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _structureWidth, _structureWidth);
         }
 
         private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(GameModel.Point location, float position)
@@ -233,7 +252,23 @@ namespace Visualise
             return (xTopLeft, yTopLeft);
         }
 
-        public void DrawTriangle(Graphics graphics, GameModel.Point location, float position, SolidBrush brush)
+        internal void DrawTrapezium(GameModel.Point location, float position, SolidBrush brush)
+        {
+            var topLeftCorner = UnitLocationTopLeftCorner(location, position);
+
+            PointF[] points =
+            {
+                new PointF(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
+                new PointF(topLeftCorner.xTopLeft + _structureWidth, topLeftCorner.yTopLeft),
+                new PointF(topLeftCorner.xTopLeft + _structureWidth * .8F, topLeftCorner.yTopLeft + _structureWidth * .65F),
+                new PointF(topLeftCorner.xTopLeft + _structureWidth * .2F, topLeftCorner.yTopLeft + _structureWidth * .65F),
+                
+            };
+
+            _graphics.FillPolygon(brush, points);
+        }
+
+        public void DrawTriangle(GameModel.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
@@ -244,17 +279,17 @@ namespace Visualise
                 new PointF(topLeftCorner.xTopLeft + _structureWidth / 2, topLeftCorner.yTopLeft + _structureWidth)
             };
 
-            graphics.FillPolygon(brush, points);
+            _graphics.FillPolygon(brush, points);
         }
 
-        internal void DrawRectangle(Graphics graphics, GameModel.Point location, SolidBrush brush)
+        internal void DrawRectangle(GameModel.Point location, SolidBrush brush)
         {
             var hexCentre = HexCentre(_hexWidth, _hexHeight, location.Y, location.X);
 
             var x = hexCentre.X - (_structureWidth / 2);
             var y = hexCentre.Y - (_structureWidth / 2);
 
-            graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
+            _graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
         }
 
         private PointF HexCentre(float hexWidth, float hexHeight, float row, float col)
@@ -274,7 +309,7 @@ namespace Visualise
             return new PointF(x, y);
         }
 
-        public void LabelHexes(Graphics graphics, Pen pen, float xMin, float xMax, float yMin, float yMax, string[,] labels)
+        public void LabelHexes(Pen pen, float xMin, float xMax, float yMin, float yMax, string[,] labels)
         {
             var font = new Font("Arial", (int)(_hexHeight * .2));
 
@@ -310,7 +345,7 @@ namespace Visualise
                                 if (col <= labels.GetUpperBound(0) && row <= labels.GetUpperBound(1))
                                 {
                                     var label = labels[col, row];
-                                    graphics.DrawString(label, font, Brushes.Black, x, y, sf);
+                                    _graphics.DrawString(label, font, Brushes.Black, x, y, sf);
                                 }
                             }
                         }

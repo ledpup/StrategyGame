@@ -24,6 +24,7 @@ namespace GameModel
         Mountain = 1 << 6,
         Reef = 1 << 7,
         Wall = 1 << 8,
+        Port = 1 << 9,
     }
 
     public class Edge

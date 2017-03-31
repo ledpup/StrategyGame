@@ -17,12 +17,11 @@ namespace Visualise
         Units,
         Labels
     }
-    public class TwoDimensionalVisualisation
+    public class GameBoardRenderer
     {
         public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
-            var graphics = Graphics.FromImage(bitmap);
-            var hexGrid = new HexGrid(bitmap.Width, boardWidth);
+            var drawing = new GameBoardDrawing2D(bitmap, boardWidth);
 
             if (renderBegin <= RenderPipeline.Board)
             {
@@ -44,7 +43,7 @@ namespace Visualise
                 );
 
                 
-                hexGrid.DrawBoard(graphics, bitmap.Width, bitmap.Height, hexagonColours);
+                drawing.DrawBoard(bitmap.Width, bitmap.Height, hexagonColours);
             }
             if (renderUntil == RenderPipeline.Board)
                 return bitmap;
@@ -54,21 +53,31 @@ namespace Visualise
                 var vectors = new List<Vector>();
                 if (edges != null)
                 {
-
                     edges.ToList().ForEach(x =>
                     {
                         if (x.EdgeType == EdgeType.Bridge)
                             vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
                         vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
                     });
+
+
+                    if (lines != null)
+                        vectors.AddRange(lines);
+
+                    vectors.ForEach(x => drawing.DrawEdge( 
+                        new GameModel.Point(x.Origin.X, x.Origin.Y), 
+                        new GameModel.Point(x.Destination.X, x.Destination.Y), 
+                        new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), 
+                        x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), 
+                        x.BaseEdgeType == BaseEdgeType.CentreToCentre ? true : false,
+                        x.EdgeType == EdgeType.Port ? true : false));
+
+                    //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
+
+
+                    var ports = edges.Where(x => x.EdgeType == EdgeType.Port).ToList();
+
                 }
-
-                if (lines != null)
-                    vectors.AddRange(lines);
-
-                vectors.ForEach(x => hexGrid.DrawLine(graphics, new GameModel.Point(x.Origin.X, x.Origin.Y), new GameModel.Point(x.Destination.X, x.Destination.Y), new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), x.BaseEdgeType));
-
-                //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
             }
             if (renderUntil == RenderPipeline.Vectors)
                 return bitmap;
@@ -80,7 +89,7 @@ namespace Visualise
                     structures.ForEach(x =>
                     {
                         var colour = x.Colour;
-                        hexGrid.DrawRectangle(graphics, x.Tile.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                        drawing.DrawRectangle(x.Tile.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                     });
                 }
             }
@@ -91,7 +100,7 @@ namespace Visualise
             {
                 if (units != null)
                 {
-                    var unitsByLocation = units.GroupBy(x => x.Tile);
+                    var unitsByLocation = units.GroupBy(x => x.Location);
 
                     foreach (var group in unitsByLocation)
                     {
@@ -104,13 +113,15 @@ namespace Visualise
                             switch (unitsAtLocation[i].MovementType)
                             {
                                 case MovementType.Airborne:
-                                    hexGrid.DrawTriangle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawTriangle(group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
                                     break;
 
                                 case MovementType.Water:
+                                    drawing.DrawTrapezium(group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    break;
+
                                 case MovementType.Land:
-                                    colour = Color.FromArgb(unitsAtLocation[i].UnitColour.Alpha, unitsAtLocation[i].UnitColour.Red, unitsAtLocation[i].UnitColour.Green, unitsAtLocation[i].UnitColour.Blue);
-                                    hexGrid.DrawCircle(graphics, group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawCircle(group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
                                     break;
                             }
                         }
@@ -122,7 +133,7 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Labels)
             {
-                hexGrid.LabelHexes(graphics, Pens.Black, 0, bitmap.Width, 0, bitmap.Height, labels);
+                drawing.LabelHexes(Pens.Black, 0, bitmap.Width, 0, bitmap.Height, labels);
             }
             
             return bitmap;
@@ -150,6 +161,8 @@ namespace Visualise
                     return Colours.SandyBrown;
                 case EdgeType.Mountain:
                     return Colours.Brown;
+                case EdgeType.Port:
+                    return Colours.DarkBlue;
                 default:
                     return Colours.Black;
             }

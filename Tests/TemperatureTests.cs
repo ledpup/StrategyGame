@@ -36,7 +36,7 @@ namespace Tests
                     }
                 }
 
-                Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardTemp" + i + ".png", board.Width, tiles, board.Edges, null, labels);
+                Visualise.GameBoardRenderer.RenderAndSave("BasicBoardTemp" + i + ".png", board.Width, tiles, board.Edges, null, labels);
             }
         }
     }

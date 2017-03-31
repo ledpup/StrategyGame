@@ -45,8 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TwoDimensionalVisualisation.cs" />
-    <Compile Include="HexGrid.cs" />
+    <Compile Include="GameBoardRenderer.cs" />
+    <Compile Include="GameBoardDrawing2D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

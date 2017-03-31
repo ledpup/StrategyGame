@@ -110,9 +110,9 @@ namespace GameModel
 
         public override string ToString()
         {
-            return Name + " (" + Strength + ") at " + Tile.ToString();
+            return Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile tile = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced)
         {
             IsAlive = true;
 
@@ -158,7 +158,7 @@ namespace GameModel
             }
             Name = name;
             OwnerIndex = ownerIndex;
-            Tile = tile;
+            Location = location;
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
             UnitType = unitType;
@@ -256,7 +256,7 @@ namespace GameModel
         }
 
 
-        public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Tile == o.Tile && p.MovementType == o.MovementType;
+        public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Location == o.Location && p.MovementType == o.MovementType;
 
         void LandUnit()
         {
@@ -315,20 +315,20 @@ namespace GameModel
 
 
 
-        public Tile Tile
+        public Tile Location
         {
-            get { return _tile; }
+            get { return _location; }
             set
             {
-                if (_tile != null)
-                    _tile.Units.Remove(this);
+                if (_location != null)
+                    _location.Units.Remove(this);
 
-                _tile = value;
-                if (_tile != null)
-                    _tile.Units.Add(this);
+                _location = value;
+                if (_location != null)
+                    _location.Units.Add(this);
             }
         }
-        Tile _tile;
+        Tile _location;
 
         public override int GetHashCode()
         {
@@ -381,12 +381,12 @@ namespace GameModel
 
             var movesConsidered = new List<Move>();
 
-            possibleMoves = GenerateStandardMoves(this, Tile, null, movesConsidered, MovementPoints, 1);
+            possibleMoves = GenerateStandardMoves(this, Location, null, movesConsidered, MovementPoints, 1);
 
             if (RoadMovementBonus > 0)
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
-                var roadMoves = GenerateRoadBonusMoves(this, Tile, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus);
+                var roadMoves = GenerateRoadBonusMoves(this, Location, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus);
                 var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
                 possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }
@@ -398,7 +398,7 @@ namespace GameModel
         {
             var potentialMoves = new List<Move>();
 
-            potentialMoves.AddRange(tile.Neighbours.Where(dest => dest != unit.Tile
+            potentialMoves.AddRange(tile.Neighbours.Where(dest => dest != unit.Location
                                         && !movesConsidered.Any(x => x.Origin == tile && x.Destination == dest && x.MovesRemaining > movementPoints)
                                         && (unit.MovementType == MovementType.Airborne 
                                                 || (GetEdge(tile, dest).BaseEdgeType == BaseEdgeType.CentreToCentre && unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null || (unit.EdgeMovementCosts[GetEdge(tile, dest).EdgeType] != null && unit.TerrainMovementCosts[dest.TerrainType] != null)))

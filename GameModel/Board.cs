@@ -174,7 +174,7 @@ namespace GameModel
         {
             Structures.ForEach(x => 
             {
-                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Tile == x.Tile).GroupBy(y => y.OwnerIndex);
+                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Tile).GroupBy(y => y.OwnerIndex);
                 if (unitsAtStructureByOwner.Count() == 1)
                     x.OwnerIndex = unitsAtStructureByOwner.First().Key;
             });
@@ -419,7 +419,7 @@ namespace GameModel
             var movingUnits = moveOrders.Select(x => x.Unit).ToList();
             float maxMovementPoints = 12;
 
-            var invalidMoveOrders = moveOrders.Where(x => x.Moves[0].Origin != x.Unit.Tile);
+            var invalidMoveOrders = moveOrders.Where(x => x.Moves[0].Origin != x.Unit.Location);
             if (invalidMoveOrders.Count() > 0)
             {
                 throw new Exception("The following units received orders to move from a location where they don't currently reside: " + string.Join(", ", invalidMoveOrders.Select(x => x.Unit + ". Ordered " + x.Moves[0])));
@@ -455,7 +455,7 @@ namespace GameModel
                 // Move units
                 foreach (var unitStepMove in unitStepMoves)
                 {
-                    unitStepMove.Key.Tile = unitStepMove.Value.Destination;
+                    unitStepMove.Key.Location = unitStepMove.Value.Destination;
                 }
 
                 // Remove conflicting units from move orders                

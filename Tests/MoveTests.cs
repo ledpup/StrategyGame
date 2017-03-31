@@ -16,13 +16,13 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(tile: board[335]) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(location: board[335]) };
 
             var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 361));
@@ -37,13 +37,13 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(tile: board[345], roadMovementBonus: 2) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(location: board[345], roadMovementBonus: 2) };
 
             var moves = units[0].PossibleMoves();
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitMovesOverRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnitMovesOverRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 316));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 317));
@@ -73,7 +73,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitMovesOverRoadOverMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnitMovesOverRoadOverMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 56));
@@ -103,7 +103,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAirborneUnitMovesWithRoadAndMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithAirborneUnitMovesWithRoadAndMountain.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 31));
@@ -136,7 +136,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAirborneUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithAirborneUnitMoves.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             //Assert.AreEqual(12, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
@@ -186,7 +186,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithLandUnitNearBrdigeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithLandUnitNearBrdigeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
@@ -207,7 +207,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithLandUnitNearBridgeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithLandUnitNearBridgeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[114]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[115]));
@@ -229,7 +229,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAmphibiousUnitNearRiverAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithAmphibiousUnitNearRiverAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
@@ -249,7 +249,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Destination.IsSelected = true);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithAquaticUnit.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithAquaticUnit.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 198));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 226));
@@ -269,8 +269,8 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             { 
-                new MilitaryUnit() { Tile = board[1, 1], BaseMovementPoints = 5 },
-                new MilitaryUnit() { Tile = board[1, 1] },
+                new MilitaryUnit() { Location = board[1, 1], BaseMovementPoints = 5 },
+                new MilitaryUnit() { Location = board[1, 1] },
             };
 
             var moveOrders = new List<MoveOrder>
@@ -298,8 +298,8 @@ namespace Tests
 
             board.ResolveMoves(moveOrders);
 
-            Assert.AreEqual(board[3, 2], board.Units[0].Tile);
-            Assert.AreEqual(board[2, 2], board.Units[1].Tile);
+            Assert.AreEqual(board[3, 2], board.Units[0].Location);
+            Assert.AreEqual(board[2, 2], board.Units[1].Location);
         }
 
         [TestMethod]
@@ -309,8 +309,8 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(tile: board[1, 1]),
-                new MilitaryUnit(ownerIndex: 1, tile: board[2, 2]),
+                new MilitaryUnit(location: board[1, 1]),
+                new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
             };
 
             var moveOrders = new List<MoveOrder>
@@ -335,8 +335,8 @@ namespace Tests
 
             board.ResolveMoves(moveOrders);
 
-            Assert.AreEqual(board[1, 1], board.Units[0].Tile);
-            Assert.AreEqual(board[2, 2], board.Units[1].Tile);
+            Assert.AreEqual(board[1, 1], board.Units[0].Location);
+            Assert.AreEqual(board[2, 2], board.Units[1].Location);
         }
 
         [TestMethod]
@@ -346,9 +346,9 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(tile: board[1, 1]),
-                new MilitaryUnit(ownerIndex: 1, tile: board[2, 2]),
-                new MilitaryUnit(ownerIndex: 1, tile: board[2, 2]),
+                new MilitaryUnit(location: board[1, 1]),
+                new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
+                new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
             };
 
             var moveOrders = new List<MoveOrder>
@@ -381,9 +381,9 @@ namespace Tests
 
             board.ResolveMoves(moveOrders);
 
-            Assert.AreEqual(board[1, 1], board.Units[0].Tile); // Unit 0 is prevented from moving because a larger army is moving into their hex from the same hexside
-            Assert.AreEqual(board[1, 1], board.Units[1].Tile);
-            Assert.AreEqual(board[1, 1], board.Units[2].Tile);
+            Assert.AreEqual(board[1, 1], board.Units[0].Location); // Unit 0 is prevented from moving because a larger army is moving into their hex from the same hexside
+            Assert.AreEqual(board[1, 1], board.Units[1].Location);
+            Assert.AreEqual(board[1, 1], board.Units[2].Location);
         }
 
         [TestMethod]
@@ -445,17 +445,17 @@ namespace Tests
             var vectors = new List<Vector>();
             moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitsPreMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnitsPreMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveMoves(moveOrders);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnitsPostMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnitsPostMove.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
-            Assert.AreEqual(board[2, 2], board.Units[0].Tile);
-            Assert.AreEqual(board[2, 2], board.Units[1].Tile);
+            Assert.AreEqual(board[2, 2], board.Units[0].Location);
+            Assert.AreEqual(board[2, 2], board.Units[1].Location);
 
-            Assert.AreEqual(board[12, 2], board.Units[2].Tile);
-            Assert.AreEqual(board[11, 1], board.Units[3].Tile);
+            Assert.AreEqual(board[12, 2], board.Units[2].Location);
+            Assert.AreEqual(board[11, 1], board.Units[3].Location);
         }
 
         [TestMethod]
@@ -466,9 +466,9 @@ namespace Tests
 
             var units = new List<MilitaryUnit> 
             { 
-                            new MilitaryUnit() { Tile = tile1, }, 
-                            new MilitaryUnit() { OwnerIndex = 2, Tile = tile1, },
-                            new MilitaryUnit() { Tile = tile2, },
+                            new MilitaryUnit() { Location = tile1, }, 
+                            new MilitaryUnit() { OwnerIndex = 2, Location = tile1, },
+                            new MilitaryUnit() { Location = tile2, },
             };
 
             var movingUnits = new List<MilitaryUnit> 

@@ -27,16 +27,16 @@ namespace Tests
 
             var labels = new string[board.Width, board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("Coords - array.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("Coords - array.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("Coords - offset.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("Coords - offset.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("Coords - cube.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("Coords - cube.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.ContiguousRegionId.ToString());
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("ContiguousRegionIds.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]
@@ -46,13 +46,13 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit() { Tile = board[1, 1] },
-                new MilitaryUnit() { Tile = board[1, 1] },
-                new MilitaryUnit() { Tile = board[1, 1] },
-                new MilitaryUnit() { Tile = board[1, 1], OwnerIndex = 2 }
+                new MilitaryUnit() { Location = board[1, 1] },
+                new MilitaryUnit() { Location = board[1, 1] },
+                new MilitaryUnit() { Location = board[1, 1] },
+                new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units);
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace Tests
 
             var vectors = new List<Vector>() { new Vector(board[28].Location, board[29].Location, Colours.Black) { EdgeType = EdgeType.Road } };
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardWithCurves.png", board.Width, board.Tiles, circles: board[1,1]);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithCurves.png", board.Width, board.Tiles, circles: board[1,1]);
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, Structures);
 
-            var unit = new MilitaryUnit() { Tile = board[1, 1] };
+            var unit = new MilitaryUnit() { Location = board[1, 1] };
 
             var vectors = new List<Vector>();
 
@@ -89,7 +89,7 @@ namespace Tests
                 }
             }
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Tiles, board.Edges, board.Structures, labels, vectors);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Tiles, board.Edges, board.Structures, labels, vectors);
         }
 
         private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)

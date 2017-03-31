@@ -149,7 +149,7 @@ namespace GameModel
         {
             for (var i = 0; i < 4; i++)
             {
-                var hexesInRing = Hex.HexRing(unit.Tile.Hex, i);
+                var hexesInRing = Hex.HexRing(unit.Location.Hex, i);
 
                 hexesInRing.ForEach(x =>
                 {
@@ -185,11 +185,11 @@ namespace GameModel
         {
             var possibleMoves = unit.PossibleMoves();
 
-            var highestInfluence = possibleMoves.Max(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Tile.Hex) + 1));
+            var highestInfluence = possibleMoves.Max(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Location.Hex) + 1));
 
-            if (unit.Tile.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) < highestInfluence)
+            if (unit.Location.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) < highestInfluence)
             {
-                var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Tile.Hex) + 1) == highestInfluence);
+                var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[unit.Role][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Location.Hex) + 1) == highestInfluence);
 
                 var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(unit.Index)).ThenBy(y => y.Distance).First();
 

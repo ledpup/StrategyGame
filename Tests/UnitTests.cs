@@ -42,7 +42,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(movementType: MovementType.Airborne);
 
-            unit.Tile = board[1, 1];
+            unit.Location = board[1, 1];
 
             var moveList = unit.PossibleMoves();
 

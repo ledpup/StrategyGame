@@ -53,6 +53,7 @@
     <Compile Include="StructureTests.cs" />
     <Compile Include="SupplyTests.cs" />
     <Compile Include="TemperatureTests.cs" />
+    <Compile Include="TransportTests.cs" />
     <Compile Include="VisualiseTests.cs" />
     <Compile Include="PathFindTests.cs" />
     <Compile Include="StackTests.cs" />

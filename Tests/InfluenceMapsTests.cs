@@ -55,11 +55,11 @@ namespace Tests
             var vectors = new List<Vector>();
             moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveMoves(moveOrders);
 
-            Visualise.TwoDimensionalVisualisation.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
         }
     }
 }

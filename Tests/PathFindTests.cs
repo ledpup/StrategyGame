@@ -23,7 +23,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit() { Tile = board[1, 1] };
+            var unit = new MilitaryUnit() { Location = board[1, 1] };
 
             List<PathFindTile> pathFindTiles = Board.GetValidMovesWithMoveCostsForUnit(board, unit);
 

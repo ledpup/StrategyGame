@@ -8,7 +8,7 @@ namespace GameModel
 {
     public class Move
     {
-        public Move(Tile origin, Tile destination, Move previousMove = null, int movesRemaining = 0, int distance = 0)
+        public Move(Tile origin, Tile destination, Move previousMove, int movesRemaining = 0, int distance = 0)
         {
             Origin = origin;
             Destination = destination;
@@ -40,7 +40,7 @@ namespace GameModel
 
             moveList.Reverse();
 
-            return new MoveOrder() { Moves = moveList.ToArray() };
+            return new MoveOrder(moveList.ToArray());
         }
 
         public double TerrainAndWeatherModifers(int unitIndex)

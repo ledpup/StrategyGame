@@ -22,27 +22,22 @@ namespace Tests
                 new MilitaryUnit(1, "2nd Infantry", 1, board[2, 3]),
             };
 
+            var moves1 = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2], null),
+                        new Move(board[1, 2], board[2, 2], null),
+                        new Move(board[2, 2], board[3, 2], null),
+                    };
+            var moves2 = new Move[]
+                    {
+                        new Move(board[2, 3], board[2, 2], null),
+                        new Move(board[2, 2], board[2, 1], null),
+                    };
+
             var moveOrders = new List<MoveOrder>
             {
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[1, 1], board[1, 2]),
-                        new Move(board[1, 2], board[2, 2]),
-                        new Move(board[2, 2], board[3, 2]),
-                    },
-                    Unit = board.Units[0] }
-                ,
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[2, 3], board[2, 2]),
-                        new Move(board[2, 2], board[2, 1]),
-                    },
-                    Unit = board.Units[1]
-                },
+                new MoveOrder(moves1, board.Units[0]),
+                new MoveOrder(moves2, board.Units[1]),
             };
 
             board.ResolveMoves(moveOrders);

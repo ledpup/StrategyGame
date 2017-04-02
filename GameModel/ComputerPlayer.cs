@@ -45,6 +45,28 @@ namespace GameModel
                 return _enemyUnitInfluenceModifier;
             }
         }
+
+        public static Move MoveOrderFromShortestPath(List<Move> moves, PathFindTile[] shortestPath)
+        {
+            Move furthestMove = null;
+            var origin = shortestPath[0].Point;
+            for (var i = 1; i < shortestPath.Length; i++)
+            {
+                var move = moves.SingleOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point);
+
+                if (move == null)
+                    return furthestMove;
+
+                furthestMove = move;
+
+                // Remove moves that we've considered
+                moves.RemoveAll(x => x.Origin.Point == origin);
+                origin = shortestPath[i].Point;
+            }
+
+            return furthestMove;
+        }
+
         static Dictionary<Role, double> _enemyUnitInfluenceModifier;
 
         static Dictionary<Role, double> FriendlyStructureInfluence
@@ -199,6 +221,30 @@ namespace GameModel
                 return moveOrder;
             }
             return null;
+        }
+
+        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)
+        {
+            var ori = pathFindTiles.Single(x => x.X == origin.X && x.Y == origin.Y);
+            var dest = pathFindTiles.Single(x => x.X == destination.X && x.Y == destination.Y);
+
+            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
+            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
+
+            return PathFind.PathFind.FindPath(ori, dest, distance, estimate).Reverse();
+        }
+
+        public static List<Vector> PathFindTilesToVectors(IEnumerable<PathFindTile> path)
+        {
+            var pathArray = path.ToArray();
+
+            var vectors = new List<Vector>();
+            for (var i = 0; i < pathArray.Length - 1; i++)
+            {
+                vectors.Add(new Vector(pathArray[i].Point, pathArray[i + 1].Point, Colours.Black));
+            }
+
+            return vectors;
         }
     }
 }

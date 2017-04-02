@@ -56,8 +56,8 @@ namespace Visualise
                     edges.ToList().ForEach(x =>
                     {
                         if (x.EdgeType == EdgeType.Bridge)
-                            vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
-                        vectors.Add(new Vector(x.Tiles[0].Location, x.Tiles[1].Location, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
+                            vectors.Add(new Vector(x.Tiles[0].Point, x.Tiles[1].Point, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
+                        vectors.Add(new Vector(x.Tiles[0].Point, x.Tiles[1].Point, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
                     });
 
 
@@ -89,7 +89,7 @@ namespace Visualise
                     structures.ForEach(x =>
                     {
                         var colour = x.Colour;
-                        drawing.DrawRectangle(x.Tile.Location, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                        drawing.DrawRectangle(x.Tile.Point, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                     });
                 }
             }
@@ -113,15 +113,15 @@ namespace Visualise
                             switch (unitsAtLocation[i].MovementType)
                             {
                                 case MovementType.Airborne:
-                                    drawing.DrawTriangle(group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawTriangle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
                                     break;
 
                                 case MovementType.Water:
-                                    drawing.DrawTrapezium(group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawTrapezium(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
                                     break;
 
                                 case MovementType.Land:
-                                    drawing.DrawCircle(group.Key.Location, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawCircle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
                                     break;
                             }
                         }

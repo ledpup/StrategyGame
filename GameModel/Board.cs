@@ -383,20 +383,20 @@ namespace GameModel
 
         public List<Edge> Edges;
 
-        public static List<PathFindTile> GetValidMovesWithMoveCostsForUnit(Board board, MilitaryUnit unit)
+        public List<PathFindTile> ValidMovesWithMoveCostsForUnit(MilitaryUnit unit)
         {
             var pathFindTiles = new List<PathFindTile>();
-            board.Tiles.ToList().ForEach(x => pathFindTiles.Add(new PathFindTile(x.Index, x.X, x.Y)));
+            Tiles.ToList().ForEach(x => pathFindTiles.Add(new PathFindTile(x.X, x.Y)));
 
             foreach (var pathFindTile in pathFindTiles)
             {
                 var neighbours = new List<PathFindTile>();
 
-                var originTile = board[pathFindTile.Point.X, pathFindTile.Point.Y];
+                var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
 
                 originTile.ValidAdjacentMoves(unit).ToList().ForEach(x =>
                 {
-                    var neighbour = pathFindTiles.Single(y => y.Point.X == x.X && y.Point.Y == x.Y);
+                    var neighbour = pathFindTiles.Single(y => y.Point == x.Point);
 
                     neighbours.Add(neighbour);
                     pathFindTile.Neighbours = neighbours;

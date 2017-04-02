@@ -10,9 +10,9 @@ namespace GameModel
      public class Tile
     {
         public int Index { get; private set; }
-        public Point Location { get; private set; }
-        public int X { get { return Location.X; } }
-        public int Y { get { return Location.Y; } }
+        public Point Point { get; private set; }
+        public int X { get { return Point.X; } }
+        public int Y { get { return Point.Y; } }
         public BaseTerrainType BaseTerrainType;
         public TerrainType TerrainType;
         public Weather Weather;
@@ -35,7 +35,7 @@ namespace GameModel
             NeighbourEdges = new List<Edge>();
 
             Index = index;
-            Location = new Point(x, y);
+            Point = new Point(x, y);
 
             Hex = OffsetCoord.QoffsetToCube(new OffsetCoord(x, y));
 
@@ -51,7 +51,7 @@ namespace GameModel
         public override string ToString()
         {
             var subTerrain = IsLake ? " (Lake)" : IsSea ? " (Sea)" : "";
-            return Index + " " + Location.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
+            return Index + " " + Point.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
         }
 
         public List<Edge> NeighbourEdges

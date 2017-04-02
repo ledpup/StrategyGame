@@ -273,27 +273,23 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1] },
             };
 
+            var moves1 = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2], null),
+                        new Move(board[1, 2], board[2, 2], null),
+                        new Move(board[2, 2], board[3, 2], null),
+                    };
+
+            var moves2 = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2], null),
+                        new Move(board[1, 2], board[2, 2], null),
+                    };
+
             var moveOrders = new List<MoveOrder>
             {
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[1, 1], board[1, 2]),
-                        new Move(board[1, 2], board[2, 2]),
-                        new Move(board[2, 2], board[3, 2]),
-                    },
-                    Unit = board.Units[0] }
-                ,
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[1, 1], board[1, 2]),
-                        new Move(board[1, 2], board[2, 2]),
-                    },
-                    Unit = board.Units[1]
-                },
+                new MoveOrder(moves1, board.Units[0]),
+                new MoveOrder(moves2, board.Units[1]),
             };
 
             board.ResolveMoves(moveOrders);
@@ -313,24 +309,20 @@ namespace Tests
                 new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
             };
 
+            var moves1 = new Move[]
+                                {
+                                    new Move(board[1, 1], board[2, 2], null),
+                                };
+
+            var moves2 = new Move[]
+                                {
+                                    new Move(board[2, 2], board[1, 1], null),
+                                };
+
             var moveOrders = new List<MoveOrder>
             {
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[1, 1], board[2, 2]),
-                    },
-                    Unit = board.Units[0] }
-                ,
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[2, 2], board[1, 1]),
-                    },
-                    Unit = board.Units[1]
-                },
+                new MoveOrder(moves1, board.Units[0]),
+                new MoveOrder(moves2, board.Units[1]),
             };
 
             board.ResolveMoves(moveOrders);
@@ -351,32 +343,21 @@ namespace Tests
                 new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
             };
 
+            var moves1 = new Move[]
+                                {
+                                    new Move(board[1, 1], board[2, 2], null),
+                                };
+
+            var moves2 = new Move[]
+                                {
+                                    new Move(board[2, 2], board[1, 1], null),
+                                };
+
             var moveOrders = new List<MoveOrder>
             {
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[1, 1], board[2, 2]),
-                    },
-                    Unit = board.Units[0] }
-                ,
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[2, 2], board[1, 1]),
-                    },
-                    Unit = board.Units[1]
-                },
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[2, 2], board[1, 1]),
-                    },
-                    Unit = board.Units[2]
-                },
+                new MoveOrder(moves1, board.Units[0]),
+                new MoveOrder(moves2, board.Units[1]),
+                new MoveOrder(moves2, board.Units[2]),
             };
 
             board.ResolveMoves(moveOrders);
@@ -399,47 +380,35 @@ namespace Tests
                 new MilitaryUnit(3, "2nd Infantry", 2, board[10, 3]),
             };
 
+            var moves1 = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2], null),
+                        new Move(board[1, 2], board[2, 2], null),
+                        new Move(board[2, 2], board[3, 2], null),
+                    };
+            var moves2 = new Move[]
+                    {
+                        new Move(board[4, 1], board[3, 1], null),
+                        new Move(board[3, 1], board[2, 2], null),
+                        new Move(board[2, 2], board[2, 1], null),
+                    };
+            var moves3 = new Move[]
+                    {
+                        new Move(board[10, 2], board[11, 2], null),
+                        new Move(board[11, 2], board[12, 2], null),
+                    };
+            var moves4 = new Move[]
+                    {
+                        new Move(board[10, 3], board[11, 2], null),
+                        new Move(board[11, 2], board[11, 1], null),
+                    };
+
             var moveOrders = new List<MoveOrder>
             {
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[1, 1], board[1, 2]),
-                        new Move(board[1, 2], board[2, 2]),
-                        new Move(board[2, 2], board[3, 2]),
-                    },
-                    Unit = board.Units[0] }
-                ,
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[4, 1], board[3, 1]),
-                        new Move(board[3, 1], board[2, 2]),
-                        new Move(board[2, 2], board[2, 1]),
-                    },
-                    Unit = board.Units[1]
-                },
-
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[10, 2], board[11, 2]),
-                        new Move(board[11, 2], board[12, 2]),
-                    },
-                    Unit = board.Units[2]
-                },
-                new MoveOrder
-                {
-                    Moves = new Move[]
-                    {
-                        new Move(board[10, 3], board[11, 2]),
-                        new Move(board[11, 2], board[11, 1]),
-                    },
-                    Unit = board.Units[3]
-                },
+                new MoveOrder(moves1, board.Units[0]),               
+                new MoveOrder(moves2, board.Units[1]),
+                new MoveOrder(moves3, board.Units[2]),
+                new MoveOrder(moves4, board.Units[3]),
             };
 
             var vectors = new List<Vector>();

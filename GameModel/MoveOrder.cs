@@ -10,22 +10,18 @@ namespace GameModel
         public MilitaryUnit Unit;
         public Move[] Moves;
 
-
-        public MoveOrder()
+        public MoveOrder(Move[] moves, MilitaryUnit unit = null)
         {
-
-        }
-        public MoveOrder(MilitaryUnit unit, Move[] moves)
-        {
-            Unit = unit;
             Moves = moves;
+            Unit = unit;
         }
 
         public List<Vector> Vectors
         {
             get
             {
-                return Moves.Select(x => new Vector(x.Origin.Location, x.Destination.Location, Unit.UnitColour, BaseEdgeType.CentreToCentre)).ToList();
+                var colour = Unit == null ? Colours.Black : Unit.UnitColour;
+                return Moves.Select(x => new Vector(x.Origin.Point, x.Destination.Point, colour, BaseEdgeType.CentreToCentre)).ToList();
             }
         }
     }

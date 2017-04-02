@@ -60,7 +60,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, Structures);
 
-            var vectors = new List<Vector>() { new Vector(board[28].Location, board[29].Location, Colours.Black) { EdgeType = EdgeType.Road } };
+            var vectors = new List<Vector>() { new Vector(board[28].Point, board[29].Point, Colours.Black) { EdgeType = EdgeType.Road } };
 
             Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithCurves.png", board.Width, board.Tiles, circles: board[1,1]);
         }
@@ -70,15 +70,14 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, Structures);
 
-            var unit = new MilitaryUnit() { Location = board[1, 1] };
+            var unit = new MilitaryUnit(location: board[1, 1]);
 
             var vectors = new List<Vector>();
 
-            List<PathFindTile> pathFindTiles = Board.GetValidMovesWithMoveCostsForUnit(board, unit);
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
 
-            vectors.AddRange(FindPath(pathFindTiles, new Point(1, 1), new Point(7, 7)));
-
-            vectors.AddRange(FindPath(pathFindTiles, new Point(10, 3), new Point(13, 6)));
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(7, 7))));
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(10, 3), new Point(13, 6))));
 
             var labels = new string[board.Width, board.Height];
             for (var x = 0; x < board.Width; x++)
@@ -92,22 +91,6 @@ namespace Tests
             Visualise.GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Tiles, board.Edges, board.Structures, labels, vectors);
         }
 
-        private List<Vector> FindPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)
-        {
-            var ori = pathFindTiles.Single(x => x.X == origin.X && x.Y == origin.Y);
-            var dest = pathFindTiles.Single(x => x.X == destination.X && x.Y == destination.Y);
 
-            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
-
-            var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate).Reverse().ToArray();
-
-            var vectors = new List<Vector>();
-            for (var i = 0; i < path.Length - 1; i++)
-            {
-                vectors.Add(new Vector(path[i].Point, path[i + 1].Point, Colours.Black));
-            }
-
-            return vectors;
-        }
     }
 }

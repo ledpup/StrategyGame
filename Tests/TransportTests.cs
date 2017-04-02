@@ -25,12 +25,19 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[21, 10], movementType: MovementType.Water),
-                new MilitaryUnit(location: board[24, 16]),
+                new MilitaryUnit(location: board[24, 16], roadMovementBonus: 1),
                 new MilitaryUnit() { Location = board[1, 1] },
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.GameBoardRenderer.RenderAndSave("Ports.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units);
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(units[1]);
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, units[1].Location.Point, new Point(21, 11)).ToArray();
+
+            var move = ComputerPlayer.MoveOrderFromShortestPath(units[1].PossibleMoves().ToList(), shortestPath);
+
+            var vectors = ComputerPlayer.PathFindTilesToVectors(shortestPath);
+
+            Visualise.GameBoardRenderer.RenderAndSave("Ports.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units, lines: move.GetMoveOrder().Vectors);
         }
     }
 }

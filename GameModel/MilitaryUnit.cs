@@ -275,8 +275,8 @@ namespace GameModel
             RoadMovementBonus = 1;
 
             CanMoveOver = Terrain.Non_Mountainous_Land;
-            CanMoveOverEdge = EdgeType.Road | EdgeType.Bridge | EdgeType.Forest | EdgeType.Hill;
             CanStopOn = Terrain.Non_Mountainous_Land;
+            CanMoveOverEdge = EdgeType.Road | EdgeType.Bridge | EdgeType.Forest | EdgeType.Hill;
         }
 
         void AirborneUnit()
@@ -286,13 +286,14 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Forest] = 1;
             TerrainMovementCosts[TerrainType.Hill] = 1;
             TerrainMovementCosts[TerrainType.Mountain] = 1;
-            TerrainMovementCosts[TerrainType.Water] = 1;
             TerrainMovementCosts[TerrainType.Wetland] = 1;
+
+            TerrainMovementCosts[TerrainType.Water] = 1;
             TerrainMovementCosts[TerrainType.Reef] = 1;
 
             CanMoveOver = Terrain.All_Terrain;
-            CanMoveOverEdge = Edge.All_Edges;
             CanStopOn = Terrain.Non_Mountainous_Land;
+            CanMoveOverEdge = Edge.All_Edges;
         }
 
         void WaterUnit()
@@ -304,8 +305,8 @@ namespace GameModel
             EdgeMovementCosts[EdgeType.Reef] = 1;
 
             CanMoveOver = Terrain.All_Water;
-            CanMoveOverEdge = EdgeType.Normal;
             CanStopOn = Terrain.All_Water;
+            CanMoveOverEdge = EdgeType.Normal;
         }
         //public TerrainType StopOn;
         //public TerrainType TerrainCombatBonus;
@@ -386,7 +387,7 @@ namespace GameModel
             if (RoadMovementBonus > 0)
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
-                var roadMoves = GenerateRoadBonusMoves(this, Location, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus);
+                var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus);
                 var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
                 possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }
@@ -436,25 +437,28 @@ namespace GameModel
 
         }
 
-        private static List<Move> GenerateRoadBonusMoves(MilitaryUnit unit, Tile tile, List<Move> movesConsidered, int movementPoints)
+        private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints)
         {
-            var roadMoves = tile.NeighbourEdges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre && !movesConsidered.Any(y => (x.Tiles[0] == tile && x.Tiles[1] == y.Destination) || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination)))
-                .Select(x => new Move(x.Tiles[0], x.Tiles[1])).ToList();
+            var moves = tile.NeighbourEdges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre 
+                                                            && !movesConsidered.Any(y => (x.Tiles[0] == tile && x.Tiles[1] == y.Destination) 
+                                                                                      || (x.Tiles[1] == tile && x.Tiles[0] == y.Destination))
+                                                     )
+                .Select(x => new Move(x.Tiles[0], x.Tiles[1], previousMove)).ToList();
 
-            movesConsidered.AddRange(roadMoves);
+            movesConsidered.AddRange(moves);
 
             var neighbourMoves = new List<Move>();
 
-            foreach (var roadMove in roadMoves)
+            foreach (var move in moves)
             {
                 var cost = movementPoints - 1;
                 if (cost > 0)
-                    neighbourMoves.AddRange(GenerateRoadBonusMoves(unit, roadMove.Destination, movesConsidered, cost));
+                    neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Destination, move, movesConsidered, cost));
             }
 
-            roadMoves.AddRange(neighbourMoves);
+            moves.AddRange(neighbourMoves);
 
-            return roadMoves;
+            return moves;
         }
 
         private static Edge GetEdge(Tile origin, Tile destination)

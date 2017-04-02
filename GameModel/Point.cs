@@ -33,6 +33,16 @@ namespace GameModel
             return X == otherPoint.X && Y == otherPoint.Y;
         }
 
+        public static bool operator ==(Point a, Point b)
+        {
+            return a.X == b.X && a.Y == b.Y;
+        }
+
+        public static bool operator !=(Point a, Point b)
+        {
+            return !(a == b);
+        }
+
         public static int PointToIndex(int x, int y, int width)
         {
             return y * width + x;

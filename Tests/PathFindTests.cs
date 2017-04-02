@@ -25,15 +25,21 @@ namespace Tests
 
             var unit = new MilitaryUnit() { Location = board[1, 1] };
 
-            List<PathFindTile> pathFindTiles = Board.GetValidMovesWithMoveCostsForUnit(board, unit);
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7)).ToArray();
 
-            var start = pathFindTiles.Single(x => x.Point.X == 1 && x.Point.Y == 1);
-            var destination = pathFindTiles.Single(x => x.Point.X == 5 && x.Point.Y == 7);
+            Assert.AreEqual(shortestPath[0].Point, new Point(1, 1)); // Origin
 
-            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
-            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.Point.X - destination.Point.X, 2) + Math.Pow(t.Point.Y - destination.Point.Y, 2));
+            Assert.AreEqual(shortestPath[1].Point, new Point(2, 2));
+            Assert.AreEqual(shortestPath[2].Point, new Point(3, 2));
+            Assert.AreEqual(shortestPath[3].Point, new Point(4, 3));
+            Assert.AreEqual(shortestPath[4].Point, new Point(5, 3));
+            Assert.AreEqual(shortestPath[5].Point, new Point(6, 4));
+            Assert.AreEqual(shortestPath[6].Point, new Point(6, 5));
+            Assert.AreEqual(shortestPath[7].Point, new Point(5, 5));
+            Assert.AreEqual(shortestPath[8].Point, new Point(5, 6));
 
-            var path = PathFind.PathFind.FindPath(start, destination, distance, estimate);
+            Assert.AreEqual(shortestPath[9].Point, new Point(5, 7)); // Destination
         }
 
 

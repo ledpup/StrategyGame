@@ -30,14 +30,34 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(units[1]);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, units[1].Location.Point, new Point(21, 11)).ToArray();
+            board.Units = units;
 
-            var move = ComputerPlayer.MoveOrderFromShortestPath(units[1].PossibleMoves().ToList(), shortestPath);
+            for (var turn = 0; turn < 2; turn++)
+            {
 
-            var vectors = ComputerPlayer.PathFindTilesToVectors(shortestPath);
+                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(units[1]);
+                var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, units[1].Location.Point, new Point(21, 11)).ToArray();
 
-            Visualise.GameBoardRenderer.RenderAndSave("Ports.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units, lines: move.GetMoveOrder().Vectors);
+                var move = ComputerPlayer.MoveOrderFromShortestPath(units[1].PossibleMoves().ToList(), shortestPath);
+
+                var vectors = ComputerPlayer.PathFindTilesToVectors(shortestPath);
+
+                var moveOrder = move.GetMoveOrder(units[1]);
+
+                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{turn}.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units, lines: moveOrder.Vectors);
+
+                board.ResolveMoves(new List<MoveOrder> { moveOrder });
+
+                switch (turn)
+                {
+                    case 0:
+                        Assert.AreEqual(board[23, 13], units[1].Location);
+                        break;
+                    case 1:
+                        Assert.AreEqual(board[21, 11], units[1].Location);
+                        break;
+                }
+            }
         }
     }
 }

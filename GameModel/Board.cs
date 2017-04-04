@@ -416,7 +416,7 @@ namespace GameModel
 
             MoveOrders[Turn] = moveOrders;
 
-            var movingUnits = moveOrders.Select(x => x.Unit).ToList();
+            //var movingUnits = moveOrders.Select(x => x.Unit).ToList();
             float maxMovementPoints = 12;
 
             var invalidMoveOrders = moveOrders.Where(x => x.Moves[0].Origin != x.Unit.Location);
@@ -428,8 +428,15 @@ namespace GameModel
             if (moveOrders.Max(x => x.Moves.Length) > maxMovementPoints)
                 throw new Exception(string.Format("The max number of moves is capped at {0}. A move order has exceeded this limit.", maxMovementPoints));
 
+            moveOrders.ForEach(x => 
+                {
+                    if (x.Moves.Length > x.Unit.MovementPoints + x.Unit.RoadMovementBonus)
+                        throw new Exception($"Number of moves for {x.Unit} = { x.Moves.Length } exceeds the max number of moves permitted for the unit of {x.Unit.MovementPoints} moves with a road move bonus of {x.Unit.RoadMovementBonus}");
+                }
+            );
+
             var unitStepRate = new Dictionary<MilitaryUnit, int>();
-            movingUnits.ForEach(x => unitStepRate.Add(x, (int)Math.Round(maxMovementPoints / x.MovementPoints)));
+            moveOrders.ForEach(x => unitStepRate.Add(x.Unit, (int)Math.Round(maxMovementPoints / (x.Moves.Length > x.Unit.MovementPoints ? (x.Unit.MovementPoints + x.Unit.RoadMovementBonus) : x.Unit.MovementPoints))));
 
             for (var step = 1; step <= maxMovementPoints; step++)
             {
@@ -459,7 +466,7 @@ namespace GameModel
                 }
 
                 // Remove conflicting units from move orders                
-                var conflictedUnits = DetectConflictedUnits(movingUnits, Units.Where(x => x.IsAlive));
+                var conflictedUnits = DetectConflictedUnits(moveOrders.Select(x => x.Unit).ToList(), Units.Where(x => x.IsAlive));
                 moveOrders.RemoveAll(x => conflictedUnits.Contains(x.Unit));
             }
         }

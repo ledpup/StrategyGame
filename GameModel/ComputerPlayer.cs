@@ -215,7 +215,7 @@ namespace GameModel
 
                 var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(unit.Index)).ThenBy(y => y.Distance).First();
 
-                var moveOrder = bestMove.GetMoveOrder();
+                var moveOrder = bestMove.GetMoveOrder(unit);
 
                 moveOrder.Unit = unit;
                 return moveOrder;

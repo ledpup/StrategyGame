@@ -28,7 +28,7 @@ namespace GameModel
             return "From: " + Origin + " To: " + Destination;
         }
 
-        public MoveOrder GetMoveOrder()
+        public MoveOrder GetMoveOrder(MilitaryUnit unit)
         {
             var moveList = new List<Move>();
             var currentMove = this;
@@ -40,7 +40,7 @@ namespace GameModel
 
             moveList.Reverse();
 
-            return new MoveOrder(moveList.ToArray());
+            return new MoveOrder(moveList.ToArray(), unit);
         }
 
         public double TerrainAndWeatherModifers(int unitIndex)

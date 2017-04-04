@@ -10,7 +10,7 @@ namespace GameModel
         public MilitaryUnit Unit;
         public Move[] Moves;
 
-        public MoveOrder(Move[] moves, MilitaryUnit unit = null)
+        public MoveOrder(Move[] moves, MilitaryUnit unit)
         {
             Moves = moves;
             Unit = unit;

@@ -421,33 +421,8 @@ namespace GameModel
             var neighbourMoves = new List<Move>();
 
             potentialMoves.ForEach(x => {
-                var edge = Edge.GetEdge(x.Origin, x.Destination);
-                var newMovementPoints = 0;
-                if (unit.TerrainMovementCosts[x.Destination.TerrainType] != null && unit.EdgeMovementCosts[edge.EdgeType] != null)
-                {
-                    if (unit.EdgeMovementCosts[edge.EdgeType] == 0)
-                    {
-                        newMovementPoints = movementPoints - 1;
-                    }
-                    else
-                    {
-                        newMovementPoints = movementPoints - (int)unit.TerrainMovementCosts[x.Destination.TerrainType] - (int)unit.EdgeMovementCosts[edge.EdgeType];
-                    }
-                    if (newMovementPoints == movementPoints)
-                        throw new Exception("There always needs to be a cost to moving from one tile to another");
-                }
-                else if (unit.TerrainMovementCosts[x.Destination.TerrainType] == null && unit.EdgeMovementCosts[edge.EdgeType] != null)
-                {
-                    newMovementPoints = movementPoints - (unit.EdgeMovementCosts[edge.EdgeType] == 0 ? 1 : (int)unit.EdgeMovementCosts[edge.EdgeType]);
-                    if (newMovementPoints == movementPoints)
-                        throw new Exception("There always needs to be a cost to moving from one tile to another");
-                } 
-                else
-                {
-                    newMovementPoints = movementPoints - 1;
-                }
 
-
+                var newMovementPoints = movementPoints - x.Origin.CalculateMoveCost(unit, x.Destination);
 
                 if (newMovementPoints > 0)
                 {

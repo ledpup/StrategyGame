@@ -61,40 +61,41 @@ namespace GameModel
 
         public float? Supply { get; set; }
 
-        public double CalculateMoveCost(MilitaryUnit unit, Tile destination)
+        public int CalculateMoveCost(MilitaryUnit unit, Tile destination)
         {
             var costChanged = false;
-            var cost = 100D;
+            var cost = 100;
 
-            var edge = Edges.SingleOrDefault(x => x.Destination == destination);
-            if (edge != null)
+            var edge = Edges.Single(x => x.Destination == destination);
+            
+            if (unit.EdgeMovementCosts[edge.EdgeType] != null)
             {
-                if (unit.EdgeMovementCosts[edge.EdgeType] != null)
+                costChanged = true;
+                cost = (int)unit.EdgeMovementCosts[edge.EdgeType];
+            }
+            else
+            {
+                return cost;
+            }
+
+            if (unit.TerrainMovementCosts[destination.TerrainType] != null)
+            {
+                if (costChanged)
                 {
-                    costChanged = true;
-                    cost = (double)unit.EdgeMovementCosts[edge.EdgeType];
+                    if (!(unit.MovementType == MovementType.Land && (edge.EdgeType.HasFlag(EdgeType.Road) || edge.EdgeType.HasFlag(EdgeType.Bridge))))
+                    {
+                        cost += (int)unit.TerrainMovementCosts[destination.TerrainType];
+                    }                        
                 }
                 else
                 {
-                    return 100;
+                    cost = (int)unit.TerrainMovementCosts[destination.TerrainType];
                 }
             }
 
-            if (unit.TerrainMovementCosts[TerrainType] != null)
-            {
-                if (unit.TerrainMovementCosts[destination.TerrainType] != null)
-                {
-                    if (costChanged)
-                    {
-                        cost += (double)unit.TerrainMovementCosts[destination.TerrainType];
-                    }
-                    else
-                    {
-                        cost = (double)unit.TerrainMovementCosts[destination.TerrainType];
-                    }
-                }
-            }
-            
+            if (cost == 0)
+                cost = 1;
+
             return cost;
         }
 

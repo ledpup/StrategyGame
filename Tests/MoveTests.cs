@@ -209,15 +209,16 @@ namespace Tests
 
             Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithLandUnitNearBridgeAndRoad.png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, units);
 
+            Assert.IsTrue(moves.Any(x => x.Destination == board[87]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[88]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[114]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[115]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[140]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[142]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[87]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[88]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[168]));
 
-            // Blocked by mountain hexside and hill/wetland terrain
-            Assert.IsFalse(moves.Any(x => x.Destination == board[168]));
+
+            // Blocked by mountain hexside and hill/wetland terrain            
             Assert.IsFalse(moves.Any(x => x.Destination == board[169]));
         }
 

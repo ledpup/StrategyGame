@@ -63,12 +63,17 @@ namespace Tests
                                  break;
                              case StrategicAction.Dock:
                                  {
-                                     closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
-                                     unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
+                                     if (unit.StrategicDestination == unit.Location)
+                                     { }
+                                     else
+                                     {
+                                         closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                         unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
 
-                                     var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
+                                         var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
 
-                                     moveOrders.Add(moveOrder);
+                                         moveOrders.Add(moveOrder);
+                                     }
                                      break;
                                  }
                          }

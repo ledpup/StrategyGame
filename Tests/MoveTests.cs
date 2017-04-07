@@ -67,7 +67,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[85], MovementType.Land, 2) { RoadMovementBonus = 1 } };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[85], MovementType.Land, 2, roadMovementBonus: 1) };
 
             var moves = units[0].PossibleMoves();
 
@@ -180,7 +180,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[1, 1]) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 0, board[1, 1]) };
 
             var moves = units[0].PossibleMoves();
 
@@ -191,7 +191,7 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 1]));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[3, 1]));
 
             Assert.IsFalse(moves.Any(x => x.Destination == board[1, 3])); // Can't cross river
         }
@@ -201,7 +201,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[141]) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 0, board[141]) };
 
             var moves = units[0].PossibleMoves();
 
@@ -212,10 +212,13 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Destination == board[114]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[115]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[140]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[168]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[169]));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[142]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[87]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[88]));
+
+            // Blocked by mountain hexside and hill/wetland terrain
+            Assert.IsFalse(moves.Any(x => x.Destination == board[168]));
+            Assert.IsFalse(moves.Any(x => x.Destination == board[169]));
         }
 
         [TestMethod]
@@ -234,7 +237,7 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[2, 1]));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
+            Assert.IsTrue(moves.Any(x => x.Destination == board[3, 1]));
             Assert.IsTrue(moves.Any(x => x.Destination == board[1, 3]));
         }
 
@@ -373,10 +376,10 @@ namespace Tests
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, "1st Infantry", 1, board[1, 1]),
-                new MilitaryUnit(1, "2nd Infantry", 2, board[4, 1]),
+                new MilitaryUnit(0, "1st Infantry", 1, board[1, 1], baseMovementPoints : 3),
+                new MilitaryUnit(1, "2nd Infantry", 2, board[4, 1], baseMovementPoints : 3),
 
-                new MilitaryUnit(2, "1st Infantry", 1, board[10, 2]) { BaseMovementPoints = 6 },
+                new MilitaryUnit(2, "1st Infantry", 1, board[10, 2], baseMovementPoints : 6),
                 new MilitaryUnit(3, "2nd Infantry", 2, board[10, 3]),
             };
 

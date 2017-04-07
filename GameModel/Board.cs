@@ -127,7 +127,7 @@ namespace GameModel
                     float neighbourSupply = 0;
                     if (neighbour.OwnerId == ownerId || neighbour.OwnerId == null)
                     {
-                        var tileEdge = Edges.SingleOrDefault(x => x.Tiles.All(y => y == tile || y == neighbour));
+                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour));
                         if (tileEdge != null)
                         {
                             if (tileEdge.BaseEdgeType == BaseEdgeType.CentreToCentre && !Terrain.All_Water.HasFlag(neighbour.TerrainType))
@@ -272,7 +272,7 @@ namespace GameModel
                     {
                         var neighbour = this[neighbourX, neighbourY];
                         neighbours.Add(neighbour);
-                        tile.NeighbourEdges.Add(new Edge("Normal", new Tile[] { tile, neighbour }));
+                        tile.Edges.Add(new Edge("Normal", tile, neighbour));
                     }
                 }
 
@@ -307,16 +307,16 @@ namespace GameModel
                     if (!t1.Neighbours.Contains(t2))
                         throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because they are not neighbours", t1.Index, t2.Index));
 
-                    var existingEdge = tileEdgesList.Where(y => y.Tiles.Contains(t1) && y.Tiles.Contains(t2));
+                    var existingEdge = tileEdgesList.Where(y => y.CrossesEdge(t1, t2));
 
                     if (existingEdge.Any())
                         throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because one already exists of type {2}.", t1.Index, t2.Index, existingEdge.First().EdgeType.ToString()));
 
                     var tiles = new Tile[] { t1, t2 };
-                    var edge = t1.NeighbourEdges.Single(y => y.Tiles.Contains(t2));
+                    var edge = t1.Edges.Single(y => y.Destination == t2);
                     edge.SetEdgeType(columns[2]);
 
-                    edge = t2.NeighbourEdges.Single(y => y.Tiles.Contains(t1));
+                    edge = t2.Edges.Single(y => y.Destination == t1);
                     edge.SetEdgeType(columns[2]);
 
                     tileEdgesList.Add(edge);

@@ -46,6 +46,35 @@ namespace GameModel
             }
         }
 
+        public static IEnumerable<PathFindTile> ClosestPortPath(Board board, MilitaryUnit unit)
+        {
+            var closestPortDistance = int.MaxValue;
+            IEnumerable<PathFindTile> closestPort = null;
+            board.Tiles.ToList().ForEach(x =>
+                {
+                    if (x.ContiguousRegionId == unit.Location.ContiguousRegionId && x.HasPort)
+                    {
+                        if (unit.IsTransporter)
+                        {
+                            if (!board.Units.Any(y => x.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.StrategicAction == StrategicAction.Embark))
+                                return;
+                        }
+
+                        var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                        var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, x.Point);
+                        var distance = shortestPath.Count();
+                        if (distance < closestPortDistance)
+                        {
+                            closestPortDistance = distance;
+                            closestPort = shortestPath;
+                        }
+                    }
+                }
+            );
+
+            return closestPort;
+        }
+
         public static Move MoveOrderFromShortestPath(List<Move> moves, PathFindTile[] shortestPath)
         {
             Move furthestMove = null;
@@ -231,7 +260,9 @@ namespace GameModel
             Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
             Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
 
-            return PathFind.PathFind.FindPath(ori, dest, distance, estimate).Reverse();
+            var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate);
+
+            return path == null ? null : path.Reverse();
         }
 
         public static List<Vector> PathFindTilesToVectors(IEnumerable<PathFindTile> path)

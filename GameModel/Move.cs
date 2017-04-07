@@ -8,16 +8,26 @@ namespace GameModel
 {
     public class Move
     {
-        public Move(Tile origin, Tile destination, Move previousMove, int movesRemaining = 0, int distance = 0)
+        public Move(Tile origin, Tile destination, Move previousMove, int movesRemaining = 0, int distance = 0) : 
+            this(origin, destination, origin.Edges.Single(x => x.Destination == destination), previousMove, movesRemaining, distance)
+        {
+            
+        }
+
+        public Move(Tile origin, Tile destination, Edge edge, Move previousMove, int movesRemaining = 0, int distance = 0)
         {
             Origin = origin;
             Destination = destination;
+            Edge = edge;
             PreviousMove = previousMove;
             MovesRemaining = movesRemaining;
             Distance = distance;
         }
+
+
         public Tile Origin;
         public Tile Destination;
+        public Edge Edge;
         public Move PreviousMove;
         public int MovesRemaining;
         public int Distance;

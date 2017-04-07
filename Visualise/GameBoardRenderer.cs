@@ -56,8 +56,8 @@ namespace Visualise
                     edges.ToList().ForEach(x =>
                     {
                         if (x.EdgeType == EdgeType.Bridge)
-                            vectors.Add(new Vector(x.Tiles[0].Point, x.Tiles[1].Point, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
-                        vectors.Add(new Vector(x.Tiles[0].Point, x.Tiles[1].Point, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
+                            vectors.Add(new Vector(x.Origin.Point, x.Destination.Point, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
+                        vectors.Add(new Vector(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
                     });
 
 

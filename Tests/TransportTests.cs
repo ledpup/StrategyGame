@@ -24,40 +24,92 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[21, 10], movementType: MovementType.Water),
-                new MilitaryUnit(location: board[24, 16], roadMovementBonus: 1),
+                new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, strategicAction: StrategicAction.Dock),
+                new MilitaryUnit(location: board[24, 16], roadMovementBonus: 1, strategicAction: StrategicAction.Embark),
                 new MilitaryUnit() { Location = board[1, 1] },
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
             board.Units = units;
 
-            for (var turn = 0; turn < 2; turn++)
+            for (var turn = 0; turn < 3; turn++)
             {
 
-                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(units[1]);
-                var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, units[1].Location.Point, new Point(21, 11)).ToArray();
+                var moveOrders = new List<MoveOrder>();
 
-                var move = ComputerPlayer.MoveOrderFromShortestPath(units[1].PossibleMoves().ToList(), shortestPath);
+                units.Where(x => x.IsAlive && x.StrategicAction != StrategicAction.None)
+                     .ToList()
+                     .ForEach(unit =>
+                     {
+                         switch (unit.StrategicAction)
+                         {
+                             case StrategicAction.Embark:
+                                 var closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                 unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
 
-                var vectors = ComputerPlayer.PathFindTilesToVectors(shortestPath);
+                                 if (unit.StrategicDestination == unit.Location)
+                                 {
+                                     var waterTiles = unit.StrategicDestination.Edges.Where(x => x.EdgeType == EdgeType.Port).Select(x => x.Destination).ToList();
+                                     var transportingUnits = units.Where(x => x.IsAlive && x.IsTransporter && waterTiles.Contains(x.Location) && x.CanTransport(unit));
+                                     var transportUnit = transportingUnits.First();
+                                     moveOrders.Add(unit.PossibleMoves().Single(x => x.Destination == transportUnit.Location).GetMoveOrder(unit));
+                                 }
+                                 else
+                                 {
+                                     var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
 
-                var moveOrder = move.GetMoveOrder(units[1]);
+                                     moveOrders.Add(moveOrder);
+                                 }
+                                 break;
+                             case StrategicAction.Dock:
+                                 {
+                                     closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                     unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
 
-                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{turn}.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units, lines: moveOrder.Vectors);
+                                     var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
 
-                board.ResolveMoves(new List<MoveOrder> { moveOrder });
+                                     moveOrders.Add(moveOrder);
+                                     break;
+                                 }
+                         }
+                     });
+
+
+
+                var vectors = new List<Vector>();
+                moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
+
+
+                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{turn}.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units, lines: vectors);
+
+                board.ResolveMoves(moveOrders);
 
                 switch (turn)
                 {
                     case 0:
+                        Assert.AreEqual(board[21, 11], units[1].StrategicDestination);
                         Assert.AreEqual(board[23, 13], units[1].Location);
                         break;
                     case 1:
+                        Assert.AreEqual(board[21, 11], units[1].StrategicDestination);
                         Assert.AreEqual(board[21, 11], units[1].Location);
+                        break;
+                    case 2:
+                        Assert.AreEqual(board[21, 10], units[1].Location);
                         break;
                 }
             }
+        }
+
+        private static MoveOrder GetMoveOrderToStrategicDestination(MilitaryUnit unit, Board board, List<MilitaryUnit> units)
+        {
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, unit.StrategicDestination.Point).ToArray();
+
+            var move = ComputerPlayer.MoveOrderFromShortestPath(unit.PossibleMoves().ToList(), shortestPath);
+
+            var moveOrders = move.GetMoveOrder(unit);
+            return moveOrders;
         }
     }
 }

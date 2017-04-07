@@ -29,13 +29,12 @@ namespace GameModel
 
     public class Edge
     {
-        public static EdgeType All_Edges = EdgeType.River | EdgeType.Road | EdgeType.Forest | EdgeType.Hill | EdgeType.Mountain | EdgeType.Reef | EdgeType.Wall;
-
-        public Edge(string edgeType, Tile[] tiles)
+        public Edge(string edgeType, Tile origin, Tile destination)
         {
             SetEdgeType(edgeType);
 
-            Tiles = tiles;
+            Origin = origin;
+            Destination = destination;
         }
 
         public void SetEdgeType(string edgeType)
@@ -54,8 +53,23 @@ namespace GameModel
             }
         }
 
-        public Tile[] Tiles;
+        public Tile Origin;
+        public Tile Destination;
         public EdgeType EdgeType;
         public BaseEdgeType BaseEdgeType;
+
+        internal static bool CrossesEdge(Edge edge, Tile origin, Tile destination)
+        {
+            return (edge.Origin == origin && edge.Destination == destination) || (edge.Destination == origin && edge.Origin == destination);
+        }
+
+        internal bool CrossesEdge(Tile origin, Tile destination)
+        {
+            return CrossesEdge(this, origin, destination);
+        }
+        internal static Edge GetEdge(Tile origin, Tile destination)
+        {
+            return origin.Edges.Single(y => y.Destination == destination);
+        }
     }
 }

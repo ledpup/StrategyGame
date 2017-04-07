@@ -21,22 +21,20 @@ namespace Tests
         }
 
         [TestMethod]
-        public void NewUnit_Airborne_HasCorrectMovement()
+        public void AirborneUnitCanStopOn()
         {
             var airborneUnit = new MilitaryUnit(movementType: MovementType.Airborne);
 
-            Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Forest));
-            Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Water));
-            Assert.IsTrue(airborneUnit.CanMoveOver.HasFlag(TerrainType.Reef));
+            Assert.IsTrue(airborneUnit.CanStopOn.HasFlag(TerrainType.Forest));
 
             Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Water));
+            Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Reef));
+            Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Water));
             Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Mountain));
-
-            Assert.IsTrue(airborneUnit.CanStopOn.HasFlag(TerrainType.Forest));
         }
 
         [TestMethod]
-        public void UnitMoveList_AirborneUnit_SixMovesOnCorrectTerrain()
+        public void AirborneUnitValidMoves()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 

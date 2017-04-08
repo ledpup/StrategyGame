@@ -54,10 +54,18 @@ namespace GameModel
                 {
                     if (x.ContiguousRegionId == unit.Location.ContiguousRegionId && x.HasPort)
                     {
-                        if (unit.IsTransporter)
+                        switch (unit.StrategicAction)
                         {
-                            if (!board.Units.Any(y => x.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.StrategicAction == StrategicAction.Embark))
-                                return;
+                            case StrategicAction.Dock:
+                                // Only go to a port that has units that want to embark
+                                if (!board.Units.Any(y => x.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.StrategicAction == StrategicAction.Embark))
+                                    return;
+                                break;
+                            case StrategicAction.Transport:
+                                // Only go to a port that has enemy structure(s)
+                                if (!board.Structures.Any(y => x.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                                    return;
+                                break;
                         }
 
                         var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
@@ -171,7 +179,7 @@ namespace GameModel
                 {
                     for (var distance = 0; distance < 5; distance++)
                     {
-                        var hexesInRing = Hex.HexRing(structure.Tile.Hex, distance);
+                        var hexesInRing = Hex.HexRing(structure.Location.Hex, distance);
 
                         hexesInRing.ForEach(y =>
                         {

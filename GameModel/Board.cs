@@ -174,7 +174,7 @@ namespace GameModel
         {
             Structures.ForEach(x => 
             {
-                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Tile).GroupBy(y => y.OwnerIndex);
+                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex);
                 if (unitsAtStructureByOwner.Count() == 1)
                     x.OwnerIndex = unitsAtStructureByOwner.First().Key;
             });
@@ -463,6 +463,8 @@ namespace GameModel
                 foreach (var unitStepMove in unitStepMoves)
                 {
                     unitStepMove.Key.Location = unitStepMove.Value.Destination;
+                    // Take transported units along with you
+                    unitStepMove.Key.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
                 }
 
                 // Remove conflicting units from move orders                

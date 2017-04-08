@@ -45,7 +45,9 @@ namespace GameModel
     {
         None,
         Dock,
+        Transport,
         Embark,
+        Disembark,
     }
     public class MilitaryUnit
     {
@@ -107,7 +109,9 @@ namespace GameModel
         public Dictionary<EdgeType, int?> EdgeMovementCosts { get; set; }
 
         public bool IsTransporter { get; set; }
-        public bool IsTransporting { get; set; }
+        public List<MilitaryUnit> Transporting { get; set; }
+
+        public MilitaryUnit Transport { get; set; }
 
         public int TurnCreated { get; set; }
 
@@ -202,6 +206,8 @@ namespace GameModel
             Role = role;
             StrategicAction = strategicAction;
 
+
+            Transporting = new List<MilitaryUnit>();
             CalculateStrength();
         }
 
@@ -363,9 +369,9 @@ namespace GameModel
         public bool CanTransport(MilitaryUnit transportee)
         {
             if (!IsTransporter)
-                return false;
+                throw new Exception("Only transporters can transport units");
 
-            return TransportSize >= transportee.TransportSize;
+            return TransportSize >= transportee.TransportSize + Transporting.Sum(x => x.TransportSize);
         }
 
         public int TransportSize
@@ -383,8 +389,7 @@ namespace GameModel
 
         public int RoadMovementBonus { get; set; }
         public double StructureBattleModifier { get; set; }
-
-        
+        public bool IsTransported { get; set; }
 
         public IEnumerable<Move> PossibleMoves()
         {
@@ -394,7 +399,7 @@ namespace GameModel
 
             possibleMoves = GenerateStandardMoves(this, Location, null, movesConsidered, MovementPoints, 1);
 
-            if (RoadMovementBonus > 0)
+            if (RoadMovementBonus > 0 && !IsTransported)
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
                 var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus);
@@ -412,7 +417,8 @@ namespace GameModel
             potentialMoves.AddRange(origin.Neighbours.Where(dest => dest != unit.Location
                                         && !movesConsidered.Any(x => x.Origin == origin && x.Destination == dest && x.MovesRemaining > movementPoints)
                                         && (unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] != null 
-                                                        && (unit.TerrainMovementCosts[dest.TerrainType] != null || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port))
+                                                        && (unit.TerrainMovementCosts[dest.TerrainType] != null || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port)
+                                                        && (!unit.IsTransported || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port))
                                         ).Select(x => new Move(origin, x, previousMove, movementPoints, distance))
                                         .ToList());
 

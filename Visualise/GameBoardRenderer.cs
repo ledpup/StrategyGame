@@ -89,7 +89,7 @@ namespace Visualise
                     structures.ForEach(x =>
                     {
                         var colour = x.Colour;
-                        drawing.DrawRectangle(x.Tile.Point, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                        drawing.DrawRectangle(x.Location.Point, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                     });
                 }
             }

@@ -32,7 +32,7 @@ namespace Tests
 
             board.Units = units;
 
-            for (var turn = 0; turn < 3; turn++)
+            for (var turn = 0; turn < 8; turn++)
             {
 
                 var moveOrders = new List<MoveOrder>();
@@ -53,6 +53,7 @@ namespace Tests
                                      var transportingUnits = units.Where(x => x.IsAlive && x.IsTransporter && waterTiles.Contains(x.Location) && x.CanTransport(unit));
                                      var transportUnit = transportingUnits.First();
                                      moveOrders.Add(unit.PossibleMoves().Single(x => x.Destination == transportUnit.Location).GetMoveOrder(unit));
+                                     unit.StrategicAction = StrategicAction.Disembark;
                                  }
                                  else
                                  {
@@ -61,10 +62,41 @@ namespace Tests
                                      moveOrders.Add(moveOrder);
                                  }
                                  break;
+                             case StrategicAction.Disembark:
+                                 {
+                                     // If near a port, disembark if the region contains an enemy structures
+                                     if (unit.Location.HasPort)
+                                     {
+                                         if (board.Structures.Any(y => unit.Location.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                                         {
+                                             moveOrders.Add(unit.PossibleMoves().First().GetMoveOrder(unit));
+                                             unit.StrategicAction = StrategicAction.None;
+                                         }
+                                     }
+                                     break;
+                                 }
                              case StrategicAction.Dock:
                                  {
                                      if (unit.StrategicDestination == unit.Location)
-                                     { }
+                                     {
+                                        var loadUnits = true;
+                                        while (loadUnits)
+                                        {
+                                            var transportedUnits = units.Where(x => x.MovementType != MovementType.Water && x.Location.Point == unit.Location.Point && unit.CanTransport(x)).OrderBy(x => x.TransportSize);
+                                            var transportUnit = transportedUnits.FirstOrDefault();
+                                            if (transportUnit == null)
+                                            {
+                                                loadUnits = false;
+                                            }
+                                            else
+                                            {
+                                                 unit.Transporting.Add(transportUnit);
+                                                 transportUnit.IsTransported = true;
+                                                 unit.StrategicDestination = null;
+                                                 unit.StrategicAction = StrategicAction.Transport;
+                                             }
+                                         }
+                                     }
                                      else
                                      {
                                          closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
@@ -74,6 +106,20 @@ namespace Tests
 
                                          moveOrders.Add(moveOrder);
                                      }
+                                     break;
+                                 }
+                             case StrategicAction.Transport:
+                                 {
+                                     if (unit.StrategicDestination == unit.Location)
+                                         break;
+
+                                     // Find the closest port that has a region with one or more enemy structures
+                                     closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                     unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
+
+                                     var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
+
+                                     moveOrders.Add(moveOrder);
                                      break;
                                  }
                          }
@@ -100,6 +146,7 @@ namespace Tests
                         Assert.AreEqual(board[21, 11], units[1].Location);
                         break;
                     case 2:
+                        Assert.AreEqual(board[21, 10], units[0].Location);
                         Assert.AreEqual(board[21, 10], units[1].Location);
                         break;
                 }

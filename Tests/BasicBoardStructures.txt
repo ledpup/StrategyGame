@@ -1,4 +1,6 @@
-﻿82,Fortress,0,4
+﻿78,City,1,6
+82,Fortress,0,4
 150,Fortress,1,4
 168,City,1,6
+381,Outpost,0,3
 456,Outpost,0,3

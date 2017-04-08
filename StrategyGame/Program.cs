@@ -105,7 +105,7 @@ namespace StrategyGame
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>
                 {
-                    var structure = board.Structures.SingleOrDefault(y => y.Tile == x.Tile);
+                    var structure = board.Structures.SingleOrDefault(y => y.Location == x.Tile);
                     var structureName = structure == null ? "" : " " + structure.StructureType.ToString();
                     log.Info($"Battle occurred at {x.Tile.ToString()}{structureName} on turn {x.Turn}.");
                     x.CasualtyLog.ForEach(y => log.Info(y.Text));

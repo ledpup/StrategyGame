@@ -67,6 +67,12 @@ namespace GameModel
             var cost = 100;
 
             var edge = Edges.Single(x => x.Destination == destination);
+
+            // Movement by road or bridge always costs 1 regardless of terrain type
+            if (unit.MovementType == MovementType.Land && (edge.EdgeType.HasFlag(EdgeType.Road) || edge.EdgeType.HasFlag(EdgeType.Bridge)))
+            {
+                return 1;
+            }
             
             if (unit.EdgeMovementCosts[edge.EdgeType] != null)
             {
@@ -82,19 +88,17 @@ namespace GameModel
             {
                 if (costChanged)
                 {
-                    if (!(unit.MovementType == MovementType.Land && (edge.EdgeType.HasFlag(EdgeType.Road) || edge.EdgeType.HasFlag(EdgeType.Bridge))))
-                    {
-                        cost += (int)unit.TerrainMovementCosts[destination.TerrainType];
-                    }                        
+                    cost += (int)unit.TerrainMovementCosts[destination.TerrainType];
                 }
                 else
                 {
                     cost = (int)unit.TerrainMovementCosts[destination.TerrainType];
                 }
             }
+            
 
             if (cost == 0)
-                cost = 1;
+                throw new Exception();
 
             return cost;
         }

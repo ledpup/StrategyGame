@@ -25,7 +25,7 @@ namespace GameModel
             };
 
         public int Index;
-        public Tile Tile;
+        public Tile Location;
         public int OwnerIndex;
         public float Supply;
 
@@ -33,7 +33,7 @@ namespace GameModel
         {
             Index = index;
             StructureType = structureType;
-            Tile = tile;
+            Location = tile;
             OwnerIndex = ownerIndex;
             Supply = supply;
         }

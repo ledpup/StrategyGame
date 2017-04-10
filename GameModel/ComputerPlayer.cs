@@ -279,7 +279,7 @@ namespace GameModel
 
             var highestInfluence = possibleMoves.Max(y => y.Destination.AggregateInfluence[rmt][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Location.Hex) + 1));
 
-            if (unit.Location.AggregateInfluence[rmt][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) < highestInfluence)
+            if (unit.Location.AggregateInfluence[rmt][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) <= highestInfluence)
             {
                 var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[rmt][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Location.Hex) + 1) == highestInfluence);
 

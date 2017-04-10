@@ -457,6 +457,26 @@ namespace GameModel
                         }
                     }
                 }
+
+                // Don't move a land unit onto a water time unless there is a transport there that can take it
+                unitStepMoves.Where(x => x.Value.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
+                    .ToList()
+                    .ForEach(x => 
+                    {
+                        var transportedUnit = x.Key;
+                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Destination.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                        var transport = transports.FirstOrDefault();
+                        if (transport != null)
+                        {
+                            transport.Transporting.Add(transportedUnit);
+                            transportedUnit.TransportedBy = transport;
+                        }
+                        else
+                        {
+                            removeUnitMoves.Add(x.Key, x.Value);
+                        }
+                    });
+
                 removeUnitMoves.Keys.ToList().ForEach(x => unitStepMoves.Remove(x));
 
                 // Move units

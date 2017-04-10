@@ -468,7 +468,7 @@ namespace GameModel
 
             potentialMoves.AddRange(neighbourMoves);
 
-            return potentialMoves.Where(x => unit.CanStopOn.HasFlag(x.Destination.TerrainType) || x.Edge.EdgeType == EdgeType.Port).ToList();
+            return potentialMoves.Where(x => unit.CanStopOn.HasFlag(x.Destination.TerrainType) || (x.Edge.EdgeType == EdgeType.Port && unit.MovementType == MovementType.Land)).ToList();
 
         }
 

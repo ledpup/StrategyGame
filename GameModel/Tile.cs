@@ -20,11 +20,11 @@ namespace GameModel
 
         public Hex Hex;
 
-        public double[] FriendlyStructureInfluence;
-        public double[] EnemyStructureInfluence;
+        public Dictionary<MovementType, double[]> FriendlyStructureInfluence;
+        public Dictionary<MovementType, double[]> EnemyStructureInfluence;
         public double[] FriendlyUnitInfluence;
         public double[] EnemyUnitInfluence;
-        public Dictionary<Role, double[]> AggregateInfluence;
+        public Dictionary<RoleMovementType, double[]> AggregateInfluence;
         public Dictionary<int, double> TerrainAndWeatherInfluenceByUnit;
 
         public int ContiguousRegionId { get; set; }
@@ -43,7 +43,7 @@ namespace GameModel
             TerrainType = terrainType;
             IsEdgeOfMap = isEdge;
 
-            AggregateInfluence = new Dictionary<Role, double[]>();
+            AggregateInfluence = new Dictionary<RoleMovementType, double[]>();
 
             TerrainAndWeatherInfluenceByUnit = new Dictionary<int, double>();
         }

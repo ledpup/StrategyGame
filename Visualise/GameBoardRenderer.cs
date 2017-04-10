@@ -146,6 +146,11 @@ namespace Visualise
             bitmap.Save(fileName);
         }
 
+        public static void RenderLabelsAndSave(string fileName, Bitmap bitmap, int boardWidth, string[,] labels)
+        {
+            bitmap = Render(bitmap, RenderPipeline.Labels, RenderPipeline.Labels, boardWidth, labels: labels);
+            bitmap.Save(fileName);
+        }
         private static ArgbColour EdgeToColour(EdgeType edgeType)
         {
             switch (edgeType)

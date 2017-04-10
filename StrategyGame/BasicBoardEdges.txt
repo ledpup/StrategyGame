@@ -6,6 +6,8 @@
 94,120,Wall
 95,96,Hill
 69,96,Wall
+90,91,Port
+129,155,Port
 291,318,Port
 318,345,Road
 345,373,Road

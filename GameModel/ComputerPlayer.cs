@@ -133,7 +133,7 @@ namespace GameModel
             var origin = shortestPath[0].Point;
             for (var i = 1; i < shortestPath.Length; i++)
             {
-                var move = moves.FirstOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point);
+                var move = moves.FirstOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point && x.Distance == i);
 
                 if (move == null)
                     return furthestMove;

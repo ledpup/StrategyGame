@@ -35,7 +35,7 @@ namespace Tests
 
             board.Units = units;
 
-            for (var turn = 0; turn < 30; turn++)
+            for (var turn = 0; turn < 40; turn++)
             {
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 

@@ -431,7 +431,7 @@ namespace GameModel
             if (RoadMovementBonus > 0 && TransportedBy == null)
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
-                var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus);
+                var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus, 1);
                 var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
                 possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }
@@ -472,12 +472,12 @@ namespace GameModel
 
         }
 
-        private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints)
+        private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
         {
             var moves = tile.Edges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre 
                                                             && !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination))
                                                      )
-                .Select(x => new Move(x.Origin, x.Destination, x, previousMove)).ToList();
+                .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance)).ToList();
 
             movesConsidered.AddRange(moves);
 
@@ -487,7 +487,7 @@ namespace GameModel
             {
                 var cost = movementPoints - 1;
                 if (cost > 0)
-                    neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Destination, move, movesConsidered, cost));
+                    neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Destination, move, movesConsidered, cost, distance + 1));
             }
 
             moves.AddRange(neighbourMoves);

@@ -279,15 +279,15 @@ namespace Tests
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null),
-                        new Move(board[1, 2], board[2, 2], null),
-                        new Move(board[2, 2], board[3, 2], null),
+                        new Move(board[1, 1], board[1, 2], null, 2, 1),
+                        new Move(board[1, 2], board[2, 2], null, 1, 2),
+                        new Move(board[2, 2], board[3, 2], null, 0, 3),
                     };
 
             var moves2 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null),
-                        new Move(board[1, 2], board[2, 2], null),
+                        new Move(board[1, 1], board[1, 2], null, 2, 1),
+                        new Move(board[1, 2], board[2, 2], null, 1, 2),
                     };
 
             var moveOrders = new List<MoveOrder>
@@ -315,12 +315,12 @@ namespace Tests
 
             var moves1 = new Move[]
                                 {
-                                    new Move(board[1, 1], board[2, 2], null),
+                                    new Move(board[1, 1], board[2, 2], null, 2, 1),
                                 };
 
             var moves2 = new Move[]
                                 {
-                                    new Move(board[2, 2], board[1, 1], null),
+                                    new Move(board[2, 2], board[1, 1], null, 2, 1),
                                 };
 
             var moveOrders = new List<MoveOrder>
@@ -349,12 +349,12 @@ namespace Tests
 
             var moves1 = new Move[]
                                 {
-                                    new Move(board[1, 1], board[2, 2], null),
+                                    new Move(board[1, 1], board[2, 2], null, 1, 1),
                                 };
 
             var moves2 = new Move[]
                                 {
-                                    new Move(board[2, 2], board[1, 1], null),
+                                    new Move(board[2, 2], board[1, 1], null, 1, 1),
                                 };
 
             var moveOrders = new List<MoveOrder>
@@ -386,25 +386,25 @@ namespace Tests
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null),
-                        new Move(board[1, 2], board[2, 2], null),
-                        new Move(board[2, 2], board[3, 2], null),
+                        new Move(board[1, 1], board[1, 2], null, 2, 1),
+                        new Move(board[1, 2], board[2, 2], null, 1, 2),
+                        new Move(board[2, 2], board[3, 2], null, 0, 3),
                     };
             var moves2 = new Move[]
                     {
-                        new Move(board[4, 1], board[3, 1], null),
-                        new Move(board[3, 1], board[2, 2], null),
-                        new Move(board[2, 2], board[2, 1], null),
+                        new Move(board[4, 1], board[3, 1], null, 2, 1),
+                        new Move(board[3, 1], board[2, 2], null, 1, 2),
+                        new Move(board[2, 2], board[2, 1], null, 0, 3),
                     };
             var moves3 = new Move[]
                     {
-                        new Move(board[10, 2], board[11, 2], null),
-                        new Move(board[11, 2], board[12, 2], null),
+                        new Move(board[10, 2], board[11, 2], null, 1, 1),
+                        new Move(board[11, 2], board[12, 2], null, 0, 2),
                     };
             var moves4 = new Move[]
                     {
-                        new Move(board[10, 3], board[11, 2], null),
-                        new Move(board[11, 2], board[11, 1], null),
+                        new Move(board[10, 3], board[11, 2], null, 1, 1),
+                        new Move(board[11, 2], board[11, 1], null, 0, 2),
                     };
 
             var moveOrders = new List<MoveOrder>

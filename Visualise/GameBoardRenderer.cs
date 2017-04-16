@@ -25,7 +25,7 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Board)
             {
-                var hexagonColours = new Dictionary<PointF, Brush>();
+                var hexagonColours = new Dictionary<GameModel.Point, Brush>();
 
                 var displaySelected = tiles.Any(x => x.IsSelected);
 
@@ -38,7 +38,7 @@ namespace Visualise
                         colour.Green = (short)(colour.Green * .3);
                         colour.Blue = (short)(colour.Blue * .3);
                     }
-                    hexagonColours.Add(new PointF(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                    hexagonColours.Add(new GameModel.Point(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                 }
                 );
 
@@ -81,6 +81,8 @@ namespace Visualise
             }
             if (renderUntil == RenderPipeline.Vectors)
                 return bitmap;
+
+            drawing.DrawEdge(new GameModel.Point(0,0), new GameModel.Point(0,0), 2, new Pen(Color.Red));
 
             if (renderBegin <= RenderPipeline.Structures)
             {

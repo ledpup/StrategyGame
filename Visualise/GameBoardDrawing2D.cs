@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using GameModel;
+using System.Linq;
 
 namespace Visualise
 {
@@ -12,180 +13,177 @@ namespace Visualise
         float _hexHeight;
         float _hexWidth;
         float _structureWidth;
+        Layout _layout;
 
         public GameBoardDrawing2D(Bitmap bitmap, int numberOfHexes)
         {
             _graphics = Graphics.FromImage(bitmap);
-            _hexHeight = Convert.ToSingle(bitmap.Width) / (numberOfHexes - 2);
+            _graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            _hexHeight = Convert.ToSingle(bitmap.Width) / (numberOfHexes - 2) / 1.85F;
             _hexWidth = (float)(4 * (_hexHeight / 2 / Math.Sqrt(3)));
             _structureWidth = _hexHeight / 5;
+            _layout = new Layout(Layout.flat, new PointD(_hexWidth, _hexHeight), new PointD(_hexWidth, _hexHeight * 2));
         }
 
-        public void DrawBoard(int width, int height, Dictionary<PointF, Brush> hexagonColours)
+        public void DrawBoard(int width, int height, Dictionary<GameModel.Point, Brush> hexagonColours)
         {
-            _graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
             _graphics.FillRectangle(Brushes.White, 0, 0, width, height);
 
-            foreach (PointF point in hexagonColours.Keys)
+            foreach (var point in hexagonColours.Keys)
             {
-                _graphics.FillPolygon(hexagonColours[point], HexToPoints(_hexWidth, _hexHeight, point.Y, point.X));
+                var points = Layout.PolygonCorners(_layout, new OffsetCoord(point.X, point.Y).QoffsetToCube());
+                _graphics.FillPolygon(hexagonColours[point], PointDtoF(points));
+                _graphics.DrawPolygon(Pens.Black, PointDtoF(points));
             }
+        }
 
-            float xMax = width;
-            float yMax = height;
-
-            for (int row = 0; ; row++)
-            {
-                PointF[] points = HexToPoints(_hexWidth, _hexHeight, row, 0);
-
-                if (points[4].Y > yMax)
-                    break;
-
-                for (int col = 0; ; col++)
-                {
-                    points = HexToPoints(_hexWidth, _hexHeight, row, col);
-
-                    // If it doesn't fit horizontally,
-                    // we're done with this row.
-                    if (points[3].X > xMax)
-                        break;
-
-                    // If it fits vertically, draw it.
-                    if (points[4].Y <= yMax)
-                    {
-                        _graphics.DrawPolygon(Pens.Black, points);
-                    }
-                }
-            }
-
-            //#if FIG34
-            //            // Draw the selected rectangles for Figures 3 and 4.
-            //            using (Pen pen = new Pen(Color.Red, 3))
-            //            {
-            //                pen.DashStyle = DashStyle.Dash;
-            //                foreach (RectangleF rect in TestRects)
-            //                {
-            //                    e.Graphics.DrawRectangle(pen, Rectangle.Round(rect));
-            //                }
-            //            }
-            //#endif
+        private PointF[] PointDtoF(List<PointD> points)
+        {
+            return points
+                .Select(x => new PointF((float)x.X, (float)x.Y))
+                .ToArray();
         }
 
         public void DrawEdge(GameModel.Point origin, GameModel.Point destination, Pen pen, bool isCentreToCentre, bool isPort)
         {
-            (PointF pt1, PointF pt2) points;
-            if (isCentreToCentre)
-            {
-                points.pt1 = HexCentre(_hexWidth, _hexHeight, origin.Y, origin.X);
-                points.pt2 = HexCentre(_hexWidth, _hexHeight, destination.Y, destination.X);
-            }
-            else
-            {
-                points = HexSidePoints(origin, destination, _hexWidth, _hexHeight);
-            }
+            //(PointF pt1, PointF pt2) points;
+            //if (isCentreToCentre)
+            //{
+            //    points.pt1 = HexCentre(_hexWidth, _hexHeight, origin.Y, origin.X);
+            //    points.pt2 = HexCentre(_hexWidth, _hexHeight, destination.Y, destination.X);
+            //}
+            //else
+            //{
+            //    points = HexSidePoints(origin, destination, _hexWidth, _hexHeight);
+            //}
 
-            if (isPort)
-            {
-                using (StringFormat sf = new StringFormat())
-                {
-                    sf.Alignment = StringAlignment.Center;
-                    sf.LineAlignment = StringAlignment.Center;
-                    var x = (points.pt1.X + points.pt2.X) / 2;
-                    var y = (points.pt1.Y + points.pt2.Y) / 2;
+            //if (isPort)
+            //{
+            //    using (StringFormat sf = new StringFormat())
+            //    {
+            //        sf.Alignment = StringAlignment.Center;
+            //        sf.LineAlignment = StringAlignment.Center;
+            //        var x = (points.pt1.X + points.pt2.X) / 2;
+            //        var y = (points.pt1.Y + points.pt2.Y) / 2;
 
-                    var font = new Font("Arial", (int)(_hexHeight * .3));
-                    _graphics.DrawString("P", font, pen.Brush, x, y, sf);
-                }
-            }
-            else
-                _graphics.DrawLine(pen, points.pt1, points.pt2);
+            //        var font = new Font("Arial", (int)(_hexHeight * .3));
+            //        _graphics.DrawString("P", font, pen.Brush, x, y, sf);
+            //    }
+            //}
+            //else
+            //    _graphics.DrawLine(pen, points.pt1, points.pt2);
+            ////else
+            ////    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
+        }
+
+        public void DrawEdge(GameModel.Point origin, GameModel.Point destination, int edge, Pen pen)
+        {
+           
+            var points = Layout.PolygonCorners(_layout, new Hex(3, 4, -7));
+
+            points.ForEach(x => _graphics.DrawEllipse(pen, (float)x.X - 2, (float)x.Y - 2, 4, 4));
+
+            var point1 = EdgeToCentrePoint(points.ToArray(), _hexWidth, 0, 10);
+            var point2 = EdgeToCentrePoint(points.ToArray(), _hexWidth, 1, 10);
+            //(PointF pt1, PointF pt2) points;
+            //if (isCentreToCentre)
+            //{
+            //    points.pt1 = HexCentre(_hexWidth, _hexHeight, origin.Y, origin.X);
+            //    points.pt2 = HexCentre(_hexWidth, _hexHeight, destination.Y, destination.X);
+            //}
+            //else
+            //{
+            //    points = HexSidePoints(origin, destination, _hexWidth, _hexHeight);
+            //}
+
+
+            _graphics.DrawLine(pen, (float) point1.X, (float)point1.Y, (float)point2.X, (float)point2.Y);
             //else
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        private static (PointF pt1, PointF pt2) HexSidePoints(GameModel.Point origin, GameModel.Point destination, float hexWidth, float hexHeight)
-        {
-            var direction = new GameModel.Point(destination.X - origin.X, destination.Y - origin.Y);
-            var points = HexToPoints(hexWidth, hexHeight, origin.Y, origin.X);
-            PointF pt1, pt2;
-            if (origin.X % 2 == 1)
-            {
-                if (direction.X == -1 && direction.Y == 0)
-                {
-                    pt1 = points[0];
-                    pt2 = points[1];
-                }
-                else if (direction.X == 0 && direction.Y == -1)
-                {
-                    pt1 = points[1];
-                    pt2 = points[2];
-                }
-                else if (direction.X == 1 && direction.Y == 0)
-                {
-                    pt1 = points[2];
-                    pt2 = points[3];
-                }
-                else if (direction.X == 1 && direction.Y == 1)
-                {
-                    pt1 = points[3];
-                    pt2 = points[4];
-                }
-                else if (direction.X == 0 && direction.Y == 1)
-                {
-                    pt1 = points[4];
-                    pt2 = points[5];
-                }
-                else if (direction.X == -1 && direction.Y == 1)
-                {
-                    pt1 = points[5];
-                    pt2 = points[0];
-                }
-                else
-                {
-                    throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
-                }
-            }
-            else
-            {
+        //private static (PointF pt1, PointF pt2) HexSidePoints(GameModel.Point origin, GameModel.Point destination, float hexWidth, float hexHeight)
+        //{
+        //    var direction = new GameModel.Point(destination.X - origin.X, destination.Y - origin.Y);
+        //    var points = HexToPoints(hexWidth, hexHeight, origin.Y, origin.X);
+        //    PointF pt1, pt2;
+        //    if (origin.X % 2 == 1)
+        //    {
+        //        if (direction.X == -1 && direction.Y == 0)
+        //        {
+        //            pt1 = points[0];
+        //            pt2 = points[1];
+        //        }
+        //        else if (direction.X == 0 && direction.Y == -1)
+        //        {
+        //            pt1 = points[1];
+        //            pt2 = points[2];
+        //        }
+        //        else if (direction.X == 1 && direction.Y == 0)
+        //        {
+        //            pt1 = points[2];
+        //            pt2 = points[3];
+        //        }
+        //        else if (direction.X == 1 && direction.Y == 1)
+        //        {
+        //            pt1 = points[3];
+        //            pt2 = points[4];
+        //        }
+        //        else if (direction.X == 0 && direction.Y == 1)
+        //        {
+        //            pt1 = points[4];
+        //            pt2 = points[5];
+        //        }
+        //        else if (direction.X == -1 && direction.Y == 1)
+        //        {
+        //            pt1 = points[5];
+        //            pt2 = points[0];
+        //        }
+        //        else
+        //        {
+        //            throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
+        //        }
+        //    }
+        //    else
+        //    {
 
-                if (direction.X == -1 && direction.Y == 0)
-                {
-                    pt1 = points[5];
-                    pt2 = points[0];
-                }
-                else if (direction.X == 0 && direction.Y == -1)
-                {
-                    pt1 = points[1];
-                    pt2 = points[2];
-                }
-                else if (direction.X == 1 && direction.Y == 0)
-                {
-                    pt1 = points[3];
-                    pt2 = points[4];
-                }
-                else if (direction.X == 1 && direction.Y == -1)
-                {
-                    pt1 = points[2];
-                    pt2 = points[3];
-                }
-                else if (direction.X == 0 && direction.Y == 1)
-                {
-                    pt1 = points[4];
-                    pt2 = points[5];
-                }
-                else if (direction.X == -1 && direction.Y == -1)
-                {
-                    pt1 = points[0];
-                    pt2 = points[1];
-                }
-                else
-                {
-                    throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
-                }
-            }
-            return (pt1, pt2);
-        }
+        //        if (direction.X == -1 && direction.Y == 0)
+        //        {
+        //            pt1 = points[5];
+        //            pt2 = points[0];
+        //        }
+        //        else if (direction.X == 0 && direction.Y == -1)
+        //        {
+        //            pt1 = points[1];
+        //            pt2 = points[2];
+        //        }
+        //        else if (direction.X == 1 && direction.Y == 0)
+        //        {
+        //            pt1 = points[3];
+        //            pt2 = points[4];
+        //        }
+        //        else if (direction.X == 1 && direction.Y == -1)
+        //        {
+        //            pt1 = points[2];
+        //            pt2 = points[3];
+        //        }
+        //        else if (direction.X == 0 && direction.Y == 1)
+        //        {
+        //            pt1 = points[4];
+        //            pt2 = points[5];
+        //        }
+        //        else if (direction.X == -1 && direction.Y == -1)
+        //        {
+        //            pt1 = points[0];
+        //            pt2 = points[1];
+        //        }
+        //        else
+        //        {
+        //            throw new Exception("Vector has not been mapped to hexside"); // This should never happen.
+        //        }
+        //    }
+        //    return (pt1, pt2);
+        //}
 
 
         //internal void DrawCurvedRoads(Graphics graphics, List<Vector> roads)
@@ -311,74 +309,62 @@ namespace Visualise
 
         public void LabelHexes(Pen pen, float xMin, float xMax, float yMin, float yMax, string[,] labels)
         {
-            var font = new Font("Arial", (int)(_hexHeight * .2));
+            var font = new Font("Arial", (int)(_hexHeight * .4));
 
-            for (int row = 0; ; row++)
+            if (labels == null)
+                return;
+
+            using (StringFormat sf = new StringFormat())
             {
-                PointF[] points = HexToPoints(_hexWidth, _hexHeight, row, 0);
+                sf.Alignment = StringAlignment.Center;
+                sf.LineAlignment = StringAlignment.Center;
 
-                if (points[4].Y > yMax)
-                    break;
-
-                for (int col = 0; ; col++)
-                {
-                    points = HexToPoints(_hexWidth, _hexHeight, row, col);
-
-                    // If it doesn't fit horizontally,
-                    // we're done with this row.
-                    if (points[3].X > xMax)
-                        break;
-
-                    // If it fits vertically, draw it.
-                    if (points[4].Y <= yMax)
+                for (var x = 0; x < labels.GetUpperBound(0); x++)
+                    for (var y = 0; y < labels.GetUpperBound(1); y++)
                     {
-                        // Label the hexagon
-                        if (labels != null)
-                        {
-                            using (StringFormat sf = new StringFormat())
-                            {
-                                sf.Alignment = StringAlignment.Center;
-                                sf.LineAlignment = StringAlignment.Center;
-                                var x = (points[0].X + points[3].X) / 2;
-                                var y = ((points[1].Y + points[4].Y) / 2);
-
-                                if (col <= labels.GetUpperBound(0) && row <= labels.GetUpperBound(1))
-                                {
-                                    var label = labels[col, row];
-                                    _graphics.DrawString(label, font, Brushes.Black, x, y, sf);
-                                }
-                            }
-                        }
+                        var points = Layout.PolygonCorners(_layout, new OffsetCoord(x, y).QoffsetToCube());
+                        var worldX = (float)(points[0].X + points[3].X) / 2;
+                        var worldY = (float)((points[1].Y + points[4].Y) / 2);
+                        var label = labels[x, y];
+                        _graphics.DrawString(label, font, Brushes.Black, worldX, worldY, sf);
                     }
-                }
             }
         }
 
         // Return the points that define the indicated hexagon.
-        private static PointF[] HexToPoints(float hexWidth, float hexHeight, float row, float col)
+        //private static PointF[] HexToPoints(float hexWidth, float hexHeight, float row, float col)
+        //{
+        //    float y = hexHeight / 2;
+        //    float x = 0;
+
+        //    // Move down the required number of rows.
+        //    y += row * hexHeight;
+
+        //    // If the column is odd, move down half a hex more.
+        //    if (col % 2 == 1) y += hexHeight / 2;
+
+        //    // Move over for the column number.
+        //    x += col * (hexWidth * 0.75f);
+
+        //    // Generate the points.
+        //    return new PointF[]
+        //        {
+        //            new PointF(x, y),
+        //            new PointF(x + hexWidth * 0.25f, y - hexHeight / 2),
+        //            new PointF(x + hexWidth * 0.75f, y - hexHeight / 2),
+        //            new PointF(x + hexWidth, y),
+        //            new PointF(x + hexWidth * 0.75f, y + hexHeight / 2),
+        //            new PointF(x + hexWidth * 0.25f, y + hexHeight / 2),
+        //        };
+        //}
+
+        PointD EdgeToCentrePoint(PointD[] hexPoints, float hexWidth, int edge, double pixelOffset = 0)
         {
-            float y = hexHeight / 2;
-            float x = 0;
+            var sourcePoint = new PointD(hexPoints[edge].X, hexPoints[edge].Y);
+            var targetPoint = new PointD(hexPoints[(edge + 1) % 6].X, hexPoints[(edge + 1) % 6].Y);
 
-            // Move down the required number of rows.
-            y += row * hexHeight;
-
-            // If the column is odd, move down half a hex more.
-            if (col % 2 == 1) y += hexHeight / 2;
-
-            // Move over for the column number.
-            x += col * (hexWidth * 0.75f);
-
-            // Generate the points.
-            return new PointF[]
-                {
-                    new PointF(x, y),
-                    new PointF(x + hexWidth * 0.25f, y - hexHeight / 2),
-                    new PointF(x + hexWidth * 0.75f, y - hexHeight / 2),
-                    new PointF(x + hexWidth, y),
-                    new PointF(x + hexWidth * 0.75f, y + hexHeight / 2),
-                    new PointF(x + hexWidth * 0.25f, y + hexHeight / 2),
-                };
+            var offset = (hexWidth / 2) + pixelOffset; // assume x==y
+            return sourcePoint.Move(targetPoint, offset);
         }
 
         // Return the row and column of the hexagon at this point.

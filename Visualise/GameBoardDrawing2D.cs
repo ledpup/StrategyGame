@@ -239,13 +239,13 @@ namespace Visualise
         {
             float Radius = _hexHeight / 4;
 
-            var hexCentre = HexCentre(_hexWidth, _hexHeight, location.Y, location.X);
+            var hexCentre = Layout.HexToPixel(_layout, new OffsetCoord(location.X, location.Y).QoffsetToCube());
 
             var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
             var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
 
-            var xTopLeft = (xOnCircle - (_structureWidth / 2));
-            var yTopLeft = (yOnCircle - (_structureWidth / 2));
+            var xTopLeft = (float)(xOnCircle - (_structureWidth / 2));
+            var yTopLeft = (float)(yOnCircle - (_structureWidth / 2));
 
             return (xTopLeft, yTopLeft);
         }
@@ -282,30 +282,30 @@ namespace Visualise
 
         internal void DrawRectangle(GameModel.Point location, SolidBrush brush)
         {
-            var hexCentre = HexCentre(_hexWidth, _hexHeight, location.Y, location.X);
+            var hexCentre = Layout.HexToPixel(_layout, new OffsetCoord(location.X, location.Y).QoffsetToCube());
 
-            var x = hexCentre.X - (_structureWidth / 2);
-            var y = hexCentre.Y - (_structureWidth / 2);
+            var x = (float)hexCentre.X - (_structureWidth / 2);
+            var y = (float)hexCentre.Y - (_structureWidth / 2);
 
             _graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
         }
 
-        private PointF HexCentre(float hexWidth, float hexHeight, float row, float col)
-        {
-            float y = hexHeight / 2;
-            float x = 0;
+        //private PointF HexCentre(float hexWidth, float hexHeight, float row, float col)
+        //{
+        //    float y = hexHeight / 2;
+        //    float x = 0;
 
-            // Move down the required number of rows.
-            y += row * hexHeight;
+        //    // Move down the required number of rows.
+        //    y += row * hexHeight;
 
-            // If the column is odd, move down half a hex more.
-            if (col % 2 == 1) y += hexHeight / 2;
+        //    // If the column is odd, move down half a hex more.
+        //    if (col % 2 == 1) y += hexHeight / 2;
 
-            // Move over for the column number.
-            x += col * (hexWidth * 0.75f) + _hexWidth / 2;
+        //    // Move over for the column number.
+        //    x += col * (hexWidth * 0.75f) + _hexWidth / 2;
 
-            return new PointF(x, y);
-        }
+        //    return new PointF(x, y);
+        //}
 
         public void LabelHexes(Pen pen, float xMin, float xMax, float yMin, float yMax, string[,] labels)
         {

@@ -47,8 +47,6 @@ namespace GameModel
         {
             return angle * (180.0 / Math.PI);
         }
-
-
     }
 
     public struct Hex
@@ -114,16 +112,16 @@ namespace GameModel
             return Add(hex, Direction(direction));
         }
 
-        static public List<Hex> diagonals = new List<Hex> { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
+        static public List<Hex> Diagonals = new List<Hex> { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
 
         static public Hex DiagonalNeighbor(Hex hex, int direction)
         {
-            return Hex.Add(hex, Hex.diagonals[direction]);
+            return Hex.Add(hex, Hex.Diagonals[direction]);
         }
 
         static public int Length(Hex hex)
         {
-            return (int)((Math.Abs(hex.q) + Math.Abs(hex.r) + Math.Abs(hex.s)) / 2);
+            return (Math.Abs(hex.q) + Math.Abs(hex.r) + Math.Abs(hex.s)) / 2;
         }
 
 
@@ -221,7 +219,6 @@ namespace GameModel
             }
             return results;
         }
-
     }
 
     /// <summary>

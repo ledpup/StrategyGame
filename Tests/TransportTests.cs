@@ -40,7 +40,7 @@ namespace Tests
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var bitmap = new Bitmap(1920, 1450);
-                Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 for (var i = 0; i < numberOfPlayers; i++)
                 {
@@ -159,7 +159,7 @@ namespace Tests
                 moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
 
-                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{turn}.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units, lines: vectors);
+                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: units, lines: vectors);
 
                 board.ResolveMoves(moveOrders);
                 board.ChangeStructureOwners();

@@ -10,22 +10,31 @@ namespace GameModel
     {
         public PointD(double x, double y)
         {
-            this.X = x;
-            this.Y = y;
+            X = x;
+            Y = y;
         }
         public readonly double X;
         public readonly double Y;
 
-        double GetAngleFromPoint(PointD point)
+        double GetAngleFromPoints(PointD destination)
         {
-            var dy = (point.Y - this.Y);
-            var dx = (point.X - this.X);
+            return Theta(this, destination);
+        }
 
-            var theta = Math.Atan2(dy, dx);
+        public static double Theta(PointD origin, PointD destination)
+        {
+            var dy = -(destination.Y - origin.Y);
+            var dx = (destination.X - origin.X);
 
-            var angle = (90 - ((theta * 180) / Math.PI)) % 360;
+            var PRECISION = 10;
 
-            return angle;
+            var rad = (Math.Round(dy, PRECISION) == 0 && Math.Round(dx, PRECISION) == 0) ? 0 : Math.Atan2(dy, dx);
+
+            if (rad < 0)
+            {
+                rad = 2 * Math.PI + rad;
+            }
+            return 180 * rad / Math.PI;
         }
 
         PointD Offset(double dx, double dy)
@@ -34,16 +43,38 @@ namespace GameModel
         }
         public PointD Move(PointD target, double distance, double degreeOffset = 0)
         {
-            var theta = DegreeToRadian(GetAngleFromPoint(target) + degreeOffset);
+            var theta = Maths.DegreeToRadian(GetAngleFromPoints(target) + degreeOffset);
             return Offset(Math.Cos(theta) * distance, -Math.Sin(theta) * distance);
         }
 
-        private double DegreeToRadian(double angle)
+        public static PointD EdgeToCentrePoint(PointD[] hexPoints, float edgeLength, int edge, double pixelOffset = 0)
         {
+            var sourcePoint = hexPoints[edge];
+            var targetPoint = hexPoints[(edge + 1) % 6];
+
+            var offset = edgeLength / 2 + pixelOffset;
+            return sourcePoint.Move(targetPoint, offset);
+        }
+    }
+
+    public static class Maths
+    {
+        public static double Normalise(double value, double start, double end)
+        {
+            double width = end - start;
+            double offsetValue = value - start;
+
+            return (offsetValue - (Math.Floor(offsetValue / width) * width)) + start;
+        }
+
+        public static double DegreeToRadian(double angle)
+        {
+            angle = Normalise(angle, 0, 360);
+
             return Math.PI * angle / 180.0;
         }
 
-        private double RadianToDegree(double angle)
+        public static double RadianToDegree(double angle)
         {
             return angle * (180.0 / Math.PI);
         }
@@ -51,11 +82,11 @@ namespace GameModel
 
     public struct Hex
     {
-        public Hex(int q, int r, int s)
+        public Hex(int q, int r, int s = 0)
         {
             this.q = q;
             this.r = r;
-            this.s = s;
+            this.s = -q - r;
         }
         public readonly int q;
         public readonly int r;
@@ -132,7 +163,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            return "(" + q + ", " + r + ", " + s + ")";
+            return "(" + q + ", " + r + ")";
         }
 
         public static List<Hex> HexRing(Hex centreHex, int radius = 1)

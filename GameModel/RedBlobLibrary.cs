@@ -10,20 +10,83 @@ namespace GameModel
     {
         public PointD(double x, double y)
         {
-            this.x = x;
-            this.y = y;
+            X = x;
+            Y = y;
         }
-        public readonly double x;
-        public readonly double y;
+        public readonly double X;
+        public readonly double Y;
+
+        double GetAngleFromPoints(PointD destination)
+        {
+            return Theta(this, destination);
+        }
+
+        public static double Theta(PointD origin, PointD destination)
+        {
+            var dy = -(destination.Y - origin.Y);
+            var dx = (destination.X - origin.X);
+
+            var PRECISION = 10;
+
+            var rad = (Math.Round(dy, PRECISION) == 0 && Math.Round(dx, PRECISION) == 0) ? 0 : Math.Atan2(dy, dx);
+
+            if (rad < 0)
+            {
+                rad = 2 * Math.PI + rad;
+            }
+            return 180 * rad / Math.PI;
+        }
+
+        PointD Offset(double dx, double dy)
+        {
+            return new PointD(X + dx, Y + dy);
+        }
+        public PointD Move(PointD target, double distance, double degreeOffset = 0)
+        {
+            var theta = Maths.DegreeToRadian(GetAngleFromPoints(target) + degreeOffset);
+            return Offset(Math.Cos(theta) * distance, -Math.Sin(theta) * distance);
+        }
+
+        public static PointD EdgeToCentrePoint(PointD[] hexPoints, float edgeLength, int edge, double pixelOffset = 0)
+        {
+            var sourcePoint = hexPoints[edge];
+            var targetPoint = hexPoints[(edge + 1) % 6];
+
+            var offset = edgeLength / 2 + pixelOffset;
+            return sourcePoint.Move(targetPoint, offset);
+        }
+    }
+
+    public static class Maths
+    {
+        public static double Normalise(double value, double start, double end)
+        {
+            double width = end - start;
+            double offsetValue = value - start;
+
+            return (offsetValue - (Math.Floor(offsetValue / width) * width)) + start;
+        }
+
+        public static double DegreeToRadian(double angle)
+        {
+            angle = Normalise(angle, 0, 360);
+
+            return Math.PI * angle / 180.0;
+        }
+
+        public static double RadianToDegree(double angle)
+        {
+            return angle * (180.0 / Math.PI);
+        }
     }
 
     public struct Hex
     {
-        public Hex(int q, int r, int s)
+        public Hex(int q, int r, int s = 0)
         {
             this.q = q;
             this.r = r;
-            this.s = s;
+            this.s = -q - r;
         }
         public readonly int q;
         public readonly int r;
@@ -45,11 +108,11 @@ namespace GameModel
             return new Hex(a.q * k, a.r * k, a.s * k);
         }
 
-        static public List<Hex> directions = new List<Hex> { new Hex(1, 0, -1), new Hex(1, -1, 0), new Hex(0, -1, 1), new Hex(-1, 0, 1), new Hex(-1, 1, 0), new Hex(0, 1, -1) };
+        static public List<Hex> Directions = new List<Hex> { new Hex(1, 0, -1), new Hex(1, -1, 0), new Hex(0, -1, 1), new Hex(-1, 0, 1), new Hex(-1, 1, 0), new Hex(0, 1, -1) };
 
         static public Hex Direction(int direction)
         {
-            return Hex.directions[direction];
+            return Hex.Directions[direction];
         }
 
         public static int HexToIndex(Hex hex, int boardWidth)
@@ -80,17 +143,16 @@ namespace GameModel
             return Add(hex, Direction(direction));
         }
 
-        static public List<Hex> diagonals = new List<Hex> { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
+        static public List<Hex> Diagonals = new List<Hex> { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
 
         static public Hex DiagonalNeighbor(Hex hex, int direction)
         {
-            return Hex.Add(hex, Hex.diagonals[direction]);
+            return Hex.Add(hex, Hex.Diagonals[direction]);
         }
-
 
         static public int Length(Hex hex)
         {
-            return (int)((Math.Abs(hex.q) + Math.Abs(hex.r) + Math.Abs(hex.s)) / 2);
+            return (Math.Abs(hex.q) + Math.Abs(hex.r) + Math.Abs(hex.s)) / 2;
         }
 
 
@@ -101,7 +163,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            return "(" + q + ", " + r + ", " + s + ")";
+            return "(" + q + ", " + r + ")";
         }
 
         public static List<Hex> HexRing(Hex centreHex, int radius = 1)
@@ -188,7 +250,6 @@ namespace GameModel
             }
             return results;
         }
-
     }
 
     /// <summary>
@@ -216,6 +277,11 @@ namespace GameModel
             int col = h.q;
             int row = h.r + ((h.q + offset * (h.q & 1)) / 2);
             return new OffsetCoord(col, row);
+        }
+
+        public Hex QoffsetToCube()
+        {
+            return QoffsetToCube(ODD, this); // Always using the odd layout
         }
 
         public static Hex QoffsetToCube(OffsetCoord o)
@@ -293,9 +359,9 @@ namespace GameModel
             Orientation M = layout.orientation;
             PointD size = layout.size;
             PointD origin = layout.origin;
-            double x = (M.f0 * h.q + M.f1 * h.r) * size.x;
-            double y = (M.f2 * h.q + M.f3 * h.r) * size.y;
-            return new PointD(x + origin.x, y + origin.y);
+            double x = (M.f0 * h.q + M.f1 * h.r) * size.X;
+            double y = (M.f2 * h.q + M.f3 * h.r) * size.Y;
+            return new PointD(x + origin.X, y + origin.Y);
         }
 
 
@@ -304,9 +370,9 @@ namespace GameModel
             Orientation M = layout.orientation;
             PointD size = layout.size;
             PointD origin = layout.origin;
-            PointD pt = new PointD((p.x - origin.x) / size.x, (p.y - origin.y) / size.y);
-            double q = M.b0 * pt.x + M.b1 * pt.y;
-            double r = M.b2 * pt.x + M.b3 * pt.y;
+            PointD pt = new PointD((p.X - origin.X) / size.X, (p.Y - origin.Y) / size.Y);
+            double q = M.b0 * pt.X + M.b1 * pt.Y;
+            double r = M.b2 * pt.X + M.b3 * pt.Y;
             return new FractionalHex(q, r, -q - r);
         }
 
@@ -316,7 +382,7 @@ namespace GameModel
             Orientation M = layout.orientation;
             PointD size = layout.size;
             double angle = 2.0 * Math.PI * (corner + M.start_angle) / 6;
-            return new PointD(size.x * Math.Cos(angle), size.y * Math.Sin(angle));
+            return new PointD(size.X * Math.Cos(angle), size.Y * Math.Sin(angle));
         }
 
 
@@ -327,7 +393,7 @@ namespace GameModel
             for (int i = 0; i < 6; i++)
             {
                 PointD offset = Layout.HexCornerOffset(layout, i);
-                corners.Add(new PointD(center.x + offset.x, center.y + offset.y));
+                corners.Add(new PointD(center.X + offset.X, center.Y + offset.Y));
             }
             return corners;
         }

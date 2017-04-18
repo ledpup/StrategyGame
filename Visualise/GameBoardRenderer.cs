@@ -19,13 +19,13 @@ namespace Visualise
     }
     public class GameBoardRenderer
     {
-        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
-            var drawing = new GameBoardDrawing2D(bitmap, boardWidth);
+            var drawing = new GameBoardDrawing2D(bitmap, boardHeight);
 
             if (renderBegin <= RenderPipeline.Board)
             {
-                var hexagonColours = new Dictionary<PointF, Brush>();
+                var hexagonColours = new Dictionary<GameModel.Point, Brush>();
 
                 var displaySelected = tiles.Any(x => x.IsSelected);
 
@@ -38,7 +38,7 @@ namespace Visualise
                         colour.Green = (short)(colour.Green * .3);
                         colour.Blue = (short)(colour.Blue * .3);
                     }
-                    hexagonColours.Add(new PointF(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                    hexagonColours.Add(new GameModel.Point(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                 }
                 );
 
@@ -64,9 +64,9 @@ namespace Visualise
                     if (lines != null)
                         vectors.AddRange(lines);
 
-                    vectors.ForEach(x => drawing.DrawEdge( 
-                        new GameModel.Point(x.Origin.X, x.Origin.Y), 
-                        new GameModel.Point(x.Destination.X, x.Destination.Y), 
+                    vectors.ForEach(x => drawing.DrawEdge(
+                        x.Origin.Hex,
+                        x.Destination.Hex, 
                         new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), 
                         x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), 
                         x.BaseEdgeType == BaseEdgeType.CentreToCentre ? true : false,
@@ -139,16 +139,16 @@ namespace Visualise
             return bitmap;
         }
 
-        public static void RenderAndSave(string fileName, int boardWidth, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
+        public static void RenderAndSave(string fileName, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
         {
             var bitmap = new Bitmap(imageWidth, imageHeight);
-            bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, boardWidth, tiles, edges, structures, labels, lines, units, circles);
+            bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, boardHeight, tiles, edges, structures, labels, lines, units, circles);
             bitmap.Save(fileName);
         }
 
-        public static void RenderLabelsAndSave(string fileName, Bitmap bitmap, int boardWidth, string[,] labels)
+        public static void RenderLabelsAndSave(string fileName, Bitmap bitmap, int boardHeight, string[,] labels)
         {
-            bitmap = Render(bitmap, RenderPipeline.Labels, RenderPipeline.Labels, boardWidth, labels: labels);
+            bitmap = Render(bitmap, RenderPipeline.Labels, RenderPipeline.Labels, boardHeight, labels: labels);
             bitmap.Save(fileName);
         }
         private static ArgbColour EdgeToColour(EdgeType edgeType)

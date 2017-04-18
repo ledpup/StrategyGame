@@ -49,6 +49,7 @@
     <Compile Include="BoardTests.cs" />
     <Compile Include="InfluenceMapsTests.cs" />
     <Compile Include="GameAnalysisTests.cs" />
+    <Compile Include="MathsTests.cs" />
     <Compile Include="MoveTests.cs" />
     <Compile Include="RedBlobTests.cs" />
     <Compile Include="StructureTests.cs" />

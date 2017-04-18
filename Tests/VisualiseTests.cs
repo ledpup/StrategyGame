@@ -27,16 +27,16 @@ namespace Tests
 
             var labels = new string[board.Width, board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
-            Visualise.GameBoardRenderer.RenderAndSave("Coords - array.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("Coords - array.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
-            Visualise.GameBoardRenderer.RenderAndSave("Coords - offset.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("Coords - offset.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-            Visualise.GameBoardRenderer.RenderAndSave("Coords - cube.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("Coords - cube.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.ContiguousRegionId.ToString());
-            Visualise.GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", board.Width, board.Tiles, board.Edges, board.Structures, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Tiles, board.Edges, board.Structures, units: units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Height, board.Tiles, board.Edges, board.Structures, units: units);
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace Tests
 
             var vectors = new List<Vector>() { new Vector(board[28].Point, board[29].Point, Colours.Black) { EdgeType = EdgeType.Road } };
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithCurves.png", board.Width, board.Tiles, circles: board[1,1]);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithCurves.png", board.Height, board.Tiles, circles: board[1,1]);
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace Tests
                 }
             }
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Tiles, board.Edges, board.Structures, labels, vectors);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, labels, vectors);
         }
 
 

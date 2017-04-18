@@ -12,10 +12,12 @@ namespace GameModel
         {
             X = x;
             Y = y;
+            Hex = OffsetCoord.QoffsetToCube(new OffsetCoord(X, Y));
         }
 
         public readonly int X;
         public readonly int Y;
+        public readonly Hex Hex;
 
         //public override int GetHashCode()
         //{

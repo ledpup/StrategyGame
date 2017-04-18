@@ -61,31 +61,31 @@ namespace StrategyGame
 
                 var labels = new string[board.Width, board.Height];
                 var bitmap = new Bitmap(1920, 1450);
-                Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 
                 for (var i = 0; i < numberOfPlayers; i++)
                 {
                     foreach (var mt in MilitaryUnit.MovementTypes)
                     {
                         board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.FriendlyStructureInfluence[mt][i], 1).ToString());
-                        Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                        Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
 
                         board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.EnemyStructureInfluence[mt][i], 1).ToString());
-                        Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                        Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
                     }
 
                     board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.FriendlyUnitInfluence[i], 1).ToString());
-                    Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                    Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
 
                     board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.EnemyUnitInfluence[i], 1).ToString());
-                    Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                    Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
 
                     MilitaryUnit.Roles.ForEach(x => 
                         {
                             MilitaryUnit.MovementTypes.ForEach(z =>
                             {
                                 board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.AggregateInfluence[new RoleMovementType(z, x)][i], 1).ToString());
-                                Visualise.GameBoardRenderer.RenderLabelsAndSave($"AggregateInfluenceMap{x.ToString()}Player{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Width, labels);
+                                Visualise.GameBoardRenderer.RenderLabelsAndSave($"AggregateInfluenceMap{x.ToString()}Player{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
                             });
                         });                   
                 }
@@ -102,11 +102,11 @@ namespace StrategyGame
                 var vectors = new List<Vector>();
                 moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
 
-                Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+                Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
                 board.ResolveMoves(moveOrders);
 
-                Visualise.GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                Visualise.GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>
@@ -121,7 +121,7 @@ namespace StrategyGame
 
                 if (battleReports.Any())
                 {
-                    Visualise.GameBoardRenderer.RenderAndSave("BattlesConductedTurn" + board.Turn + ".png", board.Width, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                    Visualise.GameBoardRenderer.RenderAndSave("BattlesConductedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 }
 
                 board.Turn++;

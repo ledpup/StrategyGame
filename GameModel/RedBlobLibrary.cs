@@ -108,11 +108,11 @@ namespace GameModel
             return new Hex(a.q * k, a.r * k, a.s * k);
         }
 
-        static public List<Hex> Directions = new List<Hex> { new Hex(1, 0, -1), new Hex(1, -1, 0), new Hex(0, -1, 1), new Hex(-1, 0, 1), new Hex(-1, 1, 0), new Hex(0, 1, -1) };
+        static public List<Hex> Directions = new List<Hex> { new Hex(-1, 0, 1), new Hex(0, -1, 1), new Hex(1, -1, 0), new Hex(1, 0, -1), new Hex(0, 1, -1), new Hex(-1, 1, 0), };
 
         static public Hex Direction(int direction)
         {
-            return Hex.Directions[direction];
+            return Directions[direction];
         }
 
         public static int HexToIndex(Hex hex, int boardWidth)
@@ -389,10 +389,10 @@ namespace GameModel
         static public List<PointD> PolygonCorners(Layout layout, Hex h)
         {
             List<PointD> corners = new List<PointD> { };
-            PointD center = Layout.HexToPixel(layout, h);
+            PointD center = HexToPixel(layout, h);
             for (int i = 0; i < 6; i++)
             {
-                PointD offset = Layout.HexCornerOffset(layout, i);
+                PointD offset = HexCornerOffset(layout, i);
                 corners.Add(new PointD(center.X + offset.X, center.Y + offset.Y));
             }
             return corners;

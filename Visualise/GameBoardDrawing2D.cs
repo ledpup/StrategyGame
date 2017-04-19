@@ -64,8 +64,13 @@ namespace Visualise
             }
             else
             {
-                return;
-                //points = HexSidePoints(origin, destination, _hexWidth, _hexHeight);
+                var direction = Hex.Subtract(origin, destination);
+                var index = Hex.Directions.IndexOf(direction);
+
+                var vertices = Layout.PolygonCorners(_layout, origin);
+
+                points.pt1 = PointDtoF(vertices[index]);
+                points.pt2 = PointDtoF(vertices[(index + 1) % 6]);
             }
 
             if (isPort)
@@ -82,9 +87,9 @@ namespace Visualise
                 }
             }
             else
+            {
                 _graphics.DrawLine(pen, points.pt1, points.pt2);
-            //else
-            //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
+            }
         }
 
         public void DrawEdge(Hex origin, Hex destination, int edge, Pen pen)
@@ -136,24 +141,6 @@ namespace Visualise
 
             //else
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
-        }
-
-        private void StraightRoad(PointF[] points, float radius, int tileIndex)
-        {
-            var degreesOffset = 0 * 60;
-
-            //graphics.DrawArc(new Pen(Color.Brown, 2), points[1].X - radius, points[1].Y - radius, 2 * radius, 2 * radius, 0, 60);
-            //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 120, 120);
-            //graphics.DrawArc(new Pen(Color.Brown, 2), points[5].X - radius, points[5].Y - radius, 2 * radius, 2 * radius, 300, 60);
-
-
-            //graphics.DrawArc(new Pen(Color.Brown, 2), points[2].X - radius, points[2].Y - radius, 2 * radius, 2 * radius, 60, 60);
-            //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (HexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 180, 120);
-            //graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X - radius, points[0].Y - radius, 2 * radius, 2 * radius, 0, 60);
-
-            _graphics.DrawArc(new Pen(Color.Brown, 2), points[3].X - radius, points[3].Y - radius, 2 * radius, 2 * radius, 120, 60);
-            _graphics.DrawArc(new Pen(Color.Brown, 2), points[0].X + (_hexWidth / 2) - radius, points[0].Y - radius, 2 * radius, 2 * radius, 240, 120);
-            _graphics.DrawArc(new Pen(Color.Brown, 2), points[1].X - radius, points[1].Y - radius, 2 * radius, 2 * radius, 60, 60);
         }
 
         public void DrawCircle(GameModel.Point location, float position, SolidBrush brush)
@@ -243,7 +230,5 @@ namespace Visualise
                 }
             }
         }
-
-
     }
 }

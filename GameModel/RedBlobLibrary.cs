@@ -163,7 +163,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            return "(" + q + ", " + r + ")";
+            return q + ", " + r;
         }
 
         public static List<Hex> HexRing(Hex centreHex, int radius = 1)

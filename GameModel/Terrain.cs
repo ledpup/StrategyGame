@@ -68,5 +68,29 @@ namespace GameModel
             }
             throw new Exception(string.Format("{0} is an unknown terrain type.", character));
         }
+
+        public static Dictionary<TerrainType, int> TerrainStackLimit
+        {
+            get
+            {
+                if (_terrainStackLimit != null)
+                    return _terrainStackLimit;
+
+                _terrainStackLimit = new Dictionary<TerrainType, int>
+                {
+                    { TerrainType.Forest, 3 },
+                    { TerrainType.Grassland, 4 },
+                    { TerrainType.Hill, 3 },
+                    { TerrainType.Mountain, 2 },
+                    { TerrainType.Steppe, 2 },
+                    { TerrainType.Wetland, 2 },
+
+                    { TerrainType.Reef, 2 },
+                    { TerrainType.Water, 4 }
+                };
+                return _terrainStackLimit;
+            }
+        }
+        public static Dictionary<TerrainType, int> _terrainStackLimit;
     }
 }

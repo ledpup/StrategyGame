@@ -5,12 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
+using System.IO;
 
 namespace Tests
 {
     [TestClass]
     public class StackTests
     {
+        static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
+        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
+
+        [TestMethod]
+        public void StackLimits()
+        {
+            var board = new Board(GameBoard, structures: Structures);
+
+            Assert.AreEqual(4, board[1, 2].StackLimit);
+            Assert.AreEqual(5, board[1, 3].StackLimit);
+            Assert.AreEqual(2, board[6, 1].StackLimit);
+        }
+
         [TestMethod]
         public void CanTransport()
         {

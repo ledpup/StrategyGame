@@ -233,22 +233,22 @@ namespace GameModel
             throw new Exception("Can got resolve terrain type based on temperature given base type of " + TerrainType);
         }
 
-        //public int StackLimit
-        //{
-        //    get
-        //    {
-        //        if (Structure != null)
-        //            return stackLimit + 1;
-        //        return stackLimit;
-        //    }
-        //}
-
-        //private int stackLimit
-        //{
-        //    get { return TerrainType.StackLimit; }
-        //}
-
-
+        public int StackLimit
+        {
+            get
+            {
+                if (_stackLimit == 0)
+                {
+                    _stackLimit = Terrain.TerrainStackLimit[TerrainType];
+                    if (Structure != null)
+                    {
+                        _stackLimit++;
+                    }
+                }
+                return _stackLimit;
+            }
+        }
+        int _stackLimit = 0;
         
 
         public bool IsInConflict
@@ -268,5 +268,6 @@ namespace GameModel
         public TerrainType TemperatureAdjustedTerrainType { get; set; }
         public int? OwnerId { get; set; }
         public bool IsSelected { get; set; }
+        public Structure Structure { get; set; }
     }
 }

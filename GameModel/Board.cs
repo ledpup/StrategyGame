@@ -67,7 +67,7 @@ namespace GameModel
 
         public void ResolveStackLimits(int playerIndex)
         {
-            Tiles.Where(x => x.OverStackLimit(playerIndex) && !x.IsInConflict)
+            Tiles.Where(x => x.OverStackLimit(playerIndex))
                 .ToList()
                 .ForEach(x =>
                     {

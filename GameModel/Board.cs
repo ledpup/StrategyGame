@@ -75,7 +75,7 @@ namespace GameModel
                         x.Units
                             .Where(y => y.IsAlive && y.OwnerIndex == playerIndex)
                             .ToList()
-                            .ForEach(y => y.Morale -= .5 * overStackLimitCount);
+                            .ForEach(y => y.ChangeMorale(Turn, - .5 * overStackLimitCount, $"Units are over the stack limit of {x.StackLimit} by {overStackLimitCount} units"));
                     });
         }
 
@@ -644,7 +644,7 @@ namespace GameModel
                 var positionProportion = ((i + 1) / (double)winnersToLosers.Length);
                 var losesPenalty = (1 - winnersToLosers[i].UnitSurvivalProportion);
 
-                winnersToLosers[i].Units.Where(x => x.IsAlive).ToList().ForEach(x => x.ChangeMorale(turn, -(positionProportion + losesPenalty)));
+                winnersToLosers[i].Units.Where(x => x.IsAlive).ToList().ForEach(x => x.ChangeMorale(turn, -(positionProportion + losesPenalty), "Morale change due to combat"));
             }
 
         }

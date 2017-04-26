@@ -121,7 +121,7 @@ namespace GameModel
         public double BattleStrength { get; set; }
         public double Size { get; set; }
         public List<QuantityChangeEvent> QuantityEvents { get; set; }
-        public double Morale { get; set; }
+        public double Morale { get; private set; }
         public List<MoraleChangeEvent> MoraleEvents { get; set; }
         public double CombatInitiative { get; set; }
         public int Speed { get; set; }
@@ -259,7 +259,7 @@ namespace GameModel
             {
                 MoraleEvents = new List<MoraleChangeEvent>();
                 _initialMorale = value;
-                ChangeMorale(TurnCreated, _initialMorale);
+                ChangeMorale(TurnCreated, _initialMorale, "Initial morale");
             }
         }
         double _initialMorale;
@@ -292,10 +292,10 @@ namespace GameModel
             CalculateStrength();
         }
 
-        public void ChangeMorale(int turn, double morale)
+        public void ChangeMorale(int turn, double moraleChange, string reason)
         {
-            Morale += morale;
-            MoraleEvents.Add(new MoraleChangeEvent { Turn = turn, Morale = morale });
+            Morale += moraleChange;
+            MoraleEvents.Add(new MoraleChangeEvent(turn, moraleChange, reason));
         }
 
 

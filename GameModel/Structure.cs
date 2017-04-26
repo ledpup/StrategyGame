@@ -37,7 +37,10 @@ namespace GameModel
             OwnerIndex = ownerIndex;
             Supply = supply;
 
-            tile.Structure = this;
+            if (Location != null)
+            {
+                Location.Structure = this;
+            }            
         }
 
         public ArgbColour Colour { get { return Player.Colour(OwnerIndex); } }

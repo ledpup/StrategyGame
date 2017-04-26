@@ -20,10 +20,10 @@ namespace Tests
 
             var structures = new List<Structure>
             {
-                new Structure(1, StructureType.Fortress, null, 1),
-                new Structure(1, StructureType.Outpost, null, 1),
+                new Structure(0, StructureType.Fortress, null, 1),
+                new Structure(0, StructureType.Outpost, null, 1),
 
-                new Structure(1, StructureType.City, null, 2),
+                new Structure(0, StructureType.City, null, 2),
             };
 
             var units = new List<MilitaryUnit>
@@ -33,8 +33,6 @@ namespace Tests
                     BaseQuality = 2,
                     InitialQuantity = 300,
                 },
-
-
 
                 new MilitaryUnit(1, "1st Blue Infantry", 2)
                 {

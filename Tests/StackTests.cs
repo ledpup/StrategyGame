@@ -26,6 +26,22 @@ namespace Tests
         }
 
         [TestMethod]
+        public void OverStackLimit()
+        {
+            var board = new Board(GameBoard, structures: Structures);
+
+            var units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(location: board[6, 1], roadMovementBonus: 1),
+                new MilitaryUnit(location: board[6, 1], role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(location: board[6, 1], role: Role.Besieger),
+            };
+
+            Assert.AreEqual(2, board[6, 1].StackLimit);
+            Assert.IsTrue(board[6, 1].OverStackLimit(0));
+        }
+
+        [TestMethod]
         public void CanTransport()
         {
             var inf = new MilitaryUnit();

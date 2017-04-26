@@ -38,10 +38,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new MilitaryUnit(movementType: MovementType.Airborne);
-
-            unit.Location = board[1, 1];
-
+            var unit = new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne);
             var moveList = unit.PossibleMoves();
 
             Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
@@ -50,7 +47,6 @@ namespace Tests
             Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 1]));
             Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 1]));
             Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
-            
         }
     }
 }

@@ -251,6 +251,16 @@ namespace GameModel
         int _stackLimit = 0;
         
 
+        public bool OverStackLimit(int playerIndex)
+        {
+            return OverStackLimitCount(playerIndex) > 0;
+        }
+
+        public int OverStackLimitCount(int playerIndex)
+        {
+            return Units.Count(x => x.IsAlive && x.OwnerIndex == playerIndex) - StackLimit;
+        }
+
         public bool IsInConflict
         {
             get

@@ -33,12 +33,17 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[6, 1], roadMovementBonus: 1),
-                new MilitaryUnit(location: board[6, 1], role: Role.Defensive, isAmphibious: true),
-                new MilitaryUnit(location: board[6, 1], role: Role.Besieger),
+                new MilitaryUnit(location: board[6, 1]),
+                new MilitaryUnit(location: board[6, 1]),
+                new MilitaryUnit(location: board[6, 1]),
             };
 
             Assert.AreEqual(2, board[6, 1].StackLimit);
             Assert.IsTrue(board[6, 1].OverStackLimit(0));
+
+            board.ResolveStackLimits(0);
+
+            units.ForEach(x => Assert.AreEqual(4, x.Morale));
         }
 
         [TestMethod]

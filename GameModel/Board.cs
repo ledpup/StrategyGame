@@ -65,6 +65,20 @@ namespace GameModel
             CalculateTemperature(Turn);
         }
 
+        public void ResolveStackLimits(int playerIndex)
+        {
+            Tiles.Where(x => x.OverStackLimit(playerIndex) && !x.IsInConflict)
+                .ToList()
+                .ForEach(x =>
+                    {
+                        var overStackLimitCount = x.OverStackLimitCount(playerIndex);
+                        x.Units
+                            .Where(y => y.IsAlive && y.OwnerIndex == playerIndex)
+                            .ToList()
+                            .ForEach(y => y.Morale -= .5 * overStackLimitCount);
+                    });
+        }
+
         private void CalculateContiguousRegions()
         {
             var id = 0;

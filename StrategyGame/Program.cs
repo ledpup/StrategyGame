@@ -105,6 +105,10 @@ namespace StrategyGame
                 Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
                 board.ResolveMoves(moveOrders);
+                for (var i = 0; i < numberOfPlayers; i++)
+                {
+                    board.ResolveStackLimits(i);
+                }
 
                 Visualise.GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 

@@ -34,13 +34,13 @@ namespace Tests
                         new Move(board[2, 2], board[2, 1], null, 0, 2),
                     };
 
-            var moveOrders = new List<MoveOrder>
+            var moveOrders = new List<IUnitOrder>
             {
                 new MoveOrder(moves1, board.Units[0]),
                 new MoveOrder(moves2, board.Units[1]),
             };
 
-            board.ResolveMoves(moveOrders);
+            board.ResolveOrders(moveOrders);
 
             var battles = board.ConductBattles();
 

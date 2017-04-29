@@ -140,8 +140,6 @@ namespace GameModel
         public bool IsTransporter { get; set; }
         public List<MilitaryUnit> Transporting { get; set; }
 
-        public MilitaryUnit Transport { get; set; }
-
         public int TurnCreated { get; set; }
 
         public Role Role { get; set; }

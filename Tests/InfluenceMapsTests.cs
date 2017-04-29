@@ -43,7 +43,7 @@ namespace Tests
 
             ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-            var moveOrders = new List<MoveOrder>();
+            var moveOrders = new List<IUnitOrder>();
 
             board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
             {
@@ -53,11 +53,11 @@ namespace Tests
             });
 
             var vectors = new List<Vector>();
-            moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
+            moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
             Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
-            board.ResolveMoves(moveOrders);
+            board.ResolveOrders(moveOrders);
 
             Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
         }

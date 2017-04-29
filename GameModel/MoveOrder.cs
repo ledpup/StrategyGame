@@ -5,9 +5,9 @@ using System.Text;
 
 namespace GameModel
 {
-    public class MoveOrder
+    public class MoveOrder : IUnitOrder
     {
-        public MilitaryUnit Unit;
+        public MilitaryUnit Unit { get; set; }
         public Move[] Moves;
 
         public MoveOrder(Move[] moves, MilitaryUnit unit)

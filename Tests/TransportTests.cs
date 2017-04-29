@@ -54,7 +54,7 @@ namespace Tests
                     //});
                 }
 
-                var moveOrders = new List<MoveOrder>();
+                var moveOrders = new List<IUnitOrder>();
 
                 units.Where(x => x.IsAlive)
                      .ToList()
@@ -156,12 +156,12 @@ namespace Tests
 
 
                 var vectors = new List<Vector>();
-                moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
+                moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
 
                 Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: units, lines: vectors);
 
-                board.ResolveMoves(moveOrders);
+                board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();
 
                 board.Turn++;
@@ -182,6 +182,40 @@ namespace Tests
                         break;
                 }
             }
+        }
+
+        [TestMethod]
+        public void TransportByAir()
+        {
+            var board = new Board(GameBoard, TileEdges, Structures);
+
+            var units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
+            };
+
+            board.Units = units;
+
+            var moves = new Move[]
+            {
+                new Move(board[1, 1], board[2, 2], null, 2, 1),
+                new Move(board[2, 2], board[3, 2], null, 1, 2),
+            };
+
+            var unitOrders = new List<IUnitOrder>
+            {
+                new MoveOrder(moves, units[1]),
+                new TransportOrder(units[1], units[0]),
+
+            };
+            board.ResolveOrders(unitOrders);
+
+            Assert.AreEqual(units[0], units[1].Transporting.Single());
+            Assert.AreEqual(units[1], units[0].TransportedBy);
+
+            Assert.AreEqual(board[3, 2], units[0].Location);
+            Assert.AreEqual(board[3, 2], units[1].Location);
         }
 
         private static StrategicAction SetStrategicAction(MilitaryUnit unit, Board board)

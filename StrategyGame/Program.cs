@@ -90,7 +90,7 @@ namespace StrategyGame
                         });                   
                 }
 
-                var moveOrders = new List<MoveOrder>();
+                var moveOrders = new List<IUnitOrder>();
 
                 board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
                 {
@@ -100,11 +100,11 @@ namespace StrategyGame
                 });
 
                 var vectors = new List<Vector>();
-                moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
+                moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
                 Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
-                board.ResolveMoves(moveOrders);
+                board.ResolveOrders(moveOrders);
                 for (var i = 0; i < numberOfPlayers; i++)
                 {
                     board.ResolveStackLimits(i);

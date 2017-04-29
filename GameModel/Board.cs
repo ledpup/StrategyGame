@@ -423,10 +423,23 @@ namespace GameModel
             return pathFindTiles;
         }
 
-        public void ResolveMoves(List<MoveOrder> moveOrders)
+        public void ResolveOrders(List<IUnitOrder> unitOrders)
         {
-            if (moveOrders == null || moveOrders.Count == 0)
+            if (unitOrders == null || unitOrders.Count == 0)
                 return;
+
+
+            var transportOrders = unitOrders.OfType<TransportOrder>().ToList();
+
+            transportOrders.ForEach(x => {
+                if (x.Unit.CanTransport(x.UnitToTransport))
+                {
+                    x.Unit.Transporting.Add(x.UnitToTransport);
+                    x.UnitToTransport.TransportedBy = x.Unit;
+                }
+                });
+
+            var moveOrders = unitOrders.OfType<MoveOrder>().ToList();
 
             MoveOrders[Turn] = moveOrders;
 

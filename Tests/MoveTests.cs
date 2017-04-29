@@ -290,13 +290,13 @@ namespace Tests
                         new Move(board[1, 2], board[2, 2], null, 1, 2),
                     };
 
-            var moveOrders = new List<MoveOrder>
+            var moveOrders = new List<IUnitOrder>
             {
                 new MoveOrder(moves1, board.Units[0]),
                 new MoveOrder(moves2, board.Units[1]),
             };
 
-            board.ResolveMoves(moveOrders);
+            board.ResolveOrders(moveOrders);
 
             Assert.AreEqual(board[3, 2], board.Units[0].Location);
             Assert.AreEqual(board[2, 2], board.Units[1].Location);
@@ -323,13 +323,13 @@ namespace Tests
                                     new Move(board[2, 2], board[1, 1], null, 2, 1),
                                 };
 
-            var moveOrders = new List<MoveOrder>
+            var moveOrders = new List<IUnitOrder>
             {
                 new MoveOrder(moves1, board.Units[0]),
                 new MoveOrder(moves2, board.Units[1]),
             };
 
-            board.ResolveMoves(moveOrders);
+            board.ResolveOrders(moveOrders);
 
             Assert.AreEqual(board[1, 1], board.Units[0].Location);
             Assert.AreEqual(board[2, 2], board.Units[1].Location);
@@ -357,14 +357,14 @@ namespace Tests
                                     new Move(board[2, 2], board[1, 1], null, 1, 1),
                                 };
 
-            var moveOrders = new List<MoveOrder>
+            var moveOrders = new List<IUnitOrder>
             {
                 new MoveOrder(moves1, board.Units[0]),
                 new MoveOrder(moves2, board.Units[1]),
                 new MoveOrder(moves2, board.Units[2]),
             };
 
-            board.ResolveMoves(moveOrders);
+            board.ResolveOrders(moveOrders);
 
             Assert.AreEqual(board[1, 1], board.Units[0].Location); // Unit 0 is prevented from moving because a larger army is moving into their hex from the same hexside
             Assert.AreEqual(board[1, 1], board.Units[1].Location);
@@ -407,7 +407,7 @@ namespace Tests
                         new Move(board[11, 2], board[11, 1], null, 0, 2),
                     };
 
-            var moveOrders = new List<MoveOrder>
+            var moveOrders = new List<IUnitOrder>
             {
                 new MoveOrder(moves1, board.Units[0]),               
                 new MoveOrder(moves2, board.Units[1]),
@@ -416,11 +416,11 @@ namespace Tests
             };
 
             var vectors = new List<Vector>();
-            moveOrders.ForEach(x => vectors.AddRange(x.Vectors));
+            moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
             Visualise.GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
-            board.ResolveMoves(moveOrders);
+            board.ResolveOrders(moveOrders);
 
             Visualise.GameBoardRenderer.RenderAndSave("UnitsPostMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 

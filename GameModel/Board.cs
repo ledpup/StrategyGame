@@ -425,10 +425,6 @@ namespace GameModel
 
         public void ResolveOrders(List<IUnitOrder> unitOrders)
         {
-            if (unitOrders == null || unitOrders.Count == 0)
-                return;
-
-
             var transportOrders = unitOrders.OfType<TransportOrder>().ToList();
 
             transportOrders.ForEach(x => {
@@ -437,14 +433,34 @@ namespace GameModel
                     x.Unit.Transporting.Add(x.UnitToTransport);
                     x.UnitToTransport.TransportedBy = x.Unit;
                 }
-                });
+            });
+
+            var unloadOrders = unitOrders.OfType<UnloadOrder>().ToList();
+
+            unloadOrders.ForEach(x => {                
+                x.Unit.TransportedBy.Transporting.Remove(x.Unit);
+                x.Unit.TransportedBy = null;
+            });
 
             var moveOrders = unitOrders.OfType<MoveOrder>().ToList();
+            ResolveMoves(moveOrders);
+        }
+
+        void ResolveMoves(List<MoveOrder> moveOrders)
+        {
+            if (moveOrders == null || moveOrders.Count == 0)
+                return;
 
             MoveOrders[Turn] = moveOrders;
 
             //var movingUnits = moveOrders.Select(x => x.Unit).ToList();
             float maxMovementPoints = 12;
+
+            var transportedUnitMoveOrder = moveOrders.FirstOrDefault(x => x.Unit.TransportedBy != null);
+            if (transportedUnitMoveOrder != null)
+            {
+                throw new Exception($"Unit {transportedUnitMoveOrder.Unit.Name} is being transported and therefore may not submit move orders");
+            }
 
             var invalidMoveOrders = moveOrders.Where(x => x.Moves[0].Origin != x.Unit.Location);
             if (invalidMoveOrders.Count() > 0)

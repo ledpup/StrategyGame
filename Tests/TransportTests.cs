@@ -218,6 +218,77 @@ namespace Tests
             Assert.AreEqual(board[3, 2], units[1].Location);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void MoveTransportedUnit()
+        {
+            var board = new Board(GameBoard, TileEdges, Structures);
+
+            var units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(location: board[1, 1], name: "1st Dragoons", roadMovementBonus: 1),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
+            };
+
+            board.Units = units;
+
+            var moves = new Move[]
+            {
+                new Move(board[1, 1], board[2, 2], null, 2, 1),
+                new Move(board[2, 2], board[3, 2], null, 1, 2),
+            };
+
+            var unitOrders = new List<IUnitOrder>
+            {
+                new TransportOrder(units[1], units[0]),
+                new MoveOrder(moves, units[0]),
+            };
+            board.ResolveOrders(unitOrders);
+
+            Assert.AreEqual(units[0], units[1].Transporting.Single());
+            Assert.AreEqual(units[1], units[0].TransportedBy);
+        }
+
+        [TestMethod]
+        public void UnloadUnit()
+        {
+            var board = new Board(GameBoard, TileEdges, Structures);
+
+            var units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
+            };
+
+            board.Units = units;
+
+            var moves = new Move[]
+            {
+                new Move(board[1, 1], board[2, 2], null, 2, 1),
+                new Move(board[2, 2], board[3, 2], null, 1, 2),
+            };
+
+            var unitOrders = new List<IUnitOrder>
+            {
+                new MoveOrder(moves, units[1]),
+                new TransportOrder(units[1], units[0]),
+            };
+            board.ResolveOrders(unitOrders);
+            board.Turn++;
+
+            Assert.AreEqual(units[0], units[1].Transporting.Single());
+            Assert.AreEqual(units[1], units[0].TransportedBy);
+
+            unitOrders = new List<IUnitOrder>
+            {
+                new UnloadOrder(units[0]),
+            };
+            board.ResolveOrders(unitOrders);
+
+            Assert.AreEqual(0, units[1].Transporting.Count);
+            Assert.IsNull(units[0].TransportedBy);
+        }
+
         private static StrategicAction SetStrategicAction(MilitaryUnit unit, Board board)
         {
             unit.StrategicDestination = null;

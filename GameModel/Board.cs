@@ -188,9 +188,21 @@ namespace GameModel
         {
             Structures.ForEach(x => 
             {
-                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex);
+                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
                 if (unitsAtStructureByOwner.Count() == 1)
+                {
+                    if (x.OwnerIndex == unitsAtStructureByOwner.First().Key)
+                    {
+                        return;
+                    }
                     x.OwnerIndex = unitsAtStructureByOwner.First().Key;
+
+                    var units = unitsAtStructureByOwner.First().ToList();
+
+                    var numberOfUnits = units.Count;
+
+                    units.ForEach(y => y.ChangeMorale(Turn, 2D / numberOfUnits, $"Morale increase from pillaging {x.StructureType}"));
+                }
             });
         }
 
@@ -534,7 +546,10 @@ namespace GameModel
 
                     if (!unitStepMove.Value.RoadMove)
                     {
-                        unit.ChangeMorale(Turn, -unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining], "Morale reduced during forced march");
+                        if (unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining] > 0)
+                        {
+                            unit.ChangeMorale(Turn, -unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining], "Morale reduced during forced march");
+                        }
                     }
                 }
 

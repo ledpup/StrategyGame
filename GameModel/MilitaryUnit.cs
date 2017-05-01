@@ -150,7 +150,7 @@ namespace GameModel
         {
             return Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced, StrategicAction strategicAction = StrategicAction.None)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced, StrategicAction strategicAction = StrategicAction.None, float[] moraleMoveCost = null)
         {
             IsAlive = true;
 
@@ -187,6 +187,17 @@ namespace GameModel
             foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
             {
                 EdgeMovementCosts.Add(edgeType, null);
+            }
+
+            if (moraleMoveCost == null)
+            {
+                MoraleMoveCost = new float[BaseMovementPoints];
+                for (var i = 0; i < BaseMovementPoints; i++)
+                    MoraleMoveCost[i] = 0;
+            }
+            else
+            {
+                MoraleMoveCost = moraleMoveCost;
             }
 
             Index = index;
@@ -238,6 +249,8 @@ namespace GameModel
             CalculateStrength();
         }
 
+        public float[] MoraleMoveCost { get; set; }
+
         public int InitialQuantity
         {
             get { return _initialQuantity; }
@@ -261,8 +274,6 @@ namespace GameModel
             }
         }
         double _initialMorale;
-
-
 
         public void CalculateStrength()
         {
@@ -351,13 +362,6 @@ namespace GameModel
 
             CanStopOn = Terrain.All_Water;
         }
-        //public TerrainType StopOn;
-        //public TerrainType TerrainCombatBonus;
-
-
-        //public IEnumerable<Tile> ValidAdjacentMoves { get { return Tile.AdjacentTiles.Where(x => TerrainMovementCosts[x.TerrainType] != null) ; } }
-
-
 
         public Tile Location
         {
@@ -453,15 +457,14 @@ namespace GameModel
 
             var neighbourMoves = new List<Move>();
 
-            potentialMoves.ForEach(x => {
+            potentialMoves.ForEach(x =>
+            {
+                var remainingMovementPoints = movementPoints - x.Origin.CalculateMoveCost(unit, x.Destination);
 
-                var newMovementPoints = movementPoints - x.Origin.CalculateMoveCost(unit, x.Destination);
-
-                if (newMovementPoints > 0)
+                if (remainingMovementPoints > 0)
                 {
-                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Destination, x, movesConsidered, newMovementPoints, distance + 1));
+                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Destination, x, movesConsidered, remainingMovementPoints, distance + 1));
                 }
-
             });
 
             potentialMoves.AddRange(neighbourMoves);
@@ -475,7 +478,7 @@ namespace GameModel
             var moves = tile.Edges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre 
                                                             && !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination))
                                                      )
-                .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance)).ToList();
+                .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, true)).ToList();
 
             movesConsidered.AddRange(moves);
 
@@ -492,8 +495,6 @@ namespace GameModel
 
             return moves;
         }
-
-
     }
 }
 

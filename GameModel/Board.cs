@@ -525,9 +525,17 @@ namespace GameModel
                 // Move units
                 foreach (var unitStepMove in unitStepMoves)
                 {
-                    unitStepMove.Key.Location = unitStepMove.Value.Destination;
+                    var unit = unitStepMove.Key;
+
+                    unit.Location = unitStepMove.Value.Destination;
+
                     // Take transported units along with you
-                    unitStepMove.Key.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
+                    unit.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
+
+                    if (!unitStepMove.Value.RoadMove)
+                    {
+                        unit.ChangeMorale(Turn, -unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining - 1], "Morale reduced during forced march");
+                    }
                 }
 
                 // Remove conflicting units from move orders                
@@ -745,9 +753,5 @@ namespace GameModel
                 combatantStrengthDamage = Math.Round(combatantStrengthDamage, 0);
             }
         }
-
-        
-
-
     }
 }

@@ -454,6 +454,59 @@ namespace Tests
 
             Assert.AreEqual(1, conflictedUnits.Count());
         }
+
+        [TestMethod]
+        public void ForcedMarch()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            board.Units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
+                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
+                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
+            };
+
+            var moves1 = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2], null, 3, 1),
+                        new Move(board[1, 2], board[2, 2], null, 2, 2),
+                        new Move(board[2, 2], board[3, 2], null, 1, 3),
+                    };
+
+            var moves2 = new Move[]
+                    {
+                        new Move(board[1, 1], board[1, 2], null, 3, 1),
+                        new Move(board[1, 2], board[2, 2], null, 2, 2),
+                        new Move(board[2, 2], board[3, 2], null, 1, 3),
+                        new Move(board[3, 2], board[4, 3], null, 0, 4),
+                    };
+
+            var moves3 = new Move[]
+            {
+                        new Move(board[1, 1], board[1, 2], null, 3, 1, true),
+                        new Move(board[1, 2], board[2, 2], null, 2, 2, true),
+                        new Move(board[2, 2], board[3, 2], null, 1, 3, true),
+                        new Move(board[3, 2], board[4, 3], null, 0, 4, true),
+            };
+
+            var moveOrders = new List<IUnitOrder>
+            {
+                new MoveOrder(moves1, board.Units[0]),
+                new MoveOrder(moves2, board.Units[1]),
+                new MoveOrder(moves3, board.Units[2]),
+            };
+
+            board.ResolveOrders(moveOrders);
+
+            Assert.AreEqual(board[3, 2], board.Units[0].Location);
+            Assert.AreEqual(board[4, 3], board.Units[1].Location);
+            Assert.AreEqual(board[4, 3], board.Units[2].Location);
+
+            Assert.AreEqual(4.5, board.Units[0].Morale);
+            Assert.AreEqual(4, board.Units[1].Morale);
+            Assert.AreEqual(5, board.Units[2].Morale);
+        }
     }
 }
 

@@ -534,7 +534,7 @@ namespace GameModel
 
                     if (!unitStepMove.Value.RoadMove)
                     {
-                        unit.ChangeMorale(Turn, -unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining - 1], "Morale reduced during forced march");
+                        unit.ChangeMorale(Turn, -unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining], "Morale reduced during forced march");
                     }
                 }
 

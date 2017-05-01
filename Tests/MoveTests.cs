@@ -273,15 +273,15 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             { 
-                new MilitaryUnit() { Location = board[1, 1], BaseMovementPoints = 5 },
-                new MilitaryUnit() { Location = board[1, 1] },
+                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 5),
+                new MilitaryUnit(location: board[1, 1]),
             };
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 2, 1),
-                        new Move(board[1, 2], board[2, 2], null, 1, 2),
-                        new Move(board[2, 2], board[3, 2], null, 0, 3),
+                        new Move(board[1, 1], board[1, 2], null, 5, 1),
+                        new Move(board[1, 2], board[2, 2], null, 4, 2),
+                        new Move(board[2, 2], board[3, 2], null, 3, 3),
                     };
 
             var moves2 = new Move[]
@@ -386,25 +386,25 @@ namespace Tests
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 2, 1),
-                        new Move(board[1, 2], board[2, 2], null, 1, 2),
-                        new Move(board[2, 2], board[3, 2], null, 0, 3),
+                        new Move(board[1, 1], board[1, 2], null, 3, 1),
+                        new Move(board[1, 2], board[2, 2], null, 2, 2),
+                        new Move(board[2, 2], board[3, 2], null, 1, 3),
                     };
             var moves2 = new Move[]
                     {
-                        new Move(board[4, 1], board[3, 1], null, 2, 1),
-                        new Move(board[3, 1], board[2, 2], null, 1, 2),
-                        new Move(board[2, 2], board[2, 1], null, 0, 3),
+                        new Move(board[4, 1], board[3, 1], null, 3, 1),
+                        new Move(board[3, 1], board[2, 2], null, 2, 2),
+                        new Move(board[2, 2], board[2, 1], null, 1, 3),
                     };
             var moves3 = new Move[]
                     {
-                        new Move(board[10, 2], board[11, 2], null, 1, 1),
-                        new Move(board[11, 2], board[12, 2], null, 0, 2),
+                        new Move(board[10, 2], board[11, 2], null, 6, 1),
+                        new Move(board[11, 2], board[12, 2], null, 5, 2),
                     };
             var moves4 = new Move[]
                     {
-                        new Move(board[10, 3], board[11, 2], null, 1, 1),
-                        new Move(board[11, 2], board[11, 1], null, 0, 2),
+                        new Move(board[10, 3], board[11, 2], null, 2, 1),
+                        new Move(board[11, 2], board[11, 1], null, 1, 2),
                     };
 
             var moveOrders = new List<IUnitOrder>
@@ -469,25 +469,25 @@ namespace Tests
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 3, 1),
-                        new Move(board[1, 2], board[2, 2], null, 2, 2),
-                        new Move(board[2, 2], board[3, 2], null, 1, 3),
+                        new Move(board[1, 1], board[1, 2], null, 4, 1),
+                        new Move(board[1, 2], board[2, 2], null, 3, 2),
+                        new Move(board[2, 2], board[3, 2], null, 2, 3),
                     };
 
             var moves2 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 3, 1),
-                        new Move(board[1, 2], board[2, 2], null, 2, 2),
-                        new Move(board[2, 2], board[3, 2], null, 1, 3),
-                        new Move(board[3, 2], board[4, 3], null, 0, 4),
+                        new Move(board[1, 1], board[1, 2], null, 4, 1),
+                        new Move(board[1, 2], board[2, 2], null, 3, 2),
+                        new Move(board[2, 2], board[3, 2], null, 2, 3),
+                        new Move(board[3, 2], board[4, 3], null, 1, 4),
                     };
 
             var moves3 = new Move[]
             {
-                        new Move(board[1, 1], board[1, 2], null, 3, 1, true),
-                        new Move(board[1, 2], board[2, 2], null, 2, 2, true),
-                        new Move(board[2, 2], board[3, 2], null, 1, 3, true),
-                        new Move(board[3, 2], board[4, 3], null, 0, 4, true),
+                        new Move(board[1, 1], board[1, 2], null, 4, 1, true),
+                        new Move(board[1, 2], board[2, 2], null, 3, 2, true),
+                        new Move(board[2, 2], board[3, 2], null, 2, 3, true),
+                        new Move(board[3, 2], board[4, 3], null, 1, 4, true),
             };
 
             var moveOrders = new List<IUnitOrder>

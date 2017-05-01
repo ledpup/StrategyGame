@@ -49,7 +49,7 @@ namespace Tests
         [TestMethod]
         public void CanTransport()
         {
-            var inf = new MilitaryUnit();
+            var inf = new MilitaryUnit(transportableBy: new List<MovementType> { MovementType.Airborne });
             var air = new MilitaryUnit(movementType: MovementType.Airborne, isTransporter: true);
 
             

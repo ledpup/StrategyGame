@@ -150,7 +150,7 @@ namespace GameModel
         {
             return Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced, StrategicAction strategicAction = StrategicAction.None, float[] moraleMoveCost = null)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced, StrategicAction strategicAction = StrategicAction.None, float[] moraleMoveCost = null)
         {
             IsAlive = true;
 
@@ -189,17 +189,6 @@ namespace GameModel
                 EdgeMovementCosts.Add(edgeType, null);
             }
 
-            if (moraleMoveCost == null)
-            {
-                MoraleMoveCost = new float[BaseMovementPoints];
-                for (var i = 0; i < BaseMovementPoints; i++)
-                    MoraleMoveCost[i] = 0;
-            }
-            else
-            {
-                MoraleMoveCost = moraleMoveCost;
-            }
-
             Index = index;
             if (name == null)
             {
@@ -214,6 +203,13 @@ namespace GameModel
             BaseQuality = baseQuality;
             Size = size;
             IsTransporter = isTransporter;
+            TransportableBy = transportableBy;
+            if (TransportableBy == null)
+            {
+                TransportableBy = new List<MovementType>();
+            }
+            Transporting = new List<MilitaryUnit>();
+
             CombatInitiative = combatInitiative;
             TurnCreated = turnBuilt;
 
@@ -234,6 +230,17 @@ namespace GameModel
                     break;
             }
 
+            if (moraleMoveCost == null)
+            {
+                MoraleMoveCost = new float[BaseMovementPoints];
+                for (var i = 0; i < BaseMovementPoints; i++)
+                    MoraleMoveCost[i] = 0;
+            }
+            else
+            {
+                MoraleMoveCost = moraleMoveCost;
+            }
+
             if (IsAmphibious)
             {
                 TerrainMovementCosts[TerrainType.Wetland] = 1;
@@ -244,8 +251,6 @@ namespace GameModel
             Role = role;
             StrategicAction = strategicAction;
 
-
-            Transporting = new List<MilitaryUnit>();
             CalculateStrength();
         }
 
@@ -402,6 +407,9 @@ namespace GameModel
             if (!IsTransporter)
                 throw new Exception("Only transporters can transport units");
 
+            if (!transportee.TransportableBy.Contains(MovementType))
+                throw new Exception($"{transportee.Name} may not be transported by {MovementType} movement type");
+
             return TransportSize >= transportee.TransportSize + Transporting.Sum(x => x.TransportSize);
         }
 
@@ -421,6 +429,7 @@ namespace GameModel
         public int RoadMovementBonus { get; set; }
         public double StructureBattleModifier { get; set; }
         public MilitaryUnit TransportedBy { get; set; }
+        public List<MovementType> TransportableBy { get; private set; }
 
         public IEnumerable<Move> PossibleMoves()
         {

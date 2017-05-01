@@ -28,9 +28,9 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
-                new MilitaryUnit(location: board[24, 16], roadMovementBonus: 1),
-                new MilitaryUnit(location: board[1, 1], role: Role.Defensive, isAmphibious: true),
-                new MilitaryUnit(location: board[1, 1], role: Role.Besieger),
+                new MilitaryUnit(location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
+                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
             };
 
             board.Units = units;
@@ -191,7 +191,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1),
+                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
                 new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
             };
 
@@ -256,7 +256,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1),
+                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
                 new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
             };
 

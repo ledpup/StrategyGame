@@ -154,7 +154,7 @@ namespace Tests
         public void HexesInArea()
         {
             var hex = new Hex(14, -4);
-            var results = Hex.FindHexesWithinArea(hex, 2);
+            var results = Hex.HexesWithinArea(hex, 2);
 
             var board = new Board(GameBoard);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width)].IsSelected = true);

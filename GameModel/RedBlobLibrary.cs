@@ -166,7 +166,7 @@ namespace GameModel
             return q + ", " + r;
         }
 
-        public static List<Hex> FindHexesWithinArea(Hex centreHex, int radius)
+        public static List<Hex> HexesWithinArea(Hex centreHex, int radius)
         {
             var results = new List<Hex>();
             for (var q = -radius; q <= radius; q++)

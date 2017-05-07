@@ -166,6 +166,19 @@ namespace GameModel
             return q + ", " + r;
         }
 
+        public static List<Hex> FindHexesWithinArea(Hex centreHex, int radius)
+        {
+            var results = new List<Hex>();
+            for (var q = -radius; q <= radius; q++)
+            {
+                for (var r = Math.Max(-radius, -q - radius); r <= Math.Min(radius, -q + radius); r++)
+                {
+                    results.Add(Add(centreHex, new Hex(q, r)));
+                }
+            }
+            return results;
+        }
+
         public static List<Hex> HexRing(Hex centreHex, int radius = 1)
         {
             if (radius < 1)

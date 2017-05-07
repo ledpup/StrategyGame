@@ -7,12 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GameModel;
+using System.IO;
 
 namespace Tests
 {
     [TestClass]
     public class HexTests
     {
+        static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
+
         [TestMethod]
         public static void EqualHex(String name, Hex a, Hex b)
         {
@@ -129,9 +132,15 @@ namespace Tests
 
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(1, -2, 1))));
 
-
             hex = new Hex(5, 0, -5);
             results = Hex.HexRing(hex, 1);
+
+            var board = new Board(GameBoard);
+
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width)].IsSelected = true);
+
+            Visualise.GameBoardRenderer.RenderAndSave("HexRing.png", board.Height, board.Tiles);
+
 
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(5, -1, -4))));
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(6, -1, -5))));
@@ -141,6 +150,40 @@ namespace Tests
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(4,  0, -4))));
         }
 
+        [TestMethod]
+        public void HexesInArea()
+        {
+            var hex = new Hex(14, -4);
+            var results = Hex.FindHexesWithinArea(hex, 2);
+
+            var board = new Board(GameBoard);
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width)].IsSelected = true);
+            Visualise.GameBoardRenderer.RenderAndSave("HexesInArea.png", board.Height, board.Tiles);
+
+            Assert.AreEqual(19, results.Count);
+
+            Assert.IsTrue(results.Any(x => x.Equals(hex)));
+
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -5))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -4))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -3))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -3))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -4))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -5))));
+
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -6))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -5))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(12, -4))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(12, -3))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -3))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -3))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -2))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -3))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(16, -4))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(16, -5))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(16, -6))));
+            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -6))));
+        }
 
         //[TestMethod]
         //static public void TestConversionRoundtrip()

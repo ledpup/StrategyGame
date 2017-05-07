@@ -171,3 +171,6 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite
+/.vs/config/applicationhost.config

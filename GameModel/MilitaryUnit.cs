@@ -250,9 +250,12 @@ namespace GameModel
             RoadMovementBonus = roadMovementBonus;
             Role = role;
             StrategicAction = strategicAction;
+            RoleMovementType = new RoleMovementType(MovementType, Role);
 
             CalculateStrength();
         }
+
+        public RoleMovementType RoleMovementType { get; set; }
 
         public float[] MoraleMoveCost { get; set; }
 

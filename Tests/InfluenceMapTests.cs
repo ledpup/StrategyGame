@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Tests
 {
     [TestClass]
-    public class InfluenceMapsTests
+    public class InfluenceMapTests
     {
       
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
@@ -60,6 +60,51 @@ namespace Tests
             board.ResolveOrders(moveOrders);
 
             Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+        }
+
+        [TestMethod]
+        public void SelectBestMoveFromInfluenceMap()
+        {
+            var board = new Board(GameBoard, Edges, Structures);
+
+            var numberOfPlayers = 2;
+
+            board.Units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
+                new MilitaryUnit(ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
+                new MilitaryUnit(ownerIndex: 0, location: board[31], movementType: MovementType.Land),
+                new MilitaryUnit(ownerIndex: 0, location: board[56], movementType: MovementType.Land),
+                new MilitaryUnit(ownerIndex: 0, location: board[65], movementType: MovementType.Land),
+
+                new MilitaryUnit(ownerIndex: 1, location: board[111]),
+                new MilitaryUnit(ownerIndex: 1, location: board[111]),
+                new MilitaryUnit(ownerIndex: 1, location: board[168]),
+            };
+
+            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+
+            var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4);
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width)].IsSelected = true);
+
+            Visualise.GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+
+            var tilesOrderedInfluence = board.Tiles
+                .Where(x => results.Contains(x.Hex))
+                .OrderByDescending(x => x.AggregateInfluence[board.Units[1].RoleMovementType][board.Units[1].OwnerIndex])
+                //.Select(x => x.AggregateInfluence[board.Units[1].RoleMovementType][board.Units[1].OwnerIndex])
+                .ToList();
+
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(board.Units[1]);
+
+            IEnumerable<PathFindTile> bestPossibleDestination;
+
+            foreach (var tile in tilesOrderedInfluence)
+            {
+                bestPossibleDestination = ComputerPlayer.FindShortestPath(pathFindTiles, board.Units[1].Location.Point, tile.Point);
+                if (bestPossibleDestination != null)
+                    break;
+            }
         }
     }
 }

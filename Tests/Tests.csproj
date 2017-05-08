@@ -47,7 +47,7 @@
   <ItemGroup>
     <Compile Include="BattleTests.cs" />
     <Compile Include="BoardTests.cs" />
-    <Compile Include="InfluenceMapsTests.cs" />
+    <Compile Include="InfluenceMapTests.cs" />
     <Compile Include="GameAnalysisTests.cs" />
     <Compile Include="MathsTests.cs" />
     <Compile Include="MoveTests.cs" />

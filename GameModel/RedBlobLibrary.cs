@@ -115,17 +115,24 @@ namespace GameModel
             return Directions[direction];
         }
 
-        public static int HexToIndex(Hex hex, int boardWidth)
+        public static int HexToIndex(Hex hex, int boardWidth, int boardHeight)
         {
-            return HexToIndex(hex, OffsetCoord.ODD, boardWidth);
+            return HexToIndex(hex, OffsetCoord.ODD, boardWidth, boardHeight);
         }
 
-        static int HexToIndex(Hex hex, int offset, int boardWidth)
+        static int HexToIndex(Hex hex, int offset, int boardWidth, int boardHeight)
         {
+            var hexOffset = hex.q / 2;
+
+            if (hex.q < 0 || hex.q >= boardWidth || hex.r < -hexOffset || hex.r >= boardHeight - hexOffset)
+                throw new Exception("Hex is outside the border of the board");
+
             int col = hex.q;
             int row = hex.r + ((hex.q + offset * (hex.q & 1)) / 2);
 
-            return row * boardWidth + col;
+            var index = row * boardWidth + col;               
+
+            return index;
         }
 
         public static List<Hex> Neighbours(Hex hex)
@@ -166,33 +173,51 @@ namespace GameModel
             return q + ", " + r;
         }
 
-        public static List<Hex> HexesWithinArea(Hex centreHex, int radius)
+        public static List<Hex> HexesWithinArea(Hex centreHex, int distance, int boardWidth, int boardHeight)
         {
             var results = new List<Hex>();
-            for (var q = -radius; q <= radius; q++)
+            for (var q = -distance; q <= distance; q++)
             {
-                for (var r = Math.Max(-radius, -q - radius); r <= Math.Min(radius, -q + radius); r++)
+                if (centreHex.q + q < 0 || centreHex.q + q >= boardWidth)
+                    continue;
+
+                for (var r = Math.Max(-distance, -q - distance); r <= Math.Min(distance, -q + distance); r++)
                 {
+                    var offset = centreHex.q + q / 2;
+
+                    if (centreHex.r + r < -offset || centreHex.r + r >= boardHeight - offset)
+                        continue;
+
                     results.Add(Add(centreHex, new Hex(q, r)));
                 }
             }
             return results;
         }
 
-        public static List<Hex> HexRing(Hex centreHex, int radius = 1)
+        public static List<Hex> HexRing(int q, int r, int radius, int boardWidth, int boardHeight)
         {
+            var centreHex = new Hex(q, r);
+
             if (radius < 1)
                 return new List<Hex> { centreHex };
 
             var results = new List<Hex>();
 
-            var cube = Add(centreHex, Scale(Direction(4), radius));
+            var hex = Add(centreHex, Scale(Direction(4), radius));
+            
             for (var i = 0; i < 6; i++)
             {
                 for (var j = 0; j < radius; j++)
                 {
-                    results.Add(cube);
-                    cube = Neighbor(cube, i);
+                    // Check borders
+                    // I think you can set offset = q / 2 and then compare -offset <= r <= height - offset.
+                    // In column q = 0, offset = 0. It'd be 0 <= r <= 18 - 0; in column q = 26, offset = 13 so it'd be -13 <= r <= 18 - 13.
+                    var offset = hex.q / 2;
+
+                    if ( !(hex.q < 0 || hex.q >= boardWidth || hex.r < -offset || hex.r >= boardHeight - offset) )
+                        results.Add(hex);
+
+                    hex = Neighbor(hex, i);
                 }
             }
             return results;

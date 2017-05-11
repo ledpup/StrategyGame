@@ -125,22 +125,12 @@ namespace Tests
         }
 
         [TestMethod]
-        public void TestHexRing()
+        public void HexRing()
         {
-            var hex = new Hex(1, -3, 2);
-            var results = Hex.HexRing(hex, 1);
-
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(1, -2, 1))));
-
-            hex = new Hex(5, 0, -5);
-            results = Hex.HexRing(hex, 1);
+            var hex = new Hex(5, 0);
+            var results = Hex.HexRing(hex.q, hex.r, 1, 20, 20);
 
             var board = new Board(GameBoard);
-
-            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width)].IsSelected = true);
-
-            Visualise.GameBoardRenderer.RenderAndSave("HexRing.png", board.Height, board.Tiles);
-
 
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(5, -1, -4))));
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(6, -1, -5))));
@@ -148,16 +138,39 @@ namespace Tests
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(5,  1, -6))));
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(4,  1, -5))));
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(4,  0, -4))));
+
+            // top-left corner
+            hex = new Hex(0, 0);
+            results = Hex.HexRing(hex.q, hex.r, 1, 27, 19);
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
+
+            // top-right corner
+            hex = new Hex(26, -13);
+            results = Hex.HexRing(hex.q, hex.r, 1, 27, 19);
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
+
+            // bottom-left corner
+            hex = new Hex(0, 18);
+            results = Hex.HexRing(hex.q, hex.r, 1, 27, 19);
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
+
+            // bottom-right corner
+            hex = new Hex(26, 5);
+            results = Hex.HexRing(hex.q, hex.r, 1, 27, 19);
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
+
+            Visualise.GameBoardRenderer.RenderAndSave("HexRingCorners.png", board.Height, board.Tiles);
         }
 
         [TestMethod]
-        public void HexesInArea()
+        public void HexesWithinArea()
         {
-            var hex = new Hex(14, -4);
-            var results = Hex.HexesWithinArea(hex, 2);
-
             var board = new Board(GameBoard);
-            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width)].IsSelected = true);
+
+            var hex = new Hex(14, -4);
+            var results = Hex.HexesWithinArea(hex, 2, board.Width, board.Height);
+
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
             Visualise.GameBoardRenderer.RenderAndSave("HexesInArea.png", board.Height, board.Tiles);
 
             Assert.AreEqual(19, results.Count);

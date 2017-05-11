@@ -84,8 +84,8 @@ namespace Tests
 
             ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-            var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4);
-            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width)].IsSelected = true);
+            var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4, board.Width, board.Height);
+            results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
             Visualise.GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 

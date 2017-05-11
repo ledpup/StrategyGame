@@ -191,11 +191,11 @@ namespace GameModel
                 {
                     for (var distance = 0; distance < 6; distance++)
                     {
-                        var hexesInRing = Hex.HexRing(structure.Location.Hex, distance);
+                        var hexesInRing = Hex.HexRing(structure.Location.Hex.q, structure.Location.Hex.r, distance, board.Width, board.Height);
 
                         hexesInRing.ForEach(y =>
                         {
-                            var index = Hex.HexToIndex(y, board.Width);
+                            var index = Hex.HexToIndex(y, board.Width, board.Height);
                             if (index >= 0 && index < board.TileArray.Length)
                             {
                                 if (structure.OwnerIndex == i)
@@ -237,11 +237,11 @@ namespace GameModel
         {
             for (var i = 0; i < 4; i++)
             {
-                var hexesInRing = Hex.HexRing(unit.Location.Hex, i);
+                var hexesInRing = Hex.HexRing(unit.Location.Hex.q, unit.Location.Hex.r, i, board.Width, board.Height);
 
                 hexesInRing.ForEach(x =>
                 {
-                    var index = Hex.HexToIndex(x, board.Width);
+                    var index = Hex.HexToIndex(x, board.Width, board.Height);
                     if (index >= 0 && index < board.TileArray.Length)
                     {
                         if (unit.CanStopOn.HasFlag(board[index].TerrainType))

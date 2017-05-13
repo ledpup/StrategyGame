@@ -191,7 +191,7 @@ namespace GameModel
                 {
                     for (var distance = 0; distance < 6; distance++)
                     {
-                        var hexesInRing = Hex.HexRing(structure.Location.Hex.q, structure.Location.Hex.r, distance, board.Width, board.Height);
+                        var hexesInRing = Hex.HexRing(structure.Location.Hex, distance, board.Width, board.Height);
 
                         hexesInRing.ForEach(y =>
                         {
@@ -237,7 +237,7 @@ namespace GameModel
         {
             for (var i = 0; i < 4; i++)
             {
-                var hexesInRing = Hex.HexRing(unit.Location.Hex.q, unit.Location.Hex.r, i, board.Width, board.Height);
+                var hexesInRing = Hex.HexRing(unit.Location.Hex, i, board.Width, board.Height);
 
                 hexesInRing.ForEach(x =>
                 {
@@ -271,21 +271,28 @@ namespace GameModel
                 + (tile.EnemyStructureInfluence[movementType][playerIndex] * EnemyStructureInfluence[role]);
         }
 
-        public static MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit)
+        public static MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit, Board board)
         {
-            var possibleMoves = unit.PossibleMoves();
+            var results = Hex.HexesWithinArea(unit.Location.Hex, 4, board.Width, board.Height);
 
-            var highestInfluence = possibleMoves.Max(y => y.Destination.AggregateInfluence[unit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Location.Hex) + 1));
+            var tilesOrderedInfluence = board.Tiles
+                .Where(x => results.Contains(x.Hex))
+                .OrderByDescending(x => x.AggregateInfluence[unit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
+                .ToList();
 
-            if (unit.Location.AggregateInfluence[unit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) <= highestInfluence)
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+
+            IEnumerable<PathFindTile> bestPossibleDestination = null;
+            foreach (var tile in tilesOrderedInfluence)
             {
-                var moves = possibleMoves.Where(y => y.Destination.AggregateInfluence[unit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(y.Destination.Hex, unit.Location.Hex) + 1) == highestInfluence);
+                bestPossibleDestination = FindShortestPath(pathFindTiles, unit.Location.Point, tile.Point);
+                if (bestPossibleDestination != null)
+                    break;
+            }
 
-                var bestMove = moves.OrderByDescending(y => y.TerrainAndWeatherModifers(unit.Index)).ThenBy(y => y.Distance).First();
-
-                var moveOrder = bestMove.GetMoveOrder(unit);
-
-                moveOrder.Unit = unit;
+            if (bestPossibleDestination != null)
+            {
+                var moveOrder = unit.ShortestPathToMoveOrder(bestPossibleDestination.ToArray());
                 return moveOrder;
             }
             return null;

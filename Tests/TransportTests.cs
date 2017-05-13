@@ -68,7 +68,7 @@ namespace Tests
                          {
                              case StrategicAction.None:
                                  {
-                                     var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(unit);
+                                     var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(unit, board);
                                      if (moveOrder != null)
                                          moveOrders.Add(moveOrder);
                                      break;
@@ -93,7 +93,7 @@ namespace Tests
                                      }
                                      else
                                      {
-                                         var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
+                                         var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
                                          if (moveOrder != null)
                                              moveOrders.Add(moveOrder);
                                      }
@@ -117,7 +117,7 @@ namespace Tests
                                          {
                                              unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
 
-                                             var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
+                                             var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
                                              if (moveOrder != null)
                                                  moveOrders.Add(moveOrder);
                                          }
@@ -143,8 +143,8 @@ namespace Tests
                                          {
                                             unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
 
-                                            var moveOrder = GetMoveOrderToStrategicDestination(unit, board, units);
-                                            if (moveOrder != null)
+                                            var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
+                                             if (moveOrder != null)
                                                 moveOrders.Add(moveOrder);
                                          }
                                      }
@@ -318,21 +318,6 @@ namespace Tests
                     break;
             }
             return unit.StrategicAction;
-        }
-
-        private static MoveOrder GetMoveOrderToStrategicDestination(MilitaryUnit unit, Board board, List<MilitaryUnit> units)
-        {
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, unit.StrategicDestination.Point).ToArray();
-
-            var move = ComputerPlayer.MoveOrderFromShortestPath(unit.PossibleMoves().ToList(), shortestPath);
-
-            if (move == null)
-                return null;
-
-
-            var moveOrders = move.GetMoveOrder(unit);
-            return moveOrders;
         }
     }
 }

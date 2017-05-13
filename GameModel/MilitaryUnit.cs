@@ -507,6 +507,25 @@ namespace GameModel
 
             return moves;
         }
+
+        public MoveOrder GetMoveOrderToDestination(Point destination, Board board)
+        {
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(this);
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, Location.Point, destination).ToArray();
+
+            return ShortestPathToMoveOrder(shortestPath);
+        }
+
+        public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
+        {
+            var move = ComputerPlayer.MoveOrderFromShortestPath(PossibleMoves().ToList(), shortestPath);
+
+            if (move == null)
+                return null;
+
+            var moveOrders = move.GetMoveOrder(this);
+            return moveOrders;
+        }
     }
 }
 

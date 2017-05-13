@@ -178,14 +178,17 @@ namespace GameModel
             var results = new List<Hex>();
             for (var q = -distance; q <= distance; q++)
             {
-                if (centreHex.q + q < 0 || centreHex.q + q >= boardWidth)
+                var adjustedQ = centreHex.q + q;
+                if (adjustedQ < 0 || adjustedQ >= boardWidth)
                     continue;
+
+                var offset = adjustedQ / 2;
 
                 for (var r = Math.Max(-distance, -q - distance); r <= Math.Min(distance, -q + distance); r++)
                 {
-                    var offset = centreHex.q + q / 2;
+                    var adjustedR = centreHex.r + r;
 
-                    if (centreHex.r + r < -offset || centreHex.r + r >= boardHeight - offset)
+                    if (adjustedR < -offset || adjustedR >= boardHeight - offset)
                         continue;
 
                     results.Add(Add(centreHex, new Hex(q, r)));
@@ -194,10 +197,8 @@ namespace GameModel
             return results;
         }
 
-        public static List<Hex> HexRing(int q, int r, int radius, int boardWidth, int boardHeight)
+        public static List<Hex> HexRing(Hex centreHex, int radius, int boardWidth, int boardHeight)
         {
-            var centreHex = new Hex(q, r);
-
             if (radius < 1)
                 return new List<Hex> { centreHex };
 

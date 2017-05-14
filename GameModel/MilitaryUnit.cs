@@ -395,12 +395,18 @@ namespace GameModel
         {
             get
             {
+                var movementPoints = BaseMovementPoints;
+
+                if (MovementType == MovementType.Airborne && Transporting.Any())
+                {
+                    return movementPoints -= 1;
+                }
                 if (Morale / InitialMorale < .5)
                 {
-                    return BaseMovementPoints - 1;
+                    return movementPoints -= 1;
                 }
 
-                return BaseMovementPoints;
+                return movementPoints;
             }
         }
 

@@ -94,7 +94,7 @@ namespace StrategyGame
 
                 board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
                 {
-                    var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(x);
+                    var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(x, board);
                     if (moveOrder != null)
                         moveOrders.Add(moveOrder);
                 });

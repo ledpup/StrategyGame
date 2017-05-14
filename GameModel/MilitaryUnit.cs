@@ -448,7 +448,7 @@ namespace GameModel
 
             possibleMoves = GenerateStandardMoves(this, Location, null, movesConsidered, MovementPoints, 1);
 
-            if (RoadMovementBonus > 0 && TransportedBy == null)
+            if (MovementType == MovementType.Land && TransportedBy == null)
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
                 var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus, 1);
@@ -466,7 +466,10 @@ namespace GameModel
             potentialMoves.AddRange(origin.Neighbours.Where(dest => dest != unit.Location
                                         && !movesConsidered.Any(x => x.Origin == origin && x.Destination == dest && x.MovesRemaining > movementPoints)
                                         && (unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] != null 
-                                                        && (unit.TerrainMovementCosts[dest.TerrainType] != null || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre || (Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port && unit.StrategicAction == StrategicAction.Embark))
+                                                        && (unit.TerrainMovementCosts[dest.TerrainType] != null 
+                                                                    || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre
+                                                                    || (Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port && unit.StrategicAction == StrategicAction.Embark)
+                                                           )
                                                         && (unit.TransportedBy == null || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port))
                                         ).Select(x => new Move(origin, x, previousMove, movementPoints, distance))
                                         .ToList());
@@ -512,6 +515,25 @@ namespace GameModel
             moves.AddRange(neighbourMoves);
 
             return moves;
+        }
+
+        public MoveOrder GetMoveOrderToDestination(Point destination, Board board)
+        {
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(this);
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, Location.Point, destination).ToArray();
+
+            return ShortestPathToMoveOrder(shortestPath);
+        }
+
+        public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
+        {
+            var move = ComputerPlayer.MoveOrderFromShortestPath(PossibleMoves().ToList(), shortestPath);
+
+            if (move == null)
+                return null;
+
+            var moveOrders = move.GetMoveOrder(this);
+            return moveOrders;
         }
     }
 }

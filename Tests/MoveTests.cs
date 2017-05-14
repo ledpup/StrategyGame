@@ -93,6 +93,25 @@ namespace Tests
         }
 
         [TestMethod]
+        public void InfantryMoveOverMountainWithRoad()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(location: board[4, 3], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
+            };
+
+            var moves = units[0].PossibleMoves();
+
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.GameBoardRenderer.RenderAndSave("InfantryMoveOverMountainWithRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+
+            Assert.IsTrue(moves.Any(x => x.Destination.Index == 86));
+        }
+
+        [TestMethod]
         public void AirborneMoveListWithRoadAndMountain()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);

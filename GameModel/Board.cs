@@ -437,29 +437,43 @@ namespace GameModel
 
         public void ResolveOrders(List<IUnitOrder> unitOrders)
         {
+            ResolveTransportOrders(unitOrders);
+            UnloadOrders(unitOrders);
+            ResolveMoves(unitOrders);
+
+            // Units can load onto transports after they have moved
+            ResolveTransportOrders(unitOrders);
+        }
+
+        private static void UnloadOrders(List<IUnitOrder> unitOrders)
+        {
+            var unloadOrders = unitOrders.OfType<UnloadOrder>().ToList();
+
+            unloadOrders.ForEach(x =>
+            {
+                x.Unit.TransportedBy.Transporting.Remove(x.Unit);
+                x.Unit.TransportedBy = null;
+            });
+        }
+
+        private static void ResolveTransportOrders(List<IUnitOrder> unitOrders)
+        {
             var transportOrders = unitOrders.OfType<TransportOrder>().ToList();
 
-            transportOrders.ForEach(x => {
-                if (x.Unit.CanTransport(x.UnitToTransport))
+            transportOrders.ForEach(x =>
+            {
+                if (x.Unit.Location == x.UnitToTransport.Location && x.Unit.CanTransport(x.UnitToTransport))
                 {
                     x.Unit.Transporting.Add(x.UnitToTransport);
                     x.UnitToTransport.TransportedBy = x.Unit;
                 }
             });
-
-            var unloadOrders = unitOrders.OfType<UnloadOrder>().ToList();
-
-            unloadOrders.ForEach(x => {                
-                x.Unit.TransportedBy.Transporting.Remove(x.Unit);
-                x.Unit.TransportedBy = null;
-            });
-
-            var moveOrders = unitOrders.OfType<MoveOrder>().ToList();
-            ResolveMoves(moveOrders);
         }
 
-        void ResolveMoves(List<MoveOrder> moveOrders)
+        void ResolveMoves(List<IUnitOrder> unitOrders)
         {
+            var moveOrders = unitOrders.OfType<MoveOrder>().ToList();
+
             if (moveOrders == null || moveOrders.Count == 0)
                 return;
 

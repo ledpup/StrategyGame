@@ -48,6 +48,8 @@ namespace GameModel
         Transport,
         Embark,
         Disembark,
+        Pickup,
+        Airlift,
     }
 
     public struct RoleMovementType
@@ -148,7 +150,7 @@ namespace GameModel
         public Tile StrategicDestination { get; set; }
         public override string ToString()
         {
-            return Name + " (" + Strength + ") at " + Location.ToString();
+            return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();
         }
         public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced, StrategicAction strategicAction = StrategicAction.None, float[] moraleMoveCost = null)
         {

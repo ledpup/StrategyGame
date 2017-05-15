@@ -95,6 +95,16 @@ namespace GameModel
                     unit.StrategicDestination = null;
                     switch (unit.MovementType)
                     {
+                        case MovementType.Airborne:
+                            if (!unit.Transporting.Any() && !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex))
+                            {
+                                unit.StrategicAction = StrategicAction.Pickup;
+                            }
+                            else if (unit.Transporting.Any())
+                            {
+                                unit.StrategicAction = StrategicAction.Airlift;
+                            }
+                            break;
                         case MovementType.Land:
                             if (unit.TransportedBy == null && unit.Role != Role.Defensive && !board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex))
                             {
@@ -119,7 +129,7 @@ namespace GameModel
                             break;
                     }
 
-                };
+                });
         }
 
         public static List<IUnitOrder> CreateOrders(Board board, List<MilitaryUnit> units)
@@ -135,13 +145,43 @@ namespace GameModel
                          {
                              case StrategicAction.None:
                                  {
-                                     var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(unit, board);
+                                     var moveOrder = FindBestMoveOrderForUnit(unit, board);
                                      if (moveOrder != null)
                                          moveOrders.Add(moveOrder);
                                      break;
                                  }
                              case StrategicAction.Embark:
-                                 var closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                 var closestAvailableAirborneUnitPath = ClosestAvailableAirborneUnitPath(board, unit, units, moveOrders.OfType<MoveOrder>().ToList());
+                                 var closestPortPath = ClosestPortPath(board, unit);
+
+                                 if (closestAvailableAirborneUnitPath != null)
+                                 {
+                                     if (closestPortPath != null || closestAvailableAirborneUnitPath.Path.Count() < closestPortPath.Count())
+                                     {
+                                         // Transport by air
+                                         var transporter = closestAvailableAirborneUnitPath.Unit;
+
+                                         var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                                         var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point);
+                                         Tile transporteeMoveOrderDesintation = null;
+                                         if (pathToAirbornUnit != null)
+                                         {
+                                             var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
+                                             transporteeMoveOrderDesintation = moveOrder.Moves.Last().Destination;
+                                             moveOrders.Add(moveOrder);
+                                         }
+                                         moveOrders.Add(new TransportOrder(transporter, unit));
+
+                                         // Move transport unit to the destination of the transportee's move order or just tot he transportee's location
+                                         pathFindTiles = board.ValidMovesWithMoveCostsForUnit(transporter);
+                                         var pathToTransporteesDestination = FindShortestPath(pathFindTiles, transporter.Location.Point, transporteeMoveOrderDesintation == null ? unit.Location.Point : transporteeMoveOrderDesintation.Point);
+                                         if (pathToTransporteesDestination != null)
+                                            moveOrders.Add(transporter.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
+                                         break;
+                                     }
+                                 }
+
+                                 
                                  if (closestPortPath != null)
                                  {
                                      unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
@@ -177,7 +217,7 @@ namespace GameModel
 
                              case StrategicAction.Dock:
                                  {
-                                     closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                     closestPortPath = ClosestPortPath(board, unit);
                                      if (unit.StrategicDestination != unit.Location)
                                      {
                                          if (closestPortPath != null)
@@ -189,6 +229,22 @@ namespace GameModel
                                                  moveOrders.Add(moveOrder);
                                          }
                                      }
+                                     break;
+                                 }
+                             case StrategicAction.Pickup:
+                                 {
+                                     //closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                     //if (unit.StrategicDestination != unit.Location)
+                                     //{
+                                     //    if (closestPortPath != null)
+                                     //    {
+                                     //        unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
+
+                                     //        var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
+                                     //        if (moveOrder != null)
+                                     //            moveOrders.Add(moveOrder);
+                                     //    }
+                                     //}
                                      break;
                                  }
                              case StrategicAction.Transport:
@@ -205,7 +261,7 @@ namespace GameModel
                                      else
                                      {
                                          // Find the closest port that has a region with one or more enemy structures
-                                         closestPortPath = ComputerPlayer.ClosestPortPath(board, unit);
+                                         closestPortPath = ClosestPortPath(board, unit);
                                          if (closestPortPath != null)
                                          {
                                              unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
@@ -221,6 +277,25 @@ namespace GameModel
                      });
 
             return moveOrders;
+        }
+
+        private static UnitAndPath ClosestAvailableAirborneUnitPath(Board board, MilitaryUnit unit, List<MilitaryUnit> units, List<MoveOrder> moveOrders)
+        {
+            var potentialPickupUnits = units
+                                    .Where(x => x.MovementType == MovementType.Airborne && x.StrategicAction == StrategicAction.Pickup && x.CanTransport(unit) && !moveOrders.Any(y => y.Unit == x))
+                                    .OrderBy(x => Hex.Distance(x.Location.Hex, unit.Location.Hex));
+
+            foreach(var potentialPickupUnit in potentialPickupUnits)
+            {
+                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(potentialPickupUnit);
+                var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, potentialPickupUnit.Location.Point);
+                if (shortestPath != null)
+                {
+                    return new UnitAndPath { Unit = potentialPickupUnit, Path = shortestPath };
+                }
+            }
+
+            return null;
         }
 
         static Dictionary<Role, double> _enemyStructureInfluence;
@@ -453,7 +528,7 @@ namespace GameModel
 
             var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate);
 
-            return path == null ? null : path.Reverse();
+            return path == null || path.Count() == 1 ? null : path.Reverse();
         }
 
         public static List<Vector> PathFindTilesToVectors(IEnumerable<PathFindTile> path)

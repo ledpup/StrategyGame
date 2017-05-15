@@ -8,9 +8,9 @@ namespace GameModel
 {
     public class TransportOrder : IUnitOrder
     {
-        public TransportOrder(MilitaryUnit unit, MilitaryUnit unitToTransport)
+        public TransportOrder(MilitaryUnit transportUnit, MilitaryUnit unitToTransport)
         {
-            Unit = unit;
+            Unit = transportUnit;
             UnitToTransport = unitToTransport;
         }
         public MilitaryUnit Unit { get; set; }

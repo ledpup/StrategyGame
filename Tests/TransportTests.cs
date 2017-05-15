@@ -135,9 +135,6 @@ namespace Tests
                 new MoveOrder(moves, units[0]),
             };
             board.ResolveOrders(unitOrders);
-
-            Assert.AreEqual(units[0], units[1].Transporting.Single());
-            Assert.AreEqual(units[1], units[0].TransportedBy);
         }
 
         [TestMethod]
@@ -178,6 +175,47 @@ namespace Tests
 
             Assert.AreEqual(0, units[1].Transporting.Count);
             Assert.IsNull(units[0].TransportedBy);
+        }
+
+        [TestMethod]
+        public void AirbornePickupStrategicMove()
+        {
+            var board = new Board(GameBoard, TileEdges, Structures);
+            var numberOfPlayers = 2;
+            var labels = new string[board.Width, board.Height];
+
+            var units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
+                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Besieger),
+            };
+
+            board.Units = units;
+
+            for (var turn = 0; turn < 40; turn++)
+            {
+                ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+
+                var bitmap = new Bitmap(1920, 1450);
+                Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+
+                // Remove any units that have been destroyed for the purposes of unit orders
+                units = units.Where(x => x.IsAlive).ToList();
+                ComputerPlayer.SetStrategicAction(board, units);
+                var moveOrders = ComputerPlayer.CreateOrders(board, units);
+
+                var vectors = new List<Vector>();
+                moveOrders.OfType<MoveOrder>().ToList().ForEach(x => vectors.AddRange(x.Vectors));
+
+                Visualise.GameBoardRenderer.RenderAndSave($"AirbornePickupStrategicMoveTurn{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
+
+                board.ResolveOrders(moveOrders);
+                board.ChangeStructureOwners();
+
+                board.Turn++;
+            }
         }
     }
 }

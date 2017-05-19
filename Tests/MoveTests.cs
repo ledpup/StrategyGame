@@ -12,7 +12,16 @@ namespace Tests
     public class MoveTests
     {
         [TestMethod]
-        public void InfantryMoveList()
+        public void TerrainTypeTests()
+        {
+            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Steppe));
+            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Hill));
+
+            Assert.IsTrue(!Terrain.Non_Mountainous_Land.HasFlag(TerrainType.Mountain));
+        }
+
+        [TestMethod]
+        public void LandUnitMoveList()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -33,7 +42,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void InfantryMoveListWithRoad()
+        public void LandUnitMoveListWithRoad()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -63,7 +72,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void InfantryMoveListWithRoadOverMountain()
+        public void LandUnitMoveListWithRoadOverMountain()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -93,7 +102,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void InfantryMoveOverMountainWithRoad()
+        public void LandUnitMoveOverMountainWithRoad()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
@@ -192,6 +201,66 @@ namespace Tests
             Assert.IsFalse(moves.Any(x => x.Destination.Index == 392));
             Assert.IsFalse(moves.Any(x => x.Destination.Index == 416));
             Assert.IsFalse(moves.Any(x => x.Destination.Index == 444));
+        }
+
+
+        [TestMethod]
+        public void AirborneUnitCanStopOn()
+        {
+            var airborneUnit = new MilitaryUnit(movementType: MovementType.Airborne);
+
+            Assert.IsTrue(airborneUnit.CanStopOn.HasFlag(TerrainType.Forest));
+
+            Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Reef));
+            Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Water));
+            Assert.IsFalse(airborneUnit.CanStopOn.HasFlag(TerrainType.Mountain));
+        }
+
+        [TestMethod]
+        public void AirborneUnitValidMoves()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne);
+            var moveList = unit.PossibleMoves();
+
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 3]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 1]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 1]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
+        }
+
+        [TestMethod]
+        public void AirborneUnitValidMovesOverWater()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new MilitaryUnit(location: board[4, 9], movementType: MovementType.Airborne);
+            var moveList = unit.PossibleMoves();
+
+            moveList.ToList().ForEach(x => x.Destination.IsSelected = true);
+
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+
+
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 9])); // Mountain
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 9]));
+
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 8])); // Water
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[4, 8])); // Water
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[5, 8])); // Water
+
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 7])); // Reef
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 7]));
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 7]));
+
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 10])); // Water
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[4, 10])); // Water
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[5, 10])); // Water
+
+            Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 11]));
         }
 
         [TestMethod]

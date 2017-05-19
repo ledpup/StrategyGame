@@ -77,5 +77,55 @@ namespace Tests
 
             Assert.AreEqual(shortestPath[8].Point, new Point(21, 10)); // Destination
         }
+
+        [TestMethod]
+        public void AirborneUnitMoveOverTerrainThatItCantStopOn()
+        {
+            var board = new Board(GameBoard, TileEdges);
+
+            var unit = new MilitaryUnit(location: board[24, 15], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
+
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13)).ToArray();
+
+            Assert.AreEqual(shortestPath[0].Point, unit.Location.Point); // Origin
+
+            Assert.AreEqual(shortestPath[1].Point, new Point(23, 15));
+            Assert.AreEqual(shortestPath[2].Point, new Point(22, 15));
+            Assert.AreEqual(shortestPath[3].Point, new Point(21, 14));
+            Assert.AreEqual(shortestPath[4].Point, new Point(20, 14));
+            Assert.AreEqual(shortestPath[5].Point, new Point(19, 13));
+            Assert.AreEqual(shortestPath[6].Point, new Point(18, 13));
+            Assert.AreEqual(shortestPath[7].Point, new Point(17, 13));
+            Assert.AreEqual(shortestPath[8].Point, new Point(16, 13));
+            Assert.AreEqual(shortestPath[9].Point, new Point(15, 13));
+
+            Assert.AreEqual(shortestPath[10].Point, new Point(14, 13)); // Destination
+        }
+
+        [TestMethod]
+        public void AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine()
+        {
+            var board = new Board(GameBoard, TileEdges);
+
+            var unit = new MilitaryUnit(location: board[19, 13], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
+
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13)).ToArray();
+            
+            Assert.AreEqual(shortestPath[0].Point, unit.Location.Point); // Origin
+
+            Assert.AreEqual(shortestPath[1].Point, new Point(18, 13));
+            Assert.AreEqual(shortestPath[2].Point, new Point(17, 13));
+            Assert.AreEqual(shortestPath[3].Point, new Point(16, 13));
+            Assert.AreEqual(shortestPath[4].Point, new Point(15, 13));
+
+            Assert.AreEqual(shortestPath[5].Point, new Point(14, 13)); // Destination
+
+            var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
+
+            Assert.IsNotNull(moveOrder);
+            
+        }
     }
 }

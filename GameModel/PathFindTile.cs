@@ -22,5 +22,10 @@ namespace GameModel
             Point = new Point(x, y);
             MoveCost = new Dictionary<PathFindTile, double>();
         }
+
+        public override string ToString()
+        {
+            return $"{X}, {Y}";
+        }
     }
 }

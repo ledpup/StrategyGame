@@ -458,6 +458,17 @@ namespace GameModel
                 possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }
 
+            var searchForOnlyPassingThroughDestinations = true;
+            while (searchForOnlyPassingThroughDestinations)
+            {
+                var removeOnlyPassingThroughDestinations = possibleMoves
+                    .Where(x => x.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Destination));
+
+                searchForOnlyPassingThroughDestinations = removeOnlyPassingThroughDestinations.Any();
+
+                removeOnlyPassingThroughDestinations.ToList().ForEach(x => possibleMoves.Remove(x));
+            } 
+
             return possibleMoves;
         }
 
@@ -473,7 +484,7 @@ namespace GameModel
                                                                     || (Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port && unit.StrategicAction == StrategicAction.Embark)
                                                            )
                                                         && (unit.TransportedBy == null || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port))
-                                        ).Select(x => new Move(origin, x, previousMove, movementPoints, distance))
+                                        ).Select(x => new Move(origin, x, previousMove, movementPoints, distance, onlyPassingThrough: !unit.CanStopOn.HasFlag(x.TerrainType)))
                                         .ToList());
 
             movesConsidered.AddRange(potentialMoves);
@@ -492,7 +503,7 @@ namespace GameModel
 
             potentialMoves.AddRange(neighbourMoves);
 
-            return potentialMoves.Where(x => unit.CanStopOn.HasFlag(x.Destination.TerrainType) || (x.Edge.EdgeType == EdgeType.Port && unit.MovementType == MovementType.Land)).ToList();
+            return potentialMoves.Where(x => (x.OnlyPassingThrough || unit.CanStopOn.HasFlag(x.Destination.TerrainType)) || (x.Edge.EdgeType == EdgeType.Port && unit.MovementType == MovementType.Land)).ToList();
 
         }
 
@@ -529,7 +540,7 @@ namespace GameModel
 
         public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
         {
-            var move = ComputerPlayer.MoveOrderFromShortestPath(PossibleMoves().ToList(), shortestPath);
+            var move = ComputerPlayer.MoveFromShortestPath(PossibleMoves().ToList(), shortestPath);
 
             if (move == null)
                 return null;

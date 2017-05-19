@@ -83,7 +83,7 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true, role: Role.Defensive),
             };
 
             board.Units = units;
@@ -145,7 +145,7 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true, role: Role.Defensive),
             };
 
             board.Units = units;
@@ -178,7 +178,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void AirbornePickupStrategicMove()
+        public void AirborneUnitAirlift()
         {
             var board = new Board(GameBoard, TileEdges, Structures);
             var numberOfPlayers = 2;

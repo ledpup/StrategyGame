@@ -60,7 +60,6 @@
     <Compile Include="PathFindTests.cs" />
     <Compile Include="StackTests.cs" />
     <Compile Include="TileTests.cs" />
-    <Compile Include="UnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

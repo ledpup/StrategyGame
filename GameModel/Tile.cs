@@ -61,6 +61,15 @@ namespace GameModel
 
         public float? Supply { get; set; }
 
+        public double CalculateMoveCostAStar(MilitaryUnit unit, Tile destination)
+        {
+            var cost = (double)CalculateMoveCost(unit, destination);
+            if (!unit.CanStopOn.HasFlag(destination.TerrainType))
+            {
+                cost *= 1.5D;
+            }
+            return cost;
+        }
         public int CalculateMoveCost(MilitaryUnit unit, Tile destination)
         {
             var costChanged = false;

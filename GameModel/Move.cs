@@ -8,13 +8,13 @@ namespace GameModel
 {
     public class Move
     {
-        public Move(Tile origin, Tile destination, Move previousMove, int movesRemaining, int distance, bool roadMove = false) : 
-            this(origin, destination, origin.Edges.Single(x => x.Destination == destination), previousMove, movesRemaining, distance, roadMove)
+        public Move(Tile origin, Tile destination, Move previousMove, int movesRemaining, int distance, bool roadMove = false, bool onlyPassingThrough = false) : 
+            this(origin, destination, origin.Edges.Single(x => x.Destination == destination), previousMove, movesRemaining, distance, roadMove, onlyPassingThrough)
         {
             
         }
 
-        public Move(Tile origin, Tile destination, Edge edge, Move previousMove, int movesRemaining, int distance, bool roadMove = false)
+        public Move(Tile origin, Tile destination, Edge edge, Move previousMove, int movesRemaining, int distance, bool roadMove = false, bool onlyPassingThrough = false)
         {
             Origin = origin;
             Destination = destination;
@@ -23,6 +23,7 @@ namespace GameModel
             MovesRemaining = movesRemaining;
             Distance = distance;
             RoadMove = roadMove;
+            OnlyPassingThrough = onlyPassingThrough;
         }
 
 
@@ -33,7 +34,7 @@ namespace GameModel
         public int MovesRemaining;
         public int Distance;
         public bool RoadMove;
-
+        public bool OnlyPassingThrough;
 
         public override string ToString()
         {

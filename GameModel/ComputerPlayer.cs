@@ -395,7 +395,13 @@ namespace GameModel
                 var move = moves.FirstOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point && x.Distance == i);
 
                 if (move == null)
+                {
+                    while (furthestMove != null && furthestMove.OnlyPassingThrough)
+                    {
+                        furthestMove = furthestMove.PreviousMove;
+                    }
                     return furthestMove;
+                }
 
                 furthestMove = move;
 

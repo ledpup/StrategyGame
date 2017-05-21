@@ -465,7 +465,6 @@ namespace GameModel
                     .Where(x => x.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Destination));
 
                 searchForOnlyPassingThroughDestinations = removeOnlyPassingThroughDestinations.Any();
-
                 removeOnlyPassingThroughDestinations.ToList().ForEach(x => possibleMoves.Remove(x));
             } 
 

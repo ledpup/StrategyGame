@@ -146,11 +146,11 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 114));
 
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 58 && x.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 83 && x.OnlyPassingThrough));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 83));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 84 && x.OnlyPassingThrough));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 86 && x.OnlyPassingThrough));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 112 && x.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 113 && x.OnlyPassingThrough));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 113));
         }
 
         [TestMethod]
@@ -194,13 +194,13 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 420));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 421));
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 388 && x.OnlyPassingThrough));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 388));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 362 && x.OnlyPassingThrough));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 337 && x.OnlyPassingThrough));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 391 && x.OnlyPassingThrough));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 392 && x.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 416 && x.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 444 && x.OnlyPassingThrough));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 416));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 444));
         }
 
 
@@ -240,7 +240,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[4, 9], movementType: MovementType.Airborne);
             var moveList = unit.PossibleMoves();
 
-            moveList.Where(x => x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
+            moveList.Where(x => !x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
 
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
@@ -252,15 +252,37 @@ namespace Tests
             Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 8] && x.OnlyPassingThrough)); // Water
             Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 8] && x.OnlyPassingThrough)); // Water
 
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 7] && x.OnlyPassingThrough)); // Reef
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 7])); // Reef
             Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 7]));
             Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 7]));
 
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 10] && x.OnlyPassingThrough)); // Water
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 10])); // Water
             Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 10] && x.OnlyPassingThrough)); // Water
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 10] && x.OnlyPassingThrough)); // Water
+            Assert.IsFalse(moveList.Any(x => x.Destination == board[5, 10])); // Water
 
             Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 11]));
+        }
+
+        [TestMethod]
+        public void AirborneUnitValidMovesOverWaterFromShortestPath()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new MilitaryUnit(location: board[147], movementType: MovementType.Airborne, baseMovementPoints: 4);
+            var moveList = unit.PossibleMoves();
+
+            
+
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[196].Point);
+            
+            var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
+
+            moveList.Where(x => !x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+
+
+            Assert.IsFalse(moveOrder.Moves.Last().OnlyPassingThrough);
         }
 
         [TestMethod]
@@ -271,7 +293,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[19, 13], movementType: MovementType.Airborne, baseMovementPoints: 3);
             var moveList = unit.PossibleMoves();
 
-            moveList.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moveList.Where(x => !x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
 
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverContinent.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 

@@ -66,7 +66,7 @@ namespace GameModel
             var cost = (double)CalculateMoveCost(unit, destination);
             if (!unit.CanStopOn.HasFlag(destination.TerrainType))
             {
-                cost *= 5D;
+                cost *= 3D;
             }
             return cost;
         }

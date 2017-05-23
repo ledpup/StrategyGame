@@ -90,8 +90,8 @@ namespace Tests
 
             Assert.AreEqual(unit.Location.Point, shortestPath[0].Point); // Origin
 
-            Assert.AreEqual(new Point(23, 15), shortestPath[1].Point);
-            Assert.AreEqual(new Point(22, 15), shortestPath[2].Point);
+            Assert.AreEqual(new Point(23, 14), shortestPath[1].Point);
+            Assert.AreEqual(new Point(22, 14), shortestPath[2].Point);
             Assert.AreEqual(new Point(21, 14), shortestPath[3].Point);
             Assert.AreEqual(new Point(20, 14), shortestPath[4].Point);
             Assert.AreEqual(new Point(19, 13), shortestPath[5].Point);

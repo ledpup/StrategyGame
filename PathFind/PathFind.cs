@@ -29,23 +29,31 @@ namespace PathFind
 
                 closed.Add(path.LastStep);
 
+                if (path.LastStep.HasCumulativeCost)
+                {
+                    path.LastStep.CumulativeCost = 1;
+                    if (path.PreviousSteps != null)
+                    {
+                        foreach (var previous in path.PreviousSteps)
+                        {
+                            if (previous.HasCumulativeCost)
+                            {
+                                path.LastStep.CumulativeCost++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (path.LastStep.CumulativeCost > 3)
+                {
+                    continue;
+                }
+
                 foreach (Node n in path.LastStep.Neighbours)
                 {
-                    //path.LastStep
-
-                    if (n.HasCumulativeCost)
-                    {
-                        n.CumulativeCost = 1 + path.LastStep.CumulativeCost;
-                    }
-                    else if (!path.LastStep.HasCumulativeCost)
-                    {
-                       // n.CumulativeCost = 0;
-                    }
-                    if (n.CumulativeCost > 3)
-                    {
-                        continue;
-                    }
-
                     double d = distance(path.LastStep, n);
                     var newPath = path.AddStep(n, d);
                     queue.Enqueue(newPath.TotalCost + estimate(n), newPath);

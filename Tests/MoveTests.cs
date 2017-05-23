@@ -271,8 +271,6 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[147], movementType: MovementType.Airborne, baseMovementPoints: 4);
             var moveList = unit.PossibleMoves();
 
-            
-
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[196].Point);
             
@@ -281,8 +279,32 @@ namespace Tests
             moveList.Where(x => !x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
-
             Assert.IsFalse(moveOrder.Moves.Last().OnlyPassingThrough);
+        }
+
+        [TestMethod]
+        public void AirborneUnitShortestPathWithLongRouteOverWater()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new MilitaryUnit(location: board[202], movementType: MovementType.Airborne, baseMovementPoints: 4);
+            var moveList = unit.PossibleMoves();
+
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[381].Point);
+
+            var vectors = new List<Vector>();
+
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
+
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+
+            var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
+
+            moveList.Where(x => !x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+
+            
         }
 
         [TestMethod]

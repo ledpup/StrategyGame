@@ -8,5 +8,7 @@ namespace PathFind
     public interface IHasNeighbours<N>
     {
         IEnumerable<N> Neighbours { get; }
+        bool HasCumulativeCost { get; set; }
+        int CumulativeCost { get; set; }
     }
 }

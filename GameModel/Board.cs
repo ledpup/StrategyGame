@@ -427,8 +427,9 @@ namespace GameModel
                     neighbours.Add(neighbour);
                     pathFindTile.Neighbours = neighbours;
 
-                    pathFindTile.MoveCost[neighbour] = originTile.CalculateMoveCostAStar(unit, x);
+                    pathFindTile.MoveCost[neighbour] = originTile.CalculateMoveCost(unit, x);
 
+                    pathFindTile.HasCumulativeCost = !unit.CanStopOn.HasFlag(x.TerrainType);
                 });
             }
 

@@ -31,6 +31,21 @@ namespace PathFind
 
                 foreach (Node n in path.LastStep.Neighbours)
                 {
+                    //path.LastStep
+
+                    if (n.HasCumulativeCost)
+                    {
+                        n.CumulativeCost = 1 + path.LastStep.CumulativeCost;
+                    }
+                    else if (!path.LastStep.HasCumulativeCost)
+                    {
+                       // n.CumulativeCost = 0;
+                    }
+                    if (n.CumulativeCost > 3)
+                    {
+                        continue;
+                    }
+
                     double d = distance(path.LastStep, n);
                     var newPath = path.AddStep(n, d);
                     queue.Enqueue(newPath.TotalCost + estimate(n), newPath);

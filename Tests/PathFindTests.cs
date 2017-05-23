@@ -88,19 +88,19 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13)).ToArray();
 
-            Assert.AreEqual(shortestPath[0].Point, unit.Location.Point); // Origin
+            Assert.AreEqual(unit.Location.Point, shortestPath[0].Point); // Origin
 
-            Assert.AreEqual(shortestPath[1].Point, new Point(23, 15));
-            Assert.AreEqual(shortestPath[2].Point, new Point(22, 15));
-            Assert.AreEqual(shortestPath[3].Point, new Point(21, 14));
-            Assert.AreEqual(shortestPath[4].Point, new Point(20, 14));
-            Assert.AreEqual(shortestPath[5].Point, new Point(19, 13));
-            Assert.AreEqual(shortestPath[6].Point, new Point(18, 13));
-            Assert.AreEqual(shortestPath[7].Point, new Point(17, 13));
-            Assert.AreEqual(shortestPath[8].Point, new Point(16, 13));
-            Assert.AreEqual(shortestPath[9].Point, new Point(15, 13));
+            Assert.AreEqual(new Point(23, 15), shortestPath[1].Point);
+            Assert.AreEqual(new Point(22, 15), shortestPath[2].Point);
+            Assert.AreEqual(new Point(21, 14), shortestPath[3].Point);
+            Assert.AreEqual(new Point(20, 14), shortestPath[4].Point);
+            Assert.AreEqual(new Point(19, 13), shortestPath[5].Point);
+            Assert.AreEqual(new Point(18, 13), shortestPath[6].Point);
+            Assert.AreEqual(new Point(17, 13), shortestPath[7].Point);
+            Assert.AreEqual(new Point(16, 13), shortestPath[8].Point);
+            Assert.AreEqual(new Point(15, 13), shortestPath[9].Point);
 
-            Assert.AreEqual(shortestPath[10].Point, new Point(14, 13)); // Destination
+            Assert.AreEqual(new Point(14, 13), shortestPath[10].Point); // Destination
         }
 
         [TestMethod]

@@ -76,8 +76,8 @@ namespace Tests
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
 
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(7, 7))));
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(10, 3), new Point(13, 6))));
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(7, 7), unit.MovementPoints)));
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(10, 3), new Point(13, 6), unit.MovementPoints)));
 
             var labels = new string[board.Width, board.Height];
             for (var x = 0; x < board.Width; x++)

@@ -99,7 +99,7 @@ namespace Tests
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = ComputerPlayer.FindShortestPath(pathFindTiles, board.Units[1].Location.Point, tile.Point);
+                bestPossibleDestination = ComputerPlayer.FindShortestPath(pathFindTiles, board.Units[1].Location.Point, tile.Point, board.Units[1].MovementPoints);
                 if (bestPossibleDestination != null)
                     break;
             }

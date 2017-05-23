@@ -272,7 +272,7 @@ namespace Tests
             var moveList = unit.PossibleMoves();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[196].Point);
+            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[196].Point, unit.MovementPoints);
             
             var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
 
@@ -287,11 +287,11 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var unit = new MilitaryUnit(location: board[202], movementType: MovementType.Airborne, baseMovementPoints: 4);
+            var unit = new MilitaryUnit(location: board[202], movementType: MovementType.Airborne, baseMovementPoints: 3);
             var moveList = unit.PossibleMoves();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[381].Point);
+            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[381].Point, unit.MovementPoints);
 
             var vectors = new List<Vector>();
 
@@ -303,8 +303,42 @@ namespace Tests
 
             moveList.Where(x => !x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+        }
 
-            
+        [TestMethod]
+        public void AirborneUnitShortestPathWithLongerRouteOverWater()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new MilitaryUnit(location: board[187], movementType: MovementType.Airborne, baseMovementPoints: 3);
+            var moveList = unit.PossibleMoves();
+
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[456].Point, unit.MovementPoints);
+
+            var vectors = new List<Vector>();
+
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
+
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongerRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+        }
+
+        [TestMethod]
+        public void AirborneUnitShortestPathCornerToCorner()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var unit = new MilitaryUnit(location: board[28], movementType: MovementType.Airborne, baseMovementPoints: 3);
+            var moveList = unit.PossibleMoves();
+
+            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[484].Point, unit.MovementPoints);
+
+            var vectors = new List<Vector>();
+
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
+
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathCornerToCorner.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
         }
 
         [TestMethod]

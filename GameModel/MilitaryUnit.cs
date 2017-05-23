@@ -532,7 +532,7 @@ namespace GameModel
         public MoveOrder GetMoveOrderToDestination(Point destination, Board board)
         {
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(this);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, Location.Point, destination).ToArray();
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, Location.Point, destination, MovementPoints).ToArray();
 
             return ShortestPathToMoveOrder(shortestPath);
         }

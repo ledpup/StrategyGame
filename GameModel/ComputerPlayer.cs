@@ -167,7 +167,7 @@ namespace GameModel
                                          var transporter = closestAvailableAirborneUnitPath.Unit;
 
                                          var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                                         var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point);
+                                         var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point, unit.MovementPoints);
                                          Tile transporteeMoveOrderDesintation = null;
                                          if (pathToAirbornUnit != null)
                                          {
@@ -179,7 +179,7 @@ namespace GameModel
 
                                          // Move transport unit to the destination of the transportee's move order or just to the transportee's location
                                          pathFindTiles = board.ValidMovesWithMoveCostsForUnit(transporter);
-                                         var pathToTransporteesDestination = FindShortestPath(pathFindTiles, transporter.Location.Point, transporteeMoveOrderDesintation == null ? unit.Location.Point : transporteeMoveOrderDesintation.Point);
+                                         var pathToTransporteesDestination = FindShortestPath(pathFindTiles, transporter.Location.Point, transporteeMoveOrderDesintation == null ? unit.Location.Point : transporteeMoveOrderDesintation.Point, transporter.MovementPoints);
                                          if (pathToTransporteesDestination != null)
                                             moveOrders.Add(transporter.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
                                          break;
@@ -316,7 +316,7 @@ namespace GameModel
             foreach(var potentialPickupUnit in potentialPickupUnits)
             {
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(potentialPickupUnit);
-                var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, potentialPickupUnit.Location.Point);
+                var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, potentialPickupUnit.Location.Point, potentialPickupUnit.MovementPoints);
                 if (shortestPath != null)
                 {
                     return new UnitAndPath { Unit = potentialPickupUnit, Path = shortestPath };
@@ -338,7 +338,7 @@ namespace GameModel
             foreach (var enemyStructure in structures)
             { 
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, enemyStructure.Location.Point);
+                var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, enemyStructure.Location.Point, unit.MovementPoints);
                 if (shortestPath != null)
                 {
                     return shortestPath;
@@ -369,7 +369,7 @@ namespace GameModel
                         }
 
                         var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                        var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, x.Point);
+                        var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, x.Point, unit.MovementPoints);
                         if (shortestPath != null)
                         {
                             var distance = shortestPath.Count();
@@ -557,7 +557,7 @@ namespace GameModel
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = FindShortestPath(pathFindTiles, unit.Location.Point, tile.Point);
+                bestPossibleDestination = FindShortestPath(pathFindTiles, unit.Location.Point, tile.Point, unit.MovementPoints);
                 if (bestPossibleDestination != null)
                     break;
             }
@@ -570,7 +570,7 @@ namespace GameModel
             return null;
         }
 
-        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Point origin, Point destination)
+        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Point origin, Point destination, int maxCumulativeCost)
         {
             var ori = pathFindTiles.Single(x => x.X == origin.X && x.Y == origin.Y);
             var dest = pathFindTiles.Single(x => x.X == destination.X && x.Y == destination.Y);
@@ -578,7 +578,7 @@ namespace GameModel
             Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
             Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
 
-            var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate);
+            var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
 
             return path == null || path.Count() == 1 ? null : path.Reverse();
         }

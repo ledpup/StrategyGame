@@ -11,7 +11,8 @@ namespace PathFind
             Node start,
             Node destination,
             Func<Node, Node, double> distance,
-            Func<Node, double> estimate)
+            Func<Node, double> estimate,
+            int maxCumulativeCost)
             where Node : IHasNeighbours<Node>
         {
             var closed = new HashSet<Node>();
@@ -47,7 +48,7 @@ namespace PathFind
                         }
                     }
                 }
-                if (path.LastStep.CumulativeCost > 3)
+                if (path.LastStep.CumulativeCost >= maxCumulativeCost)
                 {
                     continue;
                 }

@@ -429,7 +429,7 @@ namespace GameModel
 
                     pathFindTile.MoveCost[neighbour] = originTile.CalculateMoveCost(unit, x);
 
-                    pathFindTile.HasCumulativeCost = unit.MovementType == MovementType.Airborne && unit.CanStopOn.HasFlag(x.TerrainType);
+                    neighbour.HasCumulativeCost = unit.MovementType == MovementType.Airborne && !unit.CanStopOn.HasFlag(x.TerrainType);
                 });
             }
 

@@ -26,7 +26,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[1, 1]);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7)).ToArray();
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7), unit.MovementPoints).ToArray();
 
             Assert.AreEqual(shortestPath[0].Point, new Point(1, 1)); // Origin
 
@@ -50,7 +50,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[1, 1]);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(4, 9));
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(4, 9), unit.MovementPoints);
 
             Assert.IsNull(shortestPath);
         }
@@ -63,7 +63,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, strategicAction: StrategicAction.Dock);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(21, 10)).ToArray();
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(21, 10), unit.MovementPoints).ToArray();
 
             Assert.AreEqual(shortestPath[0].Point, unit.Location.Point); // Origin
 
@@ -86,7 +86,11 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[24, 15], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13)).ToArray();
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
+
+            var vectors = new List<Vector>();
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
             Assert.AreEqual(unit.Location.Point, shortestPath[0].Point); // Origin
 
@@ -111,8 +115,13 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[19, 13], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13)).ToArray();
-            
+            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
+
+            var vectors = new List<Vector>();
+            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+
+
             Assert.AreEqual(shortestPath[0].Point, unit.Location.Point); // Origin
 
             Assert.AreEqual(shortestPath[1].Point, new Point(18, 13));

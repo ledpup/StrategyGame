@@ -17,8 +17,7 @@ namespace GameModel
         public IEnumerable<PathFindTile> Neighbours { get; set; }
         public Dictionary<PathFindTile, double> MoveCost { get; set; }
         public bool HasCumulativeCost { get; set; }
-        public int CumulativeCost { get; set; }
-
+        
         public PathFindTile(int x, int y)
         {
             Point = new Point(x, y);

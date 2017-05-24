@@ -30,16 +30,17 @@ namespace PathFind
 
                 closed.Add(path.LastStep);
 
+                var cumulativeCost = 0;
                 if (path.LastStep.HasCumulativeCost)
                 {
-                    path.LastStep.CumulativeCost = 1;
+                    cumulativeCost = 1;
                     if (path.PreviousSteps != null)
                     {
                         foreach (var previous in path.PreviousSteps)
                         {
                             if (previous.HasCumulativeCost)
                             {
-                                path.LastStep.CumulativeCost++;
+                                cumulativeCost++;
                             }
                             else
                             {
@@ -48,7 +49,7 @@ namespace PathFind
                         }
                     }
                 }
-                if (path.LastStep.CumulativeCost >= maxCumulativeCost)
+                if (cumulativeCost >= maxCumulativeCost)
                 {
                     continue;
                 }

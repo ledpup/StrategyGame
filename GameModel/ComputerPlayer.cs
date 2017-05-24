@@ -216,7 +216,7 @@ namespace GameModel
                                  {
                                      if (unit.TerrainMovementCosts[unit.Location.TerrainType] != null && board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
                                      {
-                                         unitOrders.Add(new UnloadOrder(unit, true));
+                                         unitOrders.Add(new UnloadOrder(unit));
                                      }
                                  }
                                  if (unit.TransportedBy.MovementType == MovementType.Water)
@@ -290,7 +290,7 @@ namespace GameModel
 
                                         if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Destination.ContiguousRegionId))
                                         {
-                                             unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, false)));
+                                             unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Destination)));
                                         }
                                     }
                                      

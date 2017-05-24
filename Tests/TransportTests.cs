@@ -169,7 +169,7 @@ namespace Tests
 
             unitOrders = new List<IUnitOrder>
             {
-                new UnloadOrder(units[0], true),
+                new UnloadOrder(units[0]),
             };
             board.ResolveOrders(unitOrders);
 

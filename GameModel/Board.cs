@@ -439,17 +439,20 @@ namespace GameModel
         public void ResolveOrders(List<IUnitOrder> unitOrders)
         {
             ResolveTransportOrders(unitOrders);
-            UnloadOrders(unitOrders, true);
+            UnloadOrders(unitOrders);
             ResolveMoves(unitOrders);
-            UnloadOrders(unitOrders, false);
+            UnloadOrders(unitOrders);
 
             // Units can load onto transports after they have moved
             ResolveTransportOrders(unitOrders);
         }
 
-        private static void UnloadOrders(List<IUnitOrder> unitOrders, bool executeBeforeMoveOrders)
+        private static void UnloadOrders(List<IUnitOrder> unitOrders)
         {
-            var unloadOrders = unitOrders.OfType<UnloadOrder>().Where(x => x.ExecuteBeforeMoveOrders == executeBeforeMoveOrders).ToList();
+            var unloadOrders = unitOrders
+                .OfType<UnloadOrder>()
+                .Where(x => x.Destination == null || x.Destination == x.Unit.Location)
+                .ToList();
 
             unloadOrders.ForEach(x =>
             {

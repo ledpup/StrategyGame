@@ -8,13 +8,13 @@ namespace GameModel
 {
     public class UnloadOrder : IUnitOrder
     {
-        public UnloadOrder(MilitaryUnit unit, bool executeBeforeMoveOrders)
+        public UnloadOrder(MilitaryUnit unit, Tile destination = null)
         {
             Unit = unit;
-            ExecuteBeforeMoveOrders = executeBeforeMoveOrders;
+            Destination = destination;
         }
         public MilitaryUnit Unit { get; set; }
 
-        public bool ExecuteBeforeMoveOrders { get; set; }
+        public Tile Destination { get; set; }
     }
 }

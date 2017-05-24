@@ -451,7 +451,7 @@ namespace GameModel
         {
             var unloadOrders = unitOrders
                 .OfType<UnloadOrder>()
-                .Where(x => x.Destination == null || x.Destination == x.Unit.Location)
+                .Where(x => x.Unit.TransportedBy != null && (x.Destination == null || x.Destination == x.Unit.Location))
                 .ToList();
 
             unloadOrders.ForEach(x =>

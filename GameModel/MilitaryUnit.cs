@@ -350,6 +350,7 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Water] = 1;
             TerrainMovementCosts[TerrainType.Reef] = 1;
 
+            // Airborne units can fly over anything except walls
             EdgeMovementCosts[EdgeType.Normal] = 0;
             EdgeMovementCosts[EdgeType.Road] = 0;
             EdgeMovementCosts[EdgeType.Bridge] = 0;

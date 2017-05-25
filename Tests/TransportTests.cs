@@ -186,10 +186,10 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
-                new MilitaryUnit(location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
-                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Defensive, isAmphibious: true),
-                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Besieger),
+                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
+                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Besieger),
             };
 
             board.Units = units;

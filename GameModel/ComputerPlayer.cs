@@ -139,173 +139,216 @@ namespace GameModel
 
             var unitOrders = new List<IUnitOrder>();
 
-            units.ForEach(unit =>
-                     {
-                         switch (unit.StrategicAction)
-                         {
-                             case StrategicAction.None:
-                                 {
-                                     var moveOrder = FindBestMoveOrderForUnit(unit, board);
-                                     if (moveOrder != null)
-                                         unitOrders.Add(moveOrder);
-                                     break;
-                                 }
-                             case StrategicAction.Embark:
-                                 Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && x.StrategicAction == StrategicAction.Pickup;
-                                 var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule, unitOrders.OfType<MoveOrder>().ToList());
+            var landAndWaterUnits = units.Where(x => x.MovementType != MovementType.Airborne).ToList();
+            landAndWaterUnits.ForEach(unit => unitOrders.AddRange(CreateOrdersForUnit(board, units, null, unit)));
 
-                                 Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;
-                                 var closestAvailableWaterUnitPath = ClosestAvailableTransportPath(board, unit, units, aquaticRule, unitOrders.OfType<MoveOrder>().ToList());
-
-                                 var closestPortPath = ClosestPortPath(board, unit);
-
-                                 if (closestAvailableAirborneUnitPath != null)
-                                 {
-                                     if (closestAvailableWaterUnitPath == null || closestAvailableAirborneUnitPath.Path.Count() < closestAvailableWaterUnitPath.Path.Count())
-                                     {
-                                         // Transport by air
-                                         var transporter = closestAvailableAirborneUnitPath.Unit;
-
-                                         var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                                         var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point, unit.MovementPoints);
-                                         Tile transporteeMoveOrderDesintation = null;
-                                         if (pathToAirbornUnit != null)
-                                         {
-                                             var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
-                                             transporteeMoveOrderDesintation = moveOrder.Moves.Last().Destination;
-                                             unitOrders.Add(moveOrder);
-                                         }
-                                         unitOrders.Add(new TransportOrder(transporter, unit));
-
-                                         // Move transport unit to the destination of the transportee's move order or just to the transportee's location
-                                         pathFindTiles = board.ValidMovesWithMoveCostsForUnit(transporter);
-                                         var pathToTransporteesDestination = FindShortestPath(pathFindTiles, transporter.Location.Point, transporteeMoveOrderDesintation == null ? unit.Location.Point : transporteeMoveOrderDesintation.Point, transporter.MovementPoints);
-                                         if (pathToTransporteesDestination != null)
-                                            unitOrders.Add(transporter.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
-                                         break;
-                                     }
-                                 }
-
-                                 
-                                 if (closestPortPath != null)
-                                 {
-                                     unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
-
-                                     if (unit.StrategicDestination == unit.Location)
-                                     {
-                                         var waterTiles = unit.StrategicDestination.Edges.Where(x => x.EdgeType == EdgeType.Port).Select(x => x.Destination).ToList();
-                                         var transportingUnits = units.Where(x => x.IsAlive && x.IsTransporter && waterTiles.Contains(x.Location) && x.CanTransport(unit))
-                                                                      .OrderByDescending(x => x.TransportSize);
-                                         var transportUnit = transportingUnits.FirstOrDefault();
-                                         if (transportUnit != null)
-                                         {
-                                             unitOrders.Add(unit.PossibleMoves().Single(x => x.Destination == transportUnit.Location).GetMoveOrder(unit));
-                                             unit.StrategicAction = StrategicAction.Disembark;
-                                         }
-                                     }
-                                     else
-                                     {
-                                         var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
-                                         if (moveOrder != null)
-                                             unitOrders.Add(moveOrder);
-                                     }
-                                 }
-                                 break;
-                             case StrategicAction.Disembark:
-                                 if (unit.TransportedBy.MovementType == MovementType.Airborne)
-                                 {
-                                     if (unit.TerrainMovementCosts[unit.Location.TerrainType] != null && board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
-                                     {
-                                         unitOrders.Add(new UnloadOrder(unit));
-                                     }
-                                 }
-                                 if (unit.TransportedBy.MovementType == MovementType.Water)
-                                 {
-                                     if (board.Structures.Any(y => unit.Location.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
-                                     {
-                                         unitOrders.Add(unit.PossibleMoves().First().GetMoveOrder(unit));
-                                         unit.TransportedBy.Transporting.Remove(unit);
-                                         unit.TransportedBy = null;
-                                     }
-                                 }
-                                 break;
-
-                             case StrategicAction.Dock:
-                                 {
-                                     closestPortPath = ClosestPortPath(board, unit);
-                                     if (unit.StrategicDestination != unit.Location)
-                                     {
-                                         if (closestPortPath != null)
-                                         {
-                                             unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
-
-                                             var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
-                                             if (moveOrder != null)
-                                                 unitOrders.Add(moveOrder);
-                                         }
-                                     }
-                                     break;
-                                 }
-                             case StrategicAction.Transport:
-                                 {
-                                     if (unit.StrategicDestination == unit.Location)
-                                     {
-                                         if (!unit.Transporting.Any())
-                                         {
-                                             unit.StrategicAction = StrategicAction.None;
-                                             unit.StrategicDestination = null;
-                                             break;
-                                         }
-                                     }
-                                     else
-                                     {
-                                         // Find the closest port that has a region with one or more enemy structures
-                                         closestPortPath = ClosestPortPath(board, unit);
-                                         if (closestPortPath != null)
-                                         {
-                                             unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
-
-                                             var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
-                                             if (moveOrder != null)
-                                                 unitOrders.Add(moveOrder);
-                                         }
-                                     }
-                                     break;
-                                 }
-                             case StrategicAction.Pickup:
-                                 {
-                                     break;
-                                 }
-                             case StrategicAction.Airlift:
-                                 {
-                                     
-                                    var closestEnemyStructure = ClosestEnemyStructurePath(board, unit);
-                                    if (closestEnemyStructure != null)
-                                    {
-                                        unit.StrategicDestination = board[closestEnemyStructure.Last().X, closestEnemyStructure.Last().Y];
-
-                                        var moveOrder = unit.ShortestPathToMoveOrder(closestEnemyStructure.ToArray());
-                                        if (moveOrder != null)
-                                            unitOrders.Add(moveOrder);
-
-                                        if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Destination.ContiguousRegionId))
-                                        {
-                                             unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Destination)));
-                                        }
-                                    }
-                                     
-                                     break;
-                                 }
-                         }
-                     });
+            var airborne = units.Where(x => x.MovementType == MovementType.Airborne).ToList();
+            airborne.ForEach(unit => unitOrders.AddRange(CreateOrdersForUnit(board, units, unitOrders, unit)));
 
             return unitOrders;
         }
 
-        private static UnitAndPath ClosestAvailableTransportPath(Board board, MilitaryUnit unit, List<MilitaryUnit> units, Func<MilitaryUnit, bool> rule, List<MoveOrder> moveOrders)
+        private static List<IUnitOrder> CreateOrdersForUnit(Board board, List<MilitaryUnit> units, List<IUnitOrder> existingOrders, MilitaryUnit unit)
+        {
+            var unitOrders = new List<IUnitOrder>();
+
+            switch (unit.StrategicAction)
+            {
+                case StrategicAction.None:
+                    {
+                        var moveOrder = FindBestMoveOrderForUnit(unit, board);
+                        if (moveOrder != null)
+                            unitOrders.Add(moveOrder);
+                        break;
+                    }
+                case StrategicAction.Embark:
+                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && x.StrategicAction == StrategicAction.Pickup;
+                    var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule);
+
+                    Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;
+                    var closestAvailableWaterUnitPath = ClosestAvailableTransportPath(board, unit, units, aquaticRule);
+
+                    var closestPortPath = ClosestPortPath(board, unit);
+
+                    if (closestAvailableAirborneUnitPath != null)
+                    {
+                        if (closestAvailableWaterUnitPath == null || closestAvailableAirborneUnitPath.Path.Count() < closestAvailableWaterUnitPath.Path.Count())
+                        {
+                            // Transport by air
+                            var transporter = closestAvailableAirborneUnitPath.Unit;
+
+                            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                            var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point, unit.MovementPoints);
+                            Tile transporteeMoveOrderDesintation = null;
+                            if (pathToAirbornUnit != null)
+                            {
+                                var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
+                                transporteeMoveOrderDesintation = moveOrder.Moves.Last().Destination;
+                                unitOrders.Add(moveOrder);
+                            }
+                            unitOrders.Add(new TransportOrder(transporter, unit));
+                            break;
+                        }
+                    }
+
+
+                    if (closestPortPath != null)
+                    {
+                        unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
+
+                        if (unit.StrategicDestination == unit.Location)
+                        {
+                            var waterTiles = unit.StrategicDestination.Edges.Where(x => x.EdgeType == EdgeType.Port).Select(x => x.Destination).ToList();
+                            var transportingUnits = units.Where(x => x.IsAlive && x.IsTransporter && waterTiles.Contains(x.Location) && x.CanTransport(unit))
+                                                         .OrderByDescending(x => x.TransportSize);
+                            var transportUnit = transportingUnits.FirstOrDefault();
+                            if (transportUnit != null)
+                            {
+                                unitOrders.Add(unit.PossibleMoves().Single(x => x.Destination == transportUnit.Location).GetMoveOrder(unit));
+                                unit.StrategicAction = StrategicAction.Disembark;
+                            }
+                        }
+                        else
+                        {
+                            var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
+                            if (moveOrder != null)
+                                unitOrders.Add(moveOrder);
+                        }
+                    }
+                    break;
+                case StrategicAction.Disembark:
+                    if (unit.TransportedBy.MovementType == MovementType.Airborne)
+                    {
+                        if (unit.TerrainMovementCosts[unit.Location.TerrainType] != null && board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
+                        {
+                            unitOrders.Add(new UnloadOrder(unit));
+                        }
+                    }
+                    if (unit.TransportedBy.MovementType == MovementType.Water)
+                    {
+                        if (board.Structures.Any(y => unit.Location.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                        {
+                            unitOrders.Add(unit.PossibleMoves().First().GetMoveOrder(unit));
+                            unit.TransportedBy.Transporting.Remove(unit);
+                            unit.TransportedBy = null;
+                        }
+                    }
+                    break;
+
+                case StrategicAction.Dock:
+                    {
+                        closestPortPath = ClosestPortPath(board, unit);
+                        if (unit.StrategicDestination != unit.Location)
+                        {
+                            if (closestPortPath != null)
+                            {
+                                unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
+
+                                var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
+                                if (moveOrder != null)
+                                    unitOrders.Add(moveOrder);
+                            }
+                        }
+                        break;
+                    }
+                case StrategicAction.Transport:
+                    {
+                        if (unit.StrategicDestination == unit.Location)
+                        {
+                            if (!unit.Transporting.Any())
+                            {
+                                unit.StrategicAction = StrategicAction.None;
+                                unit.StrategicDestination = null;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            // Find the closest port that has a region with one or more enemy structures
+                            closestPortPath = ClosestPortPath(board, unit);
+                            if (closestPortPath != null)
+                            {
+                                unit.StrategicDestination = board[closestPortPath.Last().X, closestPortPath.Last().Y];
+
+                                var moveOrder = unit.GetMoveOrderToDestination(unit.StrategicDestination.Point, board);
+                                if (moveOrder != null)
+                                    unitOrders.Add(moveOrder);
+                            }
+                        }
+                        break;
+                    }
+                case StrategicAction.Pickup:
+                    {
+                        var closestUnit = ClosestEmbarkingUnitPath(board, units, unit.Location);
+
+                        var destination = closestUnit.Location.Point;
+
+                        var transporteeMoveOrder = existingOrders.OfType<MoveOrder>().SingleOrDefault(x => x.Unit == closestUnit);
+                        if (transporteeMoveOrder != null)
+                        {
+                            destination = transporteeMoveOrder.Moves.Last().Destination.Point;
+                        }
+
+                        // Move transport unit to the destination of the transportee's move order or just to the transportee's location
+                        var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                        var pathToTransporteesDestination = FindShortestPath(pathFindTiles, unit.Location.Point, destination, unit.MovementPoints);
+                        if (pathToTransporteesDestination != null)
+                            unitOrders.Add(unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
+
+                        break;
+                    }
+                case StrategicAction.Airlift:
+                    {
+
+                        var closestEnemyStructure = ClosestEnemyStructurePath(board, unit);
+                        if (closestEnemyStructure != null)
+                        {
+                            unit.StrategicDestination = board[closestEnemyStructure.Last().X, closestEnemyStructure.Last().Y];
+
+                            var moveOrder = unit.ShortestPathToMoveOrder(closestEnemyStructure.ToArray());
+                            if (moveOrder != null)
+                                unitOrders.Add(moveOrder);
+
+                            if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Destination.ContiguousRegionId))
+                            {
+                                unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Destination)));
+                            }
+                        }
+
+                        break;
+                    }
+            }
+            return unitOrders;
+        }
+
+        private static MilitaryUnit ClosestEmbarkingUnitPath(Board board, List<MilitaryUnit> units, Tile origin)
+        {
+            var closestUnit = units
+                                    .Where(x => x.StrategicAction == StrategicAction.Embark)
+                                    .OrderBy(x => Hex.Distance(x.Location.Hex, origin.Hex))
+                                    .FirstOrDefault();
+
+            if (closestUnit == null)
+                return null;
+
+            return closestUnit;
+
+            //foreach (var closestUnit in closestUnits)
+            //{
+            //    var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(closestUnit);
+            //    var shortestPath = FindShortestPath(pathFindTiles, origin.Point, closestUnit.Location.Point, closestUnit.MovementPoints);
+            //    if (shortestPath != null)
+            //    {
+            //        return new UnitAndPath { Unit = closestUnit, Path = shortestPath };
+            //    }
+            //}
+
+            //return null;
+        }
+        private static UnitAndPath ClosestAvailableTransportPath(Board board, MilitaryUnit unit, List<MilitaryUnit> units, Func<MilitaryUnit, bool> rule)
         {
             var potentialPickupUnits = units
-                                    .Where(x => rule(x) && x.CanTransport(unit) && !moveOrders.Any(y => y.Unit == x))
+                                    .Where(x => rule(x) && x.CanTransport(unit))
                                     .OrderBy(x => Hex.Distance(x.Location.Hex, unit.Location.Hex));
 
             foreach(var potentialPickupUnit in potentialPickupUnits)

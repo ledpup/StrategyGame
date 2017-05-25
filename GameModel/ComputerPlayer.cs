@@ -381,31 +381,34 @@ namespace GameModel
             return closestPort;
         }
 
-        public static Move MoveFromShortestPath(List<Move> moves, PathFindTile[] shortestPath)
+        public static List<Move> MovesFromShortestPath(List<Move> possibleMoves, PathFindTile[] shortestPath)
         {
+            List<Move> moves = new List<Move>();
             Move furthestMove = null;
             var origin = shortestPath[0].Point;
             for (var i = 1; i < shortestPath.Length; i++)
             {
-                var move = moves.FirstOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point && x.Distance == i);
+                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point && x.Distance == i);
 
                 if (move == null)
                 {
                     while (furthestMove != null && furthestMove.OnlyPassingThrough)
                     {
+                        moves.Remove(furthestMove);
                         furthestMove = furthestMove.PreviousMove;
                     }
-                    return furthestMove;
+                    return moves;
                 }
 
+                moves.Add(move);
                 furthestMove = move;
 
                 // Remove moves that we've considered
-                moves.RemoveAll(x => x.Origin.Point == origin);
+                possibleMoves.RemoveAll(x => x.Origin.Point == origin);
                 origin = shortestPath[i].Point;
             }
 
-            return furthestMove;
+            return moves;
         }
 
         static Dictionary<Role, double> _enemyUnitInfluenceModifier;

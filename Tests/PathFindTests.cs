@@ -148,7 +148,19 @@ namespace Tests
 
             var vectors = new List<Vector>();
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWall.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+
+            var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
+
+            vectors = new List<Vector>();
+            vectors.AddRange(moveOrder.Vectors);
+
+            Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
+
+
+            var moves = unit.PossibleMoves();
+            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPossibleMoves.png", board.Height, board.Tiles, board.Edges, board.Structures);
 
 
             Assert.AreEqual(unit.Location.Point, shortestPath[0].Point); // Origin
@@ -156,10 +168,8 @@ namespace Tests
             Assert.AreEqual(new Point(12, 4), shortestPath[1].Point);
             Assert.AreEqual(new Point(13, 4), shortestPath[2].Point);
             Assert.AreEqual(new Point(13, 3), shortestPath[3].Point);
-            
-            Assert.AreEqual(new Point(14, 3), shortestPath[4].Point); // Destination
 
-            var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
+            Assert.AreEqual(new Point(14, 3), shortestPath[4].Point); // Destination
 
             Assert.AreEqual(new Point(12, 4), moveOrder.Moves[0].Destination.Point);
             Assert.AreEqual(new Point(13, 4), moveOrder.Moves[1].Destination.Point);

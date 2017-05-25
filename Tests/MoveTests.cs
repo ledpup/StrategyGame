@@ -294,12 +294,8 @@ namespace Tests
             var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[381].Point, unit.MovementPoints);
 
             var vectors = new List<Vector>();
-
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
-
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
-
-            var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
 
             moveList.Where(x => !x.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });

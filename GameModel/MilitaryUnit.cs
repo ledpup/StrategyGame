@@ -540,12 +540,12 @@ namespace GameModel
 
         public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
         {
-            var move = ComputerPlayer.MoveFromShortestPath(PossibleMoves().ToList(), shortestPath);
+            var moves = ComputerPlayer.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
 
-            if (move == null)
+            if (moves.Count == 0)
                 return null;
 
-            var moveOrders = move.GetMoveOrder(this);
+            var moveOrders = new MoveOrder(moves.ToArray(), this);
             return moveOrders;
         }
     }

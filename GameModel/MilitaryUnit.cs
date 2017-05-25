@@ -147,7 +147,6 @@ namespace GameModel
         public Role Role { get; set; }
 
         public StrategicAction StrategicAction { get; set; }
-        public Tile StrategicDestination { get; set; }
         public override string ToString()
         {
             return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();

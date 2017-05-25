@@ -55,16 +55,12 @@ namespace Tests
                 board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();
 
-                board.Turn++;
-
                 switch (turn)
                 {
                     case 0:
-                        Assert.AreEqual(board[21, 11], units[1].StrategicDestination);
                         Assert.AreEqual(board[23, 13], units[1].Location);
                         break;
                     case 1:
-                        Assert.AreEqual(board[21, 11], units[1].StrategicDestination);
                         Assert.AreEqual(board[21, 11], units[1].Location);
                         break;
                     case 2:
@@ -72,6 +68,9 @@ namespace Tests
                         Assert.AreEqual(board[21, 10], units[1].Location);
                         break;
                 }
+
+
+                board.Turn++;
             }
         }
 

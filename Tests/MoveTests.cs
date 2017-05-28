@@ -462,6 +462,23 @@ namespace Tests
         }
 
         [TestMethod]
+        public void EmbarkOnShip()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            board.Units = new List<MilitaryUnit>
+            {
+                new MilitaryUnit(0, location: board[196], baseMovementPoints: 3, transportableBy: new List<MovementType>{ MovementType.Water }, strategicAction: StrategicAction.Embark),
+                new MilitaryUnit(1, location: board[224], movementType: MovementType.Water, isTransporter: true, strategicAction: StrategicAction.Dock),
+            };
+
+            var unitOrders = ComputerPlayer.CreateOrders(board, board.Units);
+            board.ResolveOrders(unitOrders);
+
+            Assert.AreEqual(new Point[8, 8], board.Units[0]);
+        }
+
+        [TestMethod]
         public void ResolveMove()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);

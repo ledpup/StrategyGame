@@ -116,7 +116,10 @@ namespace GameModel
                                 unit.StrategicAction = StrategicAction.None;
                             break;
                         case MovementType.Water:
-                            if (!unit.Transporting.Any() && !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex))
+                            if ((!unit.Transporting.Any() && 
+                                    !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex))
+                                    ||
+                                    (unit.Location.HasPort && board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)))
                             {
                                 unit.StrategicAction = StrategicAction.Dock;
                             }
@@ -232,13 +235,16 @@ namespace GameModel
 
                 case StrategicAction.Dock:
                     {
-                        closestPortPath = ClosestPortPath(board, unit);
-                        
-                        if (closestPortPath != null)
+                        if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && x.StrategicAction == StrategicAction.Embark))
                         {
-                            var moveOrder = unit.GetMoveOrderToDestination(closestPortPath.Last().Point, board);
-                            if (moveOrder != null)
-                                unitOrders.Add(moveOrder);
+                            closestPortPath = ClosestPortPath(board, unit);
+
+                            if (closestPortPath != null)
+                            {
+                                var moveOrder = unit.GetMoveOrderToDestination(closestPortPath.Last().Point, board);
+                                if (moveOrder != null)
+                                    unitOrders.Add(moveOrder);
+                            }
                         }
                         break;
                     }

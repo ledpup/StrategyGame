@@ -27,15 +27,15 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
-                new MilitaryUnit(location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
-                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive, isAmphibious: true),
-                new MilitaryUnit(location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
+                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(1, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
+                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
             };
 
             board.Units = units;
 
-            for (var turn = 0; turn < 40; turn++)
+            for (board.Turn = 0; board.Turn < 40; board.Turn++)
             {
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
@@ -50,12 +50,12 @@ namespace Tests
                 var vectors = new List<Vector>();
                 moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
-                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
+                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 
                 board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();
 
-                switch (turn)
+                switch (board.Turn)
                 {
                     case 0:
                         Assert.AreEqual(board[23, 13], units[1].Location);
@@ -68,9 +68,6 @@ namespace Tests
                         Assert.AreEqual(board[21, 10], units[1].Location);
                         break;
                 }
-
-
-                board.Turn++;
             }
         }
 
@@ -161,8 +158,7 @@ namespace Tests
                 new TransportOrder(units[1], units[0]),
             };
             board.ResolveOrders(unitOrders);
-            board.Turn++;
-
+            
             Assert.AreEqual(units[0], units[1].Transporting.Single());
             Assert.AreEqual(units[1], units[0].TransportedBy);
 

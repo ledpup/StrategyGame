@@ -288,5 +288,12 @@ namespace GameModel
         public int? OwnerId { get; set; }
         public bool IsSelected { get; set; }
         public Structure Structure { get; set; }
+        public Tile PortDestination {
+            get {
+                var edge = Edges.Single(x => x.EdgeType == EdgeType.Port);
+                var destination = edge.Origin == this ? edge.Destination : edge.Origin;
+                return destination;
+            }
+        }
     }
 }

@@ -462,7 +462,7 @@ namespace GameModel
             while (searchForOnlyPassingThroughDestinations)
             {
                 var removeOnlyPassingThroughDestinations = possibleMoves
-                    .Where(x => x.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Destination));
+                    .Where(x => x.MoveType == MoveType.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Destination));
 
                 searchForOnlyPassingThroughDestinations = removeOnlyPassingThroughDestinations.Any();
                 removeOnlyPassingThroughDestinations.ToList().ForEach(x => possibleMoves.Remove(x));
@@ -475,15 +475,8 @@ namespace GameModel
         {
             var potentialMoves = new List<Move>();
 
-            potentialMoves.AddRange(origin.Neighbours.Where(dest => dest != unit.Location
-                                        && !movesConsidered.Any(x => x.Origin == origin && x.Destination == dest && x.MovesRemaining > movementPoints)
-                                        && (unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] != null 
-                                                        && (unit.TerrainMovementCosts[dest.TerrainType] != null 
-                                                                    || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre
-                                                                    || (Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port && unit.StrategicAction == StrategicAction.Embark)
-                                                           )
-                                                        && (unit.TransportedBy == null || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port))
-                                        ).Select(x => new Move(origin, x, previousMove, movementPoints, distance, onlyPassingThrough: !unit.CanStopOn.HasFlag(x.TerrainType)))
+            potentialMoves.AddRange(origin.Neighbours.Where(dest => PotentialMove(unit, origin, movesConsidered, movementPoints, dest)
+                                        ).Select(x => new Move(origin, x, previousMove, movementPoints, distance, GetMoveType(origin, x , unit)))
                                         .ToList());
 
             movesConsidered.AddRange(potentialMoves);
@@ -502,8 +495,55 @@ namespace GameModel
 
             potentialMoves.AddRange(neighbourMoves);
 
-            return potentialMoves.Where(x => (x.OnlyPassingThrough || unit.CanStopOn.HasFlag(x.Destination.TerrainType)) || (x.Edge.EdgeType == EdgeType.Port && unit.MovementType == MovementType.Land)).ToList();
+            return potentialMoves.Where(x => ValidMove(unit, x)).ToList();
 
+        }
+
+        private static MoveType GetMoveType(Tile origin, Tile x, MilitaryUnit unit)
+        {
+            if (unit.MovementType == MovementType.Land)
+            {
+                if (unit.TransportedBy == null && Edge.GetEdge(origin, x).EdgeType == EdgeType.Port)
+                {
+                    return MoveType.Embark;
+                }
+            }
+            if (!unit.CanStopOn.HasFlag(x.TerrainType))
+                return MoveType.OnlyPassingThrough;
+
+            return MoveType.Standard;
+        }
+
+        private static bool ValidMove(MilitaryUnit unit, Move x)
+        {
+            var validMove = x.MoveType == MoveType.OnlyPassingThrough || 
+                                        x.MoveType == MoveType.Embark ||
+                                        unit.CanStopOn.HasFlag(x.Destination.TerrainType);
+            return validMove;
+        }
+
+        private static bool PotentialMove(MilitaryUnit unit, Tile origin, List<Move> movesConsidered, int movementPoints, Tile dest)
+        {
+            var potentialMove = dest != unit.Location && !movesConsidered.Any(x => x.Origin == origin && x.Destination == dest && x.MovesRemaining > movementPoints);
+
+            if (!potentialMove)
+                return false;
+
+            potentialMove = unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] != null;
+
+            if (!potentialMove)
+                return false;
+
+            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] != null
+                                                                || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre
+                                                                || (Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port && unit.StrategicAction == StrategicAction.Embark);
+
+            if (!potentialMove)
+                return false;
+
+            potentialMove = (unit.TransportedBy == null || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port);
+
+            return potentialMove;
         }
 
         private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
@@ -511,7 +551,7 @@ namespace GameModel
             var moves = tile.Edges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre 
                                                             && !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination))
                                                      )
-                .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, true)).ToList();
+                .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
 
             movesConsidered.AddRange(moves);
 

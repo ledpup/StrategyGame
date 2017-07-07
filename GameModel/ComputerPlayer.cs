@@ -418,7 +418,7 @@ namespace GameModel
 
                 if (move == null)
                 {
-                    while (furthestMove != null && furthestMove.OnlyPassingThrough)
+                    while (furthestMove != null && furthestMove.MoveType == MoveType.OnlyPassingThrough)
                     {
                         moves.Remove(furthestMove);
                         furthestMove = furthestMove.PreviousMove;

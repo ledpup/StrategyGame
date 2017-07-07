@@ -563,7 +563,7 @@ namespace GameModel
                     // Take transported units along with you
                     unit.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
 
-                    if (!unitStepMove.Value.RoadMove)
+                    if (unitStepMove.Value.MoveType != MoveType.Road)
                     {
                         if (unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining] > 0)
                         {

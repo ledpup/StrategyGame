@@ -204,7 +204,7 @@ namespace Tests
                 var vectors = new List<Vector>();
                 moveOrders.OfType<MoveOrder>().ToList().ForEach(x => vectors.AddRange(x.Vectors));
 
-                Visualise.GameBoardRenderer.RenderAndSave($"AirbornePickupStrategicMoveTurn{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
+                Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 
                 board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();

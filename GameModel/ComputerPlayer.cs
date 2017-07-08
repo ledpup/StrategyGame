@@ -173,19 +173,22 @@ namespace GameModel
 
                     if (closestAvailableAirborneUnitPath != null)
                     {
-                        if (closestPortPath == null || closestAvailableAirborneUnitPath.Path.Count() < closestPortPath.Count())
+                        if (closestPortPath == null || closestAvailableAirborneUnitPath.Path == null || closestAvailableAirborneUnitPath.Path.Count() < closestPortPath.Count())
                         {
                             // Transport by air
                             var transporter = closestAvailableAirborneUnitPath.Unit;
 
-                            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                            var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point, unit.MovementPoints);
-                            Tile transporteeMoveOrderDesintation = null;
-                            if (pathToAirbornUnit != null)
+                            if (closestAvailableAirborneUnitPath.Path != null)
                             {
-                                var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
-                                transporteeMoveOrderDesintation = moveOrder.Moves.Last().Destination;
-                                unitOrders.Add(moveOrder);
+                                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                                var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point, unit.MovementPoints);
+                                Tile transporteeMoveOrderDesintation = null;
+                                if (pathToAirbornUnit != null)
+                                {
+                                    var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
+                                    transporteeMoveOrderDesintation = moveOrder.Moves.Last().Destination;
+                                    unitOrders.Add(moveOrder);
+                                }
                             }
                             unitOrders.Add(new TransportOrder(transporter, unit));
                             break;
@@ -266,20 +269,23 @@ namespace GameModel
                     {
                         var closestUnit = ClosestEmbarkingUnitPath(board, units, unit.Location);
 
-                        var destination = closestUnit.Location.Point;
-
-                        var transporteeMoveOrder = existingOrders.OfType<MoveOrder>().SingleOrDefault(x => x.Unit == closestUnit);
-                        if (transporteeMoveOrder != null)
+                        if (closestUnit != null)
                         {
-                            destination = transporteeMoveOrder.Moves.Last().Destination.Point;
+                            var destination = closestUnit.Location.Point;
+
+                            var transporteeMoveOrder = existingOrders.OfType<MoveOrder>().SingleOrDefault(x => x.Unit == closestUnit);
+                            if (transporteeMoveOrder != null)
+                            {
+                                destination = transporteeMoveOrder.Moves.Last().Destination.Point;
+                            }
+
+                            // Move transport unit to the destination of the transportee's move order or just to the transportee's location
+                            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                            var pathToTransporteesDestination = FindShortestPath(pathFindTiles, unit.Location.Point, destination, unit.MovementPoints);
+                            if (pathToTransporteesDestination != null)
+                                unitOrders.Add(unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
+
                         }
-
-                        // Move transport unit to the destination of the transportee's move order or just to the transportee's location
-                        var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                        var pathToTransporteesDestination = FindShortestPath(pathFindTiles, unit.Location.Point, destination, unit.MovementPoints);
-                        if (pathToTransporteesDestination != null)
-                            unitOrders.Add(unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
-
                         break;
                     }
                 case StrategicAction.Airlift:
@@ -336,6 +342,12 @@ namespace GameModel
 
             foreach(var potentialPickupUnit in potentialPickupUnits)
             {
+                // Airborne unit already at the pickup location?
+                if (unit.Location.Point == potentialPickupUnit.Location.Point)
+                {
+                    return new UnitAndPath { Unit = potentialPickupUnit };
+                }
+
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(potentialPickupUnit);
                 var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, potentialPickupUnit.Location.Point, potentialPickupUnit.MovementPoints);
                 if (shortestPath != null)

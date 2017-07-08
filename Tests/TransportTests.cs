@@ -199,14 +199,14 @@ namespace Tests
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
                 ComputerPlayer.SetStrategicAction(board, units);
-                var moveOrders = ComputerPlayer.CreateOrders(board, units);
+                var unitOrders = ComputerPlayer.CreateOrders(board, units);
 
                 var vectors = new List<Vector>();
-                moveOrders.OfType<MoveOrder>().ToList().ForEach(x => vectors.AddRange(x.Vectors));
+                unitOrders.OfType<MoveOrder>().ToList().ForEach(x => vectors.AddRange(x.Vectors));
 
                 Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 
-                board.ResolveOrders(moveOrders);
+                board.ResolveOrders(unitOrders);
                 board.ChangeStructureOwners();
 
                 board.Turn++;

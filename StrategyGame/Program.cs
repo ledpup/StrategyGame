@@ -63,48 +63,45 @@ namespace StrategyGame
                 var bitmap = new Bitmap(1920, 1450);
                 Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 
-                for (var i = 0; i < numberOfPlayers; i++)
-                {
-                    foreach (var mt in MilitaryUnit.MovementTypes)
-                    {
-                        board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.FriendlyStructureInfluence[mt][i], 1).ToString());
-                        Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
+                //for (var i = 0; i < numberOfPlayers; i++)
+                //{
+                //    foreach (var mt in MilitaryUnit.MovementTypes)
+                //    {
+                //        board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.FriendlyStructureInfluence[mt][i], 1).ToString());
+                //        Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
 
-                        board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.EnemyStructureInfluence[mt][i], 1).ToString());
-                        Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
-                    }
+                //        board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.EnemyStructureInfluence[mt][i], 1).ToString());
+                //        Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyStructureInfluenceMap{mt.ToString()}Player{(i + 1)}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
+                //    }
 
-                    board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.FriendlyUnitInfluence[i], 1).ToString());
-                    Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
+                //    board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.FriendlyUnitInfluence[i], 1).ToString());
+                //    Visualise.GameBoardRenderer.RenderLabelsAndSave($"FriendlyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
 
-                    board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.EnemyUnitInfluence[i], 1).ToString());
-                    Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
+                //    board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.EnemyUnitInfluence[i], 1).ToString());
+                //    Visualise.GameBoardRenderer.RenderLabelsAndSave($"EnemyUnitInfluenceMapPlayer{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
 
-                    MilitaryUnit.Roles.ForEach(x => 
-                        {
-                            MilitaryUnit.MovementTypes.ForEach(z =>
-                            {
-                                board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.AggregateInfluence[new RoleMovementType(z, x)][i], 1).ToString());
-                                Visualise.GameBoardRenderer.RenderLabelsAndSave($"AggregateInfluenceMap{x.ToString()}Player{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
-                            });
-                        });                   
-                }
+                //    MilitaryUnit.Roles.ForEach(x => 
+                //        {
+                //            MilitaryUnit.MovementTypes.ForEach(z =>
+                //            {
+                //                board.Tiles.ToList().ForEach(y => labels[y.X, y.Y] = Math.Round(y.AggregateInfluence[new RoleMovementType(z, x)][i], 1).ToString());
+                //                Visualise.GameBoardRenderer.RenderLabelsAndSave($"AggregateInfluenceMap{x.ToString()}Player{i + 1}Turn{board.Turn}.png", new Bitmap(bitmap), board.Height, labels);
+                //            });
+                //        });                   
+                //}
 
-                var moveOrders = new List<IUnitOrder>();
+                var unitsOrders = new List<IUnitOrder>();
 
-                board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
-                {
-                    var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(x, board);
-                    if (moveOrder != null)
-                        moveOrders.Add(moveOrder);
-                });
+                var units = board.Units.Where(x => x.IsAlive).ToList();
+                ComputerPlayer.SetStrategicAction(board, units);
+                unitsOrders = ComputerPlayer.CreateOrders(board, units);
 
                 var vectors = new List<Vector>();
-                moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
+                unitsOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
                 Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
-                board.ResolveOrders(moveOrders);
+                board.ResolveOrders(unitsOrders);
                 for (var i = 0; i < numberOfPlayers; i++)
                 {
                     board.ResolveStackLimits(i);

@@ -416,7 +416,7 @@ namespace GameModel
         public bool CanTransport(MilitaryUnit transportee)
         {
             if (!IsTransporter)
-                throw new Exception("Only transporters can transport units");
+                return false;
 
             if (!transportee.TransportableBy.Contains(MovementType))
                 throw new Exception($"{transportee.Name} may not be transported by {MovementType} movement type");

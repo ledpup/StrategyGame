@@ -28,9 +28,10 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
-                new MilitaryUnit(1, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
-                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive, isAmphibious: true),
-                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
+                new MilitaryUnit(1, location: board[18, 0], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
+                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
             };
 
             board.Units = units;
@@ -58,14 +59,14 @@ namespace Tests
                 switch (board.Turn)
                 {
                     case 0:
-                        Assert.AreEqual(board[23, 13], units[1].Location);
+                        Assert.AreEqual(board[23, 13], units[2].Location);
                         break;
                     case 1:
-                        Assert.AreEqual(board[21, 11], units[1].Location);
+                        Assert.AreEqual(board[21, 11], units[2].Location);
                         break;
                     case 2:
                         Assert.AreEqual(board[21, 10], units[0].Location);
-                        Assert.AreEqual(board[21, 10], units[1].Location);
+                        Assert.AreEqual(board[21, 10], units[2].Location);
                         break;
                 }
             }

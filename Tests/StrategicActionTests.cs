@@ -20,7 +20,6 @@ namespace Tests
         public void EnemyNearNavelUnitSoDontDock()
         {
             var board = new Board(GameBoard, TileEdges, Structures);
-            var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
             var units = new List<MilitaryUnit>
@@ -32,9 +31,6 @@ namespace Tests
 
             board.Units = units;
 
-
-            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
-
             ComputerPlayer.SetStrategicAction(board, units);
 
             Assert.AreEqual(StrategicAction.None, units[0].StrategicAction);
@@ -44,7 +40,6 @@ namespace Tests
         public void NoEnemyNearNavelUnitSoDock()
         {
             var board = new Board(GameBoard, TileEdges, Structures);
-            var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
             var units = new List<MilitaryUnit>
@@ -53,9 +48,6 @@ namespace Tests
             };
 
             board.Units = units;
-
-
-            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
             ComputerPlayer.SetStrategicAction(board, units);
 
@@ -67,7 +59,6 @@ namespace Tests
         public void EnemyNearAirborneUnitSoDontPickup()
         {
             var board = new Board(GameBoard, TileEdges, Structures);
-            var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
             var units = new List<MilitaryUnit>
@@ -81,9 +72,6 @@ namespace Tests
 
             board.Units = units;
 
-
-            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
-
             ComputerPlayer.SetStrategicAction(board, units);
 
             Assert.AreEqual(StrategicAction.None, units[0].StrategicAction);
@@ -93,7 +81,6 @@ namespace Tests
         public void EnemyNearAirborneUnitSoPickup()
         {
             var board = new Board(GameBoard, TileEdges, Structures);
-            var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
             var units = new List<MilitaryUnit>
@@ -104,9 +91,6 @@ namespace Tests
             };
 
             board.Units = units;
-
-
-            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
             ComputerPlayer.SetStrategicAction(board, units);
 

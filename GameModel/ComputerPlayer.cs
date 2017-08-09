@@ -91,20 +91,35 @@ namespace GameModel
             units
                 .ForEach(unit =>
                 {
+                    var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                    unit.StrategicAction = StrategicAction.None;
                     switch (unit.MovementType)
                     {
                         case MovementType.Airborne:
-                            if (!unit.Transporting.Any() && !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex))
+                            // If there are any enemy land or airborne units that are nearby, don't do pickup or airlift
+                            if (board.Units.Any(x => x.OwnerIndex != unit.OwnerIndex &&
+                                        (x.MovementType == MovementType.Land || x.MovementType == MovementType.Airborne) &&
+                                        ShortestPathDistance(pathFindTiles, unit.Location.Point, x.Location.Point, unit.MovementPoints) < unit.MovementPoints * 1.5))
+                            {
+                                break;
+                            }
+                            if (!unit.Transporting.Any())
                             {
                                 unit.StrategicAction = StrategicAction.Pickup;
                             }
                             else if (unit.Transporting.Any())
                             {
-                                unit.StrategicAction = StrategicAction.Airlift;
+                                unit.StrategicAction = StrategicAction.AirliftToDestination;
                             }
                             break;
                         case MovementType.Land:
-                            if (unit.TransportedBy == null && unit.Role != Role.Defensive && !board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex))
+                            // Only embark if not already being transported, not in a defensive role, 
+                            // and there are no enemy structures or units nearby
+                            if (unit.TransportedBy == null && 
+                                        unit.Role != Role.Defensive &&
+                                        !board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex) &&
+                                        !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)
+                                        )
                             {
                                 unit.StrategicAction = StrategicAction.Embark;
                             }
@@ -112,20 +127,22 @@ namespace GameModel
                             {
                                 unit.StrategicAction = StrategicAction.Disembark;
                             }
-                            else
-                                unit.StrategicAction = StrategicAction.None;
                             break;
                         case MovementType.Water:
-                            if ((!unit.Transporting.Any() && 
-                                    !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex))
-                                    ||
-                                    (unit.Location.HasPort && board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)))
+                            // If there are any enemy units nearby, don't dock or transport to destination
+                            if (board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId
+                                                && x.OwnerIndex != unit.OwnerIndex
+                                                && ShortestPathDistance(pathFindTiles, unit.Location.Point, x.Location.Point, unit.MovementPoints) < unit.MovementPoints * 1.5))
+                            {
+                                break;
+                            }
+                            if (!unit.Transporting.Any())
                             {
                                 unit.StrategicAction = StrategicAction.Dock;
                             }
                             else if (unit.Transporting.Any())
                             {
-                                unit.StrategicAction = StrategicAction.Transport;
+                                unit.StrategicAction = StrategicAction.TransportToDestination;
                             }
                             break;
                     }
@@ -251,7 +268,7 @@ namespace GameModel
                         }
                         break;
                     }
-                case StrategicAction.Transport:
+                case StrategicAction.TransportToDestination:
                     {
                         // Find the closest port that has a region with one or more enemy structures
                         closestPortPath = ClosestPortPath(board, unit);
@@ -288,7 +305,7 @@ namespace GameModel
                         }
                         break;
                     }
-                case StrategicAction.Airlift:
+                case StrategicAction.AirliftToDestination:
                     {
 
                         var closestEnemyStructure = ClosestEnemyStructurePath(board, unit);
@@ -394,7 +411,7 @@ namespace GameModel
                                 if (!board.Units.Any(y => x.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.StrategicAction == StrategicAction.Embark))
                                     return;
                                 break;
-                            case StrategicAction.Transport:
+                            case StrategicAction.TransportToDestination:
                                 // Only go to a port that has enemy structure(s)
                                 if (!board.Structures.Any(y => x.Edges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
                                     return;
@@ -617,6 +634,14 @@ namespace GameModel
             var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
 
             return path == null || path.Count() == 1 ? null : path.Reverse();
+        }
+
+        public static int ShortestPathDistance(List<PathFindTile> pathFindTiles, Point origin, Point destination, int maxCumulativeCost)
+        {
+            var path = FindShortestPath(pathFindTiles, origin, destination, maxCumulativeCost);
+            if (path == null)
+                return int.MaxValue;
+            return path.Count();
         }
 
         public static List<Vector> PathFindTilesToVectors(IEnumerable<PathFindTile> path)

@@ -45,11 +45,11 @@ namespace GameModel
     {
         None,
         Dock,
-        Transport,
+        TransportToDestination,
         Embark,
         Disembark,
         Pickup,
-        Airlift,
+        AirliftToDestination,
     }
 
     public struct RoleMovementType

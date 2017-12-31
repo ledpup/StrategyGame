@@ -19,7 +19,7 @@ namespace Visualise
     }
     public class GameBoardRenderer
     {
-        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Line> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
             var drawing = new GameBoardDrawing2D(bitmap, boardHeight);
 
@@ -50,21 +50,19 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Vectors)
             {
-                var vectors = new List<Vector>();
+                var vectors = new List<Line>();
                 if (edges != null)
                 {
                     edges.ToList().ForEach(x =>
                     {
-                        if (x.EdgeType == EdgeType.Bridge)
-                            vectors.Add(new Vector(x.Origin.Point, x.Destination.Point, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
-                        vectors.Add(new Vector(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
+                        vectors.Add(new Line(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.EdgeType));
                     });
 
 
                     if (lines != null)
                         vectors.AddRange(lines);
 
-                    vectors.ForEach(x => drawing.DrawEdge(
+                    vectors.ForEach(x => drawing.DrawLine(
                         x.Origin.Hex,
                         x.Destination.Hex, 
                         new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), 
@@ -139,7 +137,15 @@ namespace Visualise
             return bitmap;
         }
 
-        public static void RenderAndSave(string fileName, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
+        public static ArgbColour UnitColour(MilitaryUnit unit)
+        {
+            get
+            {
+                return IsAlive ? Player.Colour(OwnerIndex) : Colours.Black;
+            }
+        }
+
+        public static void RenderAndSave(string fileName, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Line> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
         {
             var bitmap = new Bitmap(imageWidth, imageHeight);
             bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, boardHeight, tiles, edges, structures, labels, lines, units, circles);

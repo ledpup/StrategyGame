@@ -45,14 +45,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgbColour.cs" />
     <Compile Include="GameBoardRenderer.cs" />
     <Compile Include="GameBoardDrawing2D.cs" />
+    <Compile Include="Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameModel\GameModel.csproj">
       <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
       <Name>GameModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HexagonLibrary\HexagonLibrary.csproj">
+      <Project>{C2241963-FA05-4103-BDBB-554C269B137D}</Project>
+      <Name>HexagonLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

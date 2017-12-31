@@ -29,10 +29,9 @@ namespace GameModel
 
         public int ContiguousRegionId { get; set; }
 
-        public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
+        public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdgeOfMap = false)
         {
             Units = new List<MilitaryUnit>();
-            Edges = new List<Edge>();
 
             Index = index;
             Point = new Point(x, y);
@@ -41,7 +40,7 @@ namespace GameModel
 
             BaseTerrainType = terrainType.HasFlag(TerrainType.Water) || terrainType.HasFlag(TerrainType.Reef) ? BaseTerrainType.Water : BaseTerrainType.Land;
             TerrainType = terrainType;
-            IsEdgeOfMap = isEdge;
+            IsEdgeOfMap = isEdgeOfMap;
 
             AggregateInfluence = new Dictionary<RoleMovementType, double[]>();
 
@@ -52,11 +51,6 @@ namespace GameModel
         {
             var subTerrain = IsLake ? " (Lake)" : IsSea ? " (Sea)" : "";
             return Index + " " + Point.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
-        }
-
-        public List<Edge> Edges
-        {
-            get; set;
         }
 
         public float? Supply { get; set; }
@@ -83,7 +77,7 @@ namespace GameModel
                 return 1;
             }
             
-            if (unit.EdgeMovementCosts[edge.EdgeType] != null)
+            if (unit.EdgeMovementCosts[edge.EdgeType] < 100)
             {
                 costChanged = true;
                 cost = (int)unit.EdgeMovementCosts[edge.EdgeType];
@@ -194,8 +188,8 @@ namespace GameModel
         {
             return tile
                     .Neighbours
-                    .Where(x => unit.EdgeMovementCosts[Edge.GetEdge(tile, x).EdgeType] != null &&
-                                (Edge.GetEdge(tile, x).BaseEdgeType == BaseEdgeType.CentreToCentre || unit.TerrainMovementCosts[x.TerrainType] != null));
+                    .Where(x => (Edge.GetEdge(tile, x) == null || unit.EdgeMovementCosts[Edge.GetEdge(tile, x).EdgeType] < 100) &&
+                                (Road.GetRoad(tile, x) != null || unit.TerrainMovementCosts[x.TerrainType] < 100));
         }
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)

@@ -52,7 +52,7 @@ namespace Tests
                     moveOrders.Add(moveOrder);
             });
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
             moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
             Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);

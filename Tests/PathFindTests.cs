@@ -88,7 +88,7 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
@@ -117,7 +117,7 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
@@ -146,13 +146,13 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 3), unit.MovementPoints).ToArray();
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
             var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
 
-            vectors = new List<Vector>();
+            vectors = new List<Line>();
             vectors.AddRange(moveOrder.Vectors);
 
             Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);

@@ -1,4 +1,5 @@
-﻿using PathFind;
+﻿using HexagonLibrary;
+using PathFind;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,17 +40,6 @@ namespace GameModel
         Offensive,
         Defensive,
         Scout,
-    }
-
-    public enum StrategicAction
-    {
-        None,
-        Dock,
-        TransportToDestination,
-        Embark,
-        Disembark,
-        Pickup,
-        AirliftToDestination,
     }
 
     public struct RoleMovementType
@@ -129,7 +119,6 @@ namespace GameModel
         public int Speed { get; set; }
         public bool IsAlive { get; private set; }
 
-        public bool IsAmphibious { get; set; }
         public Dictionary<TerrainType, double> TerrainTypeBattleModifier { get; set; }
         public Dictionary<Weather, double> WeatherBattleModifier { get; set; }
         public Dictionary<UnitType, double> OpponentUnitTypeBattleModifier { get; set; }
@@ -146,12 +135,11 @@ namespace GameModel
 
         public Role Role { get; set; }
 
-        public StrategicAction StrategicAction { get; set; }
         public override string ToString()
         {
             return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced, StrategicAction strategicAction = StrategicAction.None, float[] moraleMoveCost = null)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, Role role = Role.Balanced, float[] moraleMoveCost = null)
         {
             IsAlive = true;
 
@@ -216,7 +204,6 @@ namespace GameModel
 
             InitialMorale = initialMorale;
             InitialQuantity = initialQuantity;
-            IsAmphibious = isAmphibious;
 
             switch (MovementType)
             {
@@ -242,15 +229,8 @@ namespace GameModel
                 MoraleMoveCost = moraleMoveCost;
             }
 
-            if (IsAmphibious)
-            {
-                TerrainMovementCosts[TerrainType.Wetland] = 1;
-                EdgeMovementCosts[EdgeType.River] = 0;
-            }
-
             RoadMovementBonus = roadMovementBonus;
             Role = role;
-            StrategicAction = strategicAction;
             RoleMovementType = new RoleMovementType(MovementType, Role);
 
             CalculateStrength();
@@ -325,13 +305,17 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Steppe] = 2;
             TerrainMovementCosts[TerrainType.Forest] = 2;
             TerrainMovementCosts[TerrainType.Hill] = 2;
+            TerrainMovementCosts[TerrainType.Mountain] = 100;
+            TerrainMovementCosts[TerrainType.Water] = 100;
             TerrainMovementCosts[TerrainType.Wetland] = 2;
+            TerrainMovementCosts[TerrainType.Reef] = 100;
 
-            EdgeMovementCosts[EdgeType.Normal] = 0;
-            EdgeMovementCosts[EdgeType.Road] = 0;
-            EdgeMovementCosts[EdgeType.Bridge] = 0;
+            EdgeMovementCosts[EdgeType.River] = 100;
             EdgeMovementCosts[EdgeType.Forest] = 1;
             EdgeMovementCosts[EdgeType.Hill] = 1;
+            EdgeMovementCosts[EdgeType.Mountain] = 100;
+            EdgeMovementCosts[EdgeType.Reef] = 100;
+            EdgeMovementCosts[EdgeType.Wall] = 100;
             EdgeMovementCosts[EdgeType.Port] = 1;
 
             CanStopOn = Terrain.Non_Mountainous_Land;
@@ -344,31 +328,39 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Forest] = 1;
             TerrainMovementCosts[TerrainType.Hill] = 1;
             TerrainMovementCosts[TerrainType.Mountain] = 1;
-            TerrainMovementCosts[TerrainType.Wetland] = 1;
-
             TerrainMovementCosts[TerrainType.Water] = 1;
+            TerrainMovementCosts[TerrainType.Wetland] = 1;            
             TerrainMovementCosts[TerrainType.Reef] = 1;
 
-            // Airborne units can fly over anything except walls
-            EdgeMovementCosts[EdgeType.Normal] = 0;
-            EdgeMovementCosts[EdgeType.Road] = 0;
-            EdgeMovementCosts[EdgeType.Bridge] = 0;
+            EdgeMovementCosts[EdgeType.River] = 0;
             EdgeMovementCosts[EdgeType.Forest] = 0;
             EdgeMovementCosts[EdgeType.Hill] = 0;
-            EdgeMovementCosts[EdgeType.Port] = 0;
-            EdgeMovementCosts[EdgeType.River] = 0;
+            EdgeMovementCosts[EdgeType.Mountain] = 0;
             EdgeMovementCosts[EdgeType.Reef] = 0;
+            EdgeMovementCosts[EdgeType.Wall] = 100;
+            EdgeMovementCosts[EdgeType.Port] = 0;
 
             CanStopOn = Terrain.Non_Mountainous_Land;
         }
 
         void WaterUnit()
         {
+            TerrainMovementCosts[TerrainType.Grassland] = 100;
+            TerrainMovementCosts[TerrainType.Steppe] = 100;
+            TerrainMovementCosts[TerrainType.Forest] = 100;
+            TerrainMovementCosts[TerrainType.Hill] = 100;
+            TerrainMovementCosts[TerrainType.Mountain] = 100;
             TerrainMovementCosts[TerrainType.Water] = 1;
+            TerrainMovementCosts[TerrainType.Wetland] = 100;
             TerrainMovementCosts[TerrainType.Reef] = 2;
 
-            EdgeMovementCosts[EdgeType.Normal] = 0;
+            EdgeMovementCosts[EdgeType.River] = 100;
+            EdgeMovementCosts[EdgeType.Forest] = 100;
+            EdgeMovementCosts[EdgeType.Hill] = 100;
+            EdgeMovementCosts[EdgeType.Mountain] = 100;
             EdgeMovementCosts[EdgeType.Reef] = 1;
+            EdgeMovementCosts[EdgeType.Wall] = 100;
+            EdgeMovementCosts[EdgeType.Port] = 100;
 
             CanStopOn = Terrain.All_Water;
         }
@@ -427,14 +419,6 @@ namespace GameModel
         public int TransportSize
         {
             get { return (int)Math.Ceiling(Quantity * Size); }
-        }
-
-        public ArgbColour UnitColour
-        {
-            get
-            {
-                return IsAlive ? Player.Colour(OwnerIndex) : Colours.Black;
-            }
         }
 
         public int RoadMovementBonus { get; set; }
@@ -529,7 +513,7 @@ namespace GameModel
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] != null;
+            potentialMove = unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] < 100;
 
             if (!potentialMove)
                 return false;

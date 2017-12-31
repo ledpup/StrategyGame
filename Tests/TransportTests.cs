@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Visualise;
 
 namespace Tests
 {
@@ -48,7 +49,7 @@ namespace Tests
                 ComputerPlayer.SetStrategicAction(board, units);
                 var moveOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var vectors = new List<Vector>();
+                var vectors = new List<Line>();
                 moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
                 Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
@@ -184,9 +185,12 @@ namespace Tests
             {
                 new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
                 new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
-                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Defensive),
                 new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Besieger),
             };
+
+            board.Units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            board.Units[2].EdgeMovementCosts[EdgeType.River] = 1;
 
             board.Units = units;
 
@@ -202,8 +206,8 @@ namespace Tests
                 ComputerPlayer.SetStrategicAction(board, units);
                 var unitOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var vectors = new List<Vector>();
-                unitOrders.OfType<MoveOrder>().ToList().ForEach(x => vectors.AddRange(x.Vectors));
+                var lines = new List<Line>();
+                unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(x.Vectors));
 
                 Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 

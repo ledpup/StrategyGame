@@ -293,7 +293,7 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[381].Point, unit.MovementPoints);
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
@@ -312,7 +312,7 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[456].Point, unit.MovementPoints);
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
 
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
 
@@ -330,7 +330,7 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[484].Point, unit.MovementPoints);
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
 
             vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
 
@@ -422,7 +422,9 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Amphibious", 1, board[1, 1], MovementType.Land, isAmphibious: true) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Amphibious", 1, board[1, 1], MovementType.Land) };
+            units[0].TerrainMovementCosts[TerrainType.Wetland] = 1;
+            units[0].EdgeMovementCosts[EdgeType.River] = 0;
 
             var moves = units[0].PossibleMoves();
 
@@ -627,7 +629,7 @@ namespace Tests
                 new MoveOrder(moves4, board.Units[3]),
             };
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
             moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
             Visualise.GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);

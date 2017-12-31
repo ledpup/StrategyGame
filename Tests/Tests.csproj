@@ -68,6 +68,10 @@
       <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
       <Name>GameModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\HexagonLibrary\HexagonLibrary.csproj">
+      <Project>{c2241963-fa05-4103-bdbb-554c269b137d}</Project>
+      <Name>HexagonLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PathFind\PathFind.csproj">
       <Project>{2caef444-6049-4d0e-b492-d3fe21800ea4}</Project>
       <Name>PathFind</Name>

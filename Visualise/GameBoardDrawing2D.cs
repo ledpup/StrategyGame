@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using GameModel;
 using System.Linq;
+using HexagonLibrary;
 
 namespace Visualise
 {
@@ -31,7 +31,7 @@ namespace Visualise
             _layout = new Layout(Layout.flat, new PointD(_edgeLength, _edgeLength), new PointD(_edgeLength, _hexHeight/2));
         }
 
-        public void DrawBoard(int width, int height, Dictionary<GameModel.Point, Brush> hexagonColours)
+        public void DrawBoard(int width, int height, Dictionary<HexagonLibrary.Point, Brush> hexagonColours)
         {
             _graphics.FillRectangle(Brushes.White, 0, 0, width, height);
 
@@ -54,7 +54,7 @@ namespace Visualise
                 .ToArray();
         }
 
-        public void DrawEdge(Hex origin, Hex destination, Pen pen, bool isCentreToCentre, bool isPort)
+        public void DrawLine(Hex origin, Hex destination, Pen pen, bool isCentreToCentre, bool isPort)
         {
             (PointF pt1, PointF pt2) points;
             if (isCentreToCentre)
@@ -143,14 +143,14 @@ namespace Visualise
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        public void DrawCircle(GameModel.Point location, float position, SolidBrush brush)
+        public void DrawCircle(HexagonLibrary.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
             _graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _unitWidth, _unitWidth);
         }
 
-        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(GameModel.Point location, float position)
+        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(HexagonLibrary.Point location, float position)
         {
             float Radius = _hexHeight / 4;
 
@@ -165,7 +165,7 @@ namespace Visualise
             return (xTopLeft, yTopLeft);
         }
 
-        internal void DrawTrapezium(GameModel.Point location, float position, SolidBrush brush)
+        internal void DrawTrapezium(HexagonLibrary.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
@@ -181,7 +181,7 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        public void DrawTriangle(GameModel.Point location, float position, SolidBrush brush)
+        public void DrawTriangle(HexagonLibrary.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
@@ -195,7 +195,7 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        internal void DrawRectangle(GameModel.Point location, SolidBrush brush)
+        internal void DrawRectangle(HexagonLibrary.Point location, SolidBrush brush)
         {
             var hexCentre = Layout.HexToPixel(_layout, new OffsetCoord(location.X, location.Y).QoffsetToCube());
 

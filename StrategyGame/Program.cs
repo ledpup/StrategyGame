@@ -31,7 +31,7 @@ namespace StrategyGame
                 new MilitaryUnit(0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3, role: Role.Besieger),
                 new MilitaryUnit(1, location: board[110], baseMovementPoints: 3, role: Role.Defensive),
                 new MilitaryUnit(2, location: board[31], role: Role.Defensive),
-                new MilitaryUnit(3, location: board[56], movementType: MovementType.Land, isAmphibious: true),
+                new MilitaryUnit(3, location: board[56], movementType: MovementType.Land),
                 new MilitaryUnit(4, location: board[65]),
                 new MilitaryUnit(5, location: board[316], role: Role.Defensive),
 
@@ -46,6 +46,9 @@ namespace StrategyGame
 
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
+
+            board.Units[3].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            board.Units[3].EdgeMovementCosts[EdgeType.River] = 1;
 
             var gameOver = false;
 
@@ -96,7 +99,7 @@ namespace StrategyGame
                 ComputerPlayer.SetStrategicAction(board, units);
                 unitsOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var vectors = new List<Vector>();
+                var vectors = new List<Line>();
                 unitsOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
 
                 Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);

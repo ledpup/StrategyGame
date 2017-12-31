@@ -60,7 +60,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, Structures);
 
-            var vectors = new List<Vector>() { new Vector(board[28].Point, board[29].Point, Colours.Black) { EdgeType = EdgeType.Road } };
+            var vectors = new List<Line>() { new Line(board[28].Point, board[29].Point, Colours.Black, EdgeType.Road) };
 
             Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithCurves.png", board.Height, board.Tiles, circles: board[1,1]);
         }
@@ -72,7 +72,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[1, 1]);
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Line>();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
 

@@ -55,7 +55,6 @@
     <Compile Include="MoveOrderDto.cs" />
     <Compile Include="QuantityChangeEvent.cs" />
     <Compile Include="PathFindTile.cs" />
-    <Compile Include="Road.cs" />
     <Compile Include="Stack.cs" />
     <Compile Include="Structure.cs" />
     <Compile Include="Terrain.cs" />

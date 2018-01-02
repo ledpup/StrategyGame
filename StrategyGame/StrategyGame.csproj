@@ -59,6 +59,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ComputerOpponent\ComputerOpponent.csproj">
+      <Project>{40377a4b-2f06-4d82-aa53-59dea7315426}</Project>
+      <Name>ComputerOpponent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameModel\GameModel.csproj">
       <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
       <Name>GameModel</Name>

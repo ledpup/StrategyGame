@@ -13,11 +13,13 @@ namespace Visualise
         public Point Origin;
         public Point Destination;
         public ArgbColour Colour;
-        public Centreline(Point origin, Point destination, ArgbColour colour)
+        public int Width;
+        public Centreline(Point origin, Point destination, ArgbColour colour, bool isBridge = false)
         {
             Origin = origin;
             Destination = destination;
             Colour = colour;
+            Width = isBridge ? 6 : 3;
         }
 
         public static List<Centreline> Lines(MoveOrder moveOrder)

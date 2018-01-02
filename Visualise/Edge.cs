@@ -13,11 +13,13 @@ namespace Visualise
         public Point Origin;
         public Point Destination;
         public ArgbColour Colour;
-        public Edge(Point origin, Point destination, ArgbColour colour)
+        public bool IsPort;
+        public Edge(Point origin, Point destination, ArgbColour colour, bool isPort)
         {
             Origin = origin;
             Destination = destination;
             Colour = colour;
+            IsPort = isPort;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GameModel;
+﻿using ComputerOpponent;
+using GameModel;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Visualise;
 
 namespace StrategyGame
 {
@@ -99,10 +101,10 @@ namespace StrategyGame
                 ComputerPlayer.SetStrategicAction(board, units);
                 unitsOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var vectors = new List<Line>();
-                unitsOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
+                var lines = new List<Centreline>();
+                unitsOrders.ForEach(x => lines.AddRange(Centreline.Lines((MoveOrder)x)));
 
-                Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+                GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(unitsOrders);
                 for (var i = 0; i < numberOfPlayers; i++)
@@ -110,7 +112,7 @@ namespace StrategyGame
                     board.ResolveStackLimits(i);
                 }
 
-                Visualise.GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>

@@ -43,7 +43,6 @@ namespace GameModel
             }            
         }
 
-        public ArgbColour Colour { get { return Player.Colour(OwnerIndex); } }
         public StructureType StructureType { get; set;}
     }
 }

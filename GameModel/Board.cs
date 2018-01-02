@@ -41,7 +41,12 @@ namespace GameModel
             FindNeighbours();
             CalculateTileDistanceFromTheSea();
             IntitaliseEdges(edges);
-            IntitaliseRoads(roads);
+            Edges.ForEach(x =>
+                {
+                    x.Origin.Edges.Add(x);
+                    x.Destination.Edges.Add(x);
+                }
+            );
             Structures = IntitaliseStructures(structures);
             InitialiseSupply();
             CalculateContiguousRegions();
@@ -330,38 +335,7 @@ namespace GameModel
                     if (existingEdge.Any())
                         throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because one already exists of type {2}.", t1.Index, t2.Index, existingEdge.Single().EdgeType.ToString()));
 
-                    Edges.Add(new Edge(columns[2], t1, t2));
-                }
-            );
-        }
-
-        private void IntitaliseRoads(string[] roads)
-        {
-            roads.ToList().ForEach(
-                x =>
-                {
-                    var columns = x.Split(',');
-
-                    var tileIndexes = new List<int> { int.Parse(columns[0]), int.Parse(columns[1]) };
-
-                    var firstTile = tileIndexes.Min();
-                    var secondTile = tileIndexes.Max();
-
-                    if (firstTile == secondTile)
-                        throw new Exception("Must create an road between two different tiles");
-
-                    var t1 = TileArray[firstTile];
-                    var t2 = TileArray[secondTile];
-
-                    if (!t1.Neighbours.Contains(t2))
-                        throw new Exception(string.Format("Can not create a tile road between tile {0} and tile {1} because they are not neighbours", t1.Index, t2.Index));
-
-                    var existingRoad = Roads.Where(y => y.CrossesRoad(t1, t2));
-
-                    if (existingRoad.Any())
-                        throw new Exception(string.Format("Can not create a tile road between tile {0} and tile {1} because one already exists", t1.Index, t2.Index));
-
-                    Roads.Add(new Road(columns[2], t1, t2));
+                    Edges.Add(new Edge(columns[2], t1, t2, bool.Parse(columns[3])));
                 }
             );
         }
@@ -423,7 +397,6 @@ namespace GameModel
         public Dictionary<TerrainType, double> TerrainTemperatureModifiers { get; private set; }
 
         public List<Edge> Edges;
-        public List<Road> Roads;
 
         public List<PathFindTile> ValidMovesWithMoveCostsForUnit(MilitaryUnit unit)
         {

@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using Hexagon;
-using Hexagon;
 
 namespace Visualise
 {
@@ -55,8 +54,9 @@ namespace Visualise
                 .ToArray();
         }
 
-        public void DrawEdge(Hex origin, Hex destination, Pen pen, bool isPort)
+        public void DrawEdge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
         {
+            var pen = new Pen(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue));
             (PointF pt1, PointF pt2) points;
 
             var direction = Hex.Subtract(origin, destination);
@@ -147,8 +147,9 @@ namespace Visualise
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        public void DrawCircle(Hexagon.Point location, float position, SolidBrush brush)
+        public void DrawCircle(Hexagon.Point location, float position, ArgbColour colour)
         {
+            var brush = ArgbColourToBrush(colour);
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
             _graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _unitWidth, _unitWidth);
@@ -169,8 +170,9 @@ namespace Visualise
             return (xTopLeft, yTopLeft);
         }
 
-        internal void DrawTrapezium(Hexagon.Point location, float position, SolidBrush brush)
+        internal void DrawTrapezium(Hexagon.Point location, float position, ArgbColour colour)
         {
+            var brush = ArgbColourToBrush(colour);
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
             PointF[] points =
@@ -185,8 +187,18 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        public void DrawTriangle(Hexagon.Point location, float position, SolidBrush brush)
+        static Color ArgbColourToColor(ArgbColour colour)
         {
+            return Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue);
+        }
+
+        static SolidBrush ArgbColourToBrush(ArgbColour colour)
+        {
+            return new SolidBrush(ArgbColourToColor(colour));
+        }
+        public void DrawTriangle(Hexagon.Point location, float position, ArgbColour colour)
+        {
+            var brush = ArgbColourToBrush(colour);
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
             PointF[] points = 
@@ -199,8 +211,9 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        internal void DrawRectangle(Hexagon.Point location, SolidBrush brush)
+        internal void DrawRectangle(Hexagon.Point location, ArgbColour colour)
         {
+            var brush = new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue));
             var hexCentre = Layout.HexToPixel(_layout, new OffsetCoord(location.X, location.Y).QoffsetToCube());
 
             var x = (float)hexCentre.X - (_structureWidth / 2);

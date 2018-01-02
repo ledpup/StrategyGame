@@ -1,4 +1,4 @@
-﻿using HexagonLibrary;
+﻿using Hexagon;
 using PathFind;
 using System;
 using System.Collections.Generic;
@@ -487,7 +487,7 @@ namespace GameModel
         {
             if (unit.MovementType == MovementType.Land)
             {
-                if (unit.TransportedBy == null && Edge.GetEdge(origin, x).EdgeType == EdgeType.Port)
+                if (unit.TransportedBy == null && Edge.GetEdge(origin.Edges, origin, x).EdgeType == EdgeType.Port)
                 {
                     return MoveType.Embark;
                 }
@@ -513,29 +513,25 @@ namespace GameModel
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] < 100;
+            potentialMove = unit.EdgeMovementCosts[Edge.GetEdge(origin.Edges, origin, dest).EdgeType] < 100;
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] != null
-                                                                || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre
-                                                                || (Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port && unit.StrategicAction == StrategicAction.Embark);
+            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] < 100;
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = (unit.TransportedBy == null || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port);
+            potentialMove = (unit.TransportedBy == null || Edge.GetEdge(origin.Edges, origin, dest).EdgeType == EdgeType.Port);
 
             return potentialMove;
         }
 
         private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
         {
-            var moves = tile.Edges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre 
-                                                            && !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination))
-                                                     )
-                .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
+            var moves = tile.Edges.Where(x => !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination)))
+                                            .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
 
             movesConsidered.AddRange(moves);
 
@@ -556,14 +552,14 @@ namespace GameModel
         public MoveOrder GetMoveOrderToDestination(Point destination, Board board)
         {
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(this);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, Location.Point, destination, MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(pathFindTiles, Location.Point, destination, MovementPoints).ToArray();
 
             return ShortestPathToMoveOrder(shortestPath);
         }
 
         public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
         {
-            var moves = ComputerPlayer.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
+            var moves = Board.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
 
             if (moves.Count == 0)
                 return null;

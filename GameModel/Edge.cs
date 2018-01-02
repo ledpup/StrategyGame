@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace GameModel
 {
     public enum EdgeType
-    { 
+    {
+        None,
         River,
         Forest,
         Hill,
@@ -19,16 +20,21 @@ namespace GameModel
 
     public class Edge
     {
-        public Edge(string edgeType, Tile origin, Tile destination)
+        public Edge(string edgeType, Tile origin, Tile destination, bool hasRoad)
         {
             EdgeType = (EdgeType)Enum.Parse(typeof(EdgeType), edgeType);
 
             Origin = origin;
             Destination = destination;
+
+            HasRoad = hasRoad;
         }
 
         public Tile Origin;
         public Tile Destination;
+
+        public bool HasRoad { get; private set; }
+
         public EdgeType EdgeType;
 
         internal static bool CrossesEdge(Edge edge, Tile tile1, Tile tile2)
@@ -45,7 +51,7 @@ namespace GameModel
             return edges.SingleOrDefault(x => x.CrossesEdge(tile1, tile2));
         }
 
-        internal static List<Edge> GetEdges(List<Edge> edges, Tile location)
+        public static List<Edge> GetEdges(List<Edge> edges, Tile location)
         {
             return edges.Where(x => x.Origin == location || x.Destination == location).ToList();
         }

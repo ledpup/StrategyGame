@@ -25,7 +25,7 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Board)
             {
-                var hexagonColours = new Dictionary<GameModel.Point, Brush>();
+                var hexagonColours = new Dictionary<HexagonLibrary.Point, Brush>();
 
                 var displaySelected = tiles.Any(x => x.IsSelected);
 
@@ -38,7 +38,7 @@ namespace Visualise
                         colour.Green = (short)(colour.Green * .3);
                         colour.Blue = (short)(colour.Blue * .3);
                     }
-                    hexagonColours.Add(new GameModel.Point(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                    hexagonColours.Add(new HexagonLibrary.Point(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                 }
                 );
 
@@ -137,12 +137,14 @@ namespace Visualise
             return bitmap;
         }
 
+        internal static ArgbColour PlayerColour(int playerIndex)
+        {
+            return playerIndex == 0 ? Colours.Blue : Colours.Red;
+        }
+
         public static ArgbColour UnitColour(MilitaryUnit unit)
         {
-            get
-            {
-                return IsAlive ? Player.Colour(OwnerIndex) : Colours.Black;
-            }
+            return unit.IsAlive ? PlayerColour(unit.OwnerIndex) : Colours.Black;
         }
 
         public static void RenderAndSave(string fileName, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Line> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)

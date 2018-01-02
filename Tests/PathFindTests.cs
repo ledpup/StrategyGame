@@ -6,6 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HexagonLibrary;
+using ComputerOpponent;
+using Visualise;
 
 namespace Tests
 {

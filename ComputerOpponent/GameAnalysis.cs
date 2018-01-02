@@ -1,10 +1,11 @@
-﻿using System;
+﻿using GameModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameModel
+namespace ComputerOpponent
 {
     public class GameAnalysis
     {

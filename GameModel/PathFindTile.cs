@@ -1,4 +1,5 @@
-﻿using PathFind;
+﻿using Hexagon;
+using PathFind;
 using System;
 using System.Collections.Generic;
 using System.Linq;

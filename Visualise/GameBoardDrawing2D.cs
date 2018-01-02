@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using HexagonLibrary;
+using Hexagon;
+using Hexagon;
 
 namespace Visualise
 {
@@ -31,7 +32,7 @@ namespace Visualise
             _layout = new Layout(Layout.flat, new PointD(_edgeLength, _edgeLength), new PointD(_edgeLength, _hexHeight/2));
         }
 
-        public void DrawBoard(int width, int height, Dictionary<HexagonLibrary.Point, Brush> hexagonColours)
+        public void DrawBoard(int width, int height, Dictionary<Hexagon.Point, Brush> hexagonColours)
         {
             _graphics.FillRectangle(Brushes.White, 0, 0, width, height);
 
@@ -54,24 +55,17 @@ namespace Visualise
                 .ToArray();
         }
 
-        public void DrawLine(Hex origin, Hex destination, Pen pen, bool isCentreToCentre, bool isPort)
+        public void DrawEdge(Hex origin, Hex destination, Pen pen, bool isPort)
         {
             (PointF pt1, PointF pt2) points;
-            if (isCentreToCentre)
-            {
-                points.pt1 = PointDtoF(Layout.HexToPixel(_layout, origin));
-                points.pt2 = PointDtoF(Layout.HexToPixel(_layout, destination));
-            }
-            else
-            {
-                var direction = Hex.Subtract(origin, destination);
-                var index = Hex.Directions.IndexOf(direction);
 
-                var vertices = Layout.PolygonCorners(_layout, origin);
+            var direction = Hex.Subtract(origin, destination);
+            var index = Hex.Directions.IndexOf(direction);
 
-                points.pt1 = PointDtoF(vertices[index]);
-                points.pt2 = PointDtoF(vertices[(index + 1) % 6]);
-            }
+            var vertices = Layout.PolygonCorners(_layout, origin);
+
+            points.pt1 = PointDtoF(vertices[index]);
+            points.pt2 = PointDtoF(vertices[(index + 1) % 6]);
 
             if (isPort)
             {
@@ -90,6 +84,16 @@ namespace Visualise
             {
                 _graphics.DrawLine(pen, points.pt1, points.pt2);
             }
+        }
+
+        public void DrawCentreline(Hex origin, Hex destination, Pen pen)
+        {
+            (PointF pt1, PointF pt2) points;
+            
+            points.pt1 = PointDtoF(Layout.HexToPixel(_layout, origin));
+            points.pt2 = PointDtoF(Layout.HexToPixel(_layout, destination));
+
+            _graphics.DrawLine(pen, points.pt1, points.pt2);
         }
 
         public void DrawEdge(Hex origin, Hex destination, int edge, Pen pen)
@@ -143,14 +147,14 @@ namespace Visualise
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        public void DrawCircle(HexagonLibrary.Point location, float position, SolidBrush brush)
+        public void DrawCircle(Hexagon.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
             _graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _unitWidth, _unitWidth);
         }
 
-        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(HexagonLibrary.Point location, float position)
+        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(Hexagon.Point location, float position)
         {
             float Radius = _hexHeight / 4;
 
@@ -165,7 +169,7 @@ namespace Visualise
             return (xTopLeft, yTopLeft);
         }
 
-        internal void DrawTrapezium(HexagonLibrary.Point location, float position, SolidBrush brush)
+        internal void DrawTrapezium(Hexagon.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
@@ -181,7 +185,7 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        public void DrawTriangle(HexagonLibrary.Point location, float position, SolidBrush brush)
+        public void DrawTriangle(Hexagon.Point location, float position, SolidBrush brush)
         {
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
 
@@ -195,7 +199,7 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        internal void DrawRectangle(HexagonLibrary.Point location, SolidBrush brush)
+        internal void DrawRectangle(Hexagon.Point location, SolidBrush brush)
         {
             var hexCentre = Layout.HexToPixel(_layout, new OffsetCoord(location.X, location.Y).QoffsetToCube());
 

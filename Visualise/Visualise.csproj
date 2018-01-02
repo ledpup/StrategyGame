@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Visualise</RootNamespace>
     <AssemblyName>Visualise</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -46,9 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgbColour.cs" />
+    <Compile Include="Centreline.cs" />
     <Compile Include="GameBoardRenderer.cs" />
     <Compile Include="GameBoardDrawing2D.cs" />
-    <Compile Include="Line.cs" />
+    <Compile Include="Edge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -56,9 +57,9 @@
       <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
       <Name>GameModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\HexagonLibrary\HexagonLibrary.csproj">
-      <Project>{C2241963-FA05-4103-BDBB-554C269B137D}</Project>
-      <Name>HexagonLibrary</Name>
+    <ProjectReference Include="..\Hexagon\Hexagon.csproj">
+      <Project>{04cd3988-f271-4897-b43d-0802e8c1a48c}</Project>
+      <Name>Hexagon</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

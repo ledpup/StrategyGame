@@ -1,4 +1,5 @@
-﻿using PathFind;
+﻿using Hexagon;
+using PathFind;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,11 @@ namespace GameModel
 
         public int ContiguousRegionId { get; set; }
 
+        public List<Edge> Edges { get; set; }
+
         public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdgeOfMap = false)
         {
-            Units = new List<MilitaryUnit>();
+            Edges = new List<Edge>();
 
             Index = index;
             Point = new Point(x, y);

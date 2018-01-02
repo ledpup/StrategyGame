@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using Hexagon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -210,7 +211,7 @@ namespace ComputerOpponent
                             if (closestAvailableAirborneUnitPath.Path != null)
                             {
                                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                                var pathToAirbornUnit = FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point, unit.MovementPoints);
+                                var pathToAirbornUnit = Board.FindShortestPath(pathFindTiles, unit.Location.Point, transporter.Location.Point, unit.MovementPoints);
                                 Tile transporteeMoveOrderDesintation = null;
                                 if (pathToAirbornUnit != null)
                                 {
@@ -311,7 +312,7 @@ namespace ComputerOpponent
 
                             // Move transport unit to the destination of the transportee's move order or just to the transportee's location
                             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                            var pathToTransporteesDestination = FindShortestPath(pathFindTiles, unit.Location.Point, destination, unit.MovementPoints);
+                            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Point, destination, unit.MovementPoints);
                             if (pathToTransporteesDestination != null)
                                 unitOrders.Add(unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
 
@@ -379,7 +380,7 @@ namespace ComputerOpponent
                 }
 
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(potentialPickupUnit);
-                var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, potentialPickupUnit.Location.Point, potentialPickupUnit.MovementPoints);
+                var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, potentialPickupUnit.Location.Point, potentialPickupUnit.MovementPoints);
                 if (shortestPath != null)
                 {
                     return new UnitAndPath { Unit = potentialPickupUnit, Path = shortestPath };
@@ -401,7 +402,7 @@ namespace ComputerOpponent
             foreach (var enemyStructure in structures)
             { 
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, enemyStructure.Location.Point, unit.MovementPoints);
+                var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, enemyStructure.Location.Point, unit.MovementPoints);
                 if (shortestPath != null)
                 {
                     return shortestPath;
@@ -432,7 +433,7 @@ namespace ComputerOpponent
                         }
 
                         var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                        var shortestPath = FindShortestPath(pathFindTiles, unit.Location.Point, x.Point, unit.MovementPoints);
+                        var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, x.Point, unit.MovementPoints);
                         if (shortestPath != null)
                         {
                             var distance = shortestPath.Count();
@@ -449,35 +450,7 @@ namespace ComputerOpponent
             return closestPort;
         }
 
-        public static List<Move> MovesFromShortestPath(List<Move> possibleMoves, PathFindTile[] shortestPath)
-        {
-            List<Move> moves = new List<Move>();
-            Move furthestMove = null;
-            var origin = shortestPath[0].Point;
-            for (var i = 1; i < shortestPath.Length; i++)
-            {
-                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point && x.Distance == i);
 
-                if (move == null)
-                {
-                    while (furthestMove != null && furthestMove.MoveType == MoveType.OnlyPassingThrough)
-                    {
-                        moves.Remove(furthestMove);
-                        furthestMove = furthestMove.PreviousMove;
-                    }
-                    return moves;
-                }
-
-                moves.Add(move);
-                furthestMove = move;
-
-                // Remove moves that we've considered
-                possibleMoves.RemoveAll(x => x.Origin.Point == origin);
-                origin = shortestPath[i].Point;
-            }
-
-            return moves;
-        }
 
         static Dictionary<Role, double> _enemyUnitInfluenceModifier;
 
@@ -623,7 +596,7 @@ namespace ComputerOpponent
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = FindShortestPath(pathFindTiles, unit.Location.Point, tile.Point, unit.MovementPoints);
+                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Point, tile.Point, unit.MovementPoints);
                 if (bestPossibleDestination != null)
                     break;
             }
@@ -636,22 +609,11 @@ namespace ComputerOpponent
             return null;
         }
 
-        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Point origin, Point destination, int maxCumulativeCost)
-        {
-            var ori = pathFindTiles.Single(x => x.X == origin.X && x.Y == origin.Y);
-            var dest = pathFindTiles.Single(x => x.X == destination.X && x.Y == destination.Y);
 
-            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
-            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
-
-            var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
-
-            return path == null || path.Count() == 1 ? null : path.Reverse();
-        }
 
         public static int ShortestPathDistance(List<PathFindTile> pathFindTiles, Point origin, Point destination, int maxCumulativeCost)
         {
-            var path = FindShortestPath(pathFindTiles, origin, destination, maxCumulativeCost);
+            var path = Board.FindShortestPath(pathFindTiles, origin, destination, maxCumulativeCost);
             if (path == null)
                 return int.MaxValue;
             return path.Count();

@@ -48,6 +48,7 @@
     <Compile Include="CasualtyLogEntry.cs" />
     <Compile Include="CombatantInBattle.cs" />
     <Compile Include="IUnitOrder.cs" />
+    <Compile Include="Neighbour.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="MoraleChangeEvent.cs" />
     <Compile Include="MoveOrder.cs" />

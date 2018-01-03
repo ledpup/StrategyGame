@@ -38,9 +38,9 @@ namespace GameModel
             Height = tiles.Length;
 
             InitialiseTiles(Width, Height, tiles);
-            FindNeighbours();
-            CalculateTileDistanceFromTheSea();
             IntitaliseEdges(edges);
+            CacheNeighbours(Edges);
+            CalculateTileDistanceFromTheSea();
             Edges.ForEach(x =>
                 {
                     x.Origin.Edges.Add(x);
@@ -103,12 +103,12 @@ namespace GameModel
         private void AssignContiguousTilesToRegion(Tile tile, int id)
         {
             tile.Neighbours
-                .Where(x => x.ContiguousRegionId == 0 && x.BaseTerrainType == tile.BaseTerrainType)
+                .Where(x => x.Tile.ContiguousRegionId == 0 && x.Tile.BaseTerrainType == tile.BaseTerrainType)
                 .ToList()
                 .ForEach(x => 
                     {
-                        x.ContiguousRegionId = id;
-                        AssignContiguousTilesToRegion(x, id);
+                        x.Tile.ContiguousRegionId = id;
+                        AssignContiguousTilesToRegion(x.Tile, id);
                     });
         }
 
@@ -146,17 +146,17 @@ namespace GameModel
                 foreach (var neighbour in tile.Neighbours)
                 {
                     float neighbourSupply = 0;
-                    if (neighbour.OwnerId == ownerId || neighbour.OwnerId == null)
+                    if (neighbour.Tile.OwnerId == ownerId || neighbour.Tile.OwnerId == null)
                     {
-                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour));
+                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour.Tile));
                         if (tileEdge != null)
                         {
                             if (tileEdge.EdgeType != EdgeType.Mountain)
                             {
                                 var edgeModifier = tileEdge.EdgeType == EdgeType.Wall ? 0 : 0.5f;
-                                if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.TerrainType))
+                                if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Tile.TerrainType))
                                 {
-                                    if (Terrain.Rough_Land.HasFlag(neighbour.TerrainType))
+                                    if (Terrain.Rough_Land.HasFlag(neighbour.Tile.TerrainType))
                                     {
                                         neighbourSupply = supply - 1.5f - edgeModifier;
                                     }
@@ -167,9 +167,9 @@ namespace GameModel
                                 }
                             }
                         }
-                        else if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.TerrainType))
+                        else if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Tile.TerrainType))
                         {
-                            if (Terrain.Rough_Land.HasFlag(neighbour.TerrainType))
+                            if (Terrain.Rough_Land.HasFlag(neighbour.Tile.TerrainType))
                             {
                                 neighbourSupply = supply - 1.5f;
                             }
@@ -180,7 +180,7 @@ namespace GameModel
                         }
                         if (neighbourSupply >= 1)
                         {
-                            CalculateSupply(neighbour, ownerId, neighbourSupply, supplyCalculated);
+                            CalculateSupply(neighbour.Tile, ownerId, neighbourSupply, supplyCalculated);
                         }
                     }
                 }
@@ -245,7 +245,7 @@ namespace GameModel
                 return distance;
             }
             distance += 1;
-            if (tile.Neighbours.Any(x => x.IsSea))
+            if (tile.Neighbours.Any(x => x.Tile.IsSea))
             {
                 return distance;
             }
@@ -253,9 +253,9 @@ namespace GameModel
             var minDistance = 100;
             foreach (var neighbour in tile.Neighbours)
             {
-                if (!searched.Contains(neighbour))
+                if (!searched.Contains(neighbour.Tile))
                 {
-                    var result = GetWaterDistanceToSea(neighbour, distance, ref searched);
+                    var result = GetWaterDistanceToSea(neighbour.Tile, distance, ref searched);
                     if (result < minDistance)
                         minDistance = result;
                 }
@@ -281,14 +281,14 @@ namespace GameModel
             }
         }
 
-        public void FindNeighbours()
+        public void CacheNeighbours(List<Edge> edges)
         {
             foreach (var tile in Tiles)
             {
                 if (tile.Neighbours != null)
                     throw new Exception("Adjacent tiles have already be calculated");
 
-                var neighbours = new List<Tile>();
+                var neighbours = new List<Neighbour>();
 
                 var potentialTiles = Hex.Neighbours(tile.Hex);
 
@@ -299,13 +299,20 @@ namespace GameModel
 
                     if (neighbourX >= 0 && neighbourX < Width && neighbourY >= 0 && neighbourY < Height)
                     {
-                        var neighbour = this[neighbourX, neighbourY];
+                        var edge = Edge.GetEdge(Edges, tile, this[neighbourX, neighbourY]);
+
+                        Neighbour neighbour;
+
+                        if (edge != null)
+                            neighbour = new Neighbour(this[neighbourX, neighbourY], edge.EdgeType, edge.HasRoad);
+                        else
+                            neighbour = new Neighbour(this[neighbourX, neighbourY]);
+
                         neighbours.Add(neighbour);
                     }
                 }
 
                 tile.Neighbours = neighbours;
-                
             }
         }
 
@@ -327,8 +334,8 @@ namespace GameModel
                     var t1 = TileArray[firstTile];
                     var t2 = TileArray[secondTile];
 
-                    if (!t1.Neighbours.Contains(t2))
-                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because they are not neighbours", t1.Index, t2.Index));
+                    //if (!t1.Neighbours.Contains(t2))
+                    //    throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because they are not neighbours", t1.Index, t2.Index));
 
                     var existingEdge = Edges.Where(y => y.CrossesEdge(t1, t2));
 

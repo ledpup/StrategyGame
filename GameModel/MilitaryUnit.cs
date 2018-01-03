@@ -205,6 +205,8 @@ namespace GameModel
             InitialMorale = initialMorale;
             InitialQuantity = initialQuantity;
 
+            EdgeMovementCosts[EdgeType.None] = 0;
+
             switch (MovementType)
             {
                 case MovementType.Land:
@@ -459,8 +461,8 @@ namespace GameModel
         {
             var potentialMoves = new List<Move>();
 
-            potentialMoves.AddRange(origin.Neighbours.Where(dest => PotentialMove(unit, origin, movesConsidered, movementPoints, dest)
-                                        ).Select(x => new Move(origin, x, previousMove, movementPoints, distance, GetMoveType(origin, x , unit)))
+            potentialMoves.AddRange(origin.Neighbours.Where(dest => PotentialMove(unit, origin, movesConsidered, movementPoints, dest.Tile)
+                                        ).Select(x => new Move(origin, x.Tile, previousMove, movementPoints, distance, GetMoveType(origin, x.Tile, unit)))
                                         .ToList());
 
             movesConsidered.AddRange(potentialMoves);

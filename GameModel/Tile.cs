@@ -109,7 +109,7 @@ namespace GameModel
             return cost;
         }
 
-        public List<Tile> Neighbours { get; set; }
+        public List<Neighbour> Neighbours { get; set; }
 
         public bool HasPort
         {
@@ -128,7 +128,7 @@ namespace GameModel
 
                 _isTileSearchedForCoast = true;
 
-                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.TerrainType));
+                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.Tile.TerrainType));
 
                 return _isCoast;
             }
@@ -145,7 +145,7 @@ namespace GameModel
 
                 _isTileSearchedForSea = true;
 
-                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.IsSea) || IsEdgeOfMap);
+                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.Tile.IsSea) || IsEdgeOfMap);
 
                 return _isSea;
             }
@@ -162,7 +162,7 @@ namespace GameModel
 
                 _isTileSearchedForLake = true;
 
-                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.IsSea);
+                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Tile.IsSea);
 
                 return _isLake;
             }
@@ -191,8 +191,9 @@ namespace GameModel
         {
             return tile
                     .Neighbours
-                    .Where(x => (Edge.GetEdge(tile, x) == null || unit.EdgeMovementCosts[Edge.GetEdge(tile, x).EdgeType] < 100) &&
-                                (Road.GetRoad(tile, x) != null || unit.TerrainMovementCosts[x.TerrainType] < 100));
+                    .Where(x => (unit.EdgeMovementCosts[x.EdgeType] < 100) &&
+                                (!x.EdgeHasRoad || unit.TerrainMovementCosts[x.Tile.TerrainType] < 100))
+                    .Select(x => x.Tile);
         }
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)

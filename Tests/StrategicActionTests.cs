@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static ComputerOpponent.ComputerPlayer;
 
 namespace Tests
 {
@@ -27,7 +26,7 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
-               
+
                 new MilitaryUnit(1, ownerIndex: 1, location: board[18, 7], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true, role: Role.Besieger),
             };
 
@@ -35,7 +34,7 @@ namespace Tests
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.None, units[0].StrategicAction);
+            Assert.AreEqual(StrategicAction.None, ComputerPlayer.StrategicActions[units[0]]);
         }
 
         [TestMethod]
@@ -53,7 +52,7 @@ namespace Tests
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.Dock, units[0].StrategicAction);
+            Assert.AreEqual(StrategicAction.Dock, ComputerPlayer.StrategicActions[units[0]]);
         }
 
 
@@ -76,7 +75,7 @@ namespace Tests
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.None, units[0].StrategicAction);
+            Assert.AreEqual(StrategicAction.None, ComputerPlayer.StrategicActions[units[0]]);
         }
 
         [TestMethod]
@@ -96,7 +95,7 @@ namespace Tests
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.Pickup, units[0].StrategicAction);
+            Assert.AreEqual(StrategicAction.Pickup, ComputerPlayer.StrategicActions[units[0]]);
         }
     }
 }

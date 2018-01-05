@@ -39,14 +39,8 @@ namespace GameModel
 
             InitialiseTiles(Width, Height, tiles);
             IntitaliseEdges(edges);
-            CacheNeighbours(Edges);
+            InitialiseNeighbours(Edges);
             CalculateTileDistanceFromTheSea();
-            Edges.ForEach(x =>
-                {
-                    x.Origin.Edges.Add(x);
-                    x.Destination.Edges.Add(x);
-                }
-            );
             Structures = IntitaliseStructures(structures);
             InitialiseSupply();
             CalculateContiguousRegions();
@@ -281,7 +275,7 @@ namespace GameModel
             }
         }
 
-        public void CacheNeighbours(List<Edge> edges)
+        public void InitialiseNeighbours(List<Edge> edges)
         {
             foreach (var tile in Tiles)
             {
@@ -318,6 +312,11 @@ namespace GameModel
 
         private void IntitaliseEdges(string[] edges)
         {
+            Edges = new List<Edge>();
+
+            if (edges == null)
+                return;
+
             edges.ToList().ForEach(
                 x =>
                 {
@@ -516,10 +515,10 @@ namespace GameModel
                 var removeUnitMoves = new Dictionary<MilitaryUnit, Move>();
                 foreach (var stepMove in unitStepMoves)
                 {
-                    if (unitStepMoves.Any(x => x.Value.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
+                    if (unitStepMoves.Any(x => x.Value.Neighbour.Tile == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
                     {
                         var originStrength = stepMove.Value.Origin.Units.Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
-                        var destinationStrength = stepMove.Value.Destination.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var destinationStrength = stepMove.Value.Neighbour.Tile.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
 
                         if (originStrength <= destinationStrength)
                         {
@@ -529,12 +528,12 @@ namespace GameModel
                 }
 
                 // Don't move a land unit onto a water time unless there is a transport there that can take it
-                unitStepMoves.Where(x => x.Value.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
+                unitStepMoves.Where(x => x.Value.Neighbour.Tile.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
                     .ToList()
                     .ForEach(x => 
                     {
                         var transportedUnit = x.Key;
-                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Destination.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Neighbour.Tile.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
                         var transport = transports.FirstOrDefault();
                         if (transport != null)
                         {
@@ -554,7 +553,7 @@ namespace GameModel
                 {
                     var unit = unitStepMove.Key;
 
-                    unit.Location = unitStepMove.Value.Destination;
+                    unit.Location = unitStepMove.Value.Neighbour.Tile;
 
                     // Take transported units along with you
                     unit.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
@@ -804,7 +803,7 @@ namespace GameModel
             var origin = shortestPath[0].Point;
             for (var i = 1; i < shortestPath.Length; i++)
             {
-                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Destination.Point == shortestPath[i].Point && x.Distance == i);
+                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Neighbour.Tile.Point == shortestPath[i].Point && x.Distance == i);
 
                 if (move == null)
                 {

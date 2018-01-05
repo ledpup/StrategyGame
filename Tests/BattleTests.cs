@@ -12,7 +12,7 @@ namespace Tests
     public class BattleTests
     {
         [TestMethod]
-        public void BasicTest()
+        public void BasicBattleTest()
         {
             var units = new List<MilitaryUnit>
             {

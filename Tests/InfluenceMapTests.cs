@@ -1,5 +1,6 @@
 ﻿using ComputerOpponent;
 using GameModel;
+using Hexagon;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Visualise;
 
 namespace Tests
 {
@@ -53,8 +55,8 @@ namespace Tests
                     moveOrders.Add(moveOrder);
             });
 
-            var vectors = new List<Line>();
-            moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
+            var vectors = new List<Centreline>();
+            moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
             Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
@@ -100,7 +102,7 @@ namespace Tests
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = ComputerPlayer.FindShortestPath(pathFindTiles, board.Units[1].Location.Point, tile.Point, board.Units[1].MovementPoints);
+                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, board.Units[1].Location.Point, tile.Point, board.Units[1].MovementPoints);
                 if (bestPossibleDestination != null)
                     break;
             }

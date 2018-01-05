@@ -48,6 +48,9 @@ namespace GameModel
         }
         internal static Edge GetEdge(List<Edge> edges, Tile tile1, Tile tile2)
         {
+            if (edges == null)
+                return null;
+
             return edges.SingleOrDefault(x => x.CrossesEdge(tile1, tile2));
         }
 

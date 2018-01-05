@@ -8,6 +8,16 @@ using System.Threading.Tasks;
 
 namespace ComputerOpponent
 {
+    public enum StrategicAction
+    {
+        None,
+        Dock,
+        TransportToDestination,
+        Embark,
+        Disembark,
+        Pickup,
+        AirliftToDestination,
+    }
     public class ComputerPlayer
     {
 
@@ -86,17 +96,6 @@ namespace ComputerOpponent
                 }
                 return _enemyStructureInfluence;
             }
-        }
-
-        public enum StrategicAction
-        {
-            None,
-            Dock,
-            TransportToDestination,
-            Embark,
-            Disembark,
-            Pickup,
-            AirliftToDestination,
         }
 
         public static Dictionary<MilitaryUnit, StrategicAction> StrategicActions { get; set; }
@@ -216,7 +215,7 @@ namespace ComputerOpponent
                                 if (pathToAirbornUnit != null)
                                 {
                                     var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
-                                    transporteeMoveOrderDesintation = moveOrder.Moves.Last().Destination;
+                                    transporteeMoveOrderDesintation = moveOrder.Moves.Last().Neighbour.Tile;
                                     unitOrders.Add(moveOrder);
                                 }
                             }
@@ -233,7 +232,7 @@ namespace ComputerOpponent
                         var transportUnit = transportingUnits.FirstOrDefault();
                         if (transportUnit != null)
                         {
-                            var moveToTransport = unit.PossibleMoves().SingleOrDefault(x => x.Destination == transportUnit.Location);
+                            var moveToTransport = unit.PossibleMoves().SingleOrDefault(x => x.Neighbour.Tile == transportUnit.Location);
 
                             if (moveToTransport != null)
                                 unitOrders.Add(moveToTransport.GetMoveOrder(unit));
@@ -307,7 +306,7 @@ namespace ComputerOpponent
                             var transporteeMoveOrder = existingOrders.OfType<MoveOrder>().SingleOrDefault(x => x.Unit == closestUnit);
                             if (transporteeMoveOrder != null)
                             {
-                                destination = transporteeMoveOrder.Moves.Last().Destination.Point;
+                                destination = transporteeMoveOrder.Moves.Last().Neighbour.Tile.Point;
                             }
 
                             // Move transport unit to the destination of the transportee's move order or just to the transportee's location
@@ -329,9 +328,9 @@ namespace ComputerOpponent
                             if (moveOrder != null)
                                 unitOrders.Add(moveOrder);
 
-                            if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Destination.ContiguousRegionId))
+                            if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Neighbour.Tile.ContiguousRegionId))
                             {
-                                unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Destination)));
+                                unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Neighbour.Tile)));
                             }
                         }
 

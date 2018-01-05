@@ -30,11 +30,9 @@ namespace GameModel
 
         public int ContiguousRegionId { get; set; }
 
-        public List<Edge> Edges { get; set; }
-
         public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdgeOfMap = false)
         {
-            Edges = new List<Edge>();
+            Units = new List<MilitaryUnit>();
 
             Index = index;
             Point = new Point(x, y);
@@ -72,10 +70,10 @@ namespace GameModel
             var costChanged = false;
             var cost = 100;
 
-            var edge = Edges.Single(x => x.Destination == destination);
+            var edge = Neighbours.Single(x => x.Tile == destination);
 
             // Movement by road or bridge always costs 1 regardless of terrain type
-            if (unit.MovementType == MovementType.Land && edge.HasRoad)
+            if (unit.MovementType == MovementType.Land && edge.EdgeHasRoad)
             {
                 return 1;
             }
@@ -115,7 +113,7 @@ namespace GameModel
         {
             get
             {
-                return Edges.Any(x => x.EdgeType == EdgeType.Port);
+                return Neighbours.Any(x => x.EdgeType == EdgeType.Port);
             }
         }
 
@@ -286,11 +284,12 @@ namespace GameModel
         public int? OwnerId { get; set; }
         public bool IsSelected { get; set; }
         public Structure Structure { get; set; }
-        public Tile PortDestination {
-            get {
-                var edge = Edges.Single(x => x.EdgeType == EdgeType.Port);
-                var destination = edge.Origin == this ? edge.Destination : edge.Origin;
-                return destination;
+        public Tile PortDestination
+        {
+            get
+            {
+                var edge = Neighbours.Single(x => x.EdgeType == EdgeType.Port);
+                return edge.Tile;
             }
         }
     }

@@ -22,12 +22,12 @@ namespace Visualise
             Width = isBridge ? 6 : 3;
         }
 
-        public static List<Centreline> Lines(MoveOrder moveOrder)
+        public static List<Centreline> MoveOrderToCentrelines(MoveOrder moveOrder)
         {
             var colour = moveOrder.Unit == null ? Colours.Black : GameBoardRenderer.UnitColour(moveOrder.Unit);
-            return moveOrder.Moves.Select(x => new Centreline(x.Origin.Point, x.Destination.Point, colour)).ToList();
+            return moveOrder.Moves.Select(x => new Centreline(x.Origin.Point, x.Neighbour.Tile.Point, colour)).ToList();
         }
-        public static List<Centreline> PathFindTilesToVectors(IEnumerable<PathFindTile> path)
+        public static List<Centreline> PathFindTilesToCentrelines(IEnumerable<PathFindTile> path)
         {
             var pathArray = path.ToArray();
 

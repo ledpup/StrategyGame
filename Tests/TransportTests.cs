@@ -32,9 +32,12 @@ namespace Tests
                 new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
                 new MilitaryUnit(1, location: board[18, 0], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true, role: Role.Besieger),
                 new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
-                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive, isAmphibious: true),
+                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive),
                 new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
             };
+
+            units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;
+            units[3].EdgeMovementCosts[EdgeType.River] = 0;
 
             board.Units = units;
 
@@ -50,8 +53,8 @@ namespace Tests
                 ComputerPlayer.SetStrategicAction(board, units);
                 var moveOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var vectors = new List<Line>();
-                moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
+                var vectors = new List<Centreline>();
+                moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
                 Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 
@@ -190,8 +193,8 @@ namespace Tests
                 new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Besieger),
             };
 
-            board.Units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
-            board.Units[2].EdgeMovementCosts[EdgeType.River] = 1;
+            units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            units[2].EdgeMovementCosts[EdgeType.River] = 0;
 
             board.Units = units;
 
@@ -200,17 +203,17 @@ namespace Tests
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var bitmap = new Bitmap(1920, 1450);
-                Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
                 ComputerPlayer.SetStrategicAction(board, units);
                 var unitOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var lines = new List<Line>();
-                unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(x.Vectors));
+                var lines = new List<Centreline>();
+                unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-                Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
+                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
 
                 board.ResolveOrders(unitOrders);
                 board.ChangeStructureOwners();

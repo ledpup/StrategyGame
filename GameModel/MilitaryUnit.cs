@@ -440,7 +440,7 @@ namespace GameModel
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
                 var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus, 1);
-                var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
+                var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Neighbour.Tile == y.Neighbour.Tile));
                 possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }
 
@@ -448,7 +448,7 @@ namespace GameModel
             while (searchForOnlyPassingThroughDestinations)
             {
                 var removeOnlyPassingThroughDestinations = possibleMoves
-                    .Where(x => x.MoveType == MoveType.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Destination));
+                    .Where(x => x.MoveType == MoveType.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Neighbour.Tile));
 
                 searchForOnlyPassingThroughDestinations = removeOnlyPassingThroughDestinations.Any();
                 removeOnlyPassingThroughDestinations.ToList().ForEach(x => possibleMoves.Remove(x));
@@ -461,8 +461,8 @@ namespace GameModel
         {
             var potentialMoves = new List<Move>();
 
-            potentialMoves.AddRange(origin.Neighbours.Where(dest => PotentialMove(unit, origin, movesConsidered, movementPoints, dest.Tile)
-                                        ).Select(x => new Move(origin, x.Tile, previousMove, movementPoints, distance, GetMoveType(origin, x.Tile, unit)))
+            potentialMoves.AddRange(origin.Neighbours.Where(dest => PotentialMove(unit, origin, movesConsidered, movementPoints, dest.Tile))
+                                        .Select(x => new Move(origin, x, previousMove, movementPoints, distance, GetMoveType(origin, x.Tile, unit)))
                                         .ToList());
 
             movesConsidered.AddRange(potentialMoves);
@@ -471,11 +471,11 @@ namespace GameModel
 
             potentialMoves.ForEach(x =>
             {
-                var remainingMovementPoints = movementPoints - x.Origin.CalculateMoveCost(unit, x.Destination);
+                var remainingMovementPoints = movementPoints - x.Origin.CalculateMoveCost(unit, x.Neighbour.Tile);
 
                 if (remainingMovementPoints > 0)
                 {
-                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Destination, x, movesConsidered, remainingMovementPoints, distance + 1));
+                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Neighbour.Tile, x, movesConsidered, remainingMovementPoints, distance + 1));
                 }
             });
 
@@ -485,16 +485,16 @@ namespace GameModel
 
         }
 
-        private static MoveType GetMoveType(Tile origin, Tile x, MilitaryUnit unit)
+        private static MoveType GetMoveType(Tile origin, Tile destination, MilitaryUnit unit)
         {
             if (unit.MovementType == MovementType.Land)
             {
-                if (unit.TransportedBy == null && Edge.GetEdge(origin.Edges, origin, x).EdgeType == EdgeType.Port)
+                if (unit.TransportedBy == null && origin.Neighbours.Single(x => x.Tile == destination).EdgeType == EdgeType.Port)
                 {
                     return MoveType.Embark;
                 }
             }
-            if (!unit.CanStopOn.HasFlag(x.TerrainType))
+            if (!unit.CanStopOn.HasFlag(destination.TerrainType))
                 return MoveType.OnlyPassingThrough;
 
             return MoveType.Standard;
@@ -504,18 +504,18 @@ namespace GameModel
         {
             var validMove = x.MoveType == MoveType.OnlyPassingThrough || 
                                         x.MoveType == MoveType.Embark ||
-                                        unit.CanStopOn.HasFlag(x.Destination.TerrainType);
+                                        unit.CanStopOn.HasFlag(x.Neighbour.Tile.TerrainType);
             return validMove;
         }
 
         private static bool PotentialMove(MilitaryUnit unit, Tile origin, List<Move> movesConsidered, int movementPoints, Tile dest)
         {
-            var potentialMove = dest != unit.Location && !movesConsidered.Any(x => x.Origin == origin && x.Destination == dest && x.MovesRemaining > movementPoints);
+            var potentialMove = dest != unit.Location && !movesConsidered.Any(x => x.Origin == origin && x.Neighbour.Tile == dest && x.MovesRemaining > movementPoints);
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.EdgeMovementCosts[Edge.GetEdge(origin.Edges, origin, dest).EdgeType] < 100;
+            potentialMove = unit.EdgeMovementCosts[origin.Neighbours.Single(x => x.Tile == dest).EdgeType] < 100;
 
             if (!potentialMove)
                 return false;
@@ -525,15 +525,18 @@ namespace GameModel
             if (!potentialMove)
                 return false;
 
-            potentialMove = (unit.TransportedBy == null || Edge.GetEdge(origin.Edges, origin, dest).EdgeType == EdgeType.Port);
+            potentialMove = (unit.TransportedBy == null || origin.Neighbours.Any(x => x.EdgeType == EdgeType.Port));
 
             return potentialMove;
         }
 
         private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
         {
-            var moves = tile.Edges.Where(x => !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination)))
-                                            .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
+            var moves = tile.Neighbours.Where(x => !movesConsidered.Any(y => y.Origin == tile && x.Tile == y.Neighbour.Tile))
+                                                .Select(x => new Move(tile, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
+
+            //var moves = tile.Edges.Where(x => !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination)))  
+            //                            .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
 
             movesConsidered.AddRange(moves);
 
@@ -543,7 +546,7 @@ namespace GameModel
             {
                 var cost = movementPoints - 1;
                 if (cost > 0)
-                    neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Destination, move, movesConsidered, cost, distance + 1));
+                    neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Neighbour.Tile, move, movesConsidered, cost, distance + 1));
             }
 
             moves.AddRange(neighbourMoves);

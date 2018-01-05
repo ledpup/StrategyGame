@@ -50,7 +50,7 @@ namespace StrategyGame
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
 
             board.Units[3].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
-            board.Units[3].EdgeMovementCosts[EdgeType.River] = 1;
+            board.Units[3].EdgeMovementCosts[EdgeType.River] = 0;
 
             var gameOver = false;
 
@@ -102,7 +102,7 @@ namespace StrategyGame
                 unitsOrders = ComputerPlayer.CreateOrders(board, units);
 
                 var lines = new List<Centreline>();
-                unitsOrders.ForEach(x => lines.AddRange(Centreline.Lines((MoveOrder)x)));
+                unitsOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
                 GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 

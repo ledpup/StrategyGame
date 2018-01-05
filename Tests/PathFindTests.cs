@@ -34,6 +34,8 @@ namespace Tests
 
             var shortestPath = Board.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7), unit.MovementPoints).ToArray();
 
+            Assert.AreEqual(10, shortestPath.Length);
+
             Assert.AreEqual(shortestPath[0].Point, new Point(1, 1)); // Origin
 
             Assert.AreEqual(shortestPath[1].Point, new Point(2, 2));

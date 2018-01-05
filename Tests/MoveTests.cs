@@ -33,7 +33,9 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+
+            Assert.AreEqual(8, moves.Count());
 
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 334));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 361));
@@ -41,6 +43,21 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 309));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 310));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 308));
+
+            // Can't go into the ocean
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 281));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 306));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 333));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 360));
+
+            // Can't go over mountains
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 337));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 363));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 362));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 388));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 364));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 390));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 389));
         }
 
         [TestMethod]
@@ -475,6 +492,8 @@ namespace Tests
                 new MilitaryUnit(0, location: board[196], baseMovementPoints: 3, transportableBy: new List<MovementType>{ MovementType.Water }),
                 new MilitaryUnit(1, location: board[224], movementType: MovementType.Water, isTransporter: true),
             };
+
+            ComputerPlayer.SetStrategicAction(board, board.Units);
 
             var unitOrders = ComputerPlayer.CreateOrders(board, board.Units);
             board.ResolveOrders(unitOrders);

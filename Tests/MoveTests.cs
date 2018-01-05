@@ -33,12 +33,29 @@ namespace Tests
 
             Visualise.GameBoardRenderer.RenderAndSave("LandUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
+            Assert.AreEqual(11, moves.Count());
+
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 361));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 336));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 309));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 310));
             Assert.IsTrue(moves.Any(x => x.Destination.Index == 308));
+
+            // Can't go into the ocean
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 281));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 306));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 333));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 360));
+
+            // Can't go over mountains
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 337));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 363));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 362));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 388));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 364));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 390));
+            Assert.IsFalse(moves.Any(x => x.Destination.Index == 389));
         }
 
         [TestMethod]

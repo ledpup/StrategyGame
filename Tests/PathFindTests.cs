@@ -30,7 +30,7 @@ namespace Tests
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
 
-            Assert.AreEqual(5, pathFindTiles.Count);
+            Assert.AreEqual(513, pathFindTiles.Count);
 
             var shortestPath = Board.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7), unit.MovementPoints).ToArray();
 

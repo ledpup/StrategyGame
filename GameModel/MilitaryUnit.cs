@@ -532,7 +532,7 @@ namespace GameModel
 
         private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
         {
-            var moves = tile.Neighbours.Where(x => !movesConsidered.Any(y => y.Origin == tile && x.Tile == y.Neighbour.Tile))
+            var moves = tile.Neighbours.Where(x => x.EdgeHasRoad && !movesConsidered.Any(y => y.Origin == tile && x.Tile == y.Neighbour.Tile))
                                                 .Select(x => new Move(tile, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
 
             //var moves = tile.Edges.Where(x => !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination)))  

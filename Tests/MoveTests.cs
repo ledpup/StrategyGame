@@ -35,7 +35,7 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("LandUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
-            Assert.AreEqual(8, moves.Count());
+            Assert.AreEqual(11, moves.Count());
 
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 334));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 361));

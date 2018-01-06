@@ -368,6 +368,7 @@ namespace Tests
 
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverContinent.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
+            Assert.AreEqual(154, moveList.Count());
 
             //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 9])); // Mountain
             //Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[5, 9]));
@@ -402,6 +403,7 @@ namespace Tests
 
             Visualise.GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
+            Assert.AreEqual(7, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 1]));
@@ -423,6 +425,7 @@ namespace Tests
 
             Visualise.GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
+            Assert.AreEqual(15, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[87]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[88]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[114]));
@@ -451,6 +454,7 @@ namespace Tests
 
             Visualise.GameBoardRenderer.RenderAndSave("AmphibiousUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
+            Assert.AreEqual(8, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 1]));
@@ -471,6 +475,7 @@ namespace Tests
 
             Visualise.GameBoardRenderer.RenderAndSave("AquaticUnit.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
+            Assert.AreEqual(138, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 198));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 226));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 253));

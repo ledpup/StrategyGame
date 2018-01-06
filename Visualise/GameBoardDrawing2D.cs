@@ -113,7 +113,7 @@ namespace Visualise
 
             //points.ForEach(x => _graphics.DrawEllipse(pen, (float)x.X - 2, (float)x.Y - 2, 4, 4));
             //var ROUTE_SIZE = 4;
-            var sourceEdgeIndex = 0;
+            //var sourceEdgeIndex = 0;
             //var sourceOffset = (sourceEdgeIndex * ROUTE_SIZE) - ((_edgeLength * ROUTE_SIZE) / 2) + (ROUTE_SIZE / 2);
             //var targetOffset = (1 * ROUTE_SIZE) - ((_edgeLength * ROUTE_SIZE) / 2) + (ROUTE_SIZE / 2);
 

@@ -249,7 +249,7 @@ namespace ComputerOpponent
                 case StrategicAction.Disembark:
                     if (unit.TransportedBy.MovementType == MovementType.Airborne)
                     {
-                        if (unit.TerrainMovementCosts[unit.Location.TerrainType] != null && board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
+                        if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
                         {
                             unitOrders.Add(new UnloadOrder(unit));
                         }

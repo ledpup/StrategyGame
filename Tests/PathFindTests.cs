@@ -45,7 +45,7 @@ namespace Tests
             Assert.AreEqual(shortestPath[1].Point, new Point(2, 2));
             Assert.AreEqual(shortestPath[2].Point, new Point(3, 2));
             Assert.AreEqual(shortestPath[3].Point, new Point(4, 3));
-            Assert.AreEqual(shortestPath[4].Point, new Point(5, 3));
+            Assert.AreEqual(shortestPath[4].Point, new Point(5, 3)); // There is a road over the mountain
             Assert.AreEqual(shortestPath[5].Point, new Point(6, 4));
             Assert.AreEqual(shortestPath[6].Point, new Point(6, 5));
             Assert.AreEqual(shortestPath[7].Point, new Point(5, 5));

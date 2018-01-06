@@ -19,7 +19,7 @@ namespace Visualise
             Origin = origin;
             Destination = destination;
             Colour = colour;
-            Width = isBridge ? 6 : 3;
+            Width = colour == Colours.Black ? 1 : isBridge ? 5 : 3;
         }
 
         public static List<Centreline> MoveOrderToCentrelines(MoveOrder moveOrder)

@@ -56,10 +56,13 @@ namespace Visualise
                 {
                     edges.ToList().ForEach(x =>
                     {
-                        edgesToRender.Add(new Edge(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
                         if (x.HasRoad)
                         {
                             centrelines.Add(new Centreline(x.Origin.Point, x.Destination.Point, Colours.SaddleBrown, x.EdgeType == EdgeType.River));
+                        }
+                        else
+                        {
+                            edgesToRender.Add(new Edge(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
                         }
                     });
 
@@ -75,6 +78,7 @@ namespace Visualise
 
                     //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
 
+                    centrelines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, x.Colour, x.Width));
 
                     var ports = edges.Where(x => x.EdgeType == EdgeType.Port).ToList();
 
@@ -83,9 +87,8 @@ namespace Visualise
             if (renderUntil == RenderPipeline.Edges)
                 return bitmap;
 
-
             if (lines != null)
-                lines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, Pens.Black));
+                lines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, Colours.Black, x.Width));
 
 
 

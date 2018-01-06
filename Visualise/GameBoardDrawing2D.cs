@@ -56,7 +56,7 @@ namespace Visualise
 
         public void DrawEdge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
         {
-            var pen = new Pen(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue));
+            var pen = new Pen(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue), 3);
             (PointF pt1, PointF pt2) points;
 
             var direction = Hex.Subtract(origin, destination);
@@ -86,10 +86,11 @@ namespace Visualise
             }
         }
 
-        public void DrawCentreline(Hex origin, Hex destination, Pen pen)
+        public void DrawCentreline(Hex origin, Hex destination, ArgbColour colour, int width)
         {
+            var pen = new Pen(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue), width);
             (PointF pt1, PointF pt2) points;
-            
+
             points.pt1 = PointDtoF(Layout.HexToPixel(_layout, origin));
             points.pt2 = PointDtoF(Layout.HexToPixel(_layout, destination));
 

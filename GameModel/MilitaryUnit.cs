@@ -125,8 +125,8 @@ namespace GameModel
 
         public TerrainType CanStopOn;
 
-        public Dictionary<TerrainType, int?> TerrainMovementCosts { get; set; }
-        public Dictionary<EdgeType, int?> EdgeMovementCosts { get; set; }
+        public Dictionary<TerrainType, int> TerrainMovementCosts { get; set; }
+        public Dictionary<EdgeType, int> EdgeMovementCosts { get; set; }
 
         public bool IsTransporter { get; set; }
         public List<MilitaryUnit> Transporting { get; set; }
@@ -167,15 +167,15 @@ namespace GameModel
                 OpponentUnitTypeBattleModifier.Add(unitTypeEnum, 0);
             }
 
-            TerrainMovementCosts = new Dictionary<TerrainType, int?>();
+            TerrainMovementCosts = new Dictionary<TerrainType, int>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                TerrainMovementCosts.Add(terrainType, null);
+                TerrainMovementCosts.Add(terrainType, Terrain.Impassable);
             }
-            EdgeMovementCosts = new Dictionary<EdgeType, int?>();
+            EdgeMovementCosts = new Dictionary<EdgeType, int>();
             foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
             {
-                EdgeMovementCosts.Add(edgeType, null);
+                EdgeMovementCosts.Add(edgeType, Terrain.Impassable);
             }
 
             Index = index;
@@ -204,8 +204,6 @@ namespace GameModel
 
             InitialMorale = initialMorale;
             InitialQuantity = initialQuantity;
-
-            EdgeMovementCosts[EdgeType.None] = 0;
 
             switch (MovementType)
             {
@@ -307,17 +305,18 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Steppe] = 2;
             TerrainMovementCosts[TerrainType.Forest] = 2;
             TerrainMovementCosts[TerrainType.Hill] = 2;
-            TerrainMovementCosts[TerrainType.Mountain] = 100;
-            TerrainMovementCosts[TerrainType.Water] = 100;
+            TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Water] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Wetland] = 2;
-            TerrainMovementCosts[TerrainType.Reef] = 100;
+            TerrainMovementCosts[TerrainType.Reef] = Terrain.Impassable;
 
-            EdgeMovementCosts[EdgeType.River] = 100;
+            EdgeMovementCosts[EdgeType.None] = 0;
+            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Forest] = 1;
             EdgeMovementCosts[EdgeType.Hill] = 1;
-            EdgeMovementCosts[EdgeType.Mountain] = 100;
-            EdgeMovementCosts[EdgeType.Reef] = 100;
-            EdgeMovementCosts[EdgeType.Wall] = 100;
+            EdgeMovementCosts[EdgeType.Mountain] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Reef] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Port] = 1;
 
             CanStopOn = Terrain.Non_Mountainous_Land;
@@ -334,12 +333,13 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Wetland] = 1;            
             TerrainMovementCosts[TerrainType.Reef] = 1;
 
+            EdgeMovementCosts[EdgeType.None] = 0;
             EdgeMovementCosts[EdgeType.River] = 0;
             EdgeMovementCosts[EdgeType.Forest] = 0;
             EdgeMovementCosts[EdgeType.Hill] = 0;
             EdgeMovementCosts[EdgeType.Mountain] = 0;
             EdgeMovementCosts[EdgeType.Reef] = 0;
-            EdgeMovementCosts[EdgeType.Wall] = 100;
+            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Port] = 0;
 
             CanStopOn = Terrain.Non_Mountainous_Land;
@@ -347,22 +347,23 @@ namespace GameModel
 
         void WaterUnit()
         {
-            TerrainMovementCosts[TerrainType.Grassland] = 100;
-            TerrainMovementCosts[TerrainType.Steppe] = 100;
-            TerrainMovementCosts[TerrainType.Forest] = 100;
-            TerrainMovementCosts[TerrainType.Hill] = 100;
-            TerrainMovementCosts[TerrainType.Mountain] = 100;
+            TerrainMovementCosts[TerrainType.Grassland] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Steppe] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Forest] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Hill] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Water] = 1;
-            TerrainMovementCosts[TerrainType.Wetland] = 100;
+            TerrainMovementCosts[TerrainType.Wetland] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Reef] = 2;
 
-            EdgeMovementCosts[EdgeType.River] = 100;
-            EdgeMovementCosts[EdgeType.Forest] = 100;
-            EdgeMovementCosts[EdgeType.Hill] = 100;
-            EdgeMovementCosts[EdgeType.Mountain] = 100;
+            EdgeMovementCosts[EdgeType.None] = 0;
+            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Forest] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Hill] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Mountain] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Reef] = 1;
-            EdgeMovementCosts[EdgeType.Wall] = 100;
-            EdgeMovementCosts[EdgeType.Port] = 100;
+            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Port] = Terrain.Impassable;
 
             CanStopOn = Terrain.All_Water;
         }

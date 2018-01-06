@@ -67,9 +67,6 @@ namespace GameModel
         //}
         public int CalculateMoveCost(MilitaryUnit unit, Tile destination)
         {
-            var costChanged = false;
-            var cost = 100;
-
             var edge = Neighbours.Single(x => x.Tile == destination);
 
             // Movement by road or bridge always costs 1 regardless of terrain type
@@ -77,34 +74,8 @@ namespace GameModel
             {
                 return 1;
             }
-            
-            if (unit.EdgeMovementCosts[edge.EdgeType] < 100)
-            {
-                costChanged = true;
-                cost = (int)unit.EdgeMovementCosts[edge.EdgeType];
-            }
-            else
-            {
-                return cost;
-            }
 
-            if (unit.TerrainMovementCosts[destination.TerrainType] != null)
-            {
-                if (costChanged)
-                {
-                    cost += (int)unit.TerrainMovementCosts[destination.TerrainType];
-                }
-                else
-                {
-                    cost = (int)unit.TerrainMovementCosts[destination.TerrainType];
-                }
-            }
-            
-
-            if (cost == 0)
-                throw new Exception();
-
-            return cost;
+            return unit.EdgeMovementCosts[edge.EdgeType] + unit.TerrainMovementCosts[destination.TerrainType];
         }
 
         public List<Neighbour> Neighbours { get; set; }

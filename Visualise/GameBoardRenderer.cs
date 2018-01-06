@@ -84,7 +84,8 @@ namespace Visualise
                 return bitmap;
 
 
-            lines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, Pens.Black));
+            if (lines != null)
+                lines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, Pens.Black));
 
 
 

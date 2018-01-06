@@ -83,6 +83,11 @@ namespace Visualise
             if (renderUntil == RenderPipeline.Edges)
                 return bitmap;
 
+
+            lines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, Pens.Black));
+
+
+
             if (renderBegin <= RenderPipeline.Structures)
             {
                 if (structures != null)

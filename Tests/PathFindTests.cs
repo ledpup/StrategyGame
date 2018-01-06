@@ -22,7 +22,7 @@ namespace Tests
 
 
         [TestMethod]
-        public void LandUnitPath()
+        public void LandUnitPathFind()
         {
             var board = new Board(GameBoard, TileEdges);
 
@@ -33,6 +33,10 @@ namespace Tests
             Assert.AreEqual(513, pathFindTiles.Count);
 
             var shortestPath = Board.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7), unit.MovementPoints).ToArray();
+
+            var lines = new List<Centreline>();
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
+            GameBoardRenderer.RenderAndSave("LandUnitPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(10, shortestPath.Length);
 
@@ -64,7 +68,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void NavelUnitMoveToPort()
+        public void NavelUnitMoveToPortPathFind()
         {
             var board = new Board(GameBoard, TileEdges);
 
@@ -72,6 +76,10 @@ namespace Tests
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(21, 10), unit.MovementPoints).ToArray();
+
+            var lines = new List<Centreline>();
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
+            GameBoardRenderer.RenderAndSave("NavelUnitMoveToPortPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(shortestPath[0].Point, unit.Location.Point); // Origin
 
@@ -96,9 +104,9 @@ namespace Tests
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
 
-            var vectors = new List<Centreline>();
-            vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            var lines = new List<Centreline>();
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
+            GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(unit.Location.Point, shortestPath[0].Point); // Origin
 

@@ -60,7 +60,8 @@ namespace Visualise
                         {
                             centrelines.Add(new Centreline(x.Origin.Point, x.Destination.Point, Colours.SaddleBrown, x.EdgeType == EdgeType.River));
                         }
-                        else
+
+                        if (!x.HasRoad || (x.HasRoad && x.EdgeType == EdgeType.River))
                         {
                             edgesToRender.Add(new Edge(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
                         }

@@ -41,7 +41,7 @@ namespace Tests
 
             board.Units = units;
 
-            for (board.Turn = 0; board.Turn < 40; board.Turn++)
+            for (board.Turn = 0; board.Turn < 10; board.Turn++)
             {
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
@@ -76,6 +76,10 @@ namespace Tests
                     case 3:
                         Assert.AreEqual(board[18, 7], units[0].Location);
                         Assert.AreEqual(board[18, 7], units[2].Location);
+                        break;
+                    case 5:
+                        Assert.AreEqual(board[17, 2], units[0].Location);
+                        Assert.AreEqual(board[21, 4], units[2].Location);
                         break;
                 }
             }

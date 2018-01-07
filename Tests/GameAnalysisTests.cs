@@ -1,4 +1,5 @@
-﻿using GameModel;
+﻿using ComputerOpponent;
+using GameModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;

@@ -16,13 +16,6 @@ namespace GameModel
             Unit = unit;
         }
 
-        public List<Vector> Vectors
-        {
-            get
-            {
-                var colour = Unit == null ? Colours.Black : Unit.UnitColour;
-                return Moves.Select(x => new Vector(x.Origin.Point, x.Destination.Point, colour, BaseEdgeType.CentreToCentre)).ToList();
-            }
-        }
+
     }
 }

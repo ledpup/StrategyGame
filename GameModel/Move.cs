@@ -15,19 +15,13 @@ namespace GameModel
     }
     public class Move
     {
-
-
-        public Move(Tile origin, Tile destination, Move previousMove, int movesRemaining, int distance, MoveType moveType = MoveType.Standard) : 
-            this(origin, destination, origin.Edges.Single(x => x.Destination == destination), previousMove, movesRemaining, distance, moveType)
-        {
-            
-        }
-
-        public Move(Tile origin, Tile destination, Edge edge, Move previousMove, int movesRemaining, int distance, MoveType moveType)
+        public Move(Tile origin, Tile destination, Move previousMove, int movesRemaining, int distance, MoveType moveType = MoveType.Standard) :
+            this(origin, origin.Neighbours.Single(x => x.Tile == destination), previousMove, movesRemaining, distance, moveType)
+        { }
+        public Move(Tile origin, Neighbour neighbour, Move previousMove, int movesRemaining, int distance, MoveType moveType)
         {
             Origin = origin;
-            Destination = destination;
-            Edge = edge;
+            Neighbour = neighbour;
             PreviousMove = previousMove;
             MovesRemaining = movesRemaining;
             Distance = distance;
@@ -36,8 +30,7 @@ namespace GameModel
 
 
         public Tile Origin;
-        public Tile Destination;
-        public Edge Edge;
+        public Neighbour Neighbour;
         public Move PreviousMove;
         public int MovesRemaining;
         public int Distance;
@@ -45,7 +38,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            return "From: " + Origin + " To: " + Destination;
+            return "From: " + Origin + " To: " + Neighbour.Tile;
         }
 
         public MoveOrder GetMoveOrder(MilitaryUnit unit)
@@ -69,7 +62,7 @@ namespace GameModel
             var currentMove = this;
             while (currentMove != null)
             {
-                mod += currentMove.Destination.TerrainAndWeatherInfluenceByUnit[unitIndex];
+                mod += currentMove.Neighbour.Tile.TerrainAndWeatherInfluenceByUnit[unitIndex];
                 currentMove = currentMove.PreviousMove;
             }
 

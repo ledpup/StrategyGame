@@ -37,6 +37,8 @@ namespace GameModel
 
     public static class Terrain
     {
+        public const int Impassable = 100;
+
         public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Steppe | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
         public static TerrainType All_Water = TerrainType.Water | TerrainType.Reef;
         public static TerrainType Non_Mountainous_Land = All_Land ^ TerrainType.Mountain;

@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Hexagon;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,9 +38,9 @@ namespace GameModel
             Height = tiles.Length;
 
             InitialiseTiles(Width, Height, tiles);
-            FindNeighbours();
+            IntitaliseEdges(edges);
+            InitialiseNeighbours(Edges);
             CalculateTileDistanceFromTheSea();
-            Edges = IntitaliseTileEdges(edges);
             Structures = IntitaliseStructures(structures);
             InitialiseSupply();
             CalculateContiguousRegions();
@@ -96,12 +97,12 @@ namespace GameModel
         private void AssignContiguousTilesToRegion(Tile tile, int id)
         {
             tile.Neighbours
-                .Where(x => x.ContiguousRegionId == 0 && x.BaseTerrainType == tile.BaseTerrainType)
+                .Where(x => x.Tile.ContiguousRegionId == 0 && x.Tile.BaseTerrainType == tile.BaseTerrainType)
                 .ToList()
                 .ForEach(x => 
                     {
-                        x.ContiguousRegionId = id;
-                        AssignContiguousTilesToRegion(x, id);
+                        x.Tile.ContiguousRegionId = id;
+                        AssignContiguousTilesToRegion(x.Tile, id);
                     });
         }
 
@@ -139,21 +140,17 @@ namespace GameModel
                 foreach (var neighbour in tile.Neighbours)
                 {
                     float neighbourSupply = 0;
-                    if (neighbour.OwnerId == ownerId || neighbour.OwnerId == null)
+                    if (neighbour.Tile.OwnerId == ownerId || neighbour.Tile.OwnerId == null)
                     {
-                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour));
+                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour.Tile));
                         if (tileEdge != null)
                         {
-                            if (tileEdge.BaseEdgeType == BaseEdgeType.CentreToCentre && !Terrain.All_Water.HasFlag(neighbour.TerrainType))
-                            {
-                                neighbourSupply = supply - .5f;
-                            }
-                            else if (tileEdge.EdgeType != EdgeType.Mountain)
+                            if (tileEdge.EdgeType != EdgeType.Mountain)
                             {
                                 var edgeModifier = tileEdge.EdgeType == EdgeType.Wall ? 0 : 0.5f;
-                                if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.TerrainType))
+                                if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Tile.TerrainType))
                                 {
-                                    if (Terrain.Rough_Land.HasFlag(neighbour.TerrainType))
+                                    if (Terrain.Rough_Land.HasFlag(neighbour.Tile.TerrainType))
                                     {
                                         neighbourSupply = supply - 1.5f - edgeModifier;
                                     }
@@ -164,9 +161,9 @@ namespace GameModel
                                 }
                             }
                         }
-                        else if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.TerrainType))
+                        else if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Tile.TerrainType))
                         {
-                            if (Terrain.Rough_Land.HasFlag(neighbour.TerrainType))
+                            if (Terrain.Rough_Land.HasFlag(neighbour.Tile.TerrainType))
                             {
                                 neighbourSupply = supply - 1.5f;
                             }
@@ -177,7 +174,7 @@ namespace GameModel
                         }
                         if (neighbourSupply >= 1)
                         {
-                            CalculateSupply(neighbour, ownerId, neighbourSupply, supplyCalculated);
+                            CalculateSupply(neighbour.Tile, ownerId, neighbourSupply, supplyCalculated);
                         }
                     }
                 }
@@ -242,7 +239,7 @@ namespace GameModel
                 return distance;
             }
             distance += 1;
-            if (tile.Neighbours.Any(x => x.IsSea))
+            if (tile.Neighbours.Any(x => x.Tile.IsSea))
             {
                 return distance;
             }
@@ -250,9 +247,9 @@ namespace GameModel
             var minDistance = 100;
             foreach (var neighbour in tile.Neighbours)
             {
-                if (!searched.Contains(neighbour))
+                if (!searched.Contains(neighbour.Tile))
                 {
-                    var result = GetWaterDistanceToSea(neighbour, distance, ref searched);
+                    var result = GetWaterDistanceToSea(neighbour.Tile, distance, ref searched);
                     if (result < minDistance)
                         minDistance = result;
                 }
@@ -278,14 +275,14 @@ namespace GameModel
             }
         }
 
-        public void FindNeighbours()
+        public void InitialiseNeighbours(List<Edge> edges)
         {
             foreach (var tile in Tiles)
             {
                 if (tile.Neighbours != null)
                     throw new Exception("Adjacent tiles have already be calculated");
 
-                var neighbours = new List<Tile>();
+                var neighbours = new List<Neighbour>();
 
                 var potentialTiles = Hex.Neighbours(tile.Hex);
 
@@ -296,25 +293,31 @@ namespace GameModel
 
                     if (neighbourX >= 0 && neighbourX < Width && neighbourY >= 0 && neighbourY < Height)
                     {
-                        var neighbour = this[neighbourX, neighbourY];
+                        var edge = Edge.GetEdge(Edges, tile, this[neighbourX, neighbourY]);
+
+                        Neighbour neighbour;
+
+                        if (edge != null)
+                            neighbour = new Neighbour(this[neighbourX, neighbourY], edge.EdgeType, edge.HasRoad);
+                        else
+                            neighbour = new Neighbour(this[neighbourX, neighbourY]);
+
                         neighbours.Add(neighbour);
-                        tile.Edges.Add(new Edge("Normal", tile, neighbour));
                     }
                 }
 
                 tile.Neighbours = neighbours;
-                
             }
         }
 
-        private List<Edge> IntitaliseTileEdges(string[] tilesEdges)
+        private void IntitaliseEdges(string[] edges)
         {
-            var tileEdgesList = new List<Edge>();
+            Edges = new List<Edge>();
 
-            if (tilesEdges == null)
-                return tileEdgesList;
+            if (edges == null)
+                return;
 
-            tilesEdges.ToList().ForEach(
+            edges.ToList().ForEach(
                 x =>
                 {
                     var columns = x.Split(',');
@@ -330,28 +333,20 @@ namespace GameModel
                     var t1 = TileArray[firstTile];
                     var t2 = TileArray[secondTile];
 
-                    if (!t1.Neighbours.Contains(t2))
-                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because they are not neighbours", t1.Index, t2.Index));
+                    //if (!t1.Neighbours.Contains(t2))
+                    //    throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because they are not neighbours", t1.Index, t2.Index));
 
-                    var existingEdge = tileEdgesList.Where(y => y.CrossesEdge(t1, t2));
+                    var existingEdge = Edges.Where(y => y.CrossesEdge(t1, t2));
 
                     if (existingEdge.Any())
-                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because one already exists of type {2}.", t1.Index, t2.Index, existingEdge.First().EdgeType.ToString()));
+                        throw new Exception(string.Format("Can not create a tile edge between tile {0} and tile {1} because one already exists of type {2}.", t1.Index, t2.Index, existingEdge.Single().EdgeType.ToString()));
 
-                    var tiles = new Tile[] { t1, t2 };
-                    var edge = t1.Edges.Single(y => y.Destination == t2);
-                    edge.SetEdgeType(columns[2]);
-
-                    edge = t2.Edges.Single(y => y.Destination == t1);
-                    edge.SetEdgeType(columns[2]);
-
-                    tileEdgesList.Add(edge);
+                    Edges.Add(new Edge(columns[2], t1, t2, bool.Parse(columns[3])));
                 }
             );
-            return tileEdgesList;
         }
 
-        private void InitialiseTiles(int width, int height, string[] data)
+        private void InitialiseTiles(int width, int height, string[] tileData)
         {
             _tiles = new Tile[width, height];
             _tiles1d = new Tile[width * height];
@@ -360,9 +355,9 @@ namespace GameModel
             {
                 for (ushort y = 0; y < height; y++)
                 {
-                    var terrainType = Terrain.ConvertCharToTerrainType(char.Parse(data[y].Substring(x, 1)));
-                    var isEdge = x == 0 || y == 0 || x == width || y == height ? true : false;
-                    var tile = new Tile(Point.PointToIndex(x, y, width), x, y, terrainType, isEdge);
+                    var terrainType = Terrain.ConvertCharToTerrainType(char.Parse(tileData[y].Substring(x, 1)));
+                    var isEdgeOfMap = x == 0 || y == 0 || x == width || y == height ? true : false;
+                    var tile = new Tile(Point.PointToIndex(x, y, width), x, y, terrainType, isEdgeOfMap);
                     _tiles[x, y] = tile;
                     _tiles1d[y * width + x] = tile;
                 }
@@ -420,17 +415,17 @@ namespace GameModel
 
                 var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
 
-                originTile.ValidAdjacentMoves(unit).ToList().ForEach(x =>
+                foreach(var validAdjacentMove in originTile.ValidAdjacentMoves(unit))
                 {
-                    var neighbour = pathFindTiles.Single(y => y.Point == x.Point);
+                    var neighbour = pathFindTiles.Single(y => y.Point == validAdjacentMove.Point);
 
                     neighbours.Add(neighbour);
                     pathFindTile.Neighbours = neighbours;
 
-                    pathFindTile.MoveCost[neighbour] = originTile.CalculateMoveCost(unit, x);
+                    pathFindTile.MoveCost[neighbour] = originTile.CalculateMoveCost(unit, validAdjacentMove);
 
-                    neighbour.HasCumulativeCost = unit.MovementType == MovementType.Airborne && !unit.CanStopOn.HasFlag(x.TerrainType);
-                });
+                    neighbour.HasCumulativeCost = unit.MovementType == MovementType.Airborne && !unit.CanStopOn.HasFlag(validAdjacentMove.TerrainType);
+                };
             }
 
             return pathFindTiles;
@@ -520,10 +515,10 @@ namespace GameModel
                 var removeUnitMoves = new Dictionary<MilitaryUnit, Move>();
                 foreach (var stepMove in unitStepMoves)
                 {
-                    if (unitStepMoves.Any(x => x.Value.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
+                    if (unitStepMoves.Any(x => x.Value.Neighbour.Tile == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
                     {
                         var originStrength = stepMove.Value.Origin.Units.Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
-                        var destinationStrength = stepMove.Value.Destination.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var destinationStrength = stepMove.Value.Neighbour.Tile.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
 
                         if (originStrength <= destinationStrength)
                         {
@@ -533,12 +528,12 @@ namespace GameModel
                 }
 
                 // Don't move a land unit onto a water time unless there is a transport there that can take it
-                unitStepMoves.Where(x => x.Value.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
+                unitStepMoves.Where(x => x.Value.Neighbour.Tile.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
                     .ToList()
                     .ForEach(x => 
                     {
                         var transportedUnit = x.Key;
-                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Destination.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Neighbour.Tile.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
                         var transport = transports.FirstOrDefault();
                         if (transport != null)
                         {
@@ -558,7 +553,7 @@ namespace GameModel
                 {
                     var unit = unitStepMove.Key;
 
-                    unit.Location = unitStepMove.Value.Destination;
+                    unit.Location = unitStepMove.Value.Neighbour.Tile;
 
                     // Take transported units along with you
                     unit.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
@@ -786,6 +781,49 @@ namespace GameModel
                 combatantStrengthDamage -= assignedStrengthDamage;
                 combatantStrengthDamage = Math.Round(combatantStrengthDamage, 0);
             }
+        }
+
+        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Point origin, Point destination, int maxCumulativeCost)
+        {
+            var ori = pathFindTiles.Single(x => x.X == origin.X && x.Y == origin.Y);
+            var dest = pathFindTiles.Single(x => x.X == destination.X && x.Y == destination.Y);
+
+            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
+            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
+
+            var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
+
+            return path == null || path.Count() == 1 ? null : path.Reverse();
+        }
+
+        public static List<Move> MovesFromShortestPath(List<Move> possibleMoves, PathFindTile[] shortestPath)
+        {
+            List<Move> moves = new List<Move>();
+            Move furthestMove = null;
+            var origin = shortestPath[0].Point;
+            for (var i = 1; i < shortestPath.Length; i++)
+            {
+                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Neighbour.Tile.Point == shortestPath[i].Point && x.Distance == i);
+
+                if (move == null)
+                {
+                    while (furthestMove != null && furthestMove.MoveType == MoveType.OnlyPassingThrough)
+                    {
+                        moves.Remove(furthestMove);
+                        furthestMove = furthestMove.PreviousMove;
+                    }
+                    return moves;
+                }
+
+                moves.Add(move);
+                furthestMove = move;
+
+                // Remove moves that we've considered
+                possibleMoves.RemoveAll(x => x.Origin.Point == origin);
+                origin = shortestPath[i].Point;
+            }
+
+            return moves;
         }
     }
 }

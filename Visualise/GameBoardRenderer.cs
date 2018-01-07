@@ -12,20 +12,20 @@ namespace Visualise
     public enum RenderPipeline
     {
         Board,
-        Vectors,
+        Edges,
         Structures,
         Units,
         Labels
     }
     public class GameBoardRenderer
     {
-        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
             var drawing = new GameBoardDrawing2D(bitmap, boardHeight);
 
             if (renderBegin <= RenderPipeline.Board)
             {
-                var hexagonColours = new Dictionary<GameModel.Point, Brush>();
+                var hexagonColours = new Dictionary<Hexagon.Point, Brush>();
 
                 var displaySelected = tiles.Any(x => x.IsSelected);
 
@@ -38,7 +38,7 @@ namespace Visualise
                         colour.Green = (short)(colour.Green * .3);
                         colour.Blue = (short)(colour.Blue * .3);
                     }
-                    hexagonColours.Add(new GameModel.Point(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                    hexagonColours.Add(new Hexagon.Point(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                 }
                 );
 
@@ -48,39 +48,50 @@ namespace Visualise
             if (renderUntil == RenderPipeline.Board)
                 return bitmap;
 
-            if (renderBegin <= RenderPipeline.Vectors)
+            if (renderBegin <= RenderPipeline.Edges)
             {
-                var vectors = new List<Vector>();
+                var edgesToRender = new List<Edge>();
+                var centrelines = new List<Centreline>();
                 if (edges != null)
                 {
                     edges.ToList().ForEach(x =>
                     {
-                        if (x.EdgeType == EdgeType.Bridge)
-                            vectors.Add(new Vector(x.Origin.Point, x.Destination.Point, EdgeToColour(EdgeType.River), BaseEdgeType.Hexside) { EdgeType = EdgeType.River });
-                        vectors.Add(new Vector(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.BaseEdgeType) { EdgeType = x.EdgeType });
+                        if (x.HasRoad)
+                        {
+                            centrelines.Add(new Centreline(x.Origin.Point, x.Destination.Point, Colours.SaddleBrown, x.EdgeType == EdgeType.River));
+                        }
+
+                        if (!x.HasRoad || (x.HasRoad && x.EdgeType == EdgeType.River))
+                        {
+                            edgesToRender.Add(new Edge(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
+                        }
                     });
 
 
-                    if (lines != null)
-                        vectors.AddRange(lines);
+                    //if (lines != null)
+                    //    edgesToRender.AddRange(lines);
 
-                    vectors.ForEach(x => drawing.DrawEdge(
+                    edgesToRender.ForEach(x => drawing.DrawEdge(
                         x.Origin.Hex,
-                        x.Destination.Hex, 
-                        new Pen(Color.FromArgb(x.Colour.Alpha, x.Colour.Red, x.Colour.Green, x.Colour.Blue), 
-                        x.EdgeType == EdgeType.Road || x.EdgeType == EdgeType.Bridge ? 6 : 3), 
-                        x.BaseEdgeType == BaseEdgeType.CentreToCentre ? true : false,
-                        x.EdgeType == EdgeType.Port ? true : false));
+                        x.Destination.Hex,
+                        x.Colour,
+                        x.IsPort));
 
                     //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
 
+                    centrelines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, x.Colour, x.Width));
 
                     var ports = edges.Where(x => x.EdgeType == EdgeType.Port).ToList();
 
                 }
             }
-            if (renderUntil == RenderPipeline.Vectors)
+            if (renderUntil == RenderPipeline.Edges)
                 return bitmap;
+
+            if (lines != null)
+                lines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, Colours.Black, x.Width));
+
+
 
             if (renderBegin <= RenderPipeline.Structures)
             {
@@ -88,8 +99,8 @@ namespace Visualise
                 {
                     structures.ForEach(x =>
                     {
-                        var colour = x.Colour;
-                        drawing.DrawRectangle(x.Location.Point, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                        var colour = GameBoardRenderer.StructureColour(x);
+                        drawing.DrawRectangle(x.Location.Point, colour);
                     });
                 }
             }
@@ -108,20 +119,19 @@ namespace Visualise
 
                         for (var i = 0; i < unitsAtLocation.Count; i++)
                         {
-                            var colour = Color.FromArgb(unitsAtLocation[i].UnitColour.Alpha, unitsAtLocation[i].UnitColour.Red, unitsAtLocation[i].UnitColour.Green, unitsAtLocation[i].UnitColour.Blue);
-                            var brush = new SolidBrush(colour);
+                            var colour = UnitColour(unitsAtLocation[i]);
                             switch (unitsAtLocation[i].MovementType)
                             {
                                 case MovementType.Airborne:
-                                    drawing.DrawTriangle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawTriangle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Water:
-                                    drawing.DrawTrapezium(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawTrapezium(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Land:
-                                    drawing.DrawCircle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), brush);
+                                    drawing.DrawCircle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
                             }
                         }
@@ -139,7 +149,22 @@ namespace Visualise
             return bitmap;
         }
 
-        public static void RenderAndSave(string fileName, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Vector> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
+        internal static ArgbColour PlayerColour(int playerIndex)
+        {
+            return playerIndex == 0 ? Colours.Blue : Colours.Red;
+        }
+
+        public static ArgbColour UnitColour(MilitaryUnit unit)
+        {
+            return unit.IsAlive ? PlayerColour(unit.OwnerIndex) : Colours.Black;
+        }
+
+        public static ArgbColour StructureColour(Structure structure)
+        {
+            return PlayerColour(structure.OwnerIndex);
+        }
+
+        public static void RenderAndSave(string fileName, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
         {
             var bitmap = new Bitmap(imageWidth, imageHeight);
             bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, boardHeight, tiles, edges, structures, labels, lines, units, circles);
@@ -157,9 +182,6 @@ namespace Visualise
             {
                 case EdgeType.River:
                     return Colours.DodgerBlue;
-                case EdgeType.Road:
-                case EdgeType.Bridge:
-                    return Colours.SaddleBrown;
                 case EdgeType.Forest:
                     return Colours.DarkGreen;
                 case EdgeType.Hill:

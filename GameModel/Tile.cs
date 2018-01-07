@@ -1,4 +1,5 @@
-﻿using PathFind;
+﻿using Hexagon;
+using PathFind;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,10 +30,9 @@ namespace GameModel
 
         public int ContiguousRegionId { get; set; }
 
-        public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdge = false)
+        public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdgeOfMap = false)
         {
             Units = new List<MilitaryUnit>();
-            Edges = new List<Edge>();
 
             Index = index;
             Point = new Point(x, y);
@@ -41,7 +41,7 @@ namespace GameModel
 
             BaseTerrainType = terrainType.HasFlag(TerrainType.Water) || terrainType.HasFlag(TerrainType.Reef) ? BaseTerrainType.Water : BaseTerrainType.Land;
             TerrainType = terrainType;
-            IsEdgeOfMap = isEdge;
+            IsEdgeOfMap = isEdgeOfMap;
 
             AggregateInfluence = new Dictionary<RoleMovementType, double[]>();
 
@@ -50,13 +50,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            var subTerrain = IsLake ? " (Lake)" : IsSea ? " (Sea)" : "";
-            return Index + " " + Point.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
-        }
-
-        public List<Edge> Edges
-        {
-            get; set;
+            return string.Format($"{Index} {Point.ToString()} {TerrainType}");
         }
 
         public float? Supply { get; set; }
@@ -72,53 +66,30 @@ namespace GameModel
         //}
         public int CalculateMoveCost(MilitaryUnit unit, Tile destination)
         {
-            var costChanged = false;
-            var cost = 100;
-
-            var edge = Edges.Single(x => x.Destination == destination);
+            var edge = Neighbours.Single(x => x.Tile == destination);
 
             // Movement by road or bridge always costs 1 regardless of terrain type
-            if (unit.MovementType == MovementType.Land && (edge.EdgeType.HasFlag(EdgeType.Road) || edge.EdgeType.HasFlag(EdgeType.Bridge)))
+            if (unit.MovementType == MovementType.Land && edge.EdgeHasRoad)
             {
                 return 1;
             }
-            
-            if (unit.EdgeMovementCosts[edge.EdgeType] != null)
+
+            // If a unit is transported by a ship, you can only get out at a port
+            if (unit.TransportedBy != null && unit.TransportedBy.MovementType == MovementType.Water && edge.EdgeType != EdgeType.Port)
             {
-                costChanged = true;
-                cost = (int)unit.EdgeMovementCosts[edge.EdgeType];
-            }
-            else
-            {
-                return cost;
+                return Terrain.Impassable;
             }
 
-            if (unit.TerrainMovementCosts[destination.TerrainType] != null)
-            {
-                if (costChanged)
-                {
-                    cost += (int)unit.TerrainMovementCosts[destination.TerrainType];
-                }
-                else
-                {
-                    cost = (int)unit.TerrainMovementCosts[destination.TerrainType];
-                }
-            }
-            
-
-            if (cost == 0)
-                throw new Exception();
-
-            return cost;
+            return unit.EdgeMovementCosts[edge.EdgeType] + unit.TerrainMovementCosts[destination.TerrainType];
         }
 
-        public List<Tile> Neighbours { get; set; }
+        public List<Neighbour> Neighbours { get; set; }
 
         public bool HasPort
         {
             get
             {
-                return Edges.Any(x => x.EdgeType == EdgeType.Port);
+                return Neighbours.Any(x => x.EdgeType == EdgeType.Port);
             }
         }
 
@@ -131,7 +102,7 @@ namespace GameModel
 
                 _isTileSearchedForCoast = true;
 
-                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.TerrainType));
+                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.Tile.TerrainType));
 
                 return _isCoast;
             }
@@ -148,7 +119,7 @@ namespace GameModel
 
                 _isTileSearchedForSea = true;
 
-                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.IsSea) || IsEdgeOfMap);
+                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.Tile.IsSea) || IsEdgeOfMap);
 
                 return _isSea;
             }
@@ -165,7 +136,7 @@ namespace GameModel
 
                 _isTileSearchedForLake = true;
 
-                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.IsSea);
+                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Tile.IsSea);
 
                 return _isLake;
             }
@@ -194,8 +165,9 @@ namespace GameModel
         {
             return tile
                     .Neighbours
-                    .Where(x => unit.EdgeMovementCosts[Edge.GetEdge(tile, x).EdgeType] != null &&
-                                (Edge.GetEdge(tile, x).BaseEdgeType == BaseEdgeType.CentreToCentre || unit.TerrainMovementCosts[x.TerrainType] != null));
+                    .Where(x => (unit.EdgeMovementCosts[x.EdgeType] < Terrain.Impassable || x.EdgeHasRoad) &&
+                                (x.EdgeHasRoad || unit.TerrainMovementCosts[x.Tile.TerrainType] < Terrain.Impassable || (x.EdgeType == EdgeType.Port && unit.MovementType == MovementType.Land)))
+                    .Select(x => x.Tile);
         }
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)
@@ -288,11 +260,12 @@ namespace GameModel
         public int? OwnerId { get; set; }
         public bool IsSelected { get; set; }
         public Structure Structure { get; set; }
-        public Tile PortDestination {
-            get {
-                var edge = Edges.Single(x => x.EdgeType == EdgeType.Port);
-                var destination = edge.Origin == this ? edge.Destination : edge.Origin;
-                return destination;
+        public Tile PortDestination
+        {
+            get
+            {
+                var edge = Neighbours.Single(x => x.EdgeType == EdgeType.Port);
+                return edge.Tile;
             }
         }
     }

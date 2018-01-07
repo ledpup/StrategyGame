@@ -1,4 +1,5 @@
-﻿using PathFind;
+﻿using Hexagon;
+using PathFind;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,17 +40,6 @@ namespace GameModel
         Offensive,
         Defensive,
         Scout,
-    }
-
-    public enum StrategicAction
-    {
-        None,
-        Dock,
-        TransportToDestination,
-        Embark,
-        Disembark,
-        Pickup,
-        AirliftToDestination,
     }
 
     public struct RoleMovementType
@@ -129,15 +119,14 @@ namespace GameModel
         public int Speed { get; set; }
         public bool IsAlive { get; private set; }
 
-        public bool IsAmphibious { get; set; }
         public Dictionary<TerrainType, double> TerrainTypeBattleModifier { get; set; }
         public Dictionary<Weather, double> WeatherBattleModifier { get; set; }
         public Dictionary<UnitType, double> OpponentUnitTypeBattleModifier { get; set; }
 
         public TerrainType CanStopOn;
 
-        public Dictionary<TerrainType, int?> TerrainMovementCosts { get; set; }
-        public Dictionary<EdgeType, int?> EdgeMovementCosts { get; set; }
+        public Dictionary<TerrainType, int> TerrainMovementCosts { get; set; }
+        public Dictionary<EdgeType, int> EdgeMovementCosts { get; set; }
 
         public bool IsTransporter { get; set; }
         public List<MilitaryUnit> Transporting { get; set; }
@@ -146,12 +135,11 @@ namespace GameModel
 
         public Role Role { get; set; }
 
-        public StrategicAction StrategicAction { get; set; }
         public override string ToString()
         {
             return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, bool isAmphibious = false, Role role = Role.Balanced, StrategicAction strategicAction = StrategicAction.None, float[] moraleMoveCost = null)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, Role role = Role.Balanced, float[] moraleMoveCost = null)
         {
             IsAlive = true;
 
@@ -179,15 +167,15 @@ namespace GameModel
                 OpponentUnitTypeBattleModifier.Add(unitTypeEnum, 0);
             }
 
-            TerrainMovementCosts = new Dictionary<TerrainType, int?>();
+            TerrainMovementCosts = new Dictionary<TerrainType, int>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                TerrainMovementCosts.Add(terrainType, null);
+                TerrainMovementCosts.Add(terrainType, Terrain.Impassable);
             }
-            EdgeMovementCosts = new Dictionary<EdgeType, int?>();
+            EdgeMovementCosts = new Dictionary<EdgeType, int>();
             foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
             {
-                EdgeMovementCosts.Add(edgeType, null);
+                EdgeMovementCosts.Add(edgeType, Terrain.Impassable);
             }
 
             Index = index;
@@ -216,7 +204,6 @@ namespace GameModel
 
             InitialMorale = initialMorale;
             InitialQuantity = initialQuantity;
-            IsAmphibious = isAmphibious;
 
             switch (MovementType)
             {
@@ -242,15 +229,8 @@ namespace GameModel
                 MoraleMoveCost = moraleMoveCost;
             }
 
-            if (IsAmphibious)
-            {
-                TerrainMovementCosts[TerrainType.Wetland] = 1;
-                EdgeMovementCosts[EdgeType.River] = 0;
-            }
-
             RoadMovementBonus = roadMovementBonus;
             Role = role;
-            StrategicAction = strategicAction;
             RoleMovementType = new RoleMovementType(MovementType, Role);
 
             CalculateStrength();
@@ -325,13 +305,18 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Steppe] = 2;
             TerrainMovementCosts[TerrainType.Forest] = 2;
             TerrainMovementCosts[TerrainType.Hill] = 2;
+            TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Water] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Wetland] = 2;
+            TerrainMovementCosts[TerrainType.Reef] = Terrain.Impassable;
 
-            EdgeMovementCosts[EdgeType.Normal] = 0;
-            EdgeMovementCosts[EdgeType.Road] = 0;
-            EdgeMovementCosts[EdgeType.Bridge] = 0;
+            EdgeMovementCosts[EdgeType.None] = 0;
+            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Forest] = 1;
             EdgeMovementCosts[EdgeType.Hill] = 1;
+            EdgeMovementCosts[EdgeType.Mountain] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Reef] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Port] = 1;
 
             CanStopOn = Terrain.Non_Mountainous_Land;
@@ -344,31 +329,41 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Forest] = 1;
             TerrainMovementCosts[TerrainType.Hill] = 1;
             TerrainMovementCosts[TerrainType.Mountain] = 1;
-            TerrainMovementCosts[TerrainType.Wetland] = 1;
-
             TerrainMovementCosts[TerrainType.Water] = 1;
+            TerrainMovementCosts[TerrainType.Wetland] = 1;            
             TerrainMovementCosts[TerrainType.Reef] = 1;
 
-            // Airborne units can fly over anything except walls
-            EdgeMovementCosts[EdgeType.Normal] = 0;
-            EdgeMovementCosts[EdgeType.Road] = 0;
-            EdgeMovementCosts[EdgeType.Bridge] = 0;
+            EdgeMovementCosts[EdgeType.None] = 0;
+            EdgeMovementCosts[EdgeType.River] = 0;
             EdgeMovementCosts[EdgeType.Forest] = 0;
             EdgeMovementCosts[EdgeType.Hill] = 0;
-            EdgeMovementCosts[EdgeType.Port] = 0;
-            EdgeMovementCosts[EdgeType.River] = 0;
+            EdgeMovementCosts[EdgeType.Mountain] = 0;
             EdgeMovementCosts[EdgeType.Reef] = 0;
+            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Port] = 0;
 
             CanStopOn = Terrain.Non_Mountainous_Land;
         }
 
         void WaterUnit()
         {
+            TerrainMovementCosts[TerrainType.Grassland] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Steppe] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Forest] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Hill] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Water] = 1;
+            TerrainMovementCosts[TerrainType.Wetland] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Reef] = 2;
 
-            EdgeMovementCosts[EdgeType.Normal] = 0;
+            EdgeMovementCosts[EdgeType.None] = 0;
+            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Forest] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Hill] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Mountain] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Reef] = 1;
+            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.Port] = Terrain.Impassable;
 
             CanStopOn = Terrain.All_Water;
         }
@@ -429,14 +424,6 @@ namespace GameModel
             get { return (int)Math.Ceiling(Quantity * Size); }
         }
 
-        public ArgbColour UnitColour
-        {
-            get
-            {
-                return IsAlive ? Player.Colour(OwnerIndex) : Colours.Black;
-            }
-        }
-
         public int RoadMovementBonus { get; set; }
         public double StructureBattleModifier { get; set; }
         public MilitaryUnit TransportedBy { get; set; }
@@ -454,7 +441,7 @@ namespace GameModel
             {
                 var roadMovesAlreadyConsidered = new List<Move>();
                 var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus, 1);
-                var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Destination == y.Destination));
+                var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Neighbour.Tile == y.Neighbour.Tile));
                 possibleMoves.AddRange(notAlreadySeenRoadMoves);
             }
 
@@ -462,7 +449,7 @@ namespace GameModel
             while (searchForOnlyPassingThroughDestinations)
             {
                 var removeOnlyPassingThroughDestinations = possibleMoves
-                    .Where(x => x.MoveType == MoveType.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Destination));
+                    .Where(x => x.MoveType == MoveType.OnlyPassingThrough && !possibleMoves.Any(y => y.Origin == x.Neighbour.Tile));
 
                 searchForOnlyPassingThroughDestinations = removeOnlyPassingThroughDestinations.Any();
                 removeOnlyPassingThroughDestinations.ToList().ForEach(x => possibleMoves.Remove(x));
@@ -475,8 +462,8 @@ namespace GameModel
         {
             var potentialMoves = new List<Move>();
 
-            potentialMoves.AddRange(origin.Neighbours.Where(dest => PotentialMove(unit, origin, movesConsidered, movementPoints, dest)
-                                        ).Select(x => new Move(origin, x, previousMove, movementPoints, distance, GetMoveType(origin, x , unit)))
+            potentialMoves.AddRange(origin.Neighbours.Where(edge => PotentialMove(unit, origin, movesConsidered, movementPoints, edge))
+                                        .Select(x => new Move(origin, x, previousMove, movementPoints, distance, GetMoveType(origin, x.Tile, unit)))
                                         .ToList());
 
             movesConsidered.AddRange(potentialMoves);
@@ -485,11 +472,11 @@ namespace GameModel
 
             potentialMoves.ForEach(x =>
             {
-                var remainingMovementPoints = movementPoints - x.Origin.CalculateMoveCost(unit, x.Destination);
+                var remainingMovementPoints = movementPoints - x.Origin.CalculateMoveCost(unit, x.Neighbour.Tile);
 
                 if (remainingMovementPoints > 0)
                 {
-                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Destination, x, movesConsidered, remainingMovementPoints, distance + 1));
+                    neighbourMoves.AddRange(GenerateStandardMoves(unit, x.Neighbour.Tile, x, movesConsidered, remainingMovementPoints, distance + 1));
                 }
             });
 
@@ -499,16 +486,16 @@ namespace GameModel
 
         }
 
-        private static MoveType GetMoveType(Tile origin, Tile x, MilitaryUnit unit)
+        private static MoveType GetMoveType(Tile origin, Tile destination, MilitaryUnit unit)
         {
             if (unit.MovementType == MovementType.Land)
             {
-                if (unit.TransportedBy == null && Edge.GetEdge(origin, x).EdgeType == EdgeType.Port)
+                if (unit.TransportedBy == null && origin.Neighbours.Single(x => x.Tile == destination).EdgeType == EdgeType.Port)
                 {
                     return MoveType.Embark;
                 }
             }
-            if (!unit.CanStopOn.HasFlag(x.TerrainType))
+            if (!unit.CanStopOn.HasFlag(destination.TerrainType))
                 return MoveType.OnlyPassingThrough;
 
             return MoveType.Standard;
@@ -518,40 +505,41 @@ namespace GameModel
         {
             var validMove = x.MoveType == MoveType.OnlyPassingThrough || 
                                         x.MoveType == MoveType.Embark ||
-                                        unit.CanStopOn.HasFlag(x.Destination.TerrainType);
+                                        unit.CanStopOn.HasFlag(x.Neighbour.Tile.TerrainType);
             return validMove;
         }
 
-        private static bool PotentialMove(MilitaryUnit unit, Tile origin, List<Move> movesConsidered, int movementPoints, Tile dest)
+        private static bool PotentialMove(MilitaryUnit unit, Tile origin, List<Move> movesConsidered, int movementPoints, Neighbour neighbour)
         {
-            var potentialMove = dest != unit.Location && !movesConsidered.Any(x => x.Origin == origin && x.Destination == dest && x.MovesRemaining > movementPoints);
+            var potentialMove = neighbour.Tile != unit.Location && !movesConsidered.Any(x => x.Origin == origin && x.MovesRemaining > movementPoints);
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.EdgeMovementCosts[Edge.GetEdge(origin, dest).EdgeType] != null;
+            potentialMove = unit.EdgeMovementCosts[neighbour.EdgeType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && neighbour.EdgeHasRoad);
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] != null
-                                                                || Edge.GetEdge(origin, dest).BaseEdgeType == BaseEdgeType.CentreToCentre
-                                                                || (Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port && unit.StrategicAction == StrategicAction.Embark);
+            potentialMove = unit.TerrainMovementCosts[neighbour.Tile.TerrainType] < Terrain.Impassable
+                                    || (unit.MovementType == MovementType.Land && neighbour.EdgeHasRoad)
+                                    || (neighbour.EdgeType == EdgeType.Port && unit.TransportedBy == null);
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = (unit.TransportedBy == null || Edge.GetEdge(origin, dest).EdgeType == EdgeType.Port);
+            potentialMove = unit.TransportedBy == null || neighbour.EdgeType == EdgeType.Port;
 
             return potentialMove;
         }
 
         private static List<Move> GenerateRoadMoves(MilitaryUnit unit, Tile tile, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
         {
-            var moves = tile.Edges.Where(x => x.BaseEdgeType == BaseEdgeType.CentreToCentre 
-                                                            && !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination))
-                                                     )
-                .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
+            var moves = tile.Neighbours.Where(x => x.EdgeHasRoad && !movesConsidered.Any(y => y.Origin == tile && x.Tile == y.Neighbour.Tile))
+                                                .Select(x => new Move(tile, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
+
+            //var moves = tile.Edges.Where(x => !movesConsidered.Any(y => Edge.CrossesEdge(x, tile, y.Destination)))  
+            //                            .Select(x => new Move(x.Origin, x.Destination, x, previousMove, movementPoints, distance, MoveType.Road)).ToList();
 
             movesConsidered.AddRange(moves);
 
@@ -561,7 +549,7 @@ namespace GameModel
             {
                 var cost = movementPoints - 1;
                 if (cost > 0)
-                    neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Destination, move, movesConsidered, cost, distance + 1));
+                    neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Neighbour.Tile, move, movesConsidered, cost, distance + 1));
             }
 
             moves.AddRange(neighbourMoves);
@@ -572,14 +560,14 @@ namespace GameModel
         public MoveOrder GetMoveOrderToDestination(Point destination, Board board)
         {
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(this);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, Location.Point, destination, MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(pathFindTiles, Location.Point, destination, MovementPoints).ToArray();
 
             return ShortestPathToMoveOrder(shortestPath);
         }
 
         public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
         {
-            var moves = ComputerPlayer.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
+            var moves = Board.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
 
             if (moves.Count == 0)
                 return null;

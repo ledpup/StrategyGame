@@ -6,6 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ComputerOpponent;
+using Hexagon;
+using Visualise;
 
 namespace Tests
 {
@@ -52,17 +55,7 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Height, board.Tiles, board.Edges, board.Structures, units: units);
-        }
-
-        [TestMethod]
-        public void VisualiseCurvedRoadsTest()
-        {
-            var board = new Board(GameBoard, TileEdges, Structures);
-
-            var vectors = new List<Vector>() { new Vector(board[28].Point, board[29].Point, Colours.Black) { EdgeType = EdgeType.Road } };
-
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithCurves.png", board.Height, board.Tiles, circles: board[1,1]);
+            GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Height, board.Tiles, board.Edges, board.Structures, units: units);
         }
 
         [TestMethod]
@@ -72,12 +65,12 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[1, 1]);
 
-            var vectors = new List<Vector>();
+            var lines = new List<Centreline>();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
 
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(7, 7), unit.MovementPoints)));
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(ComputerPlayer.FindShortestPath(pathFindTiles, new Point(10, 3), new Point(13, 6), unit.MovementPoints)));
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(7, 7), unit.MovementPoints)));
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Point(10, 3), new Point(13, 6), unit.MovementPoints)));
 
             var labels = new string[board.Width, board.Height];
             for (var x = 0; x < board.Width; x++)
@@ -88,7 +81,7 @@ namespace Tests
                 }
             }
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, labels, vectors);
+            GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, labels, lines);
         }
 
 

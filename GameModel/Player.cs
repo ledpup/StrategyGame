@@ -14,9 +14,6 @@ namespace GameModel
             return Id;
         }
 
-        internal static ArgbColour Colour(int playerIndex)
-        {
-            return playerIndex == 0 ? Colours.Blue : Colours.Red;
-        }
+
     }
 }

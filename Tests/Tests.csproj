@@ -64,9 +64,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ComputerOpponent\ComputerOpponent.csproj">
+      <Project>{40377a4b-2f06-4d82-aa53-59dea7315426}</Project>
+      <Name>ComputerOpponent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameModel\GameModel.csproj">
       <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
       <Name>GameModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Hexagon\Hexagon.csproj">
+      <Project>{04cd3988-f271-4897-b43d-0802e8c1a48c}</Project>
+      <Name>Hexagon</Name>
     </ProjectReference>
     <ProjectReference Include="..\PathFind\PathFind.csproj">
       <Project>{2caef444-6049-4d0e-b492-d3fe21800ea4}</Project>

@@ -6,6 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hexagon;
+using ComputerOpponent;
+using Visualise;
 
 namespace Tests
 {
@@ -19,21 +22,30 @@ namespace Tests
 
 
         [TestMethod]
-        public void LandUnitPath()
+        public void LandUnitPathFind()
         {
             var board = new Board(GameBoard, TileEdges);
 
             var unit = new MilitaryUnit(location: board[1, 1]);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7), unit.MovementPoints).ToArray();
+
+            Assert.AreEqual(513, pathFindTiles.Count);
+
+            var shortestPath = Board.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(5, 7), unit.MovementPoints).ToArray();
+
+            var lines = new List<Centreline>();
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
+            GameBoardRenderer.RenderAndSave("LandUnitPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
+
+            Assert.AreEqual(10, shortestPath.Length);
 
             Assert.AreEqual(shortestPath[0].Point, new Point(1, 1)); // Origin
 
             Assert.AreEqual(shortestPath[1].Point, new Point(2, 2));
             Assert.AreEqual(shortestPath[2].Point, new Point(3, 2));
             Assert.AreEqual(shortestPath[3].Point, new Point(4, 3));
-            Assert.AreEqual(shortestPath[4].Point, new Point(5, 3));
+            Assert.AreEqual(shortestPath[4].Point, new Point(5, 3)); // There is a road over the mountain
             Assert.AreEqual(shortestPath[5].Point, new Point(6, 4));
             Assert.AreEqual(shortestPath[6].Point, new Point(6, 5));
             Assert.AreEqual(shortestPath[7].Point, new Point(5, 5));
@@ -50,20 +62,24 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[1, 1]);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(4, 9), unit.MovementPoints);
+            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(4, 9), unit.MovementPoints);
 
             Assert.IsNull(shortestPath);
         }
 
         [TestMethod]
-        public void NavelUnitMoveToPort()
+        public void NavelUnitMoveToPortPathFind()
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, strategicAction: StrategicAction.Dock);
+            var unit = new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(21, 10), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(21, 10), unit.MovementPoints).ToArray();
+
+            var lines = new List<Centreline>();
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
+            GameBoardRenderer.RenderAndSave("NavelUnitMoveToPortPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(shortestPath[0].Point, unit.Location.Point); // Origin
 
@@ -86,11 +102,11 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[24, 15], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
 
-            var vectors = new List<Vector>();
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            var lines = new List<Centreline>();
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
+            GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(unit.Location.Point, shortestPath[0].Point); // Origin
 
@@ -115,10 +131,10 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[19, 13], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 13), unit.MovementPoints).ToArray();
 
-            var vectors = new List<Vector>();
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
+            var vectors = new List<Centreline>();
+            vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
 
@@ -144,22 +160,22 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[119], movementType: MovementType.Airborne, baseMovementPoints: 5, isTransporter: true);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 3), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Point, new Point(14, 3), unit.MovementPoints).ToArray();
 
-            var vectors = new List<Vector>();
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(shortestPath));
+            var vectors = new List<Centreline>();
+            vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
             var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
 
-            vectors = new List<Vector>();
-            vectors.AddRange(moveOrder.Vectors);
+            vectors = new List<Centreline>();
+            vectors.AddRange(Centreline.MoveOrderToCentrelines(moveOrder));
 
             Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 
 
             var moves = unit.PossibleMoves();
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPossibleMoves.png", board.Height, board.Tiles, board.Edges, board.Structures);
 
 
@@ -171,10 +187,10 @@ namespace Tests
 
             Assert.AreEqual(new Point(14, 3), shortestPath[4].Point); // Destination
 
-            Assert.AreEqual(new Point(12, 4), moveOrder.Moves[0].Destination.Point);
-            Assert.AreEqual(new Point(13, 4), moveOrder.Moves[1].Destination.Point);
-            Assert.AreEqual(new Point(13, 3), moveOrder.Moves[2].Destination.Point);
-            Assert.AreEqual(new Point(14, 3), moveOrder.Moves[3].Destination.Point);
+            Assert.AreEqual(new Point(12, 4), moveOrder.Moves[0].Neighbour.Tile.Point);
+            Assert.AreEqual(new Point(13, 4), moveOrder.Moves[1].Neighbour.Tile.Point);
+            Assert.AreEqual(new Point(13, 3), moveOrder.Moves[2].Neighbour.Tile.Point);
+            Assert.AreEqual(new Point(14, 3), moveOrder.Moves[3].Neighbour.Tile.Point);
         }
     }
 }

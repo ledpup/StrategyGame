@@ -1,17 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4C5F1B73-0737-4624-8E1C-F6F180067D88}</ProjectGuid>
+    <ProjectGuid>{40377A4B-2F06-4D82-AA53-59DEA7315426}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GameModel</RootNamespace>
-    <AssemblyName>GameModel</AssemblyName>
+    <RootNamespace>ComputerOpponent</RootNamespace>
+    <AssemblyName>ComputerOpponent</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,43 +30,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.4\lib\net45\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BattleReport.cs" />
-    <Compile Include="Board.cs" />
-    <Compile Include="CasualtyLogEntry.cs" />
-    <Compile Include="CombatantInBattle.cs" />
-    <Compile Include="IUnitOrder.cs" />
-    <Compile Include="Neighbour.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="MoraleChangeEvent.cs" />
-    <Compile Include="MoveOrder.cs" />
-    <Compile Include="Move.cs" />
-    <Compile Include="MoveOrderDto.cs" />
-    <Compile Include="QuantityChangeEvent.cs" />
-    <Compile Include="PathFindTile.cs" />
-    <Compile Include="Stack.cs" />
-    <Compile Include="Structure.cs" />
-    <Compile Include="Terrain.cs" />
-    <Compile Include="Tile.cs" />
-    <Compile Include="Edge.cs" />
-    <Compile Include="MilitaryUnit.cs" />
+    <Compile Include="ComputerPlayer.cs" />
+    <Compile Include="GameAnalysis.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TransportOrder.cs" />
-    <Compile Include="UnitAndPath.cs" />
-    <Compile Include="UnloadOrder.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GameModel\GameModel.csproj">
+      <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
+      <Name>GameModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Hexagon\Hexagon.csproj">
       <Project>{04cd3988-f271-4897-b43d-0802e8c1a48c}</Project>
       <Name>Hexagon</Name>
@@ -77,15 +58,5 @@
       <Name>PathFind</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

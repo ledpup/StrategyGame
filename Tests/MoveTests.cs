@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
+using ComputerOpponent;
+using Visualise;
 
 namespace Tests
 {
@@ -29,33 +31,33 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(11, moves.Count());
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 361));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 336));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 309));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 310));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 308));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 334));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 361));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 336));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 309));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 310));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 308));
 
             // Can't go into the ocean
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 281));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 306));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 333));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 360));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 281));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 306));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 333));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 360));
 
             // Can't go over mountains
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 337));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 363));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 362));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 388));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 364));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 390));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 389));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 337));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 363));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 362));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 388));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 364));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 390));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 389));
         }
 
         [TestMethod]
@@ -67,25 +69,25 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 316));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 317));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 343));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 344));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 318));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 373));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 347));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 374));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 402));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 429));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 316));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 317));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 343));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 344));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 318));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 373));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 347));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 374));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 402));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 429));
 
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 346));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 371));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 372));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 400));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 346));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 371));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 372));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 400));
         }
 
         [TestMethod]
@@ -97,25 +99,25 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoadOverMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoadOverMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 56));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 57));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 59));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 86));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 87));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 114));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 30));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 56));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 57));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 59));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 86));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 87));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 114));
 
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 58));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 32));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 60));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 83));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 84));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 112));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 113));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 58));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 32));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 60));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 83));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 84));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 112));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 113));
         }
 
         [TestMethod]
@@ -130,11 +132,11 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("InfantryMoveOverMountainWithRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("InfantryMoveOverMountainWithRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 86));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 86));
         }
 
         [TestMethod]
@@ -146,28 +148,28 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMovesWithRoadAndMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AirborneUnitMovesWithRoadAndMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 30));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 31));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 32));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 56));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 57));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 59));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 60));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 87));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 110));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 111));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 114));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 30));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 31));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 32));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 56));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 57));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 59));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 60));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 87));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 110));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 111));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 114));
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 58 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 83));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 84 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 86 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 112 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 113));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 58 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 83));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 84 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 86 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 112 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 113));
         }
 
         [TestMethod]
@@ -179,45 +181,45 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AirborneUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             //Assert.AreEqual(12, moves.Count());
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 308));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 309));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 361));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 335));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 336));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 310));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 311));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 338));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 312));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 389));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 390));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 365));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 339));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 340));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 417));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 366));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 367));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 418));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 419));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 393));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 394));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 445));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 446));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 420));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 421));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 334));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 308));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 309));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 361));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 335));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 336));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 310));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 311));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 338));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 312));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 389));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 390));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 365));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 339));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 340));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 417));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 366));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 367));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 418));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 419));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 393));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 394));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 445));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 446));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 420));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 421));
 
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 388));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 362 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 337 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 391 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 392 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 416));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 444));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 388));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 362 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 337 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 391 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 392 && x.MoveType == MoveType.OnlyPassingThrough));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 416));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 444));
         }
 
 
@@ -241,12 +243,12 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne);
             var moveList = unit.PossibleMoves();
 
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 2]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[1, 3]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 2]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[2, 1]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 1]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[1, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[1, 3]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[2, 2]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[2, 1]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[3, 1]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[3, 2]));
         }
 
         [TestMethod]
@@ -257,27 +259,27 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[4, 9], movementType: MovementType.Airborne);
             var moveList = unit.PossibleMoves();
 
-            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
+            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+            GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
 
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 9] && x.MoveType == MoveType.OnlyPassingThrough)); // Mountain
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 9]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[3, 9] && x.MoveType == MoveType.OnlyPassingThrough)); // Mountain
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[5, 9]));
 
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[3, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[3, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[4, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[5, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
 
-            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 7])); // Reef
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 7]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 7]));
+            Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 7])); // Reef
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[4, 7]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[5, 7]));
 
-            Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 10])); // Water
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 10] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
-            Assert.IsFalse(moveList.Any(x => x.Destination == board[5, 10])); // Water
+            Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 10])); // Water
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[4, 10] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
+            Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[5, 10])); // Water
 
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 11]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[4, 11]));
         }
 
         [TestMethod]
@@ -289,12 +291,12 @@ namespace Tests
             var moveList = unit.PossibleMoves();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[196].Point, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Point, board[196].Point, unit.MovementPoints);
             
             var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
 
-            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
+            GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
             Assert.IsFalse(moveOrder.Moves.Last().MoveType == MoveType.OnlyPassingThrough);
         }
@@ -308,14 +310,14 @@ namespace Tests
             var moveList = unit.PossibleMoves();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[381].Point, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Point, board[381].Point, unit.MovementPoints);
 
-            var vectors = new List<Vector>();
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            var vectors = new List<Centreline>();
+            vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
-            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
         }
 
         [TestMethod]
@@ -327,13 +329,13 @@ namespace Tests
             var moveList = unit.PossibleMoves();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[456].Point, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Point, board[456].Point, unit.MovementPoints);
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Centreline>();
 
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
+            vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongerRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongerRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
         }
 
         [TestMethod]
@@ -345,13 +347,13 @@ namespace Tests
             var moveList = unit.PossibleMoves();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = ComputerPlayer.FindShortestPath(pathFindTiles, unit.Location.Point, board[484].Point, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Point, board[484].Point, unit.MovementPoints);
 
-            var vectors = new List<Vector>();
+            var vectors = new List<Centreline>();
 
-            vectors.AddRange(ComputerPlayer.PathFindTilesToVectors(pathToTransporteesDestination));
+            vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathCornerToCorner.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathCornerToCorner.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
         }
 
         [TestMethod]
@@ -362,30 +364,30 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[19, 13], movementType: MovementType.Airborne, baseMovementPoints: 3);
             var moveList = unit.PossibleMoves();
 
-            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Destination.IsSelected = true);
+            moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverContinent.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
             Assert.AreEqual(154, moveList.Count());
 
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 9])); // Mountain
-            //Assert.IsTrue(moveList.Any(x => x.Destination == board[5, 9]));
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 9])); // Mountain
+            //Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[5, 9]));
 
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 8])); // Water
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[4, 8])); // Water
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[5, 8])); // Water
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 8])); // Water
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[4, 8])); // Water
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[5, 8])); // Water
 
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 7])); // Reef
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[16, 12]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[16, 13]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[16, 14]));
-            Assert.IsTrue(moveList.Any(x => x.Destination == board[16, 15]));
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 7])); // Reef
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[16, 12]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[16, 13]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[16, 14]));
+            Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[16, 15]));
 
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[3, 10])); // Water
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[4, 10])); // Water
-            //Assert.IsFalse(moveList.Any(x => x.Destination == board[5, 10])); // Water
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 10])); // Water
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[4, 10])); // Water
+            //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[5, 10])); // Water
 
-            //Assert.IsTrue(moveList.Any(x => x.Destination == board[4, 11]));
+            //Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[4, 11]));
         }
 
         [TestMethod]
@@ -397,18 +399,18 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(7, moves.Count());
 
-            Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[2, 1]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[3, 1]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[1, 2]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 2]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 1]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[3, 1]));
 
-            Assert.IsFalse(moves.Any(x => x.Destination == board[1, 3])); // Can't cross river
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile == board[1, 3])); // Can't cross river
         }
 
         [TestMethod]
@@ -420,23 +422,22 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(15, moves.Count());
 
-            Assert.IsTrue(moves.Any(x => x.Destination == board[87]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[88]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[114]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[115]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[140]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[142]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[168]));
-
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[87]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[88]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[114]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[115]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[140]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[142]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[168]));
 
             // Blocked by mountain hexside and hill/wetland terrain            
-            Assert.IsFalse(moves.Any(x => x.Destination == board[169]));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile == board[169]));
         }
 
         [TestMethod]
@@ -444,21 +445,23 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Amphibious", 1, board[1, 1], MovementType.Land, isAmphibious: true) };
+            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Amphibious", 1, board[1, 1], MovementType.Land) };
+            units[0].TerrainMovementCosts[TerrainType.Wetland] = 1;
+            units[0].EdgeMovementCosts[EdgeType.River] = 0;
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AmphibiousUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AmphibiousUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(8, moves.Count());
 
-            Assert.IsTrue(moves.Any(x => x.Destination == board[1, 2]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[2, 2]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[2, 1]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[3, 1]));
-            Assert.IsTrue(moves.Any(x => x.Destination == board[1, 3]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[1, 2]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 2]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 1]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[3, 1]));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[1, 3]));
         }
 
         [TestMethod]
@@ -470,21 +473,21 @@ namespace Tests
 
             var moves = units[0].PossibleMoves();
 
-            moves.ToList().ForEach(x => x.Destination.IsSelected = true);
+            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AquaticUnit.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AquaticUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(138, moves.Count());
 
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 198));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 226));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 253));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 252));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 251));
-            Assert.IsTrue(moves.Any(x => x.Destination.Index == 224));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 198));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 226));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 253));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 252));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 251));
+            Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 224));
 
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 196));
-            Assert.IsFalse(moves.Any(x => x.Destination.Index == 199));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 196));
+            Assert.IsFalse(moves.Any(x => x.Neighbour.Tile.Index == 199));
         }
 
         [TestMethod]
@@ -494,12 +497,19 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[196], baseMovementPoints: 3, transportableBy: new List<MovementType>{ MovementType.Water }, strategicAction: StrategicAction.Embark),
-                new MilitaryUnit(1, location: board[224], movementType: MovementType.Water, isTransporter: true, strategicAction: StrategicAction.Dock),
+                new MilitaryUnit(0, location: board[196], baseMovementPoints: 3, transportableBy: new List<MovementType>{ MovementType.Water }),
+                new MilitaryUnit(1, location: board[224], movementType: MovementType.Water, isTransporter: true),
             };
+
+            ComputerPlayer.SetStrategicAction(board, board.Units);
 
             var unitOrders = ComputerPlayer.CreateOrders(board, board.Units);
             board.ResolveOrders(unitOrders);
+
+            //var lines = new List<Centreline>();
+            //unitOrders.ForEach(x => unitOrders.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
+
+            //GameBoardRenderer.RenderAndSave("EmbarkOnShip.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             Assert.AreEqual(board[8, 8], board.Units[0].Location);
         }
@@ -653,14 +663,14 @@ namespace Tests
                 new MoveOrder(moves4, board.Units[3]),
             };
 
-            var vectors = new List<Vector>();
-            moveOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
+            var lines = new List<Centreline>();
+            moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-            Visualise.GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
             board.ResolveOrders(moveOrders);
 
-            Visualise.GameBoardRenderer.RenderAndSave("UnitsPostMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            GameBoardRenderer.RenderAndSave("UnitsPostMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             Assert.AreEqual(board[2, 2], board.Units[0].Location);
             Assert.AreEqual(board[2, 2], board.Units[1].Location);

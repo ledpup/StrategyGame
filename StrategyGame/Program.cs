@@ -1,4 +1,5 @@
-﻿using GameModel;
+﻿using ComputerOpponent;
+using GameModel;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Visualise;
 
 namespace StrategyGame
 {
@@ -31,7 +33,7 @@ namespace StrategyGame
                 new MilitaryUnit(0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3, role: Role.Besieger),
                 new MilitaryUnit(1, location: board[110], baseMovementPoints: 3, role: Role.Defensive),
                 new MilitaryUnit(2, location: board[31], role: Role.Defensive),
-                new MilitaryUnit(3, location: board[56], movementType: MovementType.Land, isAmphibious: true),
+                new MilitaryUnit(3, location: board[56], movementType: MovementType.Land),
                 new MilitaryUnit(4, location: board[65]),
                 new MilitaryUnit(5, location: board[316], role: Role.Defensive),
 
@@ -46,6 +48,9 @@ namespace StrategyGame
 
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
+
+            board.Units[3].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            board.Units[3].EdgeMovementCosts[EdgeType.River] = 0;
 
             var gameOver = false;
 
@@ -96,10 +101,10 @@ namespace StrategyGame
                 ComputerPlayer.SetStrategicAction(board, units);
                 unitsOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var vectors = new List<Vector>();
-                unitsOrders.ForEach(x => vectors.AddRange(((MoveOrder)x).Vectors));
+                var lines = new List<Centreline>();
+                unitsOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                Visualise.GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+                GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(unitsOrders);
                 for (var i = 0; i < numberOfPlayers; i++)
@@ -107,7 +112,7 @@ namespace StrategyGame
                     board.ResolveStackLimits(i);
                 }
 
-                Visualise.GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>

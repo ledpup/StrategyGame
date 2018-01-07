@@ -1,10 +1,9 @@
 // Code from http://www.redblobgames.com/grids/hexagons/
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
-namespace GameModel
+namespace Hexagon
 {
     public struct PointD
     {

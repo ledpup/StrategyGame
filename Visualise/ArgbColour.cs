@@ -1,4 +1,4 @@
-﻿namespace GameModel
+﻿namespace Visualise
 {
     public struct ArgbColour
     {
@@ -10,6 +10,20 @@
             Red = red;
             Green = green;
             Blue = blue;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public static bool operator ==(ArgbColour c1, ArgbColour c2)
+        {
+            return c1.Equals(c2);
+        }
+        public static bool operator !=(ArgbColour c1, ArgbColour c2)
+        {
+            return !c1.Equals(c2);
         }
     }
 

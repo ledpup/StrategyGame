@@ -74,6 +74,12 @@ namespace GameModel
                 return 1;
             }
 
+            // If a unit is transported by a ship, you can only get out at a port
+            if (unit.TransportedBy != null && unit.TransportedBy.MovementType == MovementType.Water && edge.EdgeType != EdgeType.Port)
+            {
+                return Terrain.Impassable;
+            }
+
             return unit.EdgeMovementCosts[edge.EdgeType] + unit.TerrainMovementCosts[destination.TerrainType];
         }
 

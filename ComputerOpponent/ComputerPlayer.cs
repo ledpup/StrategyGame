@@ -258,7 +258,10 @@ namespace ComputerOpponent
                     if (unit.TransportedBy.MovementType == MovementType.Water)
                     {
                         var tileEdges = Edge.GetEdges(board.Edges, unit.Location);
-                        if (board.Structures.Any(y => tileEdges.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                        if (board.Structures.Any(y => tileEdges.Any(z => 
+                                                                        z.EdgeType == EdgeType.Port 
+                                                                        && (z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) || (z.Origin.ContiguousRegionId == y.Location.ContiguousRegionId))
+                                                                        && y.OwnerIndex != unit.OwnerIndex))
                         {
                             unitOrders.Add(unit.PossibleMoves().First().GetMoveOrder(unit));
                             unit.TransportedBy.Transporting.Remove(unit);

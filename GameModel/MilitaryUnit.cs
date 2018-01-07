@@ -462,7 +462,7 @@ namespace GameModel
         {
             var potentialMoves = new List<Move>();
 
-            potentialMoves.AddRange(origin.Neighbours.Where(dest => PotentialMove(unit, origin, movesConsidered, movementPoints, dest.Tile))
+            potentialMoves.AddRange(origin.Neighbours.Where(edge => PotentialMove(unit, origin, movesConsidered, movementPoints, edge))
                                         .Select(x => new Move(origin, x, previousMove, movementPoints, distance, GetMoveType(origin, x.Tile, unit)))
                                         .ToList());
 
@@ -509,26 +509,26 @@ namespace GameModel
             return validMove;
         }
 
-        private static bool PotentialMove(MilitaryUnit unit, Tile origin, List<Move> movesConsidered, int movementPoints, Tile dest)
+        private static bool PotentialMove(MilitaryUnit unit, Tile origin, List<Move> movesConsidered, int movementPoints, Neighbour neighbour)
         {
-            var potentialMove = dest != unit.Location && !movesConsidered.Any(x => x.Origin == origin && x.Neighbour.Tile == dest && x.MovesRemaining > movementPoints);
+            var potentialMove = neighbour.Tile != unit.Location && !movesConsidered.Any(x => x.Origin == origin && x.MovesRemaining > movementPoints);
 
             if (!potentialMove)
                 return false;
 
-            var edge = origin.Neighbours.Single(x => x.Tile == dest);
-
-            potentialMove = unit.EdgeMovementCosts[edge.EdgeType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && edge.EdgeHasRoad);
+            potentialMove = unit.EdgeMovementCosts[neighbour.EdgeType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && neighbour.EdgeHasRoad);
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && (edge.EdgeHasRoad || edge.EdgeType == EdgeType.Port));
+            potentialMove = unit.TerrainMovementCosts[neighbour.Tile.TerrainType] < Terrain.Impassable
+                                    || (unit.MovementType == MovementType.Land && neighbour.EdgeHasRoad)
+                                    || (neighbour.EdgeType == EdgeType.Port && unit.TransportedBy == null);
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = (unit.TransportedBy == null || origin.Neighbours.Any(x => x.EdgeType == EdgeType.Port));
+            potentialMove = unit.TransportedBy == null || neighbour.EdgeType == EdgeType.Port;
 
             return potentialMove;
         }

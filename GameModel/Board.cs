@@ -32,7 +32,7 @@ namespace GameModel
 
         public int Turn;
 
-        public Board(string[] tiles, string[] edges = null, string[] roads = null, string[] structures = null, int turn = 0, Logger logger = null)
+        public Board(string[] tiles, string[] edges = null, string[] structures = null, int turn = 0, Logger logger = null)
         {
             Width = tiles[0].Length;
             Height = tiles.Length;

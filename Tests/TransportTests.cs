@@ -46,17 +46,17 @@ namespace Tests
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var bitmap = new Bitmap(1920, 1450);
-                Visualise.GameBoardRenderer.Render(bitmap, Visualise.RenderPipeline.Board, Visualise.RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
                 ComputerPlayer.SetStrategicAction(board, units);
                 var moveOrders = ComputerPlayer.CreateOrders(board, units);
 
-                var vectors = new List<Centreline>();
-                moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
+                var lines = new List<Centreline>();
+                moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                Visualise.GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
+                GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();

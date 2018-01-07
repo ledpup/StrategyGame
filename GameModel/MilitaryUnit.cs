@@ -523,7 +523,7 @@ namespace GameModel
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && edge.EdgeHasRoad);
+            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && (edge.EdgeHasRoad || edge.EdgeType == EdgeType.Port));
 
             if (!potentialMove)
                 return false;

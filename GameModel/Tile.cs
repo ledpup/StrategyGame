@@ -50,8 +50,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            var subTerrain = IsLake ? " (Lake)" : IsSea ? " (Sea)" : "";
-            return Index + " " + Point.ToString() + " " + TerrainType + subTerrain + (Temperature < 0 ? " Frozen" : "");
+            return string.Format($"{Index} {Point.ToString()} {TerrainType}");
         }
 
         public float? Supply { get; set; }

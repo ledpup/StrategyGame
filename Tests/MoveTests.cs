@@ -475,7 +475,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            GameBoardRenderer.RenderAndSave("AquaticUnit.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AquaticUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(138, moves.Count());
 
@@ -505,6 +505,11 @@ namespace Tests
 
             var unitOrders = ComputerPlayer.CreateOrders(board, board.Units);
             board.ResolveOrders(unitOrders);
+
+            //var lines = new List<Centreline>();
+            //unitOrders.ForEach(x => unitOrders.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
+
+            //GameBoardRenderer.RenderAndSave("EmbarkOnShip.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             Assert.AreEqual(board[8, 8], board.Units[0].Location);
         }
@@ -658,10 +663,10 @@ namespace Tests
                 new MoveOrder(moves4, board.Units[3]),
             };
 
-            var vectors = new List<Centreline>();
-            moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
+            var lines = new List<Centreline>();
+            moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-            GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
             board.ResolveOrders(moveOrders);
 

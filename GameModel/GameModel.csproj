@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="BattleReport.cs" />
     <Compile Include="Board.cs" />
+    <Compile Include="CalculateRange.cs" />
     <Compile Include="CasualtyLogEntry.cs" />
     <Compile Include="CombatantInBattle.cs" />
     <Compile Include="IUnitOrder.cs" />

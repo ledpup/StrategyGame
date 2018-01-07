@@ -61,6 +61,48 @@ namespace Tests
         }
 
         [TestMethod]
+        public void LandUnitMoveList2()
+        {
+            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+
+            var units = new List<MilitaryUnit> { new MilitaryUnit(location: board[335]) };
+
+            //var moves = units[0].PossibleMoves();
+
+            var blockedHexes = board.Tiles.Where(x => x.TerrainType == TerrainType.Mountain || x.TerrainType == TerrainType.Water).Select(x => x.Hex).ToList();
+
+            var moves = CalculateRange.UnitRangeForTurn(units[0].Location.Hex, units[0].MovementPoints, blockedHexes);
+
+            moves.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
+
+            Visualise.GameBoardRenderer.RenderAndSave("LandUnitMoves2.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+
+            //Assert.AreEqual(11, moves.Count());
+
+            Assert.IsTrue(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 334));
+            Assert.IsTrue(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 361));
+            Assert.IsTrue(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 336));
+            Assert.IsTrue(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 309));
+            Assert.IsTrue(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 310));
+            Assert.IsTrue(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 308));
+
+            // Can't go into the ocean
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 281));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 306));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 333));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 360));
+
+            // Can't go over mountains
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 337));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 363));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 362));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 388));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 364));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 390));
+            Assert.IsFalse(moves.Any(x => Hex.HexToIndex(x, board.Width, board.Height) == 389));
+        }
+
+        [TestMethod]
         public void LandUnitMoveListWithRoad()
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);

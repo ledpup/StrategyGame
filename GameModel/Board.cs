@@ -421,15 +421,15 @@ namespace GameModel
 
                     if (moveCost < Terrain.Impassable)
                     {
-                        var neightPathFindTile = pathFindTiles.Single(y => y.Point == neighbour.Destination.Point);
+                        var neighbourPathFindTile = pathFindTiles.Single(y => y.Point == neighbour.Destination.Point);
 
-                        neighbours.Add(neightPathFindTile);
+                        neighbours.Add(neighbourPathFindTile);
                         pathFindTile.Neighbours = neighbours;
 
-                        pathFindTile.MoveCost[neightPathFindTile] = moveCost;
+                        pathFindTile.MoveCost[neighbourPathFindTile] = moveCost;
 
                         // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
-                        neightPathFindTile.HasCumulativeCost = !unit.CanStopOn.HasFlag(neighbour.Destination.TerrainType);
+                        neighbourPathFindTile.HasCumulativeCost = !unit.CanStopOn.HasFlag(neighbour.Destination.TerrainType);
                     }
                 };
             }

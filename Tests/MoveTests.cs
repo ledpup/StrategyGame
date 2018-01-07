@@ -423,7 +423,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(15, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[87]));

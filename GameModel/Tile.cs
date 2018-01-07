@@ -160,7 +160,7 @@ namespace GameModel
             return tile
                     .Neighbours
                     .Where(x => (unit.EdgeMovementCosts[x.EdgeType] < Terrain.Impassable || x.EdgeHasRoad) &&
-                                (x.EdgeHasRoad || unit.TerrainMovementCosts[x.Tile.TerrainType] < Terrain.Impassable))
+                                (x.EdgeHasRoad || unit.TerrainMovementCosts[x.Tile.TerrainType] < Terrain.Impassable || (x.EdgeType == EdgeType.Port && unit.MovementType == MovementType.Land)))
                     .Select(x => x.Tile);
         }
 

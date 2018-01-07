@@ -421,12 +421,12 @@ namespace ComputerOpponent
                         {
                             case StrategicAction.Dock:
                                 // Only go to a port that has units that want to embark
-                                if (!board.Units.Any(y => Edge.GetEdges(board.Edges, y.Location).Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && StrategicActions[y] == StrategicAction.Embark))
+                                if (!board.Units.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Tile.ContiguousRegionId == y.Location.ContiguousRegionId) && StrategicActions[y] == StrategicAction.Embark))
                                     return;
                                 break;
                             case StrategicAction.TransportToDestination:
                                 // Only go to a port that has enemy structure(s)
-                                if (!board.Structures.Any(y => Edge.GetEdges(board.Edges, y.Location).Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Tile.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
                                     return;
                                 break;
                         }

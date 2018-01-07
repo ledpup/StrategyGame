@@ -229,6 +229,7 @@ namespace Tests
             GameBoardRenderer.RenderAndSave("AirborneUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             //Assert.AreEqual(12, moves.Count());
+
             Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 334));
             Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 308));
             Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 309));
@@ -409,7 +410,7 @@ namespace Tests
 
             moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverContinent.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+            GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverContinent.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
             Assert.AreEqual(154, moveList.Count());
 
@@ -446,14 +447,14 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
-            Assert.AreEqual(7, moves.Count());
-
             Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[2, 1]));
             Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[3, 1]));
 
             Assert.IsFalse(moves.Any(x => x.Edge.Destination == board[1, 3])); // Can't cross river
+
+            Assert.AreEqual(7, moves.Count());
         }
 
         [TestMethod]

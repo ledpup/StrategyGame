@@ -417,8 +417,7 @@ namespace GameModel
 
                 foreach(var neighbour in originTile.Neighbours)
                 {
-                    var unitIsBeingTransportedByWater = unit.TransportedBy != null && unit.TransportedBy.MovementType == MovementType.Water;
-                    var moveCost = neighbour.MoveCost(unit.UsesRoads, unitIsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts);
+                    var moveCost = neighbour.MoveCost(unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts);
 
                     if (moveCost < Terrain.Impassable)
                     {
@@ -429,8 +428,8 @@ namespace GameModel
 
                         pathFindTile.MoveCost[neightPathFindTile] = moveCost;
 
-                        // This is to allow the path find to allow airborne units to fly over mountains and water 
-                        neightPathFindTile.HasCumulativeCost = unit.MovementType == MovementType.Airborne && !unit.CanStopOn.HasFlag(neighbour.Destination.TerrainType);
+                        // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
+                        neightPathFindTile.HasCumulativeCost = !unit.CanStopOn.HasFlag(neighbour.Destination.TerrainType);
                     }
                 };
             }

@@ -37,16 +37,16 @@ namespace GameModel
 
         public EdgeType EdgeType;
 
-        internal static bool CrossesEdge(Edge edge, Tile tile1, Tile tile2)
+        public static bool CrossesEdge(Edge edge, Tile tile1, Tile tile2)
         {
             return (edge.Origin == tile1 && edge.Destination == tile2) || (edge.Destination == tile1 && edge.Origin == tile2);
         }
 
-        internal bool CrossesEdge(Tile tile1, Tile tile2)
+        public bool CrossesEdge(Tile tile1, Tile tile2)
         {
             return CrossesEdge(this, tile1, tile2);
         }
-        internal static Edge GetEdge(List<Edge> edges, Tile tile1, Tile tile2)
+        public static Edge GetEdge(List<Edge> edges, Tile tile1, Tile tile2)
         {
             if (edges == null)
                 return null;

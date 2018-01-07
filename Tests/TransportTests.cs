@@ -74,8 +74,8 @@ namespace Tests
                         Assert.AreEqual(board[21, 10], units[2].Location);
                         break;
                     case 3:
-                        Assert.AreEqual(board[19, 9], units[0].Location);
-                        Assert.AreEqual(board[19, 9], units[2].Location);
+                        Assert.AreEqual(board[18, 7], units[0].Location);
+                        Assert.AreEqual(board[18, 7], units[2].Location);
                         break;
                 }
             }

@@ -226,8 +226,9 @@ namespace ComputerOpponent
 
                     if (unit.Location.HasPort)
                     {
-                        var portTiles = board.Edges.Where(x => x.EdgeType == EdgeType.Port).Select(x => x.Destination).ToList();
-                        var transportingUnits = units.Where(x => x.IsAlive && x.IsTransporter && portTiles.Contains(x.Location) && x.CanTransport(unit))
+                        var portEdges = board.Edges.Where(x => x.EdgeType == EdgeType.Port);
+
+                        var transportingUnits = units.Where(x => x.IsAlive && x.IsTransporter && portEdges.Any(y => y.CrossesEdge(unit.Location, x.Location) && x.CanTransport(unit)))
                                                         .OrderByDescending(x => x.TransportSize);
                         var transportUnit = transportingUnits.FirstOrDefault();
                         if (transportUnit != null)

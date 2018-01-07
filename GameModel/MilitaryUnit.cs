@@ -516,12 +516,14 @@ namespace GameModel
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.EdgeMovementCosts[origin.Neighbours.Single(x => x.Tile == dest).EdgeType] < 100;
+            var edge = origin.Neighbours.Single(x => x.Tile == dest);
+
+            potentialMove = unit.EdgeMovementCosts[edge.EdgeType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && edge.EdgeHasRoad);
 
             if (!potentialMove)
                 return false;
 
-            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] < 100;
+            potentialMove = unit.TerrainMovementCosts[dest.TerrainType] < Terrain.Impassable || (unit.MovementType == MovementType.Land && edge.EdgeHasRoad);
 
             if (!potentialMove)
                 return false;

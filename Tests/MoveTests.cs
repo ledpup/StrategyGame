@@ -101,7 +101,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoadOverMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoadOverMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 56));
@@ -134,7 +134,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("InfantryMoveOverMountainWithRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("InfantryMoveOverMountainWithRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 86));
         }
@@ -150,7 +150,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMovesWithRoadAndMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AirborneUnitMovesWithRoadAndMountain.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 30));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 31));
@@ -183,7 +183,7 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AirborneUnitMoves.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             //Assert.AreEqual(12, moves.Count());
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 334));
@@ -261,7 +261,7 @@ namespace Tests
 
             moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+            GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
 
             Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[3, 9] && x.MoveType == MoveType.OnlyPassingThrough)); // Mountain
@@ -296,7 +296,7 @@ namespace Tests
             var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
 
             moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+            GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
 
             Assert.IsFalse(moveOrder.Moves.Last().MoveType == MoveType.OnlyPassingThrough);
         }
@@ -314,10 +314,10 @@ namespace Tests
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
             moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, new List<MilitaryUnit> { unit });
         }
 
         [TestMethod]
@@ -335,7 +335,7 @@ namespace Tests
 
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongerRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongerRouteOverWater.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
         }
 
         [TestMethod]
@@ -353,7 +353,7 @@ namespace Tests
 
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
 
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathCornerToCorner.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathCornerToCorner.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
         }
 
         [TestMethod]
@@ -401,9 +401,10 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(7, moves.Count());
+
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 1]));
@@ -426,6 +427,7 @@ namespace Tests
             GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(15, moves.Count());
+
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[87]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[88]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[114]));
@@ -433,7 +435,6 @@ namespace Tests
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[140]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[142]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[168]));
-
 
             // Blocked by mountain hexside and hill/wetland terrain            
             Assert.IsFalse(moves.Any(x => x.Neighbour.Tile == board[169]));
@@ -452,9 +453,10 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AmphibiousUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AmphibiousUnitNearRiverAndRoad.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(8, moves.Count());
+
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[1, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 2]));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile == board[2, 1]));
@@ -473,9 +475,10 @@ namespace Tests
 
             moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AquaticUnit.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
+            GameBoardRenderer.RenderAndSave("AquaticUnit.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, units);
 
             Assert.AreEqual(138, moves.Count());
+
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 198));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 226));
             Assert.IsTrue(moves.Any(x => x.Neighbour.Tile.Index == 253));
@@ -658,11 +661,11 @@ namespace Tests
             var vectors = new List<Centreline>();
             moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-            Visualise.GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveOrders(moveOrders);
 
-            Visualise.GameBoardRenderer.RenderAndSave("UnitsPostMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            GameBoardRenderer.RenderAndSave("UnitsPostMove.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             Assert.AreEqual(board[2, 2], board.Units[0].Location);
             Assert.AreEqual(board[2, 2], board.Units[1].Location);

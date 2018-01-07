@@ -215,7 +215,7 @@ namespace ComputerOpponent
                                 if (pathToAirbornUnit != null)
                                 {
                                     var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
-                                    transporteeMoveOrderDesintation = moveOrder.Moves.Last().Neighbour.Tile;
+                                    transporteeMoveOrderDesintation = moveOrder.Moves.Last().Edge.Destination;
                                     unitOrders.Add(moveOrder);
                                 }
                             }
@@ -233,7 +233,7 @@ namespace ComputerOpponent
                         var transportUnit = transportingUnits.FirstOrDefault();
                         if (transportUnit != null)
                         {
-                            var moveToTransport = unit.PossibleMoves().SingleOrDefault(x => x.Neighbour.Tile == transportUnit.Location);
+                            var moveToTransport = unit.PossibleMoves().SingleOrDefault(x => x.Edge.Destination == transportUnit.Location);
 
                             if (moveToTransport != null)
                                 unitOrders.Add(moveToTransport.GetMoveOrder(unit));
@@ -310,7 +310,7 @@ namespace ComputerOpponent
                             var transporteeMoveOrder = existingOrders.OfType<MoveOrder>().SingleOrDefault(x => x.Unit == closestUnit);
                             if (transporteeMoveOrder != null)
                             {
-                                destination = transporteeMoveOrder.Moves.Last().Neighbour.Tile.Point;
+                                destination = transporteeMoveOrder.Moves.Last().Edge.Destination.Point;
                             }
 
                             // Move transport unit to the destination of the transportee's move order or just to the transportee's location
@@ -332,9 +332,9 @@ namespace ComputerOpponent
                             if (moveOrder != null)
                                 unitOrders.Add(moveOrder);
 
-                            if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Neighbour.Tile.ContiguousRegionId))
+                            if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
                             {
-                                unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Neighbour.Tile)));
+                                unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Edge.Destination)));
                             }
                         }
 
@@ -425,12 +425,12 @@ namespace ComputerOpponent
                         {
                             case StrategicAction.Dock:
                                 // Only go to a port that has units that want to embark
-                                if (!board.Units.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Tile.ContiguousRegionId == y.Location.ContiguousRegionId) && StrategicActions[y] == StrategicAction.Embark))
+                                if (!board.Units.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && StrategicActions[y] == StrategicAction.Embark))
                                     return;
                                 break;
                             case StrategicAction.TransportToDestination:
                                 // Only go to a port that has enemy structure(s)
-                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Tile.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
                                     return;
                                 break;
                         }

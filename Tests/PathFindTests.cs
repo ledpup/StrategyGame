@@ -175,7 +175,7 @@ namespace Tests
 
 
             var moves = unit.PossibleMoves();
-            moves.ToList().ForEach(x => x.Neighbour.Tile.IsSelected = true);
+            moves.ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
             Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPossibleMoves.png", board.Height, board.Tiles, board.Edges, board.Structures);
 
 
@@ -187,10 +187,10 @@ namespace Tests
 
             Assert.AreEqual(new Point(14, 3), shortestPath[4].Point); // Destination
 
-            Assert.AreEqual(new Point(12, 4), moveOrder.Moves[0].Neighbour.Tile.Point);
-            Assert.AreEqual(new Point(13, 4), moveOrder.Moves[1].Neighbour.Tile.Point);
-            Assert.AreEqual(new Point(13, 3), moveOrder.Moves[2].Neighbour.Tile.Point);
-            Assert.AreEqual(new Point(14, 3), moveOrder.Moves[3].Neighbour.Tile.Point);
+            Assert.AreEqual(new Point(12, 4), moveOrder.Moves[0].Edge.Destination.Point);
+            Assert.AreEqual(new Point(13, 4), moveOrder.Moves[1].Edge.Destination.Point);
+            Assert.AreEqual(new Point(13, 3), moveOrder.Moves[2].Edge.Destination.Point);
+            Assert.AreEqual(new Point(14, 3), moveOrder.Moves[3].Edge.Destination.Point);
         }
     }
 }

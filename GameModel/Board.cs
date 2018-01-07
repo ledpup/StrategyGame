@@ -97,12 +97,12 @@ namespace GameModel
         private void AssignContiguousTilesToRegion(Tile tile, int id)
         {
             tile.Neighbours
-                .Where(x => x.Tile.ContiguousRegionId == 0 && x.Tile.BaseTerrainType == tile.BaseTerrainType)
+                .Where(x => x.Destination.ContiguousRegionId == 0 && x.Destination.BaseTerrainType == tile.BaseTerrainType)
                 .ToList()
                 .ForEach(x => 
                     {
-                        x.Tile.ContiguousRegionId = id;
-                        AssignContiguousTilesToRegion(x.Tile, id);
+                        x.Destination.ContiguousRegionId = id;
+                        AssignContiguousTilesToRegion(x.Destination, id);
                     });
         }
 
@@ -140,17 +140,17 @@ namespace GameModel
                 foreach (var neighbour in tile.Neighbours)
                 {
                     float neighbourSupply = 0;
-                    if (neighbour.Tile.OwnerId == ownerId || neighbour.Tile.OwnerId == null)
+                    if (neighbour.Destination.OwnerId == ownerId || neighbour.Destination.OwnerId == null)
                     {
-                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour.Tile));
+                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour.Destination));
                         if (tileEdge != null)
                         {
                             if (tileEdge.EdgeType != EdgeType.Mountain)
                             {
                                 var edgeModifier = tileEdge.EdgeType == EdgeType.Wall ? 0 : 0.5f;
-                                if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Tile.TerrainType))
+                                if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Destination.TerrainType))
                                 {
-                                    if (Terrain.Rough_Land.HasFlag(neighbour.Tile.TerrainType))
+                                    if (Terrain.Rough_Land.HasFlag(neighbour.Destination.TerrainType))
                                     {
                                         neighbourSupply = supply - 1.5f - edgeModifier;
                                     }
@@ -161,9 +161,9 @@ namespace GameModel
                                 }
                             }
                         }
-                        else if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Tile.TerrainType))
+                        else if (Terrain.Non_Mountainous_Land.HasFlag(neighbour.Destination.TerrainType))
                         {
-                            if (Terrain.Rough_Land.HasFlag(neighbour.Tile.TerrainType))
+                            if (Terrain.Rough_Land.HasFlag(neighbour.Destination.TerrainType))
                             {
                                 neighbourSupply = supply - 1.5f;
                             }
@@ -174,7 +174,7 @@ namespace GameModel
                         }
                         if (neighbourSupply >= 1)
                         {
-                            CalculateSupply(neighbour.Tile, ownerId, neighbourSupply, supplyCalculated);
+                            CalculateSupply(neighbour.Destination, ownerId, neighbourSupply, supplyCalculated);
                         }
                     }
                 }
@@ -239,7 +239,7 @@ namespace GameModel
                 return distance;
             }
             distance += 1;
-            if (tile.Neighbours.Any(x => x.Tile.IsSea))
+            if (tile.Neighbours.Any(x => x.Destination.IsSea))
             {
                 return distance;
             }
@@ -247,9 +247,9 @@ namespace GameModel
             var minDistance = 100;
             foreach (var neighbour in tile.Neighbours)
             {
-                if (!searched.Contains(neighbour.Tile))
+                if (!searched.Contains(neighbour.Destination))
                 {
-                    var result = GetWaterDistanceToSea(neighbour.Tile, distance, ref searched);
+                    var result = GetWaterDistanceToSea(neighbour.Destination, distance, ref searched);
                     if (result < minDistance)
                         minDistance = result;
                 }
@@ -282,25 +282,25 @@ namespace GameModel
                 if (tile.Neighbours != null)
                     throw new Exception("Adjacent tiles have already be calculated");
 
-                var neighbours = new List<Neighbour>();
+                var neighbours = new List<Edge>();
 
-                var potentialTiles = Hex.Neighbours(tile.Hex);
+                var hexes = Hex.Neighbours(tile.Hex);
 
-                foreach (var potientialTile in potentialTiles)
+                foreach (var hex in hexes)
                 {
-                    var neighbourX = OffsetCoord.QoffsetFromCube(potientialTile).col;
-                    var neighbourY = OffsetCoord.QoffsetFromCube(potientialTile).row;
+                    var neighbourX = OffsetCoord.QoffsetFromCube(hex).col;
+                    var neighbourY = OffsetCoord.QoffsetFromCube(hex).row;
 
                     if (neighbourX >= 0 && neighbourX < Width && neighbourY >= 0 && neighbourY < Height)
                     {
                         var edge = Edge.GetEdge(Edges, tile, this[neighbourX, neighbourY]);
 
-                        Neighbour neighbour;
+                        Edge neighbour;
 
                         if (edge != null)
-                            neighbour = new Neighbour(this[neighbourX, neighbourY], edge.EdgeType, edge.HasRoad);
+                            neighbour = new Edge(edge.EdgeType, this[Hex.HexToIndex(hex, Width, Height)], this[neighbourX, neighbourY], edge.HasRoad);
                         else
-                            neighbour = new Neighbour(this[neighbourX, neighbourY]);
+                            neighbour = new Edge(EdgeType.None, this[Hex.HexToIndex(hex, Width, Height)], this[neighbourX, neighbourY], false);
 
                         neighbours.Add(neighbour);
                     }
@@ -415,16 +415,23 @@ namespace GameModel
 
                 var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
 
-                foreach(var validAdjacentMove in originTile.ValidAdjacentMoves(unit))
+                foreach(var neighbour in originTile.Neighbours)
                 {
-                    var neighbour = pathFindTiles.Single(y => y.Point == validAdjacentMove.Point);
+                    var unitIsBeingTransportedByWater = unit.TransportedBy != null && unit.TransportedBy.MovementType == MovementType.Water;
+                    var moveCost = neighbour.MoveCost(unit.UsesRoads, unitIsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts);
 
-                    neighbours.Add(neighbour);
-                    pathFindTile.Neighbours = neighbours;
+                    if (moveCost < Terrain.Impassable)
+                    {
+                        var neightPathFindTile = pathFindTiles.Single(y => y.Point == neighbour.Destination.Point);
 
-                    pathFindTile.MoveCost[neighbour] = originTile.CalculateMoveCost(unit, validAdjacentMove);
+                        neighbours.Add(neightPathFindTile);
+                        pathFindTile.Neighbours = neighbours;
 
-                    neighbour.HasCumulativeCost = unit.MovementType == MovementType.Airborne && !unit.CanStopOn.HasFlag(validAdjacentMove.TerrainType);
+                        pathFindTile.MoveCost[neightPathFindTile] = moveCost;
+
+                        // This is to allow the path find to allow airborne units to fly over mountains and water 
+                        neightPathFindTile.HasCumulativeCost = unit.MovementType == MovementType.Airborne && !unit.CanStopOn.HasFlag(neighbour.Destination.TerrainType);
+                    }
                 };
             }
 
@@ -515,10 +522,10 @@ namespace GameModel
                 var removeUnitMoves = new Dictionary<MilitaryUnit, Move>();
                 foreach (var stepMove in unitStepMoves)
                 {
-                    if (unitStepMoves.Any(x => x.Value.Neighbour.Tile == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
+                    if (unitStepMoves.Any(x => x.Value.Edge.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
                     {
                         var originStrength = stepMove.Value.Origin.Units.Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
-                        var destinationStrength = stepMove.Value.Neighbour.Tile.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var destinationStrength = stepMove.Value.Edge.Destination.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
 
                         if (originStrength <= destinationStrength)
                         {
@@ -528,12 +535,12 @@ namespace GameModel
                 }
 
                 // Don't move a land unit onto a water time unless there is a transport there that can take it
-                unitStepMoves.Where(x => x.Value.Neighbour.Tile.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
+                unitStepMoves.Where(x => x.Value.Edge.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
                     .ToList()
                     .ForEach(x => 
                     {
                         var transportedUnit = x.Key;
-                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Neighbour.Tile.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Edge.Destination.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
                         var transport = transports.FirstOrDefault();
                         if (transport != null)
                         {
@@ -553,7 +560,7 @@ namespace GameModel
                 {
                     var unit = unitStepMove.Key;
 
-                    unit.Location = unitStepMove.Value.Neighbour.Tile;
+                    unit.Location = unitStepMove.Value.Edge.Destination;
 
                     // Take transported units along with you
                     unit.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
@@ -803,7 +810,7 @@ namespace GameModel
             var origin = shortestPath[0].Point;
             for (var i = 1; i < shortestPath.Length; i++)
             {
-                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Neighbour.Tile.Point == shortestPath[i].Point && x.Distance == i);
+                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Edge.Destination.Point == shortestPath[i].Point && x.Distance == i);
 
                 if (move == null)
                 {

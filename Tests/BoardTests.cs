@@ -41,19 +41,19 @@ namespace Tests
         {
             var board = new Board(GameBoard);
 
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Tile.X == 2 && x.Tile.Y == 0));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Tile.X == 3 && x.Tile.Y == 0));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Tile.X == 3 && x.Tile.Y == 1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Tile.X == 2 && x.Tile.Y == 2));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Tile.X == 1 && x.Tile.Y == 1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Tile.X == 1 && x.Tile.Y == 0));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 2 && x.Destination.Y == 0));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 3 && x.Destination.Y == 0));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 3 && x.Destination.Y == 1));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 2 && x.Destination.Y == 2));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 1 && x.Destination.Y == 1));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 1 && x.Destination.Y == 0));
 
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Tile.X == 5 && x.Tile.Y == 3));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Tile.X == 6 && x.Tile.Y == 4));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Tile.X == 6 && x.Tile.Y == 5));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Tile.X == 5 && x.Tile.Y == 5));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Tile.X == 4 && x.Tile.Y == 5));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Tile.X == 4 && x.Tile.Y == 4));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 5 && x.Destination.Y == 3));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 6 && x.Destination.Y == 4));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 6 && x.Destination.Y == 5));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 5 && x.Destination.Y == 5));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 4 && x.Destination.Y == 5));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 4 && x.Destination.Y == 4));
         }
 
         [TestMethod]

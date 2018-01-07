@@ -64,26 +64,9 @@ namespace GameModel
         //    }
         //    return cost;
         //}
-        public int CalculateMoveCost(MilitaryUnit unit, Tile destination)
-        {
-            var edge = Neighbours.Single(x => x.Tile == destination);
 
-            // Movement by road or bridge always costs 1 regardless of terrain type
-            if (unit.MovementType == MovementType.Land && edge.EdgeHasRoad)
-            {
-                return 1;
-            }
 
-            // If a unit is transported by a ship, you can only get out at a port
-            if (unit.TransportedBy != null && unit.TransportedBy.MovementType == MovementType.Water && edge.EdgeType != EdgeType.Port)
-            {
-                return Terrain.Impassable;
-            }
-
-            return unit.EdgeMovementCosts[edge.EdgeType] + unit.TerrainMovementCosts[destination.TerrainType];
-        }
-
-        public List<Neighbour> Neighbours { get; set; }
+        public List<Edge> Neighbours { get; set; }
 
         public bool HasPort
         {
@@ -102,7 +85,7 @@ namespace GameModel
 
                 _isTileSearchedForCoast = true;
 
-                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.Tile.TerrainType));
+                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.Destination.TerrainType));
 
                 return _isCoast;
             }
@@ -119,7 +102,7 @@ namespace GameModel
 
                 _isTileSearchedForSea = true;
 
-                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.Tile.IsSea) || IsEdgeOfMap);
+                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.Destination.IsSea) || IsEdgeOfMap);
 
                 return _isSea;
             }
@@ -136,39 +119,13 @@ namespace GameModel
 
                 _isTileSearchedForLake = true;
 
-                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Tile.IsSea);
+                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Destination.IsSea);
 
                 return _isLake;
             }
         }
         bool _isLake;
         bool _isTileSearchedForLake;
-
-
-
-        //public override bool Equals(object obj)
-        //{
-        //    return this.Location.Equals(((Tile)obj).Location);
-        //}
-
-        //public override int GetHasCode()
-        //{
-        //    return Location.GetHashCode();
-        //}
-
-        public IEnumerable<Tile> ValidAdjacentMoves(MilitaryUnit unit)
-        {
-            return ValidAdjacentMoves(unit, this);
-        }
-
-        public static IEnumerable<Tile> ValidAdjacentMoves(MilitaryUnit unit, Tile tile)
-        {
-            return tile
-                    .Neighbours
-                    .Where(x => (unit.EdgeMovementCosts[x.EdgeType] < Terrain.Impassable || x.EdgeHasRoad) &&
-                                (x.EdgeHasRoad || unit.TerrainMovementCosts[x.Tile.TerrainType] < Terrain.Impassable || (x.EdgeType == EdgeType.Port && unit.MovementType == MovementType.Land)))
-                    .Select(x => x.Tile);
-        }
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)
         {
@@ -265,7 +222,7 @@ namespace GameModel
             get
             {
                 var edge = Neighbours.Single(x => x.EdgeType == EdgeType.Port);
-                return edge.Tile;
+                return edge.Destination;
             }
         }
     }

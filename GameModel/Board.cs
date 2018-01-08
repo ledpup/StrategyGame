@@ -411,7 +411,7 @@ namespace GameModel
 
             foreach (var pathFindTile in pathFindTiles)
             {
-                var neighbours = new List<PathFindTile>();
+                pathFindTile.Neighbours = new List<PathFindTile>();
 
                 var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
 
@@ -423,8 +423,7 @@ namespace GameModel
                     {
                         var neighbourPathFindTile = pathFindTiles.Single(y => y.Point == neighbour.Destination.Point);
 
-                        neighbours.Add(neighbourPathFindTile);
-                        pathFindTile.Neighbours = neighbours;
+                        pathFindTile.Neighbours.Add(neighbourPathFindTile);
 
                         pathFindTile.MoveCost[neighbourPathFindTile] = moveCost;
 
@@ -432,9 +431,40 @@ namespace GameModel
                         neighbourPathFindTile.HasCumulativeCost = !unit.CanStopOn.HasFlag(neighbour.Destination.TerrainType);
                     }
                 };
+
+                // = neighbours;
             }
 
             return pathFindTiles;
+        }
+
+        public PathFindTile PathFindTilesForLocationAndNeighbours(Tile location, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
+        {
+            var pathFindTile = new PathFindTile(location.X, location.Y);
+
+            var neighbours = new List<PathFindTile>();
+
+            var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
+
+            foreach (var edge in originTile.Neighbours)
+            {
+                var moveCost = edge.MoveCost(usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts);
+
+                if (moveCost < Terrain.Impassable)
+                {
+                    var neighbourPathFindTile = new PathFindTile(edge.Destination.Point);
+
+                    pathFindTile.Neighbours.Add(neighbourPathFindTile);
+
+                    pathFindTile.MoveCost[neighbourPathFindTile] = moveCost;
+
+                    // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
+                    neighbourPathFindTile.HasCumulativeCost = !canStopOn.HasFlag(edge.Destination.TerrainType);
+                }
+            };
+            
+
+            return pathFindTile;
         }
 
         public void ResolveOrders(List<IUnitOrder> unitOrders)

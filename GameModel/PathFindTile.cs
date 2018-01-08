@@ -15,14 +15,18 @@ namespace GameModel
         public int X { get { return Point.X; } }
         public int Y { get { return Point.Y; } }
 
-        public IEnumerable<PathFindTile> Neighbours { get; set; }
+        public List<PathFindTile> Neighbours { get; set; }
         public Dictionary<PathFindTile, double> MoveCost { get; set; }
         public bool HasCumulativeCost { get; set; }
-        
-        public PathFindTile(int x, int y)
+
+        public PathFindTile(Point point)
         {
-            Point = new Point(x, y);
+            Point = point;
             MoveCost = new Dictionary<PathFindTile, double>();
+        }
+
+        public PathFindTile(int x, int y) : this(new Point(x, y))
+        {
         }
 
         public override string ToString()

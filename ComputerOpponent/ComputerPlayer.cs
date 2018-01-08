@@ -192,7 +192,7 @@ namespace ComputerOpponent
                         break;
                     }
                 case StrategicAction.Embark:
-                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && StrategicActions[unit] == StrategicAction.Pickup;
+                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && StrategicActions[x] == StrategicAction.Pickup;
                     var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule);
 
                     //Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;

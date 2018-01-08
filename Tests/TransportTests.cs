@@ -227,6 +227,85 @@ namespace Tests
                 board.ChangeStructureOwners();
 
                 board.Turn++;
+
+                switch (board.Turn)
+                {
+                    case 1:
+                        Assert.AreEqual(429, units[0].Location.Index);
+                        Assert.AreEqual(428, units[1].Location.Index);
+                        break;
+                    case 2:
+                        Assert.AreEqual(429, units[0].Location.Index);
+                        Assert.AreEqual(429, units[1].Location.Index);
+                        Assert.AreEqual(units[0], units[1].TransportedBy);
+                        break;
+                    case 3:
+                        Assert.AreEqual(399, units[0].Location.Index);
+                        Assert.AreEqual(399, units[1].Location.Index);
+                        Assert.AreEqual(units[0], units[1].TransportedBy);
+                        break;
+                    case 4:
+                        Assert.AreEqual(370, units[0].Location.Index);
+                        Assert.AreEqual(370, units[1].Location.Index);
+                        Assert.AreEqual(units[0], units[1].TransportedBy);
+                        break;
+                    case 5:
+                        Assert.AreEqual(367, units[0].Location.Index);
+                        Assert.AreEqual(367, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        break;
+                    case 6:
+                        Assert.AreEqual(309, units[0].Location.Index);
+                        Assert.AreEqual(365, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        break;
+                    case 7:
+                        Assert.AreEqual(390, units[0].Location.Index);
+                        Assert.AreEqual(390, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        break;
+                    case 8:
+                        Assert.AreEqual(390, units[0].Location.Index);
+                        Assert.AreEqual(390, units[1].Location.Index);
+                        Assert.AreEqual(units[0], units[1].TransportedBy);
+                        break;
+                    case 9:
+                        Assert.AreEqual(361, units[0].Location.Index);
+                        Assert.AreEqual(361, units[1].Location.Index);
+                        Assert.AreEqual(units[0], units[1].TransportedBy);
+                        break;
+                    case 10:
+                        Assert.AreEqual(385, units[0].Location.Index);
+                        Assert.AreEqual(385, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        break;
+                    case 11:
+                        Assert.AreEqual(304, units[0].Location.Index);
+                        Assert.AreEqual(438, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        break;
+                    case 12:
+                        Assert.AreEqual(196, units[0].Location.Index);
+                        Assert.AreEqual(436, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.AreEqual(196, units[3].Location.Index);
+                        Assert.AreEqual(units[0], units[3].TransportedBy);
+                        break;
+                    case 13:
+                        Assert.AreEqual(172, units[0].Location.Index);
+                        Assert.AreEqual(408, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.AreEqual(172, units[3].Location.Index);
+                        Assert.AreEqual(units[0], units[3].TransportedBy);
+                        break;
+                    case 14:
+                        Assert.AreEqual(148, units[0].Location.Index);
+                        Assert.AreEqual(381, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.AreEqual(148, units[3].Location.Index);
+                        Assert.AreEqual(null, units[3].TransportedBy);
+                        break;
+                }
             }
         }
     }

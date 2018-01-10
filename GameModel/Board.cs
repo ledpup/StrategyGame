@@ -438,15 +438,13 @@ namespace GameModel
             return pathFindTiles;
         }
 
-        public PathFindTile PathFindTilesForLocationAndNeighbours(Tile location, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
+        public static PathFindTile PathFindTilesForLocationAndNeighbours(Tile location, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
         {
             var pathFindTile = new PathFindTile(location.X, location.Y);
 
             var neighbours = new List<PathFindTile>();
 
-            var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
-
-            foreach (var edge in originTile.Neighbours)
+            foreach (var edge in location.Neighbours)
             {
                 var moveCost = edge.MoveCost(usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts);
 
@@ -828,6 +826,20 @@ namespace GameModel
             Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
 
             var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
+
+            return path == null || path.Count() == 1 ? null : path.Reverse();
+        }
+
+        public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Point destination, int maxCumulativeCost, bool usesRoads, 
+                                                                    bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, 
+                                                                    Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
+        {
+            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
+            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
+
+            var startPathFindTile = Board.PathFindTilesForLocationAndNeighbours(origin, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
+
+            var path = PathFind2.FindPath(startPathFindTile, destination, distance, estimate, maxCumulativeCost, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
 
             return path == null || path.Count() == 1 ? null : path.Reverse();
         }

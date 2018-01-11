@@ -66,7 +66,7 @@ namespace StrategyGame
 
                 var labels = new string[board.Width, board.Height];
                 var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 
                 //for (var i = 0; i < numberOfPlayers; i++)
                 //{
@@ -104,7 +104,7 @@ namespace StrategyGame
                 var lines = new List<Centreline>();
                 unitsOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
+                GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(unitsOrders);
                 for (var i = 0; i < numberOfPlayers; i++)
@@ -112,7 +112,7 @@ namespace StrategyGame
                     board.ResolveStackLimits(i);
                 }
 
-                GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>
@@ -127,7 +127,7 @@ namespace StrategyGame
 
                 if (battleReports.Any())
                 {
-                    GameBoardRenderer.RenderAndSave("BattlesConductedTurn" + board.Turn + ".png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                    GameBoardRenderer.RenderAndSave("BattlesConductedTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 }
 
                 board.Turn++;

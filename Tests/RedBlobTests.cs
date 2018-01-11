@@ -158,7 +158,7 @@ namespace Tests
             results = Hex.HexRing(hex, 1, 27, 19);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("HexRingCorners.png", board.Height, board.Tiles);
+            Visualise.GameBoardRenderer.RenderAndSave("HexRingCorners.png", board.Width, board.Height, board.Tiles);
         }
 
         [TestMethod]
@@ -170,7 +170,7 @@ namespace Tests
             var results = Hex.HexesWithinArea(hex, 2, board.Width, board.Height);
 
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
-            Visualise.GameBoardRenderer.RenderAndSave("HexesInArea.png", board.Height, board.Tiles);
+            Visualise.GameBoardRenderer.RenderAndSave("HexesInArea.png", board.Width, board.Height, board.Tiles);
             board.Tiles.ToList().ForEach(x => x.IsSelected = false);
 
             Assert.AreEqual(19, results.Count);
@@ -215,7 +215,7 @@ namespace Tests
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
 
-            Visualise.GameBoardRenderer.RenderAndSave("HexesInAreaEdges.png", board.Height, board.Tiles);
+            Visualise.GameBoardRenderer.RenderAndSave("HexesInAreaEdges.png", board.Width, board.Height, board.Tiles);
         }
 
         //[TestMethod]

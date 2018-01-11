@@ -19,13 +19,13 @@ namespace Visualise
     }
     public class GameBoardRenderer
     {
-        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static Bitmap Render(Bitmap bitmap, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
             var drawing = new GameBoardDrawing2D(bitmap, boardHeight);
 
             if (renderBegin <= RenderPipeline.Board)
             {
-                var hexagonColours = new Dictionary<Hexagon.Point, Brush>();
+                var hexagonColours = new Dictionary<Hexagon.Hex, Brush>();
 
                 var displaySelected = tiles.Any(x => x.IsSelected);
 
@@ -38,7 +38,7 @@ namespace Visualise
                         colour.Green = (short)(colour.Green * .3);
                         colour.Blue = (short)(colour.Blue * .3);
                     }
-                    hexagonColours.Add(new Hexagon.Point(x.X, x.Y), new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+                    hexagonColours.Add(x.Hex, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                 }
                 );
 
@@ -58,12 +58,12 @@ namespace Visualise
                     {
                         if (x.HasRoad)
                         {
-                            centrelines.Add(new Centreline(x.Origin.Point, x.Destination.Point, Colours.SaddleBrown, x.EdgeType == EdgeType.River));
+                            centrelines.Add(new Centreline(x.Origin.Hex, x.Destination.Hex, Colours.SaddleBrown, x.EdgeType == EdgeType.River));
                         }
 
                         if (!x.HasRoad || (x.HasRoad && x.EdgeType == EdgeType.River))
                         {
-                            edgesToRender.Add(new Edge(x.Origin.Point, x.Destination.Point, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
+                            edgesToRender.Add(new Edge(x.Origin.Hex, x.Destination.Hex, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
                         }
                     });
 
@@ -72,14 +72,14 @@ namespace Visualise
                     //    edgesToRender.AddRange(lines);
 
                     edgesToRender.ForEach(x => drawing.DrawEdge(
-                        x.Origin.Hex,
-                        x.Destination.Hex,
+                        x.Origin,
+                        x.Destination,
                         x.Colour,
                         x.IsPort));
 
                     //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
 
-                    centrelines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, x.Colour, x.Width));
+                    centrelines.ForEach(x => drawing.DrawCentreline(x.Origin, x.Destination, x.Colour, x.Width));
 
                     var ports = edges.Where(x => x.EdgeType == EdgeType.Port).ToList();
 
@@ -89,7 +89,7 @@ namespace Visualise
                 return bitmap;
 
             if (lines != null)
-                lines.ForEach(x => drawing.DrawCentreline(x.Origin.Hex, x.Destination.Hex, x.Colour, x.Width));
+                lines.ForEach(x => drawing.DrawCentreline(x.Origin, x.Destination, x.Colour, x.Width));
 
 
 
@@ -100,7 +100,7 @@ namespace Visualise
                     structures.ForEach(x =>
                     {
                         var colour = GameBoardRenderer.StructureColour(x);
-                        drawing.DrawRectangle(x.Location.Point, colour);
+                        drawing.DrawRectangle(x.Location.Hex, colour);
                     });
                 }
             }
@@ -123,15 +123,15 @@ namespace Visualise
                             switch (unitsAtLocation[i].MovementType)
                             {
                                 case MovementType.Airborne:
-                                    drawing.DrawTriangle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    drawing.DrawTriangle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Water:
-                                    drawing.DrawTrapezium(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    drawing.DrawTrapezium(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Land:
-                                    drawing.DrawCircle(group.Key.Point, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    drawing.DrawCircle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
                             }
                         }
@@ -143,7 +143,7 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Labels)
             {
-                drawing.LabelHexes(Pens.Black, 0, bitmap.Width, 0, bitmap.Height, labels);
+                drawing.LabelHexes(Pens.Black, 0, bitmap.Width, 0, bitmap.Height, labels, boardWidth);
             }
             
             return bitmap;
@@ -164,16 +164,16 @@ namespace Visualise
             return PlayerColour(structure.OwnerIndex);
         }
 
-        public static void RenderAndSave(string fileName, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[,] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
+        public static void RenderAndSave(string fileName, int boardWidth, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, int imageWidth = 1200, int imageHeight = 1000, Tile circles = null)
         {
             var bitmap = new Bitmap(imageWidth, imageHeight);
-            bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, boardHeight, tiles, edges, structures, labels, lines, units, circles);
+            bitmap = Render(bitmap, RenderPipeline.Board, RenderPipeline.Labels, boardWidth, boardHeight, tiles, edges, structures, labels, lines, units, circles);
             bitmap.Save(fileName);
         }
 
-        public static void RenderLabelsAndSave(string fileName, Bitmap bitmap, int boardHeight, string[,] labels)
+        public static void RenderLabelsAndSave(string fileName, Bitmap bitmap, int boardWidth, int boardHeight, string[] labels)
         {
-            bitmap = Render(bitmap, RenderPipeline.Labels, RenderPipeline.Labels, boardHeight, labels: labels);
+            bitmap = Render(bitmap, RenderPipeline.Labels, RenderPipeline.Labels, boardWidth, boardHeight, labels: labels);
             bitmap.Save(fileName);
         }
         private static ArgbColour EdgeToColour(EdgeType edgeType)

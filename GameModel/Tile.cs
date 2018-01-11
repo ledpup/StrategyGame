@@ -11,15 +11,12 @@ namespace GameModel
      public class Tile
     {
         public int Index { get; private set; }
-        public Point Point { get; private set; }
-        public int X { get { return Point.X; } }
-        public int Y { get { return Point.Y; } }
+        public Hex Hex { get; private set; }
+
         public BaseTerrainType BaseTerrainType;
         public TerrainType TerrainType;
         public Weather Weather;
         public List<MilitaryUnit> Units;
-
-        public Hex Hex;
 
         public Dictionary<MovementType, double[]> FriendlyStructureInfluence;
         public Dictionary<MovementType, double[]> EnemyStructureInfluence;
@@ -30,14 +27,19 @@ namespace GameModel
 
         public int ContiguousRegionId { get; set; }
 
-        public Tile(int index, int x, int y, TerrainType terrainType = TerrainType.Grassland, bool isEdgeOfMap = false)
+        public int X, Y;
+
+        public Tile(int x, int y, int width, TerrainType terrainType = TerrainType.Grassland, bool isEdgeOfMap = false)
         {
             Units = new List<MilitaryUnit>();
 
-            Index = index;
-            Point = new Point(x, y);
+            X = x;
+            Y = y;
 
-            Hex = OffsetCoord.QoffsetToCube(new OffsetCoord(x, y));
+            var offsetCoords = new OffsetCoord(x, y);
+            Hex = offsetCoords.QoffsetToCube();
+            Index = OffsetCoord.OffsetCoordsToIndex(x, y, width);
+            
 
             BaseTerrainType = terrainType.HasFlag(TerrainType.Water) || terrainType.HasFlag(TerrainType.Reef) ? BaseTerrainType.Water : BaseTerrainType.Land;
             TerrainType = terrainType;
@@ -48,9 +50,15 @@ namespace GameModel
             TerrainAndWeatherInfluenceByUnit = new Dictionary<int, double>();
         }
 
+        public string ToOffsetCoordsString()
+        {
+            var offsetCoords = OffsetCoord.QoffsetFromCube(Hex);
+            return string.Format($"{offsetCoords.col}, {offsetCoords.row}");
+        }
+
         public override string ToString()
         {
-            return string.Format($"{Index} {Point.ToString()} {TerrainType}");
+            return string.Format($"{Index} {Hex.ToString()} {TerrainType}");
         }
 
         public float? Supply { get; set; }

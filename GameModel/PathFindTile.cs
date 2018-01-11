@@ -10,28 +10,24 @@ namespace GameModel
 {
     public class PathFindTile : IHasNeighbours<PathFindTile>
     {
-        public Point Point {get; set; }
+        public Hex Hex { get; set; }
 
-        public int X { get { return Point.X; } }
-        public int Y { get { return Point.Y; } }
+        public int Q { get { return Hex.q; } }
+        public int R { get { return Hex.r; } }
 
         public List<PathFindTile> Neighbours { get; set; }
         public Dictionary<PathFindTile, double> MoveCost { get; set; }
         public bool HasCumulativeCost { get; set; }
 
-        public PathFindTile(Point point)
+        public PathFindTile(Hex hex)
         {
-            Point = point;
+            Hex = hex;
             MoveCost = new Dictionary<PathFindTile, double>();
-        }
-
-        public PathFindTile(int x, int y) : this(new Point(x, y))
-        {
         }
 
         public override string ToString()
         {
-            return $"{X}, {Y}";
+            return $"{Q}, {R}";
         }
     }
 }

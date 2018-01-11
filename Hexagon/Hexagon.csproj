@@ -40,7 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Point.cs" />
+    <Compile Include="Hex.cs" />
+    <Compile Include="Layout.cs" />
+    <Compile Include="OffsetCoord.cs" />
+    <Compile Include="Orientation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedBlobLibrary.cs" />
   </ItemGroup>

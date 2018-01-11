@@ -25,10 +25,10 @@ namespace Tests
             board.Units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Enemy", 2, board[3, 4]) };
             board.InitialiseSupply();
 
-            var labels = new string[board.Width, board.Height];
-            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Supply.ToString());
+            var labels = new string[board.Width * board.Height];
+            board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Supply.ToString());
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithStructuresAndSupply.png", board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithStructuresAndSupply.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
         }
     }
 }

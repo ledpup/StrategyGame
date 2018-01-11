@@ -46,7 +46,7 @@ namespace Tests
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
@@ -56,7 +56,7 @@ namespace Tests
                 var lines = new List<Centreline>();
                 moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
+                GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();
@@ -211,7 +211,7 @@ namespace Tests
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
@@ -221,7 +221,7 @@ namespace Tests
                 var lines = new List<Centreline>();
                 unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
+                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
 
                 board.ResolveOrders(unitOrders);
                 board.ChangeStructureOwners();

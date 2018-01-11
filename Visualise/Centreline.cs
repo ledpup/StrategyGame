@@ -10,11 +10,11 @@ namespace Visualise
 {
     public class Centreline
     {
-        public Point Origin;
-        public Point Destination;
+        public Hex Origin;
+        public Hex Destination;
         public ArgbColour Colour;
         public int Width;
-        public Centreline(Point origin, Point destination, ArgbColour colour, bool isBridge = false)
+        public Centreline(Hex origin, Hex destination, ArgbColour colour, bool isBridge = false)
         {
             Origin = origin;
             Destination = destination;
@@ -25,7 +25,7 @@ namespace Visualise
         public static List<Centreline> MoveOrderToCentrelines(MoveOrder moveOrder)
         {
             var colour = moveOrder.Unit == null ? Colours.Black : GameBoardRenderer.UnitColour(moveOrder.Unit);
-            return moveOrder.Moves.Select(x => new Centreline(x.Origin.Point, x.Edge.Destination.Point, colour)).ToList();
+            return moveOrder.Moves.Select(x => new Centreline(x.Origin.Hex, x.Edge.Destination.Hex, colour)).ToList();
         }
         public static List<Centreline> PathFindTilesToCentrelines(IEnumerable<PathFindTile> path)
         {
@@ -34,7 +34,7 @@ namespace Visualise
             var lines = new List<Centreline>();
             for (var i = 0; i < pathArray.Length - 1; i++)
             {
-                lines.Add(new Centreline(pathArray[i].Point, pathArray[i + 1].Point, Colours.Black));
+                lines.Add(new Centreline(pathArray[i].Hex, pathArray[i + 1].Hex, Colours.Black));
             }
 
             return lines;

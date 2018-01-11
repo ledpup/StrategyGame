@@ -28,18 +28,18 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, Structures);
 
-            var labels = new string[board.Width, board.Height];
-            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Index.ToString());
-            Visualise.GameBoardRenderer.RenderAndSave("Coords - array.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            var labels = new string[board.Width * board.Height];
+            board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Index.ToString());
+            GameBoardRenderer.RenderAndSave("Coords - index.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
-            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.X + ", " + x.Y);
-            Visualise.GameBoardRenderer.RenderAndSave("Coords - offset.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ToOffsetCoordsString());
+            GameBoardRenderer.RenderAndSave("Coords - offset.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
-            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.Hex.ToString());
-            Visualise.GameBoardRenderer.RenderAndSave("Coords - cube.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Hex.ToString());
+            GameBoardRenderer.RenderAndSave("Coords - cube.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
-            board.Tiles.ToList().ForEach(x => labels[x.X, x.Y] = x.ContiguousRegionId.ToString());
-            Visualise.GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
+            GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Height, board.Tiles, board.Edges, board.Structures, units: units);
+            GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);
         }
 
         [TestMethod]
@@ -69,19 +69,16 @@ namespace Tests
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
 
-            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Point(1, 1), new Point(7, 7), unit.MovementPoints)));
-            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Point(10, 3), new Point(13, 6), unit.MovementPoints)));
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Hex(1, 1), new Hex(7, 4), unit.MovementPoints)));
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Hex(10, -2), new Hex(13, 0), unit.MovementPoints)));
 
-            var labels = new string[board.Width, board.Height];
-            for (var x = 0; x < board.Width; x++)
+            var labels = new string[board.Width * board.Height];
+            for (var i = 0; i < board.TileArray.Length; i++)
             {
-                for (var y = 0; y < board.Height; y++)
-                {
-                    labels[x, y] = board[x, y].Index.ToString();
-                }
+                labels[i] = i.ToString();
             }
 
-            GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Height, board.Tiles, board.Edges, board.Structures, labels, lines);
+            GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, lines);
         }
 
 

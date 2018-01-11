@@ -11,7 +11,7 @@ namespace GameModel
     {
         public static Path<Node> FindPath<Node>(
             Node start,
-            Point destination,
+            Hex destination,
             Func<Node, Node, double> distance,
             Func<Node, double> estimate,
             int maxCumulativeCost,

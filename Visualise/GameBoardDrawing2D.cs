@@ -237,7 +237,7 @@ namespace Visualise
 
                 for (var i = 0; i < labels.Length; i++)
                 {
-                    var points = Layout.PolygonCorners(_layout, Hex.IndexToHex(labels.Length, boardWidth));
+                    var points = Layout.PolygonCorners(_layout, Hex.IndexToHex(i, boardWidth));
                     var worldX = (float)(points[0].X + points[3].X) / 2;
                     var worldY = (float)((points[1].Y + points[4].Y) / 2);
                     var label = labels[i];

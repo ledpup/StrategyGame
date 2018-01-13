@@ -51,9 +51,9 @@ namespace Tests
             Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 1));
             Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 1));
             Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 2));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 2));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 3));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 3));
             Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 2));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 1));
         }
 
         [TestMethod]

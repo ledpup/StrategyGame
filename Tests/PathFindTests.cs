@@ -72,10 +72,10 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[20, -5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true);
+            var unit = new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true);
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, new Hex(21, 10), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, new Hex(21, 0), unit.MovementPoints).ToArray();
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));

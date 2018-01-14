@@ -164,32 +164,32 @@ namespace Tests
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
+            GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
             var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
 
             vectors = new List<Centreline>();
             vectors.AddRange(Centreline.MoveOrderToCentrelines(moveOrder));
 
-            Visualise.GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
+            GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 
 
             var moves = unit.PossibleMoves();
             moves.ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
-            Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPossibleMoves.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures);
+            GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPossibleMoves.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures);
 
 
             Assert.AreEqual(unit.Location.Hex, shortestPath[0].Hex); // Origin
 
             Assert.AreEqual(new Hex(12, -2), shortestPath[1].Hex);
-            Assert.AreEqual(new Hex(13, -2), shortestPath[2].Hex);
-            Assert.AreEqual(new Hex(13, -3), shortestPath[3].Hex);
+            Assert.AreEqual(new Hex(12, -3), shortestPath[2].Hex);
+            Assert.AreEqual(new Hex(13, -4), shortestPath[3].Hex);
 
             Assert.AreEqual(new Hex(14, -4), shortestPath[4].Hex); // Destination
 
             Assert.AreEqual(new Hex(12, -2), moveOrder.Moves[0].Edge.Destination.Hex);
-            Assert.AreEqual(new Hex(13, -2), moveOrder.Moves[1].Edge.Destination.Hex);
-            Assert.AreEqual(new Hex(13, -3), moveOrder.Moves[2].Edge.Destination.Hex);
+            Assert.AreEqual(new Hex(12, -3), moveOrder.Moves[1].Edge.Destination.Hex);
+            Assert.AreEqual(new Hex(13, -4), moveOrder.Moves[2].Edge.Destination.Hex);
             Assert.AreEqual(new Hex(14, -4), moveOrder.Moves[3].Edge.Destination.Hex);
         }
     }

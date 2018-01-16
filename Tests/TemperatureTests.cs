@@ -27,16 +27,13 @@ namespace Tests
                 var tiles = new List<Tile>();
                 board.Tiles.ToList().ForEach(x => tiles.Add(new Tile(x.Index, x.X, x.Y, x.GetTerrainTypeByTemperature(x.Temperature))));
 
-                var labels = new string[board.Width, board.Height];
-                for (var x = 0; x < board.Width; x++)
+                var labels = new string[board.Width * board.Height];
+                for (var j = 0; j < board.TileArray.Length; j++)
                 {
-                    for (var y = 0; y < board.Height; y++)
-                    {
-                        labels[x, y] = Math.Round(board[x, y].Temperature, 1).ToString();
-                    }
+                    labels[j] = Math.Round(board[j].Temperature, 1).ToString();
                 }
 
-                Visualise.GameBoardRenderer.RenderAndSave("BasicBoardTemp" + i + ".png", board.Height, tiles, board.Edges, null, labels);
+                Visualise.GameBoardRenderer.RenderAndSave("BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
             }
         }
     }

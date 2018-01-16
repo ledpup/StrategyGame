@@ -46,7 +46,7 @@ namespace Tests
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
@@ -56,7 +56,7 @@ namespace Tests
                 var lines = new List<Centreline>();
                 moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
+                GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();
@@ -206,12 +206,12 @@ namespace Tests
 
             board.Units = units;
 
-            for (var turn = 0; turn < 35; turn++)
+            for (var turn = 0; turn < 25; turn++)
             {
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
@@ -221,7 +221,7 @@ namespace Tests
                 var lines = new List<Centreline>();
                 unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
+                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
 
                 board.ResolveOrders(unitOrders);
                 board.ChangeStructureOwners();
@@ -250,61 +250,62 @@ namespace Tests
                         Assert.AreEqual(units[0], units[1].TransportedBy);
                         break;
                     case 5:
-                        Assert.AreEqual(367, units[0].Location.Index);
-                        Assert.AreEqual(367, units[1].Location.Index);
+                        Assert.AreEqual(340, units[0].Location.Index);
+                        Assert.AreEqual(340, units[1].Location.Index);
                         Assert.AreEqual(null, units[1].TransportedBy);
                         break;
                     case 6:
-                        Assert.AreEqual(309, units[0].Location.Index);
+                        Assert.AreEqual(311, units[0].Location.Index);
                         Assert.AreEqual(365, units[1].Location.Index);
                         Assert.AreEqual(null, units[1].TransportedBy);
                         break;
                     case 7:
-                        Assert.AreEqual(390, units[0].Location.Index);
-                        Assert.AreEqual(390, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.AreEqual(338, units[0].Location.Index);
+                        Assert.AreEqual(338, units[1].Location.Index);
+                        Assert.AreEqual(units[0], units[1].TransportedBy);
                         break;
                     case 8:
-                        Assert.AreEqual(390, units[0].Location.Index);
-                        Assert.AreEqual(390, units[1].Location.Index);
-                        Assert.AreEqual(units[0], units[1].TransportedBy);
+                        Assert.AreEqual(257, units[0].Location.Index);
+                        Assert.AreEqual(257, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
                         break;
                     case 9:
-                        Assert.AreEqual(361, units[0].Location.Index);
-                        Assert.AreEqual(361, units[1].Location.Index);
-                        Assert.AreEqual(units[0], units[1].TransportedBy);
+                        Assert.AreEqual(199, units[0].Location.Index);
+                        Assert.AreEqual(203, units[1].Location.Index);
+                        Assert.AreEqual(null, units[1].TransportedBy);
                         break;
                     case 10:
-                        Assert.AreEqual(385, units[0].Location.Index);
-                        Assert.AreEqual(385, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
-                        break;
-                    case 11:
-                        Assert.AreEqual(304, units[0].Location.Index);
-                        Assert.AreEqual(438, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
-                        break;
-                    case 12:
                         Assert.AreEqual(196, units[0].Location.Index);
-                        Assert.AreEqual(436, units[1].Location.Index);
+                        Assert.AreEqual(150, units[1].Location.Index);
                         Assert.AreEqual(null, units[1].TransportedBy);
-                        Assert.AreEqual(196, units[3].Location.Index);
                         Assert.AreEqual(units[0], units[3].TransportedBy);
                         break;
-                    case 13:
-                        Assert.AreEqual(172, units[0].Location.Index);
-                        Assert.AreEqual(408, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
-                        Assert.AreEqual(172, units[3].Location.Index);
-                        Assert.AreEqual(units[0], units[3].TransportedBy);
-                        break;
-                    case 14:
-                        Assert.AreEqual(148, units[0].Location.Index);
-                        Assert.AreEqual(381, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
-                        Assert.AreEqual(148, units[3].Location.Index);
-                        Assert.AreEqual(null, units[3].TransportedBy);
-                        break;
+                    //case 11:
+                    //    Assert.AreEqual(304, units[0].Location.Index);
+                    //    Assert.AreEqual(438, units[1].Location.Index);
+                    //    Assert.AreEqual(null, units[1].TransportedBy);
+                    //    break;
+                    //case 12:
+                    //    Assert.AreEqual(196, units[0].Location.Index);
+                    //    Assert.AreEqual(436, units[1].Location.Index);
+                    //    Assert.AreEqual(null, units[1].TransportedBy);
+                    //    Assert.AreEqual(196, units[3].Location.Index);
+                    //    Assert.AreEqual(units[0], units[3].TransportedBy);
+                    //    break;
+                    //case 13:
+                    //    Assert.AreEqual(172, units[0].Location.Index);
+                    //    Assert.AreEqual(408, units[1].Location.Index);
+                    //    Assert.AreEqual(null, units[1].TransportedBy);
+                    //    Assert.AreEqual(172, units[3].Location.Index);
+                    //    Assert.AreEqual(units[0], units[3].TransportedBy);
+                    //    break;
+                    //case 14:
+                    //    Assert.AreEqual(148, units[0].Location.Index);
+                    //    Assert.AreEqual(381, units[1].Location.Index);
+                    //    Assert.AreEqual(null, units[1].TransportedBy);
+                    //    Assert.AreEqual(148, units[3].Location.Index);
+                    //    Assert.AreEqual(null, units[3].TransportedBy);
+                    //    break;
                 }
             }
         }

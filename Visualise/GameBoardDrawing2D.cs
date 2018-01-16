@@ -31,14 +31,14 @@ namespace Visualise
             _layout = new Layout(Layout.flat, new PointD(_edgeLength, _edgeLength), new PointD(_edgeLength, _hexHeight/2));
         }
 
-        public void DrawBoard(int width, int height, Dictionary<Hexagon.Point, Brush> hexagonColours)
+        public void DrawBoard(int width, int height, Dictionary<Hex, Brush> hexagonColours)
         {
             _graphics.FillRectangle(Brushes.White, 0, 0, width, height);
 
-            foreach (var point in hexagonColours.Keys)
+            foreach (var hex in hexagonColours.Keys)
             {
-                var points = Layout.PolygonCorners(_layout, new OffsetCoord(point.X, point.Y).QoffsetToCube());
-                _graphics.FillPolygon(hexagonColours[point], PointDtoF(points));
+                var points = Layout.PolygonCorners(_layout, hex);
+                _graphics.FillPolygon(hexagonColours[hex], PointDtoF(points));
                 _graphics.DrawPolygon(Pens.Black, PointDtoF(points));
             }
         }
@@ -148,7 +148,7 @@ namespace Visualise
             //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
         }
 
-        public void DrawCircle(Hexagon.Point location, float position, ArgbColour colour)
+        public void DrawCircle(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
@@ -156,11 +156,11 @@ namespace Visualise
             _graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _unitWidth, _unitWidth);
         }
 
-        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(Hexagon.Point location, float position)
+        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(Hex location, float position)
         {
             float Radius = _hexHeight / 4;
 
-            var hexCentre = Layout.HexToPixel(_layout, new OffsetCoord(location.X, location.Y).QoffsetToCube());
+            var hexCentre = Layout.HexToPixel(_layout, location);
 
             var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
             var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
@@ -171,7 +171,7 @@ namespace Visualise
             return (xTopLeft, yTopLeft);
         }
 
-        internal void DrawTrapezium(Hexagon.Point location, float position, ArgbColour colour)
+        internal void DrawTrapezium(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
@@ -197,7 +197,7 @@ namespace Visualise
         {
             return new SolidBrush(ArgbColourToColor(colour));
         }
-        public void DrawTriangle(Hexagon.Point location, float position, ArgbColour colour)
+        public void DrawTriangle(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
@@ -212,10 +212,10 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        internal void DrawRectangle(Hexagon.Point location, ArgbColour colour)
+        internal void DrawRectangle(Hex location, ArgbColour colour)
         {
             var brush = new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue));
-            var hexCentre = Layout.HexToPixel(_layout, new OffsetCoord(location.X, location.Y).QoffsetToCube());
+            var hexCentre = Layout.HexToPixel(_layout, location);
 
             var x = (float)hexCentre.X - (_structureWidth / 2);
             var y = (float)hexCentre.Y - (_structureWidth / 2);
@@ -223,7 +223,7 @@ namespace Visualise
             _graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
         }
 
-        public void LabelHexes(Pen pen, float xMin, float xMax, float yMin, float yMax, string[,] labels)
+        public void LabelHexes(Pen pen, float xMin, float xMax, float yMin, float yMax, string[] labels, int boardWidth)
         {
             var font = new Font("Arial", (int)(_hexHeight * .2));
 
@@ -235,16 +235,13 @@ namespace Visualise
                 sf.Alignment = StringAlignment.Center;
                 sf.LineAlignment = StringAlignment.Center;
 
-                for (var x = 0; x <= labels.GetUpperBound(0); x++)
+                for (var i = 0; i < labels.Length; i++)
                 {
-                    for (var y = 0; y <= labels.GetUpperBound(1); y++)
-                    {
-                        var points = Layout.PolygonCorners(_layout, new OffsetCoord(x, y).QoffsetToCube());
-                        var worldX = (float)(points[0].X + points[3].X) / 2;
-                        var worldY = (float)((points[1].Y + points[4].Y) / 2);
-                        var label = labels[x, y];
-                        _graphics.DrawString(label, font, Brushes.Black, worldX, worldY, sf);
-                    }
+                    var points = Layout.PolygonCorners(_layout, Hex.IndexToHex(i, boardWidth));
+                    var worldX = (float)(points[0].X + points[3].X) / 2;
+                    var worldY = (float)((points[1].Y + points[4].Y) / 2);
+                    var label = labels[i];
+                    _graphics.DrawString(label, font, Brushes.Black, worldX, worldY, sf);
                 }
             }
         }

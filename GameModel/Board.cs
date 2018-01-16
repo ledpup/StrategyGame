@@ -17,8 +17,7 @@ namespace GameModel
     }
     public class Board
     {
-        private Tile[,] _tiles;
-        Tile[] _tiles1d;
+        Tile[] _tiles;
 
         public int Width;
         public int Height;
@@ -348,8 +347,7 @@ namespace GameModel
 
         private void InitialiseTiles(int width, int height, string[] tileData)
         {
-            _tiles = new Tile[width, height];
-            _tiles1d = new Tile[width * height];
+            _tiles = new Tile[width * height];
 
             for (ushort x = 0; x < width; x++)
             {
@@ -357,9 +355,9 @@ namespace GameModel
                 {
                     var terrainType = Terrain.ConvertCharToTerrainType(char.Parse(tileData[y].Substring(x, 1)));
                     var isEdgeOfMap = x == 0 || y == 0 || x == width || y == height ? true : false;
-                    var tile = new Tile(Point.PointToIndex(x, y, width), x, y, terrainType, isEdgeOfMap);
-                    _tiles[x, y] = tile;
-                    _tiles1d[y * width + x] = tile;
+
+                    var tile = new Tile(x, y, width, terrainType, isEdgeOfMap);
+                    _tiles[y * width + x] = tile;
                 }
             }
         }
@@ -368,19 +366,17 @@ namespace GameModel
         {
             get
             {
-                return _tiles1d[index];
+                return _tiles[index];
             }
         }
 
+        // Offset coordinates
         public Tile this[int x, int y]
         {
             get
             {
-                return _tiles[x, y];
-            }
-            set
-            {
-                _tiles[x, y] = value;
+                var index = OffsetCoord.OffsetCoordsToIndex(x, y, Width);
+                return _tiles[index];
             }
         }
 
@@ -388,7 +384,7 @@ namespace GameModel
         {
             get
             {
-                return _tiles1d;
+                return _tiles;
             }
         }
 
@@ -396,7 +392,7 @@ namespace GameModel
         {
             get 
             {   
-                return _tiles1d;
+                return _tiles;
             }
         }
 
@@ -407,13 +403,15 @@ namespace GameModel
         public List<PathFindTile> ValidMovesWithMoveCostsForUnit(MilitaryUnit unit)
         {
             var pathFindTiles = new List<PathFindTile>();
-            Tiles.ToList().ForEach(x => pathFindTiles.Add(new PathFindTile(x.X, x.Y)));
+            Tiles.ToList().ForEach(x => pathFindTiles.Add(new PathFindTile(x.Hex)));
 
             foreach (var pathFindTile in pathFindTiles)
             {
                 pathFindTile.Neighbours = new List<PathFindTile>();
 
-                var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
+                var index = Hex.HexToIndex(pathFindTile.Hex, Width, Height);
+
+                var originTile = this[index];
 
                 foreach(var neighbour in originTile.Neighbours)
                 {
@@ -421,7 +419,7 @@ namespace GameModel
 
                     if (moveCost < Terrain.Impassable)
                     {
-                        var neighbourPathFindTile = pathFindTiles.Single(y => y.Point == neighbour.Destination.Point);
+                        var neighbourPathFindTile = pathFindTiles.Single(y => y.Hex == neighbour.Destination.Hex);
 
                         pathFindTile.Neighbours.Add(neighbourPathFindTile);
 
@@ -438,21 +436,19 @@ namespace GameModel
             return pathFindTiles;
         }
 
-        public PathFindTile PathFindTilesForLocationAndNeighbours(Tile location, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
+        public static PathFindTile PathFindTilesForLocationAndNeighbours(Tile location, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
         {
-            var pathFindTile = new PathFindTile(location.X, location.Y);
+            var pathFindTile = new PathFindTile(location.Hex);
 
             var neighbours = new List<PathFindTile>();
 
-            var originTile = this[pathFindTile.Point.X, pathFindTile.Point.Y];
-
-            foreach (var edge in originTile.Neighbours)
+            foreach (var edge in location.Neighbours)
             {
                 var moveCost = edge.MoveCost(usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts);
 
                 if (moveCost < Terrain.Impassable)
                 {
-                    var neighbourPathFindTile = new PathFindTile(edge.Destination.Point);
+                    var neighbourPathFindTile = new PathFindTile(edge.Destination.Hex);
 
                     pathFindTile.Neighbours.Add(neighbourPathFindTile);
 
@@ -564,12 +560,12 @@ namespace GameModel
                 }
 
                 // Don't move a land unit onto a water time unless there is a transport there that can take it
-                unitStepMoves.Where(x => x.Value.Edge.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
+                unitStepMoves.Where((KeyValuePair<MilitaryUnit, Move> x) => x.Value.Edge.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
                     .ToList()
-                    .ForEach(x => 
+                    .ForEach((Action<KeyValuePair<MilitaryUnit, Move>>)((KeyValuePair<MilitaryUnit, Move> x) => 
                     {
                         var transportedUnit = x.Key;
-                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Edge.Destination.Point == y.Location.Point && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                        var transports = Units.Where((Func<MilitaryUnit, bool>)(y => (bool)(y.MovementType == MovementType.Water && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)))).OrderBy(y => y.TransportSize);
                         var transport = transports.FirstOrDefault();
                         if (transport != null)
                         {
@@ -580,7 +576,7 @@ namespace GameModel
                         {
                             removeUnitMoves.Add(x.Key, x.Value);
                         }
-                    });
+                    }));
 
                 removeUnitMoves.Keys.ToList().ForEach(x => unitStepMoves.Remove(x));
 
@@ -819,15 +815,29 @@ namespace GameModel
             }
         }
 
-        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Point origin, Point destination, int maxCumulativeCost)
+        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Hex origin, Hex destination, int maxCumulativeCost)
         {
-            var ori = pathFindTiles.Single(x => x.X == origin.X && x.Y == origin.Y);
-            var dest = pathFindTiles.Single(x => x.X == destination.X && x.Y == destination.Y);
+            var ori = pathFindTiles.Single(x => x.Q == origin.q && x.R == origin.r);
+            var dest = pathFindTiles.Single(x => x.Q == destination.q && x.R == destination.r);
 
             Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
-            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.X - destination.X, 2) + Math.Pow(t.Y - destination.Y, 2));
+            Func<PathFindTile, double> estimate = t => Hex.Distance(t.Hex, destination);
 
             var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
+
+            return path == null || path.Count() == 1 ? null : path.Reverse();
+        }
+
+        public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Hex destination, int maxCumulativeCost, bool usesRoads, 
+                                                                    bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, 
+                                                                    Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
+        {
+            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
+            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.Q - destination.q, 2) + Math.Pow(t.R - destination.r, 2));
+
+            var startPathFindTile = Board.PathFindTilesForLocationAndNeighbours(origin, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
+
+            var path = PathFind2.FindPath(startPathFindTile, destination, distance, estimate, maxCumulativeCost, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
 
             return path == null || path.Count() == 1 ? null : path.Reverse();
         }
@@ -836,10 +846,10 @@ namespace GameModel
         {
             List<Move> moves = new List<Move>();
             Move furthestMove = null;
-            var origin = shortestPath[0].Point;
+            var origin = shortestPath[0].Hex;
             for (var i = 1; i < shortestPath.Length; i++)
             {
-                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Point && x.Edge.Destination.Point == shortestPath[i].Point && x.Distance == i);
+                var move = possibleMoves.FirstOrDefault(x => origin == x.Origin.Hex && x.Edge.Destination.Hex == shortestPath[i].Hex && x.Distance == i);
 
                 if (move == null)
                 {
@@ -855,8 +865,8 @@ namespace GameModel
                 furthestMove = move;
 
                 // Remove moves that we've considered
-                possibleMoves.RemoveAll(x => x.Origin.Point == origin);
-                origin = shortestPath[i].Point;
+                possibleMoves.RemoveAll(x => x.Origin.Hex == origin);
+                origin = shortestPath[i].Hex;
             }
 
             return moves;

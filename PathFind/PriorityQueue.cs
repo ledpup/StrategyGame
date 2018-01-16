@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PathFind
 {
-    class PriorityQueue<P, V>
+    public class PriorityQueue<P, V>
     {
         private readonly SortedDictionary<P, Queue<V>> list = new SortedDictionary<P, Queue<V>>();
         

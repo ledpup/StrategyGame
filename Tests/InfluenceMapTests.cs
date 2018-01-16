@@ -58,11 +58,11 @@ namespace Tests
             var vectors = new List<Centreline>();
             moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveOrders(moveOrders);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
         }
 
         [TestMethod]
@@ -90,7 +90,7 @@ namespace Tests
             var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4, board.Width, board.Height);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
@@ -102,7 +102,7 @@ namespace Tests
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, board.Units[1].Location.Point, tile.Point, board.Units[1].MovementPoints);
+                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, board.Units[1].Location.Hex, tile.Hex, board.Units[1].MovementPoints);
                 if (bestPossibleDestination != null)
                     break;
             }

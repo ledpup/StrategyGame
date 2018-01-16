@@ -10,11 +10,11 @@ namespace Visualise
 {
     public class Edge
     {
-        public Point Origin;
-        public Point Destination;
+        public Hex Origin;
+        public Hex Destination;
         public ArgbColour Colour;
         public bool IsPort;
-        public Edge(Point origin, Point destination, ArgbColour colour, bool isPort)
+        public Edge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
         {
             Origin = origin;
             Destination = destination;

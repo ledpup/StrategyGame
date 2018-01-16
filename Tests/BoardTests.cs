@@ -41,19 +41,19 @@ namespace Tests
         {
             var board = new Board(GameBoard);
 
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 2 && x.Destination.Y == 0));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 3 && x.Destination.Y == 0));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 3 && x.Destination.Y == 1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 2 && x.Destination.Y == 2));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 1 && x.Destination.Y == 1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.X == 1 && x.Destination.Y == 0));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 2 && x.Destination.Hex.r == -1));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 3 && x.Destination.Hex.r == -1));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 3 && x.Destination.Hex.r == 0));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 2 && x.Destination.Hex.r == 1));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 1 && x.Destination.Hex.r == 1));
+            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 1 && x.Destination.Hex.r == 0));
 
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 5 && x.Destination.Y == 3));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 6 && x.Destination.Y == 4));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 6 && x.Destination.Y == 5));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 5 && x.Destination.Y == 5));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 4 && x.Destination.Y == 5));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.X == 4 && x.Destination.Y == 4));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 1));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 1));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 2));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 3));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 3));
+            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 2));
         }
 
         [TestMethod]
@@ -75,8 +75,8 @@ namespace Tests
         [TestMethod]
         public void CoordsTests()
         {
-            Assert.AreEqual(29, Point.PointToIndex(2, 1, 27));
-            Assert.AreEqual(new Point(2, 1), Point.IndexToPoint(29, 27));
+            Assert.AreEqual(29, OffsetCoord.OffsetCoordsToIndex(2, 1, 27));
+            Assert.AreEqual(new OffsetCoord(2, 1), OffsetCoord.QoffsetFromCube(Hex.IndexToHex(29, 27)));
         }
 
         [TestMethod]
@@ -85,21 +85,17 @@ namespace Tests
             const int boardWidth = 27;
             const int boardHeight = 19;
 
-            var point = Point.IndexToPoint(29, boardWidth);
-            var hex = OffsetCoord.QoffsetToCube(new OffsetCoord(point.X, point.Y));
+            var hex = Hex.IndexToHex(29, boardWidth);
             var offsetCoord = OffsetCoord.QoffsetFromCube(hex);
             var index = Hex.HexToIndex(hex, boardWidth, boardHeight);
             Assert.AreEqual(29, index);
 
-            point = Point.IndexToPoint(25, boardWidth);
-            hex = OffsetCoord.QoffsetToCube(new OffsetCoord(point.X, point.Y));
-            offsetCoord = OffsetCoord.QoffsetFromCube(hex);
+            hex = Hex.IndexToHex(25, boardWidth);
             index = Hex.HexToIndex(hex, boardWidth, boardHeight);
             Assert.AreEqual(25, index);
 
 
-            point = Point.IndexToPoint(32, boardWidth);
-            hex = OffsetCoord.QoffsetToCube(new OffsetCoord(point.X, point.Y));
+            hex = Hex.IndexToHex(32, boardWidth);
             offsetCoord = OffsetCoord.QoffsetFromCube(hex);
             index = Hex.HexToIndex(hex, boardWidth, boardHeight);
             Assert.AreEqual(32, index);

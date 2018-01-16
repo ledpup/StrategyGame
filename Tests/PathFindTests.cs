@@ -116,9 +116,9 @@ namespace Tests
             Assert.AreEqual(new Hex(20, 4), shortestPath[4].Hex);
             Assert.AreEqual(new Hex(19, 4), shortestPath[5].Hex);
             Assert.AreEqual(new Hex(18, 4), shortestPath[6].Hex);
-            Assert.AreEqual(new Hex(17, 5), shortestPath[7].Hex);
-            Assert.AreEqual(new Hex(16, 5), shortestPath[8].Hex);
-            Assert.AreEqual(new Hex(15, 6), shortestPath[9].Hex);
+            Assert.AreEqual(new Hex(17, 4), shortestPath[7].Hex);
+            Assert.AreEqual(new Hex(16, 4), shortestPath[8].Hex);
+            Assert.AreEqual(new Hex(15, 5), shortestPath[9].Hex);
 
             Assert.AreEqual(new Hex(14, 6), shortestPath[10].Hex); // Destination
         }
@@ -141,9 +141,9 @@ namespace Tests
             Assert.AreEqual(unit.Location.Hex, shortestPath[0].Hex); // Origin
 
             Assert.AreEqual(new Hex(18, 4), shortestPath[1].Hex);
-            Assert.AreEqual(new Hex(17, 5), shortestPath[2].Hex);
-            Assert.AreEqual(new Hex(16, 5), shortestPath[3].Hex);
-            Assert.AreEqual(new Hex(15, 6), shortestPath[4].Hex);
+            Assert.AreEqual(new Hex(17, 4), shortestPath[2].Hex);
+            Assert.AreEqual(new Hex(16, 4), shortestPath[3].Hex);
+            Assert.AreEqual(new Hex(15, 5), shortestPath[4].Hex);
 
             Assert.AreEqual(new Hex(14, 6), shortestPath[5].Hex); // Destination
 

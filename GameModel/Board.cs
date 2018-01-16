@@ -821,7 +821,7 @@ namespace GameModel
             var dest = pathFindTiles.Single(x => x.Q == destination.q && x.R == destination.r);
 
             Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
-            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.Q - destination.q, 2) + Math.Pow(t.R - destination.r, 2));
+            Func<PathFindTile, double> estimate = t => Hex.Distance(t.Hex, destination);
 
             var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
 

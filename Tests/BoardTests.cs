@@ -8,6 +8,7 @@ using GameModel;
 using System.IO;
 using NLog;
 using Hexagon;
+using Visualise;
 
 namespace Tests
 {
@@ -107,6 +108,22 @@ namespace Tests
             Assert.AreEqual(86, Hex.HexToIndex(new Hex(5, 1, -6), boardWidth, boardHeight));
             Assert.AreEqual(85, Hex.HexToIndex(new Hex(4, 1, -5), boardWidth, boardHeight));
             Assert.AreEqual(58, Hex.HexToIndex(new Hex(4, 0, -4), boardWidth, boardHeight));
+        }
+
+        [TestMethod]
+        public void ContiguousRegionTest()
+        {
+            string[] gameBoard = File.ReadAllLines("ContiguousRegionTestBoard.txt");
+            string[] tileEdges = File.ReadAllLines("ContiguousRegionTestEdges.txt");
+
+            var board = new Board(gameBoard, tileEdges);
+
+            var labels = new string[board.Width * board.Height];
+            board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
+            GameBoardRenderer.RenderAndSave("ContiguousRegionsTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
+
+            Assert.AreEqual(2, board[12].ContiguousRegionId);
+            Assert.AreEqual(6, board[32].ContiguousRegionId);
         }
     }
 }

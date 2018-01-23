@@ -58,7 +58,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            return string.Format($"{Index} {Hex.ToString()} {TerrainType}");
+            return string.Format($"{Index}: {Hex.ToString()} {TerrainType}");
         }
 
         public float? Supply { get; set; }

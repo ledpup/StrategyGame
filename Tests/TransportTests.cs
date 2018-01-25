@@ -45,8 +45,7 @@ namespace Tests
             {
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-                var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
@@ -210,8 +209,7 @@ namespace Tests
             {
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-                var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();

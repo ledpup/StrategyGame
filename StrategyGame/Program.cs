@@ -65,8 +65,7 @@ namespace StrategyGame
                 ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var labels = new string[board.Width, board.Height];
-                var bitmap = new Bitmap(1920, 1450);
-                GameBoardRenderer.Render(bitmap, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 
                 //for (var i = 0; i < numberOfPlayers; i++)
                 //{

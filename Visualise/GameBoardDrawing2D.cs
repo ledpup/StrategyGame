@@ -9,31 +9,38 @@ namespace Visualise
 {
     public class GameBoardDrawing2D
     {
+        Bitmap _bitmap;
         Graphics _graphics;
-        float _hexHeight;
         float _hexWidth;
-        float _edgeLength;
+        float _hexHeight;
+        const float EdgeLength = 25;
         float _structureWidth;
         float _unitWidth;
         Layout _layout;
 
-        public GameBoardDrawing2D(Bitmap bitmap, int numberOfHexesHigh)
+        public GameBoardDrawing2D(int boardWidth, int boardHeight)
         {
-            _graphics = Graphics.FromImage(bitmap);
+            _hexWidth = EdgeLength * 2;
+            _hexHeight = (float)Math.Sqrt(3) / 2 * _hexWidth;
+
+            var imageWidth = (int)(_hexWidth * (boardWidth + .4) * .75);
+            var imageHeight = (int)(_hexHeight * (boardHeight + .6));
+
+            _bitmap = new Bitmap(imageWidth, imageHeight);
+
+            _graphics = Graphics.FromImage(_bitmap);
             _graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            
-            _hexHeight = Convert.ToSingle(bitmap.Height) / (numberOfHexesHigh + 1);
-            _edgeLength = (float)(_hexHeight / Math.Sqrt(3));
-            _hexWidth = 2 * _edgeLength;
+
+
             
             _structureWidth = _hexHeight / 4;
             _unitWidth = _structureWidth * .8f;
-            _layout = new Layout(Layout.flat, new PointD(_edgeLength, _edgeLength), new PointD(_edgeLength, _hexHeight/2));
+            _layout = new Layout(Layout.flat, new PointD(EdgeLength, EdgeLength), new PointD(EdgeLength, _hexHeight/2));
         }
 
-        public void DrawBoard(int width, int height, Dictionary<Hex, Brush> hexagonColours)
+        public void DrawBoard(Dictionary<Hex, Brush> hexagonColours)
         {
-            _graphics.FillRectangle(Brushes.White, 0, 0, width, height);
+            _graphics.FillRectangle(Brushes.White, 0, 0, _bitmap.Width, _bitmap.Height);
 
             foreach (var hex in hexagonColours.Keys)
             {
@@ -122,7 +129,7 @@ namespace Visualise
 
             for (var i = 0; i < 6;i++)
             {
-                var point = PointD.EdgeToCentrePoint(points.ToArray(), _edgeLength, i, 5);
+                var point = PointD.EdgeToCentrePoint(points.ToArray(), EdgeLength, i, 5);
                 points2[i] = new PointF((float)point.X, (float)point.Y);
             }
             
@@ -188,6 +195,11 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
+        internal void Save(string fileName)
+        {
+            _bitmap.Save(fileName);
+        }
+
         static Color ArgbColourToColor(ArgbColour colour)
         {
             return Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue);
@@ -223,8 +235,11 @@ namespace Visualise
             _graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
         }
 
-        public void LabelHexes(Pen pen, float xMin, float xMax, float yMin, float yMax, string[] labels, int boardWidth)
+        public void LabelHexes(Pen pen, float xMin, float yMin, string[] labels, int boardWidth)
         {
+            var xMax = _bitmap.Width;
+            var yMax = _bitmap.Height;
+
             var font = new Font("Arial", (int)(_hexHeight * .2));
 
             if (labels == null)

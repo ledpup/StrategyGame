@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using GameModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Visualise
 {
@@ -21,7 +25,7 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Board)
             {
-                var hexagonColours = new Dictionary<Hexagon.Hex, ArgbColour>();
+                var hexagonColours = new Dictionary<Hexagon.Hex, Brush>();
 
                 var displaySelected = tiles.Any(x => x.IsSelected);
 
@@ -34,7 +38,7 @@ namespace Visualise
                         colour.Green = (short)(colour.Green * .3);
                         colour.Blue = (short)(colour.Blue * .3);
                     }
-                    hexagonColours.Add(x.Hex, colour);
+                    hexagonColours.Add(x.Hex, new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
                 }
                 );
 
@@ -139,7 +143,7 @@ namespace Visualise
 
             if (renderBegin <= RenderPipeline.Labels)
             {
-                gameBoardDrawing2D.LabelHexes(Colours.Black, 0, 0, labels, boardWidth);
+                gameBoardDrawing2D.LabelHexes(Pens.Black, 0, 0, labels, boardWidth);
             }
             
             return gameBoardDrawing2D;
@@ -166,7 +170,7 @@ namespace Visualise
             gameBoardDrawing2D.Save(fileName);
         }
 
-        public static void RenderLabelsAndSave(string fileName, int boardWidth, int boardHeight, string[] labels)
+        public static void RenderLabelsAndSave(string fileName, Bitmap bitmap, int boardWidth, int boardHeight, string[] labels)
         {
             var gameBoardDrawing2D = Render(RenderPipeline.Labels, RenderPipeline.Labels, boardWidth, boardHeight, labels: labels);
             gameBoardDrawing2D.Save(fileName);

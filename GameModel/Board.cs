@@ -96,7 +96,7 @@ namespace GameModel
         private void AssignContiguousTilesToRegion(Tile tile, int id)
         {
             tile.Neighbours
-                .Where(x => x.Destination.ContiguousRegionId == 0 && x.Destination.BaseTerrainType == tile.BaseTerrainType && (x.HasRoad || ((tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain) || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain))))
+                .Where(x => x.Destination.ContiguousRegionId == 0 && x.Destination.BaseTerrainType == tile.BaseTerrainType && ((tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain) || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain)))
                 .ToList()
                 .ForEach(x => 
                     {

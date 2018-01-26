@@ -123,7 +123,12 @@ namespace Tests
             GameBoardRenderer.RenderAndSave("ContiguousRegionsTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             Assert.AreEqual(2, board[12].ContiguousRegionId);
-            Assert.AreEqual(6, board[32].ContiguousRegionId);
+            Assert.AreEqual(5, board[32].ContiguousRegionId);
+
+            Assert.AreEqual(3, board[17].ContiguousRegionId);
+            Assert.AreEqual(3, board[37].ContiguousRegionId);
+            Assert.AreNotEqual(3, board[27].ContiguousRegionId);
+
         }
     }
 }

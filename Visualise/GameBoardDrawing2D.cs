@@ -38,14 +38,16 @@ namespace Visualise
             _layout = new Layout(Layout.flat, new PointD(EdgeLength, EdgeLength), new PointD(EdgeLength, _hexHeight/2));
         }
 
-        public void DrawBoard(Dictionary<Hex, Brush> hexagonColours)
+        public void DrawBoard(Dictionary<Hex, ArgbColour> hexagonColours)
         {
             _graphics.FillRectangle(Brushes.White, 0, 0, _bitmap.Width, _bitmap.Height);
 
             foreach (var hex in hexagonColours.Keys)
             {
                 var points = Layout.PolygonCorners(_layout, hex);
-                _graphics.FillPolygon(hexagonColours[hex], PointDtoF(points));
+                var colour = hexagonColours[hex];
+                var brush = new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue));
+                _graphics.FillPolygon(brush, PointDtoF(points));
                 _graphics.DrawPolygon(Pens.Black, PointDtoF(points));
             }
         }
@@ -235,8 +237,10 @@ namespace Visualise
             _graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
         }
 
-        public void LabelHexes(Pen pen, float xMin, float yMin, string[] labels, int boardWidth)
+        public void LabelHexes(ArgbColour colour, float xMin, float yMin, string[] labels, int boardWidth)
         {
+            var pen = new Pen(new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue)));
+
             var xMax = _bitmap.Width;
             var yMax = _bitmap.Height;
 

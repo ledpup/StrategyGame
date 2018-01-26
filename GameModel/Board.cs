@@ -88,20 +88,20 @@ namespace GameModel
                 {
                     id++;
                     tile.ContiguousRegionId = id;
-                    AssignContiguousTilesToRegion(tile, id);
+                    AssignContiguousTilesToRegion(tile, id, tile.TerrainType == TerrainType.Mountain);
                 }
             }
         }
 
-        private void AssignContiguousTilesToRegion(Tile tile, int id)
+        private void AssignContiguousTilesToRegion(Tile tile, int id, bool isMountainRange)
         {
             tile.Neighbours
-                .Where(x => x.Destination.ContiguousRegionId == 0 && x.Destination.BaseTerrainType == tile.BaseTerrainType && (x.HasRoad || ((tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain) || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain))))
+                .Where(x => x.Destination.ContiguousRegionId == 0 && x.Destination.BaseTerrainType == tile.BaseTerrainType && (x.HasRoad || ((tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain) || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain && isMountainRange))))
                 .ToList()
                 .ForEach(x => 
                     {
                         x.Destination.ContiguousRegionId = id;
-                        AssignContiguousTilesToRegion(x.Destination, id);
+                        AssignContiguousTilesToRegion(x.Destination, id, isMountainRange);
                     });
         }
 

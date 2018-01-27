@@ -98,14 +98,14 @@ namespace ComputerOpponent
             }
         }
 
-        public static Dictionary<MilitaryUnit, StrategicAction> StrategicActions { get; set; }
+        public static Dictionary<int, AiMilitaryUnit> AiUnits { get; set; }
         public static void SetStrategicAction(Board board, List<MilitaryUnit> units)
         {
-            StrategicActions = new Dictionary<MilitaryUnit, StrategicAction>();
+            AiUnits = new Dictionary<int, AiMilitaryUnit>();
             foreach (var unit in units)
             {
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                StrategicActions[unit] = StrategicAction.None;
+                var aiUnit = new AiMilitaryUnit(unit);
                 switch (unit.MovementType)
                 {
                     case MovementType.Airborne:
@@ -118,11 +118,11 @@ namespace ComputerOpponent
                         }
                         if (!unit.Transporting.Any())
                         {
-                            StrategicActions[unit] = StrategicAction.Pickup;
+                            aiUnit.StrategicAction = StrategicAction.Pickup;
                         }
                         else if (unit.Transporting.Any())
                         {
-                            StrategicActions[unit] = StrategicAction.AirliftToDestination;
+                            aiUnit.StrategicAction = StrategicAction.AirliftToDestination;
                         }
                         break;
                     case MovementType.Land:
@@ -134,11 +134,11 @@ namespace ComputerOpponent
                                     !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)
                                     )
                         {
-                            StrategicActions[unit] = StrategicAction.Embark;
+                            aiUnit.StrategicAction = StrategicAction.Embark;
                         }
                         else if (unit.TransportedBy != null)
                         {
-                            StrategicActions[unit] = StrategicAction.Disembark;
+                            aiUnit.StrategicAction = StrategicAction.Disembark;
                         }
                         break;
                     case MovementType.Water:
@@ -151,14 +151,15 @@ namespace ComputerOpponent
                         }
                         if (!unit.Transporting.Any())
                         {
-                            StrategicActions[unit] = StrategicAction.Dock;
+                            aiUnit.StrategicAction = StrategicAction.Dock;
                         }
                         else if (unit.Transporting.Any())
                         {
-                            StrategicActions[unit] = StrategicAction.TransportToDestination;
+                            aiUnit.StrategicAction = StrategicAction.TransportToDestination;
                         }
                         break;
                 }
+                AiUnits.Add(aiUnit.Unit.Index, aiUnit);
             }
         }
 
@@ -182,7 +183,9 @@ namespace ComputerOpponent
         {
             var unitOrders = new List<IUnitOrder>();
 
-            switch (StrategicActions[unit])
+            var aiUnit = AiUnits[unit.Index];
+
+            switch (aiUnit.StrategicAction)
             {
                 case StrategicAction.None:
                     {
@@ -192,13 +195,13 @@ namespace ComputerOpponent
                         break;
                     }
                 case StrategicAction.Embark:
-                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && StrategicActions[x] == StrategicAction.Pickup;
+                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && aiUnit.StrategicAction == StrategicAction.Pickup;
                     var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule);
 
                     //Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;
                     //var closestAvailableWaterUnitPath = ClosestAvailableTransportPath(board, unit, units, aquaticRule);
 
-                    var closestPortPath = ClosestPortPath(board, unit);
+                    var closestPortPath = ClosestPortPath(board, aiUnit);
 
                     if (closestAvailableAirborneUnitPath != null)
                     {
@@ -272,9 +275,9 @@ namespace ComputerOpponent
 
                 case StrategicAction.Dock:
                     {
-                        if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && StrategicActions[x] == StrategicAction.Embark))
+                        if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && aiUnit.StrategicAction == StrategicAction.Embark))
                         {
-                            closestPortPath = ClosestPortPath(board, unit);
+                            closestPortPath = ClosestPortPath(board, aiUnit);
 
                             if (closestPortPath != null)
                             {
@@ -288,7 +291,7 @@ namespace ComputerOpponent
                 case StrategicAction.TransportToDestination:
                     {
                         // Find the closest port that has a region with one or more enemy structures
-                        closestPortPath = ClosestPortPath(board, unit);
+                        closestPortPath = ClosestPortPath(board, aiUnit);
 
                         if (closestPortPath != null)
                         {
@@ -347,7 +350,7 @@ namespace ComputerOpponent
         private static MilitaryUnit ClosestEmbarkingUnitPath(Board board, List<MilitaryUnit> units, Tile origin)
         {
             var closestUnit = units
-                                    .Where(x => StrategicActions[x] == StrategicAction.Embark)
+                                    .Where(x => AiUnits[x.Index].StrategicAction == StrategicAction.Embark)
                                     .OrderBy(x => Hex.Distance(x.Location.Hex, origin.Hex))
                                     .FirstOrDefault();
 
@@ -413,30 +416,30 @@ namespace ComputerOpponent
             }
             return null;
         }
-        public static IEnumerable<PathFindTile> ClosestPortPath(Board board, MilitaryUnit unit)
+        public static IEnumerable<PathFindTile> ClosestPortPath(Board board, AiMilitaryUnit aiUnit)
         {
             var closestPortDistance = int.MaxValue;
             IEnumerable<PathFindTile> closestPort = null;
             board.Tiles.ToList().ForEach((Action<Tile>)(x =>
                 {
-                    if (x.ContiguousRegionId == unit.Location.ContiguousRegionId && x.HasPort)
+                    if (x.ContiguousRegionId == aiUnit.Unit.Location.ContiguousRegionId && x.HasPort)
                     {
-                        switch (StrategicActions[unit])
+                        switch (aiUnit.StrategicAction)
                         {
                             case StrategicAction.Dock:
                                 // Only go to a port that has units that want to embark
-                                if (!board.Units.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && StrategicActions[y] == StrategicAction.Embark))
+                                if (!board.Units.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && AiUnits[y.Index].StrategicAction == StrategicAction.Embark))
                                     return;
                                 break;
                             case StrategicAction.TransportToDestination:
                                 // Only go to a port that has enemy structure(s)
-                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != aiUnit.Unit.OwnerIndex))
                                     return;
                                 break;
                         }
 
-                        var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                        var shortestPath = Board.FindShortestPath(pathFindTiles, (Hex)unit.Location.Hex, (Hex)x.Hex, unit.MovementPoints);
+                        var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(aiUnit.Unit);
+                        var shortestPath = Board.FindShortestPath(pathFindTiles, (Hex)aiUnit.Unit.Location.Hex, (Hex)x.Hex, aiUnit.Unit.MovementPoints);
                         if (shortestPath != null)
                         {
                             var distance = shortestPath.Count();

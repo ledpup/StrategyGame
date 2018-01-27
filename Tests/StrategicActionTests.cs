@@ -34,7 +34,7 @@ namespace Tests
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.None, ComputerPlayer.AiUnits[units[0].Index]);
+            Assert.AreEqual(StrategicAction.None, ComputerPlayer.AiUnits[units[0].Index].StrategicAction);
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace Tests
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.Dock, ComputerPlayer.AiUnits[units[0].Index]);
+            Assert.AreEqual(StrategicAction.Dock, ComputerPlayer.AiUnits[units[0].Index].StrategicAction);
         }
 
 
@@ -67,15 +67,14 @@ namespace Tests
                 new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
                 new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
 
-
-                new MilitaryUnit(0, ownerIndex: 1, location: board[25, 12], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(2, ownerIndex: 1, location: board[25, 12], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
             };
 
             board.Units = units;
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.None, ComputerPlayer.AiUnits[units[0].Index]);
+            Assert.AreEqual(StrategicAction.None, ComputerPlayer.AiUnits[units[0].Index].StrategicAction);
         }
 
         [TestMethod]
@@ -95,7 +94,7 @@ namespace Tests
 
             ComputerPlayer.SetStrategicAction(board, units);
 
-            Assert.AreEqual(StrategicAction.Pickup, ComputerPlayer.AiUnits[units[0].Index]);
+            Assert.AreEqual(StrategicAction.Pickup, ComputerPlayer.AiUnits[units[0].Index].StrategicAction);
         }
     }
 }

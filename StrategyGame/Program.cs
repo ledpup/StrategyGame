@@ -28,23 +28,27 @@ namespace StrategyGame
 
             var numberOfPlayers = 2;
 
-            board.Units = new List<MilitaryUnit>
+            var aiUnits = new List<AiMilitaryUnit>
                 {
-                new MilitaryUnit(0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3, role: Role.Besieger),
-                new MilitaryUnit(1, location: board[110], baseMovementPoints: 3, role: Role.Defensive),
-                new MilitaryUnit(2, location: board[31], role: Role.Defensive),
-                new MilitaryUnit(3, location: board[56], movementType: MovementType.Land),
-                new MilitaryUnit(4, location: board[65]),
-                new MilitaryUnit(5, location: board[316], role: Role.Defensive),
+                new AiMilitaryUnit(new MilitaryUnit(0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3)) { Role = Role.Besieger },
+                new AiMilitaryUnit(new MilitaryUnit(1, location: board[110], baseMovementPoints: 3)) { Role = Role.Defensive },
+                new AiMilitaryUnit(new MilitaryUnit(2, location: board[31])) { Role = Role.Defensive },
+                new AiMilitaryUnit(new MilitaryUnit(3, location: board[56], movementType: MovementType.Land)),
+                new AiMilitaryUnit(new MilitaryUnit(4, location: board[65])),
+                new AiMilitaryUnit(new MilitaryUnit(5, location: board[316])) { Role = Role.Defensive },
 
-                new MilitaryUnit(7, ownerIndex: 1, location: board[247], movementType: MovementType.Airborne, baseMovementPoints: 3, role: Role.Besieger),
-                new MilitaryUnit(8, ownerIndex: 1, location: board[361], movementType: MovementType.Airborne, baseMovementPoints: 3, role: Role.Besieger),
-                new MilitaryUnit(9, ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(10, ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(11, ownerIndex: 1, location: board[478], movementType: MovementType.Airborne, role: Role.Besieger),
+                new AiMilitaryUnit(new MilitaryUnit(7, ownerIndex: 1, location: board[247], movementType: MovementType.Airborne, baseMovementPoints: 3)) { Role = Role.Besieger },
+                new AiMilitaryUnit(new MilitaryUnit(8, ownerIndex: 1, location: board[361], movementType: MovementType.Airborne, baseMovementPoints: 3)) { Role = Role.Besieger },
+                new AiMilitaryUnit(new MilitaryUnit(9, ownerIndex: 1, location: board[111])),
+                new AiMilitaryUnit(new MilitaryUnit(10, ownerIndex: 1, location: board[111])),
+                new AiMilitaryUnit(new MilitaryUnit(11, ownerIndex: 1, location: board[478], movementType: MovementType.Airborne)) { Role = Role.Besieger },
 
-                new MilitaryUnit(12, ownerIndex: 1, location: board[168]),
+                new AiMilitaryUnit(new MilitaryUnit(12, ownerIndex: 1, location: board[168])),
                 };
+
+            var computerPlayer = new ComputerPlayer(aiUnits);
+
+            board.Units = aiUnits.Select(x => x.Unit).ToList();
 
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
@@ -62,7 +66,7 @@ namespace StrategyGame
             {
 
 
-                ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+                computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var labels = new string[board.Width, board.Height];
                 GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
@@ -97,8 +101,8 @@ namespace StrategyGame
                 var unitsOrders = new List<IUnitOrder>();
 
                 var units = board.Units.Where(x => x.IsAlive).ToList();
-                ComputerPlayer.SetStrategicAction(board, units);
-                unitsOrders = ComputerPlayer.CreateOrders(board, units);
+                computerPlayer.SetStrategicAction(board);
+                unitsOrders = computerPlayer.CreateOrders(board, units);
 
                 var lines = new List<Centreline>();
                 unitsOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));

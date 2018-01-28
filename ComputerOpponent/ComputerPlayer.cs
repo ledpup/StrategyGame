@@ -20,8 +20,23 @@ namespace ComputerOpponent
     }
     public class ComputerPlayer
     {
+        public ComputerPlayer()
+        {
+            AiUnits = new Dictionary<int, AiMilitaryUnit>();
+        }
 
-        static Dictionary<Role, double> FriendlyUnitInfluenceModifier
+        public ComputerPlayer(List<MilitaryUnit> units)
+        {
+            AiUnits = new Dictionary<int, AiMilitaryUnit>();
+            units.ForEach(x => AiUnits.Add(x.Index, new AiMilitaryUnit(x)));
+        }
+
+        public ComputerPlayer(List<AiMilitaryUnit> aiUnits)
+        {
+            AiUnits = new Dictionary<int, AiMilitaryUnit>();
+            aiUnits.ForEach(x => AiUnits.Add(x.Unit.Index, x));
+        }
+        Dictionary<Role, double> FriendlyUnitInfluenceModifier
         {
             get
             {
@@ -39,8 +54,8 @@ namespace ComputerOpponent
                 return _friendlyUnitInfluenceModifier;
             }
         }
-        static Dictionary<Role, double> _friendlyUnitInfluenceModifier;
-        static Dictionary<Role, double> EnemyUnitInfluenceModifier
+        Dictionary<Role, double> _friendlyUnitInfluenceModifier;
+        Dictionary<Role, double> EnemyUnitInfluenceModifier
         {
             get
             {
@@ -59,7 +74,7 @@ namespace ComputerOpponent
             }
         }
 
-        static Dictionary<Role, double> FriendlyStructureInfluence
+        Dictionary<Role, double> FriendlyStructureInfluence
         {
             get
             {
@@ -77,9 +92,9 @@ namespace ComputerOpponent
                 return _friendlyStructureInfluence;
             }
         }
-        static Dictionary<Role, double> _friendlyStructureInfluence;
+        Dictionary<Role, double> _friendlyStructureInfluence;
 
-        static Dictionary<Role, double> EnemyStructureInfluence
+        Dictionary<Role, double> EnemyStructureInfluence
         {
             get
             {
@@ -98,14 +113,13 @@ namespace ComputerOpponent
             }
         }
 
-        public static Dictionary<int, AiMilitaryUnit> AiUnits { get; set; }
-        public static void SetStrategicAction(Board board, List<MilitaryUnit> units)
+        public Dictionary<int, AiMilitaryUnit> AiUnits { get; set; }
+        public void SetStrategicAction(Board board)
         {
-            AiUnits = new Dictionary<int, AiMilitaryUnit>();
-            foreach (var unit in units)
+            foreach (var aiUnit in AiUnits.Values)
             {
+                var unit = aiUnit.Unit;
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                var aiUnit = new AiMilitaryUnit(unit);
                 switch (unit.MovementType)
                 {
                     case MovementType.Airborne:
@@ -128,8 +142,8 @@ namespace ComputerOpponent
                     case MovementType.Land:
                         // Only embark if not already being transported, not in a defensive role, 
                         // and there are no enemy structures or units nearby
-                        if (unit.TransportedBy == null && 
-                                    unit.Role != Role.Defensive &&
+                        if (unit.TransportedBy == null &&
+                                    aiUnit.Role != Role.Defensive &&
                                     !board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex) &&
                                     !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)
                                     )
@@ -159,11 +173,10 @@ namespace ComputerOpponent
                         }
                         break;
                 }
-                AiUnits.Add(aiUnit.Unit.Index, aiUnit);
             }
         }
 
-        public static List<IUnitOrder> CreateOrders(Board board, List<MilitaryUnit> units)
+        public List<IUnitOrder> CreateOrders(Board board, List<MilitaryUnit> units)
         {
             if (units.Any(x => !x.IsAlive))
                 throw new Exception("Cannot assign orders to units that have been destroyed");
@@ -179,7 +192,7 @@ namespace ComputerOpponent
             return unitOrders;
         }
 
-        private static List<IUnitOrder> CreateOrdersForUnit(Board board, List<MilitaryUnit> units, List<IUnitOrder> existingOrders, MilitaryUnit unit)
+        private List<IUnitOrder> CreateOrdersForUnit(Board board, List<MilitaryUnit> units, List<IUnitOrder> existingOrders, MilitaryUnit unit)
         {
             var unitOrders = new List<IUnitOrder>();
 
@@ -189,7 +202,7 @@ namespace ComputerOpponent
             {
                 case StrategicAction.None:
                     {
-                        var moveOrder = FindBestMoveOrderForUnit(unit, board);
+                        var moveOrder = FindBestMoveOrderForUnit(aiUnit, board);
                         if (moveOrder != null)
                             unitOrders.Add(moveOrder);
                         break;
@@ -347,7 +360,7 @@ namespace ComputerOpponent
             return unitOrders;
         }
 
-        private static MilitaryUnit ClosestEmbarkingUnitPath(Board board, List<MilitaryUnit> units, Tile origin)
+        private MilitaryUnit ClosestEmbarkingUnitPath(Board board, List<MilitaryUnit> units, Tile origin)
         {
             var closestUnit = units
                                     .Where(x => AiUnits[x.Index].StrategicAction == StrategicAction.Embark)
@@ -416,7 +429,7 @@ namespace ComputerOpponent
             }
             return null;
         }
-        public static IEnumerable<PathFindTile> ClosestPortPath(Board board, AiMilitaryUnit aiUnit)
+        public IEnumerable<PathFindTile> ClosestPortPath(Board board, AiMilitaryUnit aiUnit)
         {
             var closestPortDistance = int.MaxValue;
             IEnumerable<PathFindTile> closestPort = null;
@@ -462,7 +475,7 @@ namespace ComputerOpponent
 
 
 
-        public static void GenerateInfluenceMaps(Board board, int numberOfPlayers)
+        public void GenerateInfluenceMaps(Board board, int numberOfPlayers)
         {
             var aliveUnits = board.Units.Where(x => x.IsAlive).ToList();
 
@@ -570,7 +583,7 @@ namespace ComputerOpponent
             }
         }
 
-        private static void CalculateAggregateInfluence(Tile tile, int playerIndex, Role role, MovementType movementType)
+        private void CalculateAggregateInfluence(Tile tile, int playerIndex, Role role, MovementType movementType)
         {
             var rmt = new RoleMovementType(movementType, role);
 
@@ -581,8 +594,10 @@ namespace ComputerOpponent
                 + (tile.EnemyStructureInfluence[movementType][playerIndex] * EnemyStructureInfluence[role]);
         }
 
-        public static MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit, Board board)
+        public MoveOrder FindBestMoveOrderForUnit(AiMilitaryUnit aiUnit, Board board)
         {
+            var unit = aiUnit.Unit;
+
             var distance = 4;
             if (unit.MovementPoints > distance)
                 distance += 3;
@@ -594,7 +609,7 @@ namespace ComputerOpponent
 
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => x.AggregateInfluence[unit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unit.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
+                .OrderByDescending(x => x.AggregateInfluence[aiUnit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[aiUnit.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
                 .ToList();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);

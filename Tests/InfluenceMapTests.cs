@@ -44,13 +44,15 @@ namespace Tests
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
 
-            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+            var computerPlayer = new ComputerPlayer(board.Units);
+
+            computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
             var moveOrders = new List<IUnitOrder>();
 
             board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
             {
-                var moveOrder = ComputerPlayer.FindBestMoveOrderForUnit(x, board);
+                var moveOrder = computerPlayer.FindBestMoveOrderForUnit(computerPlayer.AiUnits[x.Index], board);
                 if (moveOrder != null)
                     moveOrders.Add(moveOrder);
             });
@@ -58,11 +60,11 @@ namespace Tests
             var vectors = new List<Centreline>();
             moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveOrders(moveOrders);
 
-            Visualise.GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
         }
 
         [TestMethod]
@@ -74,27 +76,29 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
-                new MilitaryUnit(ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
-                new MilitaryUnit(ownerIndex: 0, location: board[31], movementType: MovementType.Land),
-                new MilitaryUnit(ownerIndex: 0, location: board[56], movementType: MovementType.Land),
-                new MilitaryUnit(ownerIndex: 0, location: board[65], movementType: MovementType.Land),
+                new MilitaryUnit(0, ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
+                new MilitaryUnit(1, ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
+                new MilitaryUnit(2, ownerIndex: 0, location: board[31], movementType: MovementType.Land),
+                new MilitaryUnit(3, ownerIndex: 0, location: board[56], movementType: MovementType.Land),
+                new MilitaryUnit(4, ownerIndex: 0, location: board[65], movementType: MovementType.Land),
 
-                new MilitaryUnit(ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(ownerIndex: 1, location: board[168]),
+                new MilitaryUnit(5, ownerIndex: 1, location: board[111]),
+                new MilitaryUnit(6, ownerIndex: 1, location: board[111]),
+                new MilitaryUnit(7, ownerIndex: 1, location: board[168]),
             };
 
-            ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+
+            var computerPlayer = new ComputerPlayer(board.Units);
+            computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
             var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4, board.Width, board.Height);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => x.AggregateInfluence[board.Units[1].RoleMovementType][board.Units[1].OwnerIndex])
+                .OrderByDescending(x => x.AggregateInfluence[computerPlayer.AiUnits[1].RoleMovementType][board.Units[1].OwnerIndex])
                 .ToList();
 
             var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(board.Units[1]);

@@ -23,18 +23,16 @@ namespace Tests
             var board = new Board(GameBoard, TileEdges, Structures);
             var labels = new string[board.Width, board.Height];
 
-            var units = new List<MilitaryUnit>
+            board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
-
-                new MilitaryUnit(1, ownerIndex: 1, location: board[18, 7], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true),
+                new MilitaryUnit(1, ownerIndex: 1, location: board[18, 7], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true),
             };
 
-            board.Units = units;
+            var computerPlayer = new ComputerPlayer(board.Units);
+            computerPlayer.SetStrategicAction(board);
 
-            ComputerPlayer.SetStrategicAction(board, units);
-
-            Assert.AreEqual(StrategicAction.None, ComputerPlayer.StrategicActions[units[0]]);
+            Assert.AreEqual(StrategicAction.None, computerPlayer.AiUnits[0].StrategicAction);
         }
 
         [TestMethod]
@@ -45,14 +43,15 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true),
             };
 
             board.Units = units;
 
-            ComputerPlayer.SetStrategicAction(board, units);
+            var computerPlayer = new ComputerPlayer(board.Units);
+            computerPlayer.SetStrategicAction(board);
 
-            Assert.AreEqual(StrategicAction.Dock, ComputerPlayer.StrategicActions[units[0]]);
+            Assert.AreEqual(StrategicAction.Dock, computerPlayer.AiUnits[units[0].Index].StrategicAction);
         }
 
 
@@ -64,18 +63,18 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true),
                 new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
 
-
-                new MilitaryUnit(0, ownerIndex: 1, location: board[25, 12], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(2, ownerIndex: 1, location: board[25, 12], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true),
             };
 
             board.Units = units;
 
-            ComputerPlayer.SetStrategicAction(board, units);
+            var computerPlayer = new ComputerPlayer(board.Units);
+            computerPlayer.SetStrategicAction(board);
 
-            Assert.AreEqual(StrategicAction.None, ComputerPlayer.StrategicActions[units[0]]);
+            Assert.AreEqual(StrategicAction.None, computerPlayer.AiUnits[units[0].Index].StrategicAction);
         }
 
         [TestMethod]
@@ -86,16 +85,16 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
+                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true),
                 new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
-
             };
 
             board.Units = units;
 
-            ComputerPlayer.SetStrategicAction(board, units);
+            var computerPlayer = new ComputerPlayer(board.Units);
+            computerPlayer.SetStrategicAction(board);
 
-            Assert.AreEqual(StrategicAction.Pickup, ComputerPlayer.StrategicActions[units[0]]);
+            Assert.AreEqual(StrategicAction.Pickup, computerPlayer.AiUnits[units[0].Index].StrategicAction);
         }
     }
 }

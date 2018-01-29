@@ -13,11 +13,19 @@ namespace ComputerOpponent
         {
             Unit = unit;
             Role = Role.Balanced;
-            RoleMovementType = new RoleMovementType(Unit.MovementType, Role);
             StrategicAction = StrategicAction.None;
         }
         public MilitaryUnit Unit;
-        public Role Role;
+        public Role Role
+        {
+            get { return _role; }
+            set {
+                _role = value;
+                RoleMovementType = new RoleMovementType(Unit.MovementType, Role);
+            }
+        }
+        Role _role;
+
         public StrategicAction StrategicAction;
         public RoleMovementType RoleMovementType { get; set; }
     }

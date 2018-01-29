@@ -30,7 +30,7 @@ namespace Tests
             var aiUnits = new List<AiMilitaryUnit>
             {
                 new AiMilitaryUnit(new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true)) { Role = Role.Besieger },
-                new AiMilitaryUnit(new MilitaryUnit(1, location: board[18, 0], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true)) { Role = Role.Besieger },
+                new AiMilitaryUnit(new MilitaryUnit(1, location: board[3, 10], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true)) { Role = Role.Besieger },
                 new AiMilitaryUnit(new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1)),
                 new AiMilitaryUnit(new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water })) { Role = Role.Defensive },
                 new AiMilitaryUnit(new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water })) { Role = Role.Besieger },
@@ -43,7 +43,7 @@ namespace Tests
 
             var computerPlayer = new ComputerPlayer(aiUnits);
 
-            for (board.Turn = 0; board.Turn < 10; board.Turn++)
+            for (board.Turn = 0; board.Turn < 30; board.Turn++)
             {
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
@@ -211,7 +211,7 @@ namespace Tests
 
             var computerPlayer = new ComputerPlayer(aiUnits);
 
-            for (var turn = 0; turn < 30; turn++)
+            for (var turn = 0; turn < 25; turn++)
             {
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 

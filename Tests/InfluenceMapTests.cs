@@ -52,7 +52,7 @@ namespace Tests
 
             board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
             {
-                var moveOrder = computerPlayer.FindBestMoveOrderForUnit(x, board);
+                var moveOrder = computerPlayer.FindBestMoveOrderForUnit(computerPlayer.AiUnits[x.Index], board);
                 if (moveOrder != null)
                     moveOrders.Add(moveOrder);
             });
@@ -76,15 +76,15 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
-                new MilitaryUnit(ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
-                new MilitaryUnit(ownerIndex: 0, location: board[31], movementType: MovementType.Land),
-                new MilitaryUnit(ownerIndex: 0, location: board[56], movementType: MovementType.Land),
-                new MilitaryUnit(ownerIndex: 0, location: board[65], movementType: MovementType.Land),
+                new MilitaryUnit(0, ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
+                new MilitaryUnit(1, ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
+                new MilitaryUnit(2, ownerIndex: 0, location: board[31], movementType: MovementType.Land),
+                new MilitaryUnit(3, ownerIndex: 0, location: board[56], movementType: MovementType.Land),
+                new MilitaryUnit(4, ownerIndex: 0, location: board[65], movementType: MovementType.Land),
 
-                new MilitaryUnit(ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(ownerIndex: 1, location: board[168]),
+                new MilitaryUnit(5, ownerIndex: 1, location: board[111]),
+                new MilitaryUnit(6, ownerIndex: 1, location: board[111]),
+                new MilitaryUnit(7, ownerIndex: 1, location: board[168]),
             };
 
 

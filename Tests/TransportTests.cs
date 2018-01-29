@@ -27,30 +27,32 @@ namespace Tests
             var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
-            var units = new List<MilitaryUnit>
+            var aiUnits = new List<AiMilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true, role: Role.Besieger),
-                new MilitaryUnit(1, location: board[18, 0], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true, role: Role.Besieger),
-                new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
-                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Defensive),
-                new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
+                new AiMilitaryUnit(new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true)) { Role = Role.Besieger },
+                new AiMilitaryUnit(new MilitaryUnit(1, location: board[18, 0], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true)) { Role = Role.Besieger },
+                new AiMilitaryUnit(new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1)),
+                new AiMilitaryUnit(new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water })) { Role = Role.Defensive },
+                new AiMilitaryUnit(new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water })) { Role = Role.Besieger },
             };
 
-            units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;
-            units[3].EdgeMovementCosts[EdgeType.River] = 0;
+            aiUnits[3].Unit.TerrainMovementCosts[TerrainType.Wetland] = 1;
+            aiUnits[3].Unit.EdgeMovementCosts[EdgeType.River] = 0;
 
-            board.Units = units;
+            board.Units = aiUnits.Select(x => x.Unit).ToList();
+
+            var computerPlayer = new ComputerPlayer(aiUnits);
 
             for (board.Turn = 0; board.Turn < 10; board.Turn++)
             {
-                ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+                computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
-                units = units.Where(x => x.IsAlive).ToList();
-                ComputerPlayer.SetStrategicAction(board, units);
-                var moveOrders = ComputerPlayer.CreateOrders(board, units);
+                var units = board.Units.Where(x => x.IsAlive).ToList();
+                computerPlayer.SetStrategicAction(board);
+                var moveOrders = computerPlayer.CreateOrders(board, units);
 
                 var lines = new List<Centreline>();
                 moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
@@ -92,7 +94,7 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true, role: Role.Defensive),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
             };
 
             board.Units = units;
@@ -127,7 +129,7 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[1, 1], name: "1st Dragoons", roadMovementBonus: 1),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true, role: Role.Defensive),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true),
             };
 
             board.Units = units;
@@ -154,7 +156,7 @@ namespace Tests
             var units = new List<MilitaryUnit>
             {
                 new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true, role: Role.Defensive),
+                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
             };
 
             board.Units = units;
@@ -192,29 +194,33 @@ namespace Tests
             var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
-            var units = new List<MilitaryUnit>
+            var aiUnits = new List<AiMilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true, role: Role.Besieger),
-                new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
-                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Defensive),
-                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }, role: Role.Besieger),
+                new AiMilitaryUnit(new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true)),
+                new AiMilitaryUnit(new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1)),
+                new AiMilitaryUnit(new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne })) { Role = Role.Defensive },
+                new AiMilitaryUnit(new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne })),
             };
 
-            units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
-            units[2].EdgeMovementCosts[EdgeType.River] = 0;
+            aiUnits[2].Unit.TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            aiUnits[2].Unit.EdgeMovementCosts[EdgeType.River] = 0;
+
+            var units = aiUnits.Select(x => x.Unit).ToList();
 
             board.Units = units;
 
-            for (var turn = 0; turn < 25; turn++)
+            var computerPlayer = new ComputerPlayer(aiUnits);
+
+            for (var turn = 0; turn < 30; turn++)
             {
-                ComputerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+                computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
-                ComputerPlayer.SetStrategicAction(board, units);
-                var unitOrders = ComputerPlayer.CreateOrders(board, units);
+                computerPlayer.SetStrategicAction(board);
+                var unitOrders = computerPlayer.CreateOrders(board, units);
 
                 var lines = new List<Centreline>();
                 unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));

@@ -118,6 +118,8 @@ namespace ComputerOpponent
         {
             foreach (var aiUnit in AiUnits.Values)
             {
+                aiUnit.StrategicAction = StrategicAction.None;
+
                 var unit = aiUnit.Unit;
                 var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
                 switch (unit.MovementType)

@@ -170,7 +170,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[4, 3], transportableBy: new List<MovementType> { MovementType.Water }, role: Role.Besieger),
+                new MilitaryUnit(location: board[4, 3], transportableBy: new List<MovementType> { MovementType.Water }),
             };
 
             var moves = units[0].PossibleMoves();
@@ -545,9 +545,10 @@ namespace Tests
                 new MilitaryUnit(1, location: board[224], movementType: MovementType.Water, isTransporter: true),
             };
 
-            ComputerPlayer.SetStrategicAction(board, board.Units);
+            var computerPlayer = new ComputerPlayer(board.Units);
+            computerPlayer.SetStrategicAction(board);
 
-            var unitOrders = ComputerPlayer.CreateOrders(board, board.Units);
+            var unitOrders = computerPlayer.CreateOrders(board, board.Units);
             board.ResolveOrders(unitOrders);
 
             //var lines = new List<Centreline>();

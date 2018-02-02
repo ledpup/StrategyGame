@@ -121,14 +121,15 @@ namespace ComputerOpponent
                 aiUnit.StrategicAction = StrategicAction.None;
 
                 var unit = aiUnit.Unit;
-                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
+                //var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
                 switch (unit.MovementType)
                 {
                     case MovementType.Airborne:
                         // If there are any enemy land or airborne units that are nearby, don't do pickup or airlift
                         if (board.Units.Any(x => x.OwnerIndex != unit.OwnerIndex &&
                                     (x.MovementType == MovementType.Land || x.MovementType == MovementType.Airborne) &&
-                                    ShortestPathDistance(pathFindTiles, unit.Location.Hex, x.Location.Hex, unit.MovementPoints) < unit.MovementPoints * 1.5))
+                                    (unit.Location == x.Location 
+                                    || ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5)))
                         {
                             break;
                         }
@@ -161,7 +162,7 @@ namespace ComputerOpponent
                         // If there are any enemy units nearby, don't dock or transport to destination
                         if (board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId
                                             && x.OwnerIndex != unit.OwnerIndex
-                                            && ShortestPathDistance(pathFindTiles, unit.Location.Hex, x.Location.Hex, unit.MovementPoints) < unit.MovementPoints * 1.5))
+                                            && ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5))
                         {
                             break;
                         }
@@ -642,6 +643,12 @@ namespace ComputerOpponent
             return path.Count();
         }
 
-
+        public static int ShortestPathDistance(Tile origin, Tile destination, MilitaryUnit unit)
+        {
+            var path = Board.FindShortestPathDynamic(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
+            if (path == null)
+                return int.MaxValue;
+            return path.Count();
+        }
     }
 }

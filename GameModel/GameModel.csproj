@@ -48,8 +48,10 @@
     <Compile Include="CalculateRange.cs" />
     <Compile Include="CasualtyLogEntry.cs" />
     <Compile Include="CombatantInBattle.cs" />
+    <Compile Include="IHasNeighbours2.cs" />
     <Compile Include="IUnitOrder.cs" />
-    <Compile Include="PathFind.cs" />
+    <Compile Include="PathFind2.cs" />
+    <Compile Include="PathFindTile2.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="MoraleChangeEvent.cs" />
     <Compile Include="MoveOrder.cs" />

@@ -297,9 +297,9 @@ namespace GameModel
                         Edge neighbour;
 
                         if (edge != null)
-                            neighbour = new Edge(edge.EdgeType, this[Hex.HexToIndex(hex, Width, Height)], this[neighbourX, neighbourY], edge.HasRoad);
+                            neighbour = new Edge(edge.EdgeType, this[Hex.HexToIndex(tile.Hex, Width, Height)], this[neighbourX, neighbourY], edge.HasRoad);
                         else
-                            neighbour = new Edge(EdgeType.None, this[Hex.HexToIndex(hex, Width, Height)], this[neighbourX, neighbourY], false);
+                            neighbour = new Edge(EdgeType.None, this[Hex.HexToIndex(tile.Hex, Width, Height)], this[neighbourX, neighbourY], false);
 
                         neighbours.Add(neighbour);
                     }
@@ -436,32 +436,7 @@ namespace GameModel
             return pathFindTiles;
         }
 
-        public static PathFindTile PathFindTilesForLocationAndNeighbours(Tile location, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
-        {
-            var pathFindTile = new PathFindTile(location.Hex);
 
-            var neighbours = new List<PathFindTile>();
-
-            foreach (var edge in location.Neighbours)
-            {
-                var moveCost = edge.MoveCost(usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts);
-
-                if (moveCost < Terrain.Impassable)
-                {
-                    var neighbourPathFindTile = new PathFindTile(edge.Destination.Hex);
-
-                    pathFindTile.Neighbours.Add(neighbourPathFindTile);
-
-                    pathFindTile.MoveCost[neighbourPathFindTile] = moveCost;
-
-                    // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
-                    neighbourPathFindTile.HasCumulativeCost = !canStopOn.HasFlag(edge.Destination.TerrainType);
-                }
-            };
-            
-
-            return pathFindTile;
-        }
 
         public void ResolveOrders(List<IUnitOrder> unitOrders)
         {
@@ -828,16 +803,18 @@ namespace GameModel
             return path == null || path.Count() == 1 ? null : path.Reverse();
         }
 
-        public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Hex destination, int maxCumulativeCost, bool usesRoads, 
+        public static IEnumerable<PathFindTile2> FindShortestPathDynamic(Tile origin, Tile destination, int maxCumulativeCost, bool usesRoads, 
                                                                     bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, 
                                                                     Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
         {
-            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
-            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.Q - destination.q, 2) + Math.Pow(t.R - destination.r, 2));
+            var ori = new PathFindTile2(origin.Hex, origin.Neighbours);
+            var dest = new PathFindTile2(destination.Hex, destination.Neighbours);
 
-            var startPathFindTile = Board.PathFindTilesForLocationAndNeighbours(origin, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
+            Func<PathFindTile2, PathFindTile2, double> distance = (node1, node2) => node1.MoveCost[node2.Hex];
+            Func<PathFindTile2, double> estimate = t => Math.Sqrt(Math.Pow(t.Q - dest.Q, 2) + Math.Pow(t.R - dest.R, 2));
 
-            var path = PathFind2.FindPath(startPathFindTile, destination, distance, estimate, maxCumulativeCost, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
+
+            var path = PathFind2.FindPath2(ori, dest, distance, estimate, maxCumulativeCost, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
 
             return path == null || path.Count() == 1 ? null : path.Reverse();
         }

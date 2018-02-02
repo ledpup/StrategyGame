@@ -36,7 +36,5 @@ namespace PathFind
         {
             return GetEnumerator();
         }
-
-        
     }
 }

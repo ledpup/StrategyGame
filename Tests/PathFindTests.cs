@@ -55,6 +55,38 @@ namespace Tests
         }
 
         [TestMethod]
+        public void LandUnitPathFindDynamic()
+        {
+            var board = new Board(GameBoard, TileEdges);
+
+            var unit = new MilitaryUnit(location: board[1, 1]);
+
+            var shortestPath = Board.FindShortestPathDynamic(board[1, 1], board[194], unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn)
+
+                .Select(x => new PathFindTile(x.Hex))
+                .ToArray();
+
+            var lines = new List<Centreline>();
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
+            GameBoardRenderer.RenderAndSave("LandUnitPathFindDynamic.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
+
+            Assert.AreEqual(10, shortestPath.Length);
+
+            Assert.AreEqual(shortestPath[0].Hex, new Hex(1, 1)); // Origin
+
+            Assert.AreEqual(shortestPath[1].Hex, new Hex(2, 1));
+            Assert.AreEqual(shortestPath[2].Hex, new Hex(3, 1));
+            Assert.AreEqual(shortestPath[3].Hex, new Hex(4, 1));
+            Assert.AreEqual(shortestPath[4].Hex, new Hex(5, 1)); // There is a road over the mountain
+            Assert.AreEqual(shortestPath[5].Hex, new Hex(6, 1));
+            Assert.AreEqual(shortestPath[6].Hex, new Hex(6, 2));
+            Assert.AreEqual(shortestPath[7].Hex, new Hex(5, 3));
+            Assert.AreEqual(shortestPath[8].Hex, new Hex(5, 4));
+
+            Assert.AreEqual(shortestPath[9].Hex, new Hex(5, 5)); // Destination
+        }
+
+        [TestMethod]
         public void LandUnitNoPathToDestination()
         {
             var board = new Board(GameBoard, TileEdges);

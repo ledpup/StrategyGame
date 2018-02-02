@@ -24,6 +24,9 @@ namespace GameModel
         {
             EdgeType = edgeType;
 
+            if (origin.Hex.Equals(destination.Hex))
+                throw new Exception($"Origin and destination tiles are the same ({origin.Hex})");
+
             Origin = origin;
             Destination = destination;
 

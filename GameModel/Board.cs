@@ -562,10 +562,10 @@ namespace GameModel
                 // Don't move a land unit onto a water time unless there is a transport there that can take it
                 unitStepMoves.Where((KeyValuePair<MilitaryUnit, Move> x) => x.Value.Edge.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
                     .ToList()
-                    .ForEach((Action<KeyValuePair<MilitaryUnit, Move>>)((KeyValuePair<MilitaryUnit, Move> x) => 
+                    .ForEach((KeyValuePair<MilitaryUnit, Move> x) =>
                     {
                         var transportedUnit = x.Key;
-                        var transports = Units.Where((Func<MilitaryUnit, bool>)(y => (bool)(y.MovementType == MovementType.Water && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)))).OrderBy(y => y.TransportSize);
+                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
                         var transport = transports.FirstOrDefault();
                         if (transport != null)
                         {
@@ -576,7 +576,7 @@ namespace GameModel
                         {
                             removeUnitMoves.Add(x.Key, x.Value);
                         }
-                    }));
+                    });
 
                 removeUnitMoves.Keys.ToList().ForEach(x => unitStepMoves.Remove(x));
 

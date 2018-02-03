@@ -12,14 +12,33 @@ using Visualise;
 
 namespace Tests
 {
-    
-
     [TestClass]
     public class PathFindTests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
         static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
+        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
+        [TestMethod]
+        public void VisualisePathfind()
+        {
+            var board = new Board(GameBoard, TileEdges, Structures);
+
+            var unit = new MilitaryUnit(location: board[1, 1]);
+
+            var lines = new List<Centreline>();
+
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(board[28], board[196], unit)));
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(board[91], board[175], unit)));
+
+            var labels = new string[board.Width * board.Height];
+            for (var i = 0; i < board.TileArray.Length; i++)
+            {
+                labels[i] = i.ToString();
+            }
+
+            GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, lines);
+        }
 
         [TestMethod]
         public void LandUnitPathFind()
@@ -28,11 +47,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[1, 1]);
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-
-            Assert.AreEqual(513, pathFindTiles.Count);
-
-            var shortestPath = Board.FindShortestPath(pathFindTiles, new Hex(1, 1), new Hex(5, 5), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(board[1, 1], board[194], unit).ToArray();
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -40,50 +55,18 @@ namespace Tests
 
             Assert.AreEqual(10, shortestPath.Length);
 
-            Assert.AreEqual(shortestPath[0].Hex, new Hex(1, 1)); // Origin
+            Assert.AreEqual(new Hex(1, 1), shortestPath[0].Hex); // Origin
 
-            Assert.AreEqual(shortestPath[1].Hex, new Hex(2, 1));
-            Assert.AreEqual(shortestPath[2].Hex, new Hex(3, 1));
-            Assert.AreEqual(shortestPath[3].Hex, new Hex(4, 1));
-            Assert.AreEqual(shortestPath[4].Hex, new Hex(5, 1)); // There is a road over the mountain
-            Assert.AreEqual(shortestPath[5].Hex, new Hex(6, 1));
-            Assert.AreEqual(shortestPath[6].Hex, new Hex(6, 2));
-            Assert.AreEqual(shortestPath[7].Hex, new Hex(5, 3));
-            Assert.AreEqual(shortestPath[8].Hex, new Hex(5, 4));
+            Assert.AreEqual(new Hex(2, 1), shortestPath[1].Hex);
+            Assert.AreEqual(new Hex(3, 1), shortestPath[2].Hex);
+            Assert.AreEqual(new Hex(4, 1), shortestPath[3].Hex);
+            Assert.AreEqual(new Hex(5, 1), shortestPath[4].Hex); // There is a road over the mountain
+            Assert.AreEqual(new Hex(6, 1), shortestPath[5].Hex);
+            Assert.AreEqual(new Hex(6, 2), shortestPath[6].Hex);
+            Assert.AreEqual(new Hex(5, 3), shortestPath[7].Hex);
+            Assert.AreEqual(new Hex(5, 4), shortestPath[8].Hex);
 
-            Assert.AreEqual(shortestPath[9].Hex, new Hex(5, 5)); // Destination
-        }
-
-        [TestMethod]
-        public void LandUnitPathFindDynamic()
-        {
-            var board = new Board(GameBoard, TileEdges);
-
-            var unit = new MilitaryUnit(location: board[1, 1]);
-
-            var shortestPath = Board.FindShortestPathDynamic(board[1, 1], board[194], unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn)
-
-                .Select(x => new PathFindTile(x.Hex))
-                .ToArray();
-
-            var lines = new List<Centreline>();
-            lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            GameBoardRenderer.RenderAndSave("LandUnitPathFindDynamic.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
-
-            Assert.AreEqual(10, shortestPath.Length);
-
-            Assert.AreEqual(shortestPath[0].Hex, new Hex(1, 1)); // Origin
-
-            Assert.AreEqual(shortestPath[1].Hex, new Hex(2, 1));
-            Assert.AreEqual(shortestPath[2].Hex, new Hex(3, 1));
-            Assert.AreEqual(shortestPath[3].Hex, new Hex(4, 1));
-            Assert.AreEqual(shortestPath[4].Hex, new Hex(5, 1)); // There is a road over the mountain
-            Assert.AreEqual(shortestPath[5].Hex, new Hex(6, 1));
-            Assert.AreEqual(shortestPath[6].Hex, new Hex(6, 2));
-            Assert.AreEqual(shortestPath[7].Hex, new Hex(5, 3));
-            Assert.AreEqual(shortestPath[8].Hex, new Hex(5, 4));
-
-            Assert.AreEqual(shortestPath[9].Hex, new Hex(5, 5)); // Destination
+            Assert.AreEqual(new Hex(5, 5), shortestPath[9].Hex); // Destination
         }
 
         [TestMethod]
@@ -93,8 +76,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[1, 1]);
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, new Hex(4, 7), unit.MovementPoints);
+            var shortestPath = Board.FindShortestPath(unit.Location, board[247], unit);
 
             Assert.IsNull(shortestPath);
         }
@@ -106,8 +88,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true);
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, new Hex(21, 0), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(unit.Location, board[291], unit).ToArray();
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -133,8 +114,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[24, 15], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, new Hex(14, 6), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(unit.Location, board[365], unit).ToArray();
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -162,8 +142,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[19, 13], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, new Hex(14, 6), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(unit.Location, board[365], unit).ToArray();
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -191,8 +170,7 @@ namespace Tests
 
             var unit = new MilitaryUnit(location: board[119], movementType: MovementType.Airborne, baseMovementPoints: 5, isTransporter: true);
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, new Hex(14, -4), unit.MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(unit.Location, board[95], unit).ToArray();
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));

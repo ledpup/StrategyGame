@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GameModel
 {
-    public interface IHasNeighbours2<N>
+    public interface IHasNeighbours<N>
     {
         Hex Hex { get; }
         List<N> Neighbours { get; }

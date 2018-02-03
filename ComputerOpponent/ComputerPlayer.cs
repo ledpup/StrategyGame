@@ -228,8 +228,7 @@ namespace ComputerOpponent
 
                             if (closestAvailableAirborneUnitPath.Path != null)
                             {
-                                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                                var pathToAirbornUnit = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, transporter.Location.Hex, unit.MovementPoints);
+                                var pathToAirbornUnit = Board.FindShortestPath(unit.Location, transporter.Location, unit);
                                 Tile transporteeMoveOrderDesintation = null;
                                 if (pathToAirbornUnit != null)
                                 {
@@ -260,7 +259,8 @@ namespace ComputerOpponent
                     }
                     else
                     {
-                        var moveOrder = unit.GetMoveOrderToDestination(closestPortPath.Last().Hex, board);
+                        var dest = board[Hex.HexToIndex(closestPortPath.Last().Hex, board.Width, board.Height)];
+                        var moveOrder = unit.GetMoveOrderToDestination(dest, board);
                         if (moveOrder != null)
                             unitOrders.Add(moveOrder);
                     }
@@ -297,7 +297,8 @@ namespace ComputerOpponent
 
                             if (closestPortPath != null)
                             {
-                                var moveOrder = unit.GetMoveOrderToDestination(closestPortPath.Last().Hex, board);
+                                var dest = board[Hex.HexToIndex(closestPortPath.Last().Hex, board.Width, board.Height)];
+                                var moveOrder = unit.GetMoveOrderToDestination(dest, board);
                                 if (moveOrder != null)
                                     unitOrders.Add(moveOrder);
                             }
@@ -311,7 +312,8 @@ namespace ComputerOpponent
 
                         if (closestPortPath != null)
                         {
-                            var moveOrder = unit.GetMoveOrderToDestination(closestPortPath.Last().Hex, board);
+                            var dest = board[Hex.HexToIndex(closestPortPath.Last().Hex, board.Width, board.Height)];
+                            var moveOrder = unit.GetMoveOrderToDestination(dest, board);
                             if (moveOrder != null)
                                 unitOrders.Add(moveOrder);
                         }
@@ -324,17 +326,16 @@ namespace ComputerOpponent
 
                         if (closestUnit != null)
                         {
-                            var destination = closestUnit.Location.Hex;
+                            var destination = closestUnit.Location;
 
                             var transporteeMoveOrder = existingOrders.OfType<MoveOrder>().SingleOrDefault(x => x.Unit == closestUnit);
                             if (transporteeMoveOrder != null)
                             {
-                                destination = transporteeMoveOrder.Moves.Last().Edge.Destination.Hex;
+                                destination = transporteeMoveOrder.Moves.Last().Edge.Destination;
                             }
 
                             // Move transport unit to the destination of the transportee's move order or just to the transportee's location
-                            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, destination, unit.MovementPoints);
+                            var pathToTransporteesDestination = Board.FindShortestPath(unit.Location, destination, unit);
                             if (pathToTransporteesDestination != null)
                                 unitOrders.Add(unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
 
@@ -401,8 +402,7 @@ namespace ComputerOpponent
                     return new UnitAndPath { Unit = potentialPickupUnit };
                 }
 
-                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(potentialPickupUnit);
-                var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, potentialPickupUnit.Location.Hex, potentialPickupUnit.MovementPoints);
+                var shortestPath = Board.FindShortestPath(unit.Location, potentialPickupUnit.Location, potentialPickupUnit);
                 if (shortestPath != null)
                 {
                     return new UnitAndPath { Unit = potentialPickupUnit, Path = shortestPath };
@@ -423,8 +423,7 @@ namespace ComputerOpponent
 
             foreach (var enemyStructure in structures)
             { 
-                var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-                var shortestPath = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, enemyStructure.Location.Hex, unit.MovementPoints);
+                var shortestPath = Board.FindShortestPath(unit.Location, enemyStructure.Location, unit);
                 if (shortestPath != null)
                 {
                     return shortestPath;
@@ -454,8 +453,7 @@ namespace ComputerOpponent
                                 break;
                         }
 
-                        var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(aiUnit.Unit);
-                        var shortestPath = Board.FindShortestPath(pathFindTiles, (Hex)aiUnit.Unit.Location.Hex, (Hex)x.Hex, aiUnit.Unit.MovementPoints);
+                        var shortestPath = Board.FindShortestPath(aiUnit.Unit.Location, x, aiUnit.Unit);
                         if (shortestPath != null)
                         {
                             var distance = shortestPath.Count();
@@ -615,12 +613,13 @@ namespace ComputerOpponent
                 .OrderByDescending(x => x.AggregateInfluence[aiUnit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[aiUnit.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
                 .ToList();
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, tile.Hex, unit.MovementPoints);
+                if (unit.Location.Equals(tile))
+                    continue;
+
+                bestPossibleDestination = Board.FindShortestPath(unit.Location, tile, unit);
                 if (bestPossibleDestination != null)
                     break;
             }
@@ -634,18 +633,9 @@ namespace ComputerOpponent
         }
 
 
-
-        public static int ShortestPathDistance(List<PathFindTile> pathFindTiles, Hex origin, Hex destination, int maxCumulativeCost)
-        {
-            var path = Board.FindShortestPath(pathFindTiles, origin, destination, maxCumulativeCost);
-            if (path == null)
-                return int.MaxValue;
-            return path.Count();
-        }
-
         public static int ShortestPathDistance(Tile origin, Tile destination, MilitaryUnit unit)
         {
-            var path = Board.FindShortestPathDynamic(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
+            var path = Board.FindShortestPath(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
             if (path == null)
                 return int.MaxValue;
             return path.Count();

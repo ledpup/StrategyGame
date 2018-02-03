@@ -7,9 +7,9 @@ using System.Text;
 
 namespace GameModel
 {
-    public static class PathFind2
+    public static class PathFind
     {
-        public static Path<Node> FindPath2<Node>(
+        public static Path<Node> FindPath<Node>(
             Node origin,
             Node destination,
             Func<Node, Node, double> distance,
@@ -20,7 +20,7 @@ namespace GameModel
             Dictionary<EdgeType, int> edgeMovementCosts,
             Dictionary<TerrainType, int> terrainMovementCosts,
             TerrainType canStopOn)
-            where Node : IHasNeighbours2<Node>
+            where Node : IHasNeighbours<Node>
         {
             if (origin.Hex.Equals(destination.Hex))
             {

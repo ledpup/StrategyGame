@@ -400,44 +400,6 @@ namespace GameModel
 
         public List<Edge> Edges;
 
-        public List<PathFindTile> ValidMovesWithMoveCostsForUnit(MilitaryUnit unit)
-        {
-            var pathFindTiles = new List<PathFindTile>();
-            Tiles.ToList().ForEach(x => pathFindTiles.Add(new PathFindTile(x.Hex)));
-
-            foreach (var pathFindTile in pathFindTiles)
-            {
-                pathFindTile.Neighbours = new List<PathFindTile>();
-
-                var index = Hex.HexToIndex(pathFindTile.Hex, Width, Height);
-
-                var originTile = this[index];
-
-                foreach(var neighbour in originTile.Neighbours)
-                {
-                    var moveCost = neighbour.MoveCost(unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts);
-
-                    if (moveCost < Terrain.Impassable)
-                    {
-                        var neighbourPathFindTile = pathFindTiles.Single(y => y.Hex == neighbour.Destination.Hex);
-
-                        pathFindTile.Neighbours.Add(neighbourPathFindTile);
-
-                        pathFindTile.MoveCost[neighbourPathFindTile] = moveCost;
-
-                        // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
-                        neighbourPathFindTile.HasCumulativeCost = !unit.CanStopOn.HasFlag(neighbour.Destination.TerrainType);
-                    }
-                };
-
-                // = neighbours;
-            }
-
-            return pathFindTiles;
-        }
-
-
-
         public void ResolveOrders(List<IUnitOrder> unitOrders)
         {
             ResolveTransportOrders(unitOrders);
@@ -790,31 +752,22 @@ namespace GameModel
             }
         }
 
-        public static IEnumerable<PathFindTile> FindShortestPath(List<PathFindTile> pathFindTiles, Hex origin, Hex destination, int maxCumulativeCost)
+        public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Tile destination, MilitaryUnit unit)
         {
-            var ori = pathFindTiles.Single(x => x.Q == origin.q && x.R == origin.r);
-            var dest = pathFindTiles.Single(x => x.Q == destination.q && x.R == destination.r);
-
-            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
-            Func<PathFindTile, double> estimate = t => Hex.Distance(t.Hex, destination);
-
-            var path = PathFind.PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost);
-
-            return path == null || path.Count() == 1 ? null : path.Reverse();
+            return FindShortestPath(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
         }
 
-        public static IEnumerable<PathFindTile2> FindShortestPathDynamic(Tile origin, Tile destination, int maxCumulativeCost, bool usesRoads, 
+        public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Tile destination, int maxCumulativeCost, bool usesRoads, 
                                                                     bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, 
                                                                     Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
         {
-            var ori = new PathFindTile2(origin.Hex, origin.Neighbours);
-            var dest = new PathFindTile2(destination.Hex, destination.Neighbours);
+            var ori = new PathFindTile(origin.Hex, origin.Neighbours);
+            var dest = new PathFindTile(destination.Hex, destination.Neighbours);
 
-            Func<PathFindTile2, PathFindTile2, double> distance = (node1, node2) => node1.MoveCost[node2.Hex];
-            Func<PathFindTile2, double> estimate = t => Math.Sqrt(Math.Pow(t.Q - dest.Q, 2) + Math.Pow(t.R - dest.R, 2));
+            Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2.Hex];
+            Func<PathFindTile, double> estimate = t => Math.Sqrt(Math.Pow(t.Q - dest.Q, 2) + Math.Pow(t.R - dest.R, 2));
 
-
-            var path = PathFind2.FindPath2(ori, dest, distance, estimate, maxCumulativeCost, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
+            var path = PathFind.FindPath(ori, dest, distance, estimate, maxCumulativeCost, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
 
             return path == null || path.Count() == 1 ? null : path.Reverse();
         }

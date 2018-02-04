@@ -12,9 +12,6 @@ namespace GameModel
     {
         public Hex Hex { get; set; }
         public List<Edge> Edges { get; set; }
-        public int Q { get { return Hex.q; } }
-        public int R { get { return Hex.r; } }
-
         public List<PathFindTile> Neighbours { get; set; }
         public Dictionary<Hex, double> MoveCost { get; set; }
         public bool HasCumulativeCost { get; set; }
@@ -58,7 +55,7 @@ namespace GameModel
 
         public override string ToString()
         {
-            return $"{Q}, {R}";
+            return $"{Hex.q}, {Hex.r}";
         }
     }
 }

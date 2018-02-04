@@ -334,6 +334,10 @@ namespace ComputerOpponent
                                 destination = transporteeMoveOrder.Moves.Last().Edge.Destination;
                             }
 
+                            
+                            if (unit.Location == destination)
+                                break;
+
                             // Move transport unit to the destination of the transportee's move order or just to the transportee's location
                             var pathToTransporteesDestination = Board.FindShortestPath(unit.Location, destination, unit);
                             if (pathToTransporteesDestination != null)
@@ -435,7 +439,7 @@ namespace ComputerOpponent
         {
             var closestPortDistance = int.MaxValue;
             IEnumerable<PathFindTile> closestPort = null;
-            board.Tiles.ToList().ForEach((Action<Tile>)(x =>
+            board.Tiles.ToList().ForEach(x =>
                 {
                     if (x.ContiguousRegionId == aiUnit.Unit.Location.ContiguousRegionId && x.HasPort)
                     {
@@ -453,6 +457,9 @@ namespace ComputerOpponent
                                 break;
                         }
 
+                        if (aiUnit.Unit.Location == x)
+                            return;
+
                         var shortestPath = Board.FindShortestPath(aiUnit.Unit.Location, x, aiUnit.Unit);
                         if (shortestPath != null)
                         {
@@ -464,8 +471,7 @@ namespace ComputerOpponent
                             }
                         }
                     }
-                })
-            );
+                });
 
             return closestPort;
         }

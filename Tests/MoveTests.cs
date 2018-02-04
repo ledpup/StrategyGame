@@ -334,8 +334,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[147], movementType: MovementType.Airborne, baseMovementPoints: 4);
             var moveList = unit.PossibleMoves();
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, board[196].Hex, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(unit.Location, board[196], unit);
             
             var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
 
@@ -353,8 +352,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[202], movementType: MovementType.Airborne, baseMovementPoints: 3);
             var moveList = unit.PossibleMoves();
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, board[381].Hex, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(unit.Location, board[381], unit);
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
@@ -372,8 +370,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[187], movementType: MovementType.Airborne, baseMovementPoints: 3);
             var moveList = unit.PossibleMoves();
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, board[456].Hex, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(unit.Location, board[456], unit);
 
             var vectors = new List<Centreline>();
 
@@ -390,8 +387,7 @@ namespace Tests
             var unit = new MilitaryUnit(location: board[28], movementType: MovementType.Airborne, baseMovementPoints: 3);
             var moveList = unit.PossibleMoves();
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-            var pathToTransporteesDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, board[484].Hex, unit.MovementPoints);
+            var pathToTransporteesDestination = Board.FindShortestPath(unit.Location, board[484], unit);
 
             var vectors = new List<Centreline>();
 

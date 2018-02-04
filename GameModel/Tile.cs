@@ -233,5 +233,15 @@ namespace GameModel
                 return edge.Destination;
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Tile))
+                return false;
+
+            var tile = (Tile)obj;
+
+            return Index == tile.Index;
+        }
     }
 }

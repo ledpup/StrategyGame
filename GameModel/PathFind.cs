@@ -7,11 +7,11 @@ using System.Text;
 
 namespace GameModel
 {
-    public static class PathFind2
+    public static class PathFind
     {
         public static Path<Node> FindPath<Node>(
-            Node start,
-            Hex destination,
+            Node origin,
+            Node destination,
             Func<Node, Node, double> distance,
             Func<Node, double> estimate,
             int maxCumulativeCost,
@@ -22,10 +22,21 @@ namespace GameModel
             TerrainType canStopOn)
             where Node : IHasNeighbours<Node>
         {
+            if (origin.Hex.Equals(destination.Hex))
+            {
+                throw new Exception($"Origin and destination are the same ({origin.Hex})");
+            }
+
             var closed = new HashSet<Node>();
+
+            var loadedPathFindTiles = new HashSet<Node>();
+
+            loadedPathFindTiles.Add(origin);
+            loadedPathFindTiles.Add(destination);
+
             var queue = new PriorityQueue<double, Path<Node>>();
 
-            queue.Enqueue(0, new Path<Node>(start));
+            queue.Enqueue(0, new Path<Node>(origin));
 
             while (!queue.IsEmpty)
             {
@@ -35,6 +46,7 @@ namespace GameModel
                     continue;
                 if (path.LastStep.Equals(destination))
                     return path;
+
 
                 closed.Add(path.LastStep);
 
@@ -61,6 +73,8 @@ namespace GameModel
                 {
                     continue;
                 }
+
+                path.LastStep.LoadNeighbours(loadedPathFindTiles, path.LastStep.Edges, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
 
                 foreach (Node n in path.LastStep.Neighbours)
                 {

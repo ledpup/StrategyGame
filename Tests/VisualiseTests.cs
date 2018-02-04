@@ -21,7 +21,7 @@ namespace Tests
         static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
         static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
-        Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2];
+        Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2.Hex];
 
         [TestMethod]
         public void VisualiseBoardTest()
@@ -58,28 +58,7 @@ namespace Tests
             GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);
         }
 
-        [TestMethod]
-        public void VisualisePathfind()
-        {
-            var board = new Board(GameBoard, TileEdges, Structures);
 
-            var unit = new MilitaryUnit(location: board[1, 1]);
-
-            var lines = new List<Centreline>();
-
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
-
-            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Hex(1, 1), new Hex(7, 4), unit.MovementPoints)));
-            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(pathFindTiles, new Hex(10, -2), new Hex(13, 0), unit.MovementPoints)));
-
-            var labels = new string[board.Width * board.Height];
-            for (var i = 0; i < board.TileArray.Length; i++)
-            {
-                labels[i] = i.ToString();
-            }
-
-            GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, lines);
-        }
 
 
     }

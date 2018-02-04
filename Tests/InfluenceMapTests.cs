@@ -101,12 +101,10 @@ namespace Tests
                 .OrderByDescending(x => x.AggregateInfluence[computerPlayer.AiUnits[1].RoleMovementType][board.Units[1].OwnerIndex])
                 .ToList();
 
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(board.Units[1]);
-
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, board.Units[1].Location.Hex, tile.Hex, board.Units[1].MovementPoints);
+                bestPossibleDestination = Board.FindShortestPath(board.Units[1].Location, tile, board.Units[1]);
                 if (bestPossibleDestination != null)
                     break;
             }

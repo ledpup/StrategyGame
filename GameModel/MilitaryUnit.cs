@@ -559,10 +559,9 @@ namespace GameModel
             return moves;
         }
 
-        public MoveOrder GetMoveOrderToDestination(Hex destination, Board board)
+        public MoveOrder GetMoveOrderToDestination(Tile destination, Board board)
         {
-            var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(this);
-            var shortestPath = Board.FindShortestPath(pathFindTiles, Location.Hex, destination, MovementPoints).ToArray();
+            var shortestPath = Board.FindShortestPath(Location, destination, this).ToArray();
 
             return ShortestPathToMoveOrder(shortestPath);
         }

@@ -622,12 +622,19 @@ namespace ComputerOpponent
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
+
                 if (unit.Location.Equals(tile))
                     continue;
 
                 bestPossibleDestination = Board.FindShortestPath(unit.Location, tile, unit);
+
+                if (!unit.CanStopOn.HasFlag(tile.TerrainType))
+                    continue;
+
+                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, tile.Hex, unit.MovementPoints);
+
                 if (bestPossibleDestination != null)
-                    break;
+                    break;  
             }
 
             if (bestPossibleDestination != null)

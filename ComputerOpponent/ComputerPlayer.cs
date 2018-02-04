@@ -623,15 +623,15 @@ namespace ComputerOpponent
             foreach (var tile in tilesOrderedInfluence)
             {
 
+                // Don't bother pathfinding if you're already there
                 if (unit.Location.Equals(tile))
                     continue;
 
-                bestPossibleDestination = Board.FindShortestPath(unit.Location, tile, unit);
-
+                // Don't attempt to pathfind to a location that the unit can't stop on
                 if (!unit.CanStopOn.HasFlag(tile.TerrainType))
                     continue;
 
-                bestPossibleDestination = Board.FindShortestPath(pathFindTiles, unit.Location.Hex, tile.Hex, unit.MovementPoints);
+                bestPossibleDestination = Board.FindShortestPath(unit.Location, tile, unit);
 
                 if (bestPossibleDestination != null)
                     break;  

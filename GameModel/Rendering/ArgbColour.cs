@@ -1,4 +1,4 @@
-﻿namespace Visualise
+﻿namespace GameModel.Rendering
 {
     public struct ArgbColour
     {

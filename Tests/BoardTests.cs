@@ -9,6 +9,7 @@ using System.IO;
 using NLog;
 using Hexagon;
 using Visualise;
+using GameModel.Rendering;
 
 namespace Tests
 {
@@ -120,7 +121,8 @@ namespace Tests
 
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
-            GameBoardRenderer.RenderAndSave("ContiguousRegionsTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            GameRenderer.RenderAndSave(drawing2d, "ContiguousRegionsTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             Assert.AreEqual(2, board[12].ContiguousRegionId);
             Assert.AreEqual(7, board[32].ContiguousRegionId);

@@ -1,5 +1,6 @@
 ﻿using ComputerOpponent;
 using GameModel;
+using GameModel.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,8 @@ namespace Tests
             {
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 var units = board.Units.Where(x => x.IsAlive).ToList();
@@ -57,7 +59,7 @@ namespace Tests
                 var lines = new List<Centreline>();
                 moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
+                GameRenderer.RenderAndSave(drawing2d, $"PortsTurn{board.Turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(moveOrders);
                 board.ChangeStructureOwners();
@@ -215,7 +217,8 @@ namespace Tests
             {
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
@@ -225,7 +228,7 @@ namespace Tests
                 var lines = new List<Centreline>();
                 unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
+                GameRenderer.RenderAndSave(drawing2d, $"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
 
                 board.ResolveOrders(unitOrders);
                 board.ChangeStructureOwners();

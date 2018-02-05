@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using GameModel.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Visualise;
 
 namespace Tests
 {
@@ -28,7 +30,8 @@ namespace Tests
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Supply.ToString());
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithStructuresAndSupply.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
+            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            GameRenderer.RenderAndSave(drawing2d, "BasicBoardWithStructuresAndSupply.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
         }
     }
 }

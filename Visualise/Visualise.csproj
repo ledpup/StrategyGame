@@ -45,11 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgbColour.cs" />
-    <Compile Include="Centreline.cs" />
-    <Compile Include="GameBoardRenderer.cs" />
     <Compile Include="GameBoardDrawing2D.cs" />
-    <Compile Include="Edge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

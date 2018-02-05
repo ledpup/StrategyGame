@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using GameModel.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Visualise;
 
 namespace Tests
 {
@@ -33,7 +35,8 @@ namespace Tests
                     labels[j] = Math.Round(board[j].Temperature, 1).ToString();
                 }
 
-                Visualise.GameBoardRenderer.RenderAndSave("BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
+                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                GameRenderer.RenderAndSave(drawing2d, "BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
             }
         }
     }

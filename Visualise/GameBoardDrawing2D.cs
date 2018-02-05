@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using GameModel.Rendering;
 using Hexagon;
 
 namespace Visualise
 {
-    public class GameBoardDrawing2D
+    public class GameRenderingEngine2D : IGameRenderingEngine
     {
         Bitmap _bitmap;
         Graphics _graphics;
@@ -18,7 +19,7 @@ namespace Visualise
         float _unitWidth;
         Layout _layout;
 
-        public GameBoardDrawing2D(int boardWidth, int boardHeight)
+        public GameRenderingEngine2D(int boardWidth, int boardHeight)
         {
             _hexWidth = EdgeLength * 2;
             _hexHeight = (float)Math.Sqrt(3) / 2 * _hexWidth;
@@ -31,8 +32,6 @@ namespace Visualise
             _graphics = Graphics.FromImage(_bitmap);
             _graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-
-            
             _structureWidth = _hexHeight / 4;
             _unitWidth = _structureWidth * .8f;
             _layout = new Layout(Layout.flat, new PointD(EdgeLength, EdgeLength), new PointD(EdgeLength, _hexHeight/2));
@@ -106,57 +105,6 @@ namespace Visualise
             _graphics.DrawLine(pen, points.pt1, points.pt2);
         }
 
-        public void DrawEdge(Hex origin, Hex destination, int edge, Pen pen)
-        {
-           
-            var points = Layout.PolygonCorners(_layout, new Hex(3, 4));
-
-            var point1 = PointDtoF(Layout.HexToPixel(_layout, new Hex(3, 4)));
-            var point2 = PointDtoF(Layout.HexToPixel(_layout, new Hex(4, 4)));
-
-            foreach (var point in points)
-            {
-                //var points = Layout.PolygonCorners(_layout, new OffsetCoord(point.X, point.Y).QoffsetToCube());
-                //graphics.FillPolygon(hexagonColours[point], PointDtoF(points));
-                _graphics.DrawLine(Pens.Black, point1, point2);
-            }
-
-            //points.ForEach(x => _graphics.DrawEllipse(pen, (float)x.X - 2, (float)x.Y - 2, 4, 4));
-            //var ROUTE_SIZE = 4;
-            //var sourceEdgeIndex = 0;
-            //var sourceOffset = (sourceEdgeIndex * ROUTE_SIZE) - ((_edgeLength * ROUTE_SIZE) / 2) + (ROUTE_SIZE / 2);
-            //var targetOffset = (1 * ROUTE_SIZE) - ((_edgeLength * ROUTE_SIZE) / 2) + (ROUTE_SIZE / 2);
-
-            var points2 = new PointF[6];
-
-            for (var i = 0; i < 6;i++)
-            {
-                var point = PointD.EdgeToCentrePoint(points.ToArray(), EdgeLength, i, 5);
-                points2[i] = new PointF((float)point.X, (float)point.Y);
-            }
-            
-            
-            //(PointF pt1, PointF pt2) points;
-            //if (isCentreToCentre)
-            //{
-            //    points.pt1 = HexCentre(_hexWidth, _hexHeight, origin.Y, origin.X);
-            //    points.pt2 = HexCentre(_hexWidth, _hexHeight, destination.Y, destination.X);
-            //}
-            //else
-            //{
-            //    points = HexSidePoints(origin, destination, _hexWidth, _hexHeight);
-            //}
-
-
-            _graphics.DrawPolygon(pen, points2);
-
-            //_graphics.DrawLine(pen, (float) point1.X, (float)point1.Y, (float)point2.X, (float)point2.Y);
-            //_graphics.DrawLine(pen, (float)point1.X, (float)point1.Y, (float)point2.X, (float)point2.Y);
-
-            //else
-            //    graphics.DrawArc(pen, new RectangleF(pt1.X, pt1.Y, Math.Abs(pt2.X - pt1.X), Math.Abs(pt2.Y - pt1.Y)), 270, 90);
-        }
-
         public void DrawCircle(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
@@ -180,7 +128,7 @@ namespace Visualise
             return (xTopLeft, yTopLeft);
         }
 
-        internal void DrawTrapezium(Hex location, float position, ArgbColour colour)
+        public void DrawTrapezium(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
             var topLeftCorner = UnitLocationTopLeftCorner(location, position);
@@ -191,26 +139,16 @@ namespace Visualise
                 new PointF(topLeftCorner.xTopLeft + _unitWidth, topLeftCorner.yTopLeft),
                 new PointF(topLeftCorner.xTopLeft + _unitWidth * .8F, topLeftCorner.yTopLeft + _unitWidth * .65F),
                 new PointF(topLeftCorner.xTopLeft + _unitWidth * .2F, topLeftCorner.yTopLeft + _unitWidth * .65F),
-                
             };
 
             _graphics.FillPolygon(brush, points);
         }
 
-        internal void Save(string fileName)
+        public void SaveGameBoardToFile(string fileName)
         {
             _bitmap.Save(fileName);
         }
 
-        static Color ArgbColourToColor(ArgbColour colour)
-        {
-            return Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue);
-        }
-
-        static SolidBrush ArgbColourToBrush(ArgbColour colour)
-        {
-            return new SolidBrush(ArgbColourToColor(colour));
-        }
         public void DrawTriangle(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
@@ -226,7 +164,7 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
-        internal void DrawRectangle(Hex location, ArgbColour colour)
+        public void DrawRectangle(Hex location, ArgbColour colour)
         {
             var brush = new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue));
             var hexCentre = Layout.HexToPixel(_layout, location);
@@ -263,6 +201,17 @@ namespace Visualise
                     _graphics.DrawString(label, font, Brushes.Black, worldX, worldY, sf);
                 }
             }
+        }
+
+
+        static Color ArgbColourToColor(ArgbColour colour)
+        {
+            return Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue);
+        }
+
+        static SolidBrush ArgbColourToBrush(ArgbColour colour)
+        {
+            return new SolidBrush(ArgbColourToColor(colour));
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ComputerOpponent;
 using Hexagon;
 using Visualise;
+using GameModel.Rendering;
 
 namespace Tests
 {
@@ -30,16 +31,17 @@ namespace Tests
 
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Index.ToString());
-            GameBoardRenderer.RenderAndSave("Coords - index.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            GameRenderer.RenderAndSave(drawing2d, "Coords - index.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ToOffsetCoordsString());
-            GameBoardRenderer.RenderAndSave("Coords - offset.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            GameRenderer.RenderAndSave(drawing2d, "Coords - offset.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Hex.ToString());
-            GameBoardRenderer.RenderAndSave("Coords - cube.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            GameRenderer.RenderAndSave(drawing2d, "Coords - cube.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
-            GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            GameRenderer.RenderAndSave(drawing2d, "ContiguousRegionIds.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
         }
 
         [TestMethod]
@@ -55,7 +57,8 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);
+            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            GameRenderer.RenderAndSave(drawing2d, "BasicBoardWithUnits.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);
         }
 
 

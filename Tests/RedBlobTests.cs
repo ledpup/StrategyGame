@@ -7,6 +7,8 @@ using System.Linq;
 using GameModel;
 using System.IO;
 using Hexagon;
+using GameModel.Rendering;
+using Visualise;
 
 namespace Tests
 {
@@ -158,7 +160,8 @@ namespace Tests
             results = Hex.HexRing(hex, 1, 27, 19);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-            Visualise.GameBoardRenderer.RenderAndSave("HexRingCorners.png", board.Width, board.Height, board.Tiles);
+            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            GameRenderer.RenderAndSave(drawing2d, "HexRingCorners.png", board.Width, board.Height, board.Tiles);
         }
 
         [TestMethod]
@@ -170,7 +173,8 @@ namespace Tests
             var results = Hex.HexesWithinArea(hex, 2, board.Width, board.Height);
 
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
-            Visualise.GameBoardRenderer.RenderAndSave("HexesInArea.png", board.Width, board.Height, board.Tiles);
+            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            GameRenderer.RenderAndSave(drawing2d, "HexesInArea.png", board.Width, board.Height, board.Tiles);
             board.Tiles.ToList().ForEach(x => x.IsSelected = false);
 
             Assert.AreEqual(19, results.Count);
@@ -215,7 +219,7 @@ namespace Tests
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
 
-            Visualise.GameBoardRenderer.RenderAndSave("HexesInAreaEdges.png", board.Width, board.Height, board.Tiles);
+            GameRenderer.RenderAndSave(drawing2d, "HexesInAreaEdges.png", board.Width, board.Height, board.Tiles);
         }
 
         //[TestMethod]

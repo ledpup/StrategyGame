@@ -58,6 +58,11 @@
     <Compile Include="Move.cs" />
     <Compile Include="MoveOrderDto.cs" />
     <Compile Include="QuantityChangeEvent.cs" />
+    <Compile Include="Rendering\ArgbColour.cs" />
+    <Compile Include="Rendering\Centreline.cs" />
+    <Compile Include="Rendering\Edge.cs" />
+    <Compile Include="Rendering\GameRenderer.cs" />
+    <Compile Include="Rendering\IGameRenderingEngine.cs" />
     <Compile Include="Stack.cs" />
     <Compile Include="Structure.cs" />
     <Compile Include="Terrain.cs" />

@@ -1,5 +1,6 @@
 ﻿using ComputerOpponent;
 using GameModel;
+using GameModel.Rendering;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,8 @@ namespace StrategyGame
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var labels = new string[board.Width, board.Height];
-                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 
                 //for (var i = 0; i < numberOfPlayers; i++)
                 //{
@@ -107,7 +109,7 @@ namespace StrategyGame
                 var lines = new List<Centreline>();
                 unitsOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                GameBoardRenderer.RenderAndSave("MoveOrdersTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
+                GameRenderer.RenderAndSave(drawing2d, "MoveOrdersTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
                 board.ResolveOrders(unitsOrders);
                 for (var i = 0; i < numberOfPlayers; i++)
@@ -115,7 +117,7 @@ namespace StrategyGame
                     board.ResolveStackLimits(i);
                 }
 
-                GameBoardRenderer.RenderAndSave("MovesResolvedTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameRenderer.RenderAndSave(drawing2d, "MovesResolvedTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 var battleReports = board.ConductBattles();
                 battleReports.ForEach(x =>
@@ -130,7 +132,7 @@ namespace StrategyGame
 
                 if (battleReports.Any())
                 {
-                    GameBoardRenderer.RenderAndSave("BattlesConductedTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                    GameRenderer.RenderAndSave(drawing2d, "BattlesConductedTurn" + board.Turn + ".png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 }
 
                 board.Turn++;

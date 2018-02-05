@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GameModel;
 
-namespace Visualise
+namespace GameModel.Rendering
 {
     public enum RenderPipeline
     {
@@ -13,11 +12,11 @@ namespace Visualise
         Units,
         Labels
     }
-    public class GameBoardRenderer
+    public class GameRenderer
     {
-        public static GameBoardDrawing2D Render(RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static IGameRenderingEngine Render(IGameRenderingEngine gameRenderingEngine, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
-            var gameBoardDrawing2D = new GameBoardDrawing2D(boardWidth, boardHeight);
+            //var gameBoardDrawing2D = new GameBoardDrawing2D(boardWidth, boardHeight);
 
             if (renderBegin <= RenderPipeline.Board)
             {
@@ -38,11 +37,11 @@ namespace Visualise
                 }
                 );
 
-                
-                gameBoardDrawing2D.DrawBoard(hexagonColours);
+
+                gameRenderingEngine.DrawBoard(hexagonColours);
             }
             if (renderUntil == RenderPipeline.Board)
-                return gameBoardDrawing2D;
+                return gameRenderingEngine;
 
             if (renderBegin <= RenderPipeline.Edges)
             {
@@ -67,7 +66,7 @@ namespace Visualise
                     //if (lines != null)
                     //    edgesToRender.AddRange(lines);
 
-                    edgesToRender.ForEach(x => gameBoardDrawing2D.DrawEdge(
+                    edgesToRender.ForEach(x => gameRenderingEngine.DrawEdge(
                         x.Origin,
                         x.Destination,
                         x.Colour,
@@ -75,17 +74,17 @@ namespace Visualise
 
                     //HexGrid.DrawCurvedRoads(graphics, vectors.Where(x => x.EdgeType == EdgeType.Road).ToList());
 
-                    centrelines.ForEach(x => gameBoardDrawing2D.DrawCentreline(x.Origin, x.Destination, x.Colour, x.Width));
+                    centrelines.ForEach(x => gameRenderingEngine.DrawCentreline(x.Origin, x.Destination, x.Colour, x.Width));
 
                     var ports = edges.Where(x => x.EdgeType == EdgeType.Port).ToList();
 
                 }
             }
             if (renderUntil == RenderPipeline.Edges)
-                return gameBoardDrawing2D;
+                return gameRenderingEngine;
 
             if (lines != null)
-                lines.ForEach(x => gameBoardDrawing2D.DrawCentreline(x.Origin, x.Destination, x.Colour, x.Width));
+                lines.ForEach(x => gameRenderingEngine.DrawCentreline(x.Origin, x.Destination, x.Colour, x.Width));
 
 
 
@@ -95,13 +94,13 @@ namespace Visualise
                 {
                     structures.ForEach(x =>
                     {
-                        var colour = GameBoardRenderer.StructureColour(x);
-                        gameBoardDrawing2D.DrawRectangle(x.Location.Hex, colour);
+                        var colour = GameRenderer.StructureColour(x);
+                        gameRenderingEngine.DrawRectangle(x.Location.Hex, colour);
                     });
                 }
             }
             if (renderUntil == RenderPipeline.Structures)
-                return gameBoardDrawing2D;
+                return gameRenderingEngine;
 
             if (renderBegin <= RenderPipeline.Units)
             {
@@ -119,15 +118,15 @@ namespace Visualise
                             switch (unitsAtLocation[i].MovementType)
                             {
                                 case MovementType.Airborne:
-                                    gameBoardDrawing2D.DrawTriangle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    gameRenderingEngine.DrawTriangle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Water:
-                                    gameBoardDrawing2D.DrawTrapezium(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    gameRenderingEngine.DrawTrapezium(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Land:
-                                    gameBoardDrawing2D.DrawCircle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    gameRenderingEngine.DrawCircle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
                                     break;
                             }
                         }
@@ -135,14 +134,14 @@ namespace Visualise
                 }
             }
             if (renderUntil == RenderPipeline.Units)
-                return gameBoardDrawing2D;
+                return gameRenderingEngine;
 
             if (renderBegin <= RenderPipeline.Labels)
             {
-                gameBoardDrawing2D.LabelHexes(Colours.Black, 0, 0, labels, boardWidth);
+                gameRenderingEngine.LabelHexes(Colours.Black, 0, 0, labels, boardWidth);
             }
             
-            return gameBoardDrawing2D;
+            return gameRenderingEngine;
         }
 
         internal static ArgbColour PlayerColour(int playerIndex)
@@ -160,16 +159,16 @@ namespace Visualise
             return PlayerColour(structure.OwnerIndex);
         }
 
-        public static void RenderAndSave(string fileName, int boardWidth, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static void RenderAndSave(IGameRenderingEngine gameRenderingEngine, string fileName, int boardWidth, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
-            var gameBoardDrawing2D = Render(RenderPipeline.Board, RenderPipeline.Labels, boardWidth, boardHeight, tiles, edges, structures, labels, lines, units, circles);
-            gameBoardDrawing2D.Save(fileName);
+            var gameBoardDrawing2D = Render(gameRenderingEngine, RenderPipeline.Board, RenderPipeline.Labels, boardWidth, boardHeight, tiles, edges, structures, labels, lines, units, circles);
+            gameBoardDrawing2D.SaveGameBoardToFile(fileName);
         }
 
-        public static void RenderLabelsAndSave(string fileName, int boardWidth, int boardHeight, string[] labels)
+        public static void RenderLabelsAndSave(IGameRenderingEngine gameRenderingEngine, string fileName, int boardWidth, int boardHeight, string[] labels)
         {
-            var gameBoardDrawing2D = Render(RenderPipeline.Labels, RenderPipeline.Labels, boardWidth, boardHeight, labels: labels);
-            gameBoardDrawing2D.Save(fileName);
+            var gameBoardDrawing2D = Render(gameRenderingEngine, RenderPipeline.Labels, RenderPipeline.Labels, boardWidth, boardHeight, labels: labels);
+            gameBoardDrawing2D.SaveGameBoardToFile(fileName);
         }
         private static ArgbColour EdgeToColour(EdgeType edgeType)
         {
@@ -190,7 +189,7 @@ namespace Visualise
             }
         }
 
-        private static ArgbColour GetColour(TerrainType terrainType)
+        public static ArgbColour GetColour(TerrainType terrainType)
         {
             switch (terrainType)
             {

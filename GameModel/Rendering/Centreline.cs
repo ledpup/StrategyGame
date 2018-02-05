@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Visualise
+namespace GameModel.Rendering
 {
     public class Centreline
     {
@@ -24,7 +24,7 @@ namespace Visualise
 
         public static List<Centreline> MoveOrderToCentrelines(MoveOrder moveOrder)
         {
-            var colour = moveOrder.Unit == null ? Colours.Black : GameBoardRenderer.UnitColour(moveOrder.Unit);
+            var colour = moveOrder.Unit == null ? Colours.Black : GameRenderer.UnitColour(moveOrder.Unit);
             return moveOrder.Moves.Select(x => new Centreline(x.Origin.Hex, x.Edge.Destination.Hex, colour)).ToList();
         }
         public static List<Centreline> PathFindTilesToCentrelines(IEnumerable<PathFindTile> path)

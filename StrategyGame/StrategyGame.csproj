@@ -67,9 +67,9 @@
       <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
       <Name>GameModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Visualise\Visualise.csproj">
+    <ProjectReference Include="..\Visualise\GameRendering2D.csproj">
       <Project>{922935d8-0781-4c27-8019-10d84c6797a0}</Project>
-      <Name>Visualise</Name>
+      <Name>GameRendering2D</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

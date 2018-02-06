@@ -6,7 +6,7 @@ using System.Linq;
 using GameModel.Rendering;
 using Hexagon;
 
-namespace Visualise
+namespace GameRendering2D
 {
     public class GameRenderingEngine2D : IGameRenderingEngine
     {
@@ -147,6 +147,11 @@ namespace Visualise
         public void SaveGameBoardToFile(string fileName)
         {
             _bitmap.Save(fileName);
+        }
+
+        public object GetBitmap()
+        {
+            return _bitmap;
         }
 
         public void DrawTriangle(Hex location, float position, ArgbColour colour)

@@ -8,8 +8,8 @@ using GameModel;
 using System.IO;
 using NLog;
 using Hexagon;
-using Visualise;
 using GameModel.Rendering;
+using GameRendering2D;
 
 namespace Tests
 {

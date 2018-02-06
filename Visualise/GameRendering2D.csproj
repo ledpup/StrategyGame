@@ -7,8 +7,8 @@
     <ProjectGuid>{922935D8-0781-4C27-8019-10D84C6797A0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Visualise</RootNamespace>
-    <AssemblyName>Visualise</AssemblyName>
+    <RootNamespace>GameRendering2D</RootNamespace>
+    <AssemblyName>GameRendering2D</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameBoardDrawing2D.cs" />
+    <Compile Include="GameRenderingEngine2D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

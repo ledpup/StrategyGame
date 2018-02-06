@@ -19,5 +19,6 @@ namespace GameModel.Rendering
         void LabelHexes(ArgbColour colour, float xMin, float yMin, string[] labels, int boardWidth);
 
         void SaveGameBoardToFile(string fileName);
+        object GetBitmap();
     }
 }

@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ComputerOpponent;
 using Hexagon;
-using Visualise;
 using GameModel.Rendering;
+using GameRendering2D;
 
 namespace Tests
 {

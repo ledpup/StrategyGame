@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameModel", "GameModel\GameModel.csproj", "{4C5F1B73-0737-4624-8E1C-F6F180067D88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualise", "Visualise\Visualise.csproj", "{922935D8-0781-4C27-8019-10D84C6797A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameRendering2D", "Visualise\GameRendering2D.csproj", "{922935D8-0781-4C27-8019-10D84C6797A0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathFind", "PathFind\PathFind.csproj", "{2CAEF444-6049-4D0E-B492-D3FE21800EA4}"
 EndProject

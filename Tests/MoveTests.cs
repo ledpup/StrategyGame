@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
 using ComputerOpponent;
-using Visualise;
 using Hexagon;
 using GameModel.Rendering;
+using GameRendering2D;
 
 namespace Tests
 {

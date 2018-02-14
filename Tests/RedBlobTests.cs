@@ -8,7 +8,7 @@ using GameModel;
 using System.IO;
 using Hexagon;
 using GameModel.Rendering;
-using Visualise;
+using GameRendering2D;
 
 namespace Tests
 {

@@ -3,12 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hx="clr-namespace:HexGridControl;assembly=HexGridControl"
         xmlns:local="clr-namespace:ScenarioEditor"
         mc:Ignorable="d"
         Title="MainWindow" Height="1050" Width="1680" Loaded="Window_Loaded">
     <Grid>
-        <Image x:Name="Map" Margin="10,10,0,0" Width="1275" Height="999" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,10,0,0" VerticalAlignment="Top" Width="264"/>
 
+        <hx:HexGrid Orientation="Horizontal" Name="HexGrid" Margin="10,10,427,10" />
+
+        <Image x:Name="Map" Margin="1239,589,0,0" Width="422" Height="420" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,10,0,0" VerticalAlignment="Top" Width="264"/>
+        <hx:HexItem Orientation="Horizontal" Margin="1433,206,77,685" Name="TerrainType"
+                            Content="{Binding Path=Orientation, RelativeSource={RelativeSource Self}}"/>
     </Grid>
 </Window>

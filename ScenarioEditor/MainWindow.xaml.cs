@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
+using HexGridControl;
 
 namespace ScenarioEditor
 {
@@ -34,6 +35,7 @@ namespace ScenarioEditor
         static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
         static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
+        TerrainType _selectedTerrainType;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             var board = new Board(GameBoard, TileEdges, Structures);
@@ -55,7 +57,8 @@ namespace ScenarioEditor
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
                 var color = ColourToColor(GameRenderer.GetColour(terrainType));
-                TerrainTypeSelector.Children.Add(new Button
+
+                var button = new Button
                 {
                     Content = terrainType.ToString(),
                     Background = new SolidColorBrush(color),
@@ -63,11 +66,54 @@ namespace ScenarioEditor
                     Margin = new Thickness(5),
                     Width = 60,
                     FontWeight = FontWeights.Bold,
+                    Tag = terrainType,
+                };
+
+                button.Click += Button_Click;
+
+                TerrainTypeSelector.Children.Add(button);
+               
+            }
+
+            HexGrid.RowCount = board.Height;
+            HexGrid.ColumnCount = board.Width;
+
+            for (var x = 0; x < HexGrid.RowCount; x++)
+            { 
+                for (var y = 0; y < HexGrid.ColumnCount; y++)
+                {
+                    var hexItem = new HexItem();
+                    hexItem.SetValue(Grid.ColumnProperty, x);
+                    hexItem.SetValue(Grid.RowProperty, y);
+                    hexItem.BorderThickness = new Thickness(.5);
+                    hexItem.Background = System.Windows.Media.Brushes.White;
+                    hexItem.MouseEnter += Hi_MouseEnter;
+                    hexItem.MouseLeftButtonUp += Hi_MouseLeftButtonDown;
+                    HexGrid.Children.Add(hexItem);
                 }
-                );
             }
         }
 
+        private void Hi_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                ((HexItem)sender).Background = TerrainType.Background;
+            }
+        }
+
+        private void Hi_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ((HexItem)sender).Background = TerrainType.Background;
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var button = ((Button)e.Source);
+            _selectedTerrainType = (TerrainType)button.Tag;
+            TerrainType.Background = button.Background;
+        }
 
         private System.Windows.Media.Color ColourToColor(ArgbColour colour)
         {

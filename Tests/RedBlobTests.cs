@@ -160,7 +160,7 @@ namespace Tests
             results = Hex.HexRing(hex, 1, 27, 19);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "HexRingCorners.png", board.Width, board.Height, board.Tiles);
         }
 
@@ -173,7 +173,7 @@ namespace Tests
             var results = Hex.HexesWithinArea(hex, 2, board.Width, board.Height);
 
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "HexesInArea.png", board.Width, board.Height, board.Tiles);
             board.Tiles.ToList().ForEach(x => x.IsSelected = false);
 

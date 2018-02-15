@@ -61,7 +61,7 @@ namespace Tests
             var vectors = new List<Centreline>();
             moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 
             board.ResolveOrders(moveOrders);
@@ -96,7 +96,7 @@ namespace Tests
             var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4, board.Width, board.Height);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
             var tilesOrderedInfluence = board.Tiles

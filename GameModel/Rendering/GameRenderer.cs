@@ -195,8 +195,8 @@ namespace GameModel.Rendering
             {
                 case TerrainType.Grassland:
                     return Colours.GreenYellow;
-                case TerrainType.Steppe:
-                    return Colours.Yellow;
+                case TerrainType.Desert:
+                    return Colours.YellowNcs;
                 case TerrainType.Forest:
                     return Colours.DarkGreen;
                 case TerrainType.Hill:

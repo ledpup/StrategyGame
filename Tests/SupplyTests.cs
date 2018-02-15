@@ -30,7 +30,7 @@ namespace Tests
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Supply.ToString());
 
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "BasicBoardWithStructuresAndSupply.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
         }
     }

@@ -152,7 +152,7 @@ namespace GameModel
                     }
                     if (temperature > 30)
                     {
-                        return TerrainType.Steppe;
+                        return TerrainType.Desert;
                     }
                     return TerrainType.Grassland;
 
@@ -164,10 +164,10 @@ namespace GameModel
                     }
                     return TerrainType.Water;
 
-                case TerrainType.Steppe:
+                case TerrainType.Desert:
                     if (temperature < 10)
                         return TerrainType.Grassland;
-                    return TerrainType.Steppe;
+                    return TerrainType.Desert;
 
                 case TerrainType.Wetland:
                     if (temperature < 10)

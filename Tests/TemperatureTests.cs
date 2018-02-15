@@ -35,7 +35,7 @@ namespace Tests
                     labels[j] = Math.Round(board[j].Temperature, 1).ToString();
                 }
 
-                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
                 GameRenderer.RenderAndSave(drawing2d, "BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
             }
         }

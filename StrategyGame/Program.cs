@@ -70,7 +70,7 @@ namespace StrategyGame
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
                 var labels = new string[board.Width, board.Height];
-                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
                 GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
                 
                 //for (var i = 0; i < numberOfPlayers; i++)

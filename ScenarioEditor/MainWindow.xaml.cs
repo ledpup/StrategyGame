@@ -48,7 +48,7 @@ namespace ScenarioEditor
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Labels, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);
 
             var bitmap = (Bitmap)drawing2d.GetBitmap();
@@ -78,15 +78,15 @@ namespace ScenarioEditor
             HexGrid.RowCount = board.Height;
             HexGrid.ColumnCount = board.Width;
 
-            for (var x = 0; x < HexGrid.RowCount; x++)
+            for (var x = 0; x < HexGrid.ColumnCount; x++)
             { 
-                for (var y = 0; y < HexGrid.ColumnCount; y++)
+                for (var y = 0; y < HexGrid.RowCount; y++)
                 {
                     var hexItem = new HexItem();
                     hexItem.SetValue(Grid.ColumnProperty, x);
                     hexItem.SetValue(Grid.RowProperty, y);
                     hexItem.BorderThickness = new Thickness(.5);
-                    hexItem.Background = System.Windows.Media.Brushes.White;
+                    hexItem.Background = new SolidColorBrush(ColourToColor(GameRenderer.GetColour(board[x, y].TerrainType)));
                     hexItem.MouseEnter += Hi_MouseEnter;
                     hexItem.MouseLeftButtonUp += Hi_MouseLeftButtonDown;
                     HexGrid.Children.Add(hexItem);

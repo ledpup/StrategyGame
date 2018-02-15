@@ -38,7 +38,7 @@ namespace Tests
                 labels[i] = i.ToString();
             }
 
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "BasicBoardPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, lines);
         }
 
@@ -53,7 +53,7 @@ namespace Tests
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "LandUnitPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(10, shortestPath.Length);
@@ -95,7 +95,7 @@ namespace Tests
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "NavelUnitMoveToPortPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(shortestPath[0].Hex, unit.Location.Hex); // Origin
@@ -122,7 +122,7 @@ namespace Tests
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines);
 
             Assert.AreEqual(unit.Location.Hex, shortestPath[0].Hex); // Origin
@@ -151,7 +151,7 @@ namespace Tests
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
 
@@ -180,7 +180,7 @@ namespace Tests
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "AirborneUnitMoveOverWallPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors);
 
             var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);

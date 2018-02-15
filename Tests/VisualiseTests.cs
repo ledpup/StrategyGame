@@ -31,7 +31,7 @@ namespace Tests
 
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Index.ToString());
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "Coords - index.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
 
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ToOffsetCoordsString());
@@ -57,7 +57,7 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
             };
 
-            var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
             GameRenderer.RenderAndSave(drawing2d, "BasicBoardWithUnits.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);
         }
 

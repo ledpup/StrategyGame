@@ -16,7 +16,7 @@ namespace GameModel
     public enum TerrainType
     {
         Grassland = 1 << 0,
-        Steppe = 1 << 1,
+        Desert = 1 << 1,
         Forest = 1 << 2,
         Hill = 1 << 3,
         Mountain = 1 << 4,
@@ -39,7 +39,7 @@ namespace GameModel
     {
         public const int Impassable = 100;
 
-        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Steppe | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
+        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Desert | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
         public static TerrainType All_Water = TerrainType.Water | TerrainType.Reef;
         public static TerrainType Non_Mountainous_Land = All_Land ^ TerrainType.Mountain;
         public static TerrainType Rough_Land = All_Land ^ TerrainType.Grassland;
@@ -54,7 +54,7 @@ namespace GameModel
                 case 'F':
                     return TerrainType.Forest;
                 case 'D':
-                    return TerrainType.Steppe;
+                    return TerrainType.Desert;
                 case 'M':
                     return TerrainType.Mountain;
                 case 'H':
@@ -84,7 +84,7 @@ namespace GameModel
                     { TerrainType.Grassland, 4 },
                     { TerrainType.Hill, 3 },
                     { TerrainType.Mountain, 2 },
-                    { TerrainType.Steppe, 2 },
+                    { TerrainType.Desert, 2 },
                     { TerrainType.Wetland, 2 },
 
                     { TerrainType.Reef, 2 },

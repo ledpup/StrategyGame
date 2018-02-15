@@ -80,7 +80,7 @@ namespace Tests
 
             units[0].TerrainTypeBattleModifier[TerrainType.Mountain] = 1;
             units[0].TerrainTypeBattleModifier[TerrainType.Hill] = 1;
-            units[0].TerrainTypeBattleModifier[TerrainType.Steppe] = -1;
+            units[0].TerrainTypeBattleModifier[TerrainType.Desert] = -1;
 
             units[1].WeatherBattleModifier[Weather.Cold] = -1;
 

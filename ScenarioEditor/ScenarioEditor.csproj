@@ -100,6 +100,10 @@
       <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
       <Name>GameModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Hexagon\Hexagon.csproj">
+      <Project>{04cd3988-f271-4897-b43d-0802e8c1a48c}</Project>
+      <Name>Hexagon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HexGridControl\HexGridControl.csproj">
       <Project>{942134ac-6ea2-4500-8f22-0f739b70a05f}</Project>
       <Name>HexGridControl</Name>

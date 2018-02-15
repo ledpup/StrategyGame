@@ -48,7 +48,7 @@ namespace Tests
             {
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
                 GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
@@ -217,7 +217,7 @@ namespace Tests
             {
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-                var drawing2d = new GameRenderingEngine2D(board.Width, board.Height);
+                var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
                 GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders

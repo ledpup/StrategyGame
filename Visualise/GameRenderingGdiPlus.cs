@@ -8,7 +8,7 @@ using Hexagon;
 
 namespace GameRendering2D
 {
-    public class GameRenderingEngine2D : IGameRenderingEngine
+    public class GameRenderingGdiPlus : IGameRenderingEngine
     {
         Bitmap _bitmap;
         Graphics _graphics;
@@ -19,7 +19,7 @@ namespace GameRendering2D
         float _unitWidth;
         Layout _layout;
 
-        public GameRenderingEngine2D(int boardWidth, int boardHeight)
+        public GameRenderingGdiPlus(int boardWidth, int boardHeight)
         {
             _hexWidth = EdgeLength * 2;
             _hexHeight = (float)Math.Sqrt(3) / 2 * _hexWidth;

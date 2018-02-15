@@ -36,23 +36,20 @@ namespace ScenarioEditor
         static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
         TerrainType _selectedTerrainType;
+        Board _board;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            _board = new Board(GameBoard, TileEdges, Structures);
 
-            var units = new List<MilitaryUnit>
+            _board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit() { Location = board[1, 1] },
-                new MilitaryUnit() { Location = board[1, 1] },
-                new MilitaryUnit() { Location = board[1, 1] },
-                new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
+                new MilitaryUnit() { Location = _board[1, 1] },
+                new MilitaryUnit() { Location = _board[1, 1] },
+                new MilitaryUnit() { Location = _board[1, 1] },
+                new MilitaryUnit() { Location = _board[1, 1], OwnerIndex = 2 }
             };
 
-            var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);
-            GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Labels, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);
-
-            var bitmap = (Bitmap)drawing2d.GetBitmap();
-            Map.Source = BitmapToBitmapImage(bitmap);
+            RenderGdiPlusBoard();
 
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
@@ -72,46 +69,63 @@ namespace ScenarioEditor
                 button.Click += Button_Click;
 
                 TerrainTypeSelector.Children.Add(button);
-               
             }
 
-            HexGrid.RowCount = board.Height;
-            HexGrid.ColumnCount = board.Width;
+            HexGrid.RowCount = _board.Height;
+            HexGrid.ColumnCount = _board.Width;
 
             for (var x = 0; x < HexGrid.ColumnCount; x++)
-            { 
+            {
                 for (var y = 0; y < HexGrid.RowCount; y++)
                 {
                     var hexItem = new HexItem();
                     hexItem.SetValue(Grid.ColumnProperty, x);
                     hexItem.SetValue(Grid.RowProperty, y);
                     hexItem.BorderThickness = new Thickness(.5);
-                    hexItem.Background = new SolidColorBrush(ColourToColor(GameRenderer.GetColour(board[x, y].TerrainType)));
-                    hexItem.MouseEnter += Hi_MouseEnter;
-                    hexItem.MouseLeftButtonUp += Hi_MouseLeftButtonDown;
+                    hexItem.Background = new SolidColorBrush(ColourToColor(GameRenderer.GetColour(_board[x, y].TerrainType)));
+                    hexItem.MouseEnter += HexItem_MouseEnter;
+                    hexItem.PreviewMouseLeftButtonDown += HexItem_PreviewMouseLeftButtonDown;
                     HexGrid.Children.Add(hexItem);
                 }
             }
         }
 
-        private void Hi_MouseEnter(object sender, MouseEventArgs e)
+        private void HexItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            SetTerrainType(sender);
+        }
+
+        private void RenderGdiPlusBoard()
+        {
+            var drawing2d = new GameRenderingGdiPlus(_board.Width, _board.Height);
+            GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Labels, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
+
+            var bitmap = (Bitmap)drawing2d.GetBitmap();
+            Map.Source = BitmapToBitmapImage(bitmap);
+        }
+
+        private void HexItem_MouseEnter(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                ((HexItem)sender).Background = TerrainType.Background;
+                SetTerrainType(sender);
             }
         }
 
-        private void Hi_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void SetTerrainType(object sender)
         {
             ((HexItem)sender).Background = TerrainType.Background;
-
+            var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
+            var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
+            _board[x, y].TerrainType = _selectedTerrainType;
+            RenderGdiPlusBoard();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var button = ((Button)e.Source);
             _selectedTerrainType = (TerrainType)button.Tag;
+            TerrainType.Content = _selectedTerrainType;
             TerrainType.Background = button.Background;
         }
 

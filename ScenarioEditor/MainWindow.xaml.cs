@@ -53,7 +53,7 @@ namespace ScenarioEditor
 
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                var color = ColourToColor(GameRenderer.GetColour(terrainType));
+                var color = GameRenderingWpf.ColourToColor(GameRenderer.GetColour(terrainType));
 
                 var button = new Button
                 {
@@ -71,23 +71,17 @@ namespace ScenarioEditor
                 TerrainTypeSelector.Children.Add(button);
             }
 
-            HexGrid.RowCount = _board.Height;
-            HexGrid.ColumnCount = _board.Width;
+            var wpf = new GameRenderingWpf(_board.Width, _board.Height);
+            var gameRenderer = GameRenderer.Render(wpf, RenderPipeline.Board, RenderPipeline.Board, _board.Width, _board.Height, _board.Tiles);
+            var hexGrid = (HexGrid)gameRenderer.GetBitmap();
 
-            for (var x = 0; x < HexGrid.ColumnCount; x++)
+            foreach (HexItem hexItem in hexGrid.Children)
             {
-                for (var y = 0; y < HexGrid.RowCount; y++)
-                {
-                    var hexItem = new HexItem();
-                    hexItem.SetValue(Grid.ColumnProperty, x);
-                    hexItem.SetValue(Grid.RowProperty, y);
-                    hexItem.BorderThickness = new Thickness(.5);
-                    hexItem.Background = new SolidColorBrush(ColourToColor(GameRenderer.GetColour(_board[x, y].TerrainType)));
-                    hexItem.MouseEnter += HexItem_MouseEnter;
-                    hexItem.PreviewMouseLeftButtonDown += HexItem_PreviewMouseLeftButtonDown;
-                    HexGrid.Children.Add(hexItem);
-                }
+                hexItem.MouseEnter += HexItem_MouseEnter;
+                hexItem.PreviewMouseLeftButtonDown += HexItem_PreviewMouseLeftButtonDown;
             }
+
+            MainGrid.Children.Add(hexGrid);
         }
 
         private void HexItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -129,10 +123,7 @@ namespace ScenarioEditor
             TerrainType.Background = button.Background;
         }
 
-        private System.Windows.Media.Color ColourToColor(ArgbColour colour)
-        {
-            return System.Windows.Media.Color.FromArgb((byte)colour.Alpha, (byte)colour.Red, (byte)colour.Green, (byte)colour.Blue);
-        }
+
 
         private int PerceivedBrightness(System.Windows.Media.Color c)
         {

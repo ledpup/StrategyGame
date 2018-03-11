@@ -7,12 +7,13 @@
         xmlns:local="clr-namespace:ScenarioEditor"
         mc:Ignorable="d"
         Title="MainWindow" Height="1050" Width="1680" Loaded="Window_Loaded">
-    <Grid Name="MainGrid">
-
-        
-
-        <Image x:Name="Map" Margin="1239,589,0,0" Width="422" Height="420" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
-        <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,10,0,0" VerticalAlignment="Top" Width="264"/>
-        <hx:HexItem Orientation="Horizontal" Margin="1433,206,77,685" Name="TerrainType" />
-    </Grid>
+   
+    <Viewbox Stretch="Fill">
+        <Grid Name="MainGrid">
+            <Image x:Name="Map" Margin="1239,589,0,0" Width="422" Height="420" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,10,0,0" VerticalAlignment="Top" Width="264"/>
+                <hx:HexItem Orientation="Horizontal" Margin="0,206,77,0" Name="TerrainType" HorizontalAlignment="Right" VerticalAlignment="Top" Height="102" Width="112" />
+            </Grid>
+    </Viewbox>
+   
 </Window>

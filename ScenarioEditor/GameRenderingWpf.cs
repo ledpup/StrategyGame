@@ -61,7 +61,7 @@ namespace ScenarioEditor
 
         public void DrawCentreline(Hex origin, Hex destination, ArgbColour colour, int width)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public void DrawCircle(Hex location, float position, ArgbColour colour)
@@ -71,12 +71,49 @@ namespace ScenarioEditor
 
         public void DrawEdge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
         {
-            throw new NotImplementedException();
+            //var pen = new Pen(ColourToColor(colour), 3);
+            //(PointF pt1, PointF pt2) points;
+
+            //var direction = Hex.Subtract(origin, destination);
+            //var index = Hex.Directions.IndexOf(direction);
+
+            //var vertices = Layout.PolygonCorners(_layout, origin);
+
+            //points.pt1 = PointDtoF(vertices[index]);
+            //points.pt2 = PointDtoF(vertices[(index + 1) % 6]);
+
+            //if (isPort)
+            //{
+            //    using (StringFormat sf = new StringFormat())
+            //    {
+            //        sf.Alignment = StringAlignment.Center;
+            //        sf.LineAlignment = StringAlignment.Center;
+            //        var x = (points.pt1.X + points.pt2.X) / 2;
+            //        var y = (points.pt1.Y + points.pt2.Y) / 2;
+
+            //        var font = new Font("Arial", (int)(_hexHeight * .3));
+            //        _graphics.DrawString("P", font, pen.Brush, x, y, sf);
+            //    }
+            //}
+            //else
+            //{
+            //    _graphics.DrawLine(pen, points.pt1, points.pt2);
+            //}
         }
 
         public void DrawRectangle(Hex location, ArgbColour colour)
         {
-            throw new NotImplementedException();
+            var offsetCoord = OffsetCoord.QoffsetFromCube(location);
+
+            var rectangle = new System.Windows.Shapes.Rectangle
+            {
+                Width = 10,
+                Height = 10,
+                Fill = new SolidColorBrush(ColourToColor(colour))
+            };
+            rectangle.SetValue(Grid.ColumnProperty, offsetCoord.col);
+            rectangle.SetValue(Grid.RowProperty, offsetCoord.row);
+            _hexGrid.Children.Add(rectangle);
         }
 
         public void DrawTrapezium(Hex location, float position, ArgbColour colour)

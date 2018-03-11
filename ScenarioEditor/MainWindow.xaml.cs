@@ -72,13 +72,16 @@ namespace ScenarioEditor
             }
 
             var wpf = new GameRenderingWpf(_board.Width, _board.Height);
-            var gameRenderer = GameRenderer.Render(wpf, RenderPipeline.Board, RenderPipeline.Board, _board.Width, _board.Height, _board.Tiles);
+            var gameRenderer = GameRenderer.Render(wpf, RenderPipeline.Board, RenderPipeline.Structures, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures);
             var hexGrid = (HexGrid)gameRenderer.GetBitmap();
 
-            foreach (HexItem hexItem in hexGrid.Children)
+            foreach (UIElement uiElement in hexGrid.Children)
             {
-                hexItem.MouseEnter += HexItem_MouseEnter;
-                hexItem.PreviewMouseLeftButtonDown += HexItem_PreviewMouseLeftButtonDown;
+                if (uiElement is HexItem hexItem)
+                {
+                    hexItem.MouseEnter += HexItem_MouseEnter;
+                    hexItem.PreviewMouseLeftButtonDown += HexItem_PreviewMouseLeftButtonDown;
+                }
             }
 
             MainGrid.Children.Add(hexGrid);

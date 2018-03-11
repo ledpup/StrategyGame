@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 
 namespace HexGridControl
 {
@@ -97,12 +98,19 @@ namespace HexGridControl
                 w = 0;
                 foreach (UIElement e in InternalChildren)
                 {
-                    e.Measure(availableSize);
-                    var s = e.DesiredSize;
-                    if (s.Height > h)
-                        h = s.Height;
-                    if (s.Width > w)
-                        w = s.Width;
+                    if (e is HexItem)
+                    {
+                        e.Measure(availableSize);
+                        var s = e.DesiredSize;
+                        if (s.Height > h)
+                            h = s.Height;
+                        if (s.Width > w)
+                            w = s.Width;
+                    }
+                    else if (e is Rectangle)
+                    {
+
+                    }
                 }                
 
                 // multiply maximum size to RowCount and ColumnCount to get total size
@@ -239,10 +247,9 @@ namespace HexGridControl
         #endregion
 
         protected override Size ArrangeOverride(Size finalSize)
-        {            
+        {
             // determine if there is empty space at grid borders
-            bool first, last;
-            HasShift(out first, out last);
+            HasShift(out bool first, out bool last);
 
             // compute final hex size
             Size hexSize = GetHexSize(finalSize);

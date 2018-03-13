@@ -53,7 +53,7 @@ namespace ScenarioEditor
 
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                var color = GameRenderingWpf.ColourToColor(GameRenderer.GetColour(terrainType));
+                var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.GetColour(terrainType));
 
                 var button = new Button
                 {
@@ -73,7 +73,17 @@ namespace ScenarioEditor
 
             var wpf = new GameRenderingWpf(_board.Width, _board.Height);
             var gameRenderer = GameRenderer.Render(wpf, RenderPipeline.Board, RenderPipeline.Structures, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures);
-            var hexGrid = (HexGrid)gameRenderer.GetBitmap();
+            var canvas = (Canvas)gameRenderer.GetBitmap();
+            HexGrid hexGrid = null;
+
+            foreach (UIElement uiElement in canvas.Children)
+            {
+                if (uiElement is HexGrid)
+                {
+                    hexGrid = uiElement as HexGrid;
+                    break;
+                }
+            }
 
             foreach (UIElement uiElement in hexGrid.Children)
             {
@@ -84,7 +94,7 @@ namespace ScenarioEditor
                 }
             }
 
-            MainGrid.Children.Add(hexGrid);
+            MainGrid.Children.Add(canvas);
         }
 
         private void HexItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

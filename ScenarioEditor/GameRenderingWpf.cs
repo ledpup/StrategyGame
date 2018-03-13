@@ -91,12 +91,6 @@ namespace ScenarioEditor
                 Stroke = new SolidColorBrush(ArgbColourToColor(colour))
             };
 
-            var offsetCoord = OffsetCoord.QoffsetFromCube(origin);
-
-            line.SetValue(Grid.ColumnProperty, offsetCoord.col);
-            line.SetValue(Grid.RowProperty, offsetCoord.row);
-
-
             _canvas.Children.Add(line);
         }
 
@@ -106,35 +100,41 @@ namespace ScenarioEditor
         }
 
         public void DrawEdge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
-        {
-            //var pen = new Pen(ColourToColor(colour), 3);
-            //(PointF pt1, PointF pt2) points;
+        {            
+            var direction = Hex.Subtract(origin, destination);
+            var index = Hex.Directions.IndexOf(direction);
 
-            //var direction = Hex.Subtract(origin, destination);
-            //var index = Hex.Directions.IndexOf(direction);
+            var vertices = Layout.PolygonCorners(_layout, origin);
 
-            //var vertices = Layout.PolygonCorners(_layout, origin);
+            var point1 = vertices[index];
+            var point2 = vertices[(index + 1) % 6];
 
-            //points.pt1 = PointDtoF(vertices[index]);
-            //points.pt2 = PointDtoF(vertices[(index + 1) % 6]);
+            if (isPort)
+            {
+                //using (StringFormat sf = new StringFormat())
+                //{
+                //    sf.Alignment = StringAlignment.Center;
+                //    sf.LineAlignment = StringAlignment.Center;
+                //    var x = (points.pt1.X + points.pt2.X) / 2;
+                //    var y = (points.pt1.Y + points.pt2.Y) / 2;
 
-            ////if (isPort)
-            ////{
-            ////    using (StringFormat sf = new StringFormat())
-            ////    {
-            ////        sf.Alignment = StringAlignment.Center;
-            ////        sf.LineAlignment = StringAlignment.Center;
-            ////        var x = (points.pt1.X + points.pt2.X) / 2;
-            ////        var y = (points.pt1.Y + points.pt2.Y) / 2;
-
-            ////        var font = new Font("Arial", (int)(_hexHeight * .3));
-            ////        _graphics.DrawString("P", font, pen.Brush, x, y, sf);
-            ////    }
-            ////}
-            ////else
-            //{
-            //    _graphics.DrawLine(pen, points.pt1, points.pt2);
-            //}
+                //    var font = new Font("Arial", (int)(_hexHeight * .3));
+                //    _graphics.DrawString("P", font, pen.Brush, x, y, sf);
+                //}
+            }
+            else
+            {
+                var line = new System.Windows.Shapes.Line
+                {
+                    X1 = point1.X,
+                    Y1 = point1.Y,
+                    X2 = point2.X,
+                    Y2 = point2.Y,
+                    StrokeThickness = 3,
+                    Stroke = new SolidColorBrush(ArgbColourToColor(colour))
+                };
+                _canvas.Children.Add(line);
+            }
         }
 
         public void DrawRectangle(Hex location, ArgbColour colour)

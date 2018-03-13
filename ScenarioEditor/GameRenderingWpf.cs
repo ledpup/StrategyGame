@@ -111,16 +111,17 @@ namespace ScenarioEditor
 
             if (isPort)
             {
-                //using (StringFormat sf = new StringFormat())
-                //{
-                //    sf.Alignment = StringAlignment.Center;
-                //    sf.LineAlignment = StringAlignment.Center;
-                //    var x = (points.pt1.X + points.pt2.X) / 2;
-                //    var y = (points.pt1.Y + points.pt2.Y) / 2;
+                var label = new Label
+                {
+                    Content = "P",
+                    FontWeight = FontWeights.Bold,
+                    FontSize = 16,
+                    Foreground = new SolidColorBrush(ArgbColourToColor(colour))
+                };
 
-                //    var font = new Font("Arial", (int)(_hexHeight * .3));
-                //    _graphics.DrawString("P", font, pen.Brush, x, y, sf);
-                //}
+                Canvas.SetLeft(label, (point1.X + point2.X) / 2 - 10);
+                Canvas.SetTop(label, (point1.Y + point2.Y) / 2 - 10);
+                _canvas.Children.Add(label);
             }
             else
             {

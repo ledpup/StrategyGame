@@ -68,7 +68,7 @@ namespace ScenarioEditor
                     Tag = terrainType,
                 };
 
-                button.Click += Button_Click;
+                button.Click += TerrainTypeSelected_Click;
 
                 TerrainTypeSelector.Children.Add(button);
             }
@@ -88,7 +88,7 @@ namespace ScenarioEditor
                     Tag = edgeType,
                 };
 
-                button.Click += Button_Click;
+                //button.Click += Button_Click;
 
                 EdgeTypeSelector.Children.Add(button);
             }
@@ -150,7 +150,7 @@ namespace ScenarioEditor
             RenderGdiPlusBoard();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void TerrainTypeSelected_Click(object sender, RoutedEventArgs e)
         {
             var button = ((Button)e.Source);
             _selectedTerrainType = (TerrainType)button.Tag;

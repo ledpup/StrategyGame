@@ -27,7 +27,7 @@ namespace GameModel.Rendering
 
                 tiles.ToList().ForEach(x =>
                 {
-                    var colour = GetColour(x.TerrainType);
+                    var colour = TerrainTypeColour(x.TerrainType);
                     if (displaySelected && !x.IsSelected)
                     {
                         colour.Red = (short)(colour.Red * .3);
@@ -59,7 +59,7 @@ namespace GameModel.Rendering
 
                         if (!x.HasRoad || (x.HasRoad && x.EdgeType == EdgeType.River))
                         {
-                            edgesToRender.Add(new Edge(x.Origin.Hex, x.Destination.Hex, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
+                            edgesToRender.Add(new Edge(x.Origin.Hex, x.Destination.Hex, EdgeTypeColour(x.EdgeType), x.EdgeType == EdgeType.Port));
                         }
                     });
 
@@ -171,7 +171,7 @@ namespace GameModel.Rendering
             var gameBoardDrawing2D = Render(gameRenderingEngine, RenderPipeline.Labels, RenderPipeline.Labels, boardWidth, boardHeight, labels: labels);
             gameBoardDrawing2D.SaveGameBoardToFile(fileName);
         }
-        private static ArgbColour EdgeToColour(EdgeType edgeType)
+        public static ArgbColour EdgeTypeColour(EdgeType edgeType)
         {
             switch (edgeType)
             {
@@ -190,7 +190,7 @@ namespace GameModel.Rendering
             }
         }
 
-        public static ArgbColour GetColour(TerrainType terrainType)
+        public static ArgbColour TerrainTypeColour(TerrainType terrainType)
         {
             switch (terrainType)
             {

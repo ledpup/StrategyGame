@@ -13,6 +13,7 @@
             <Image x:Name="Map" Margin="1239,589,0,0" Width="422" Height="420" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
             <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,10,0,0" VerticalAlignment="Top" Width="264"/>
             <hx:HexItem Orientation="Horizontal" Margin="0,206,77,0" Name="TerrainType" HorizontalAlignment="Right" VerticalAlignment="Top" Height="102" Width="112" />
+            <WrapPanel x:Name="EdgeTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,328,0,0" VerticalAlignment="Top" Width="264"/>
         </Grid>
     </Viewbox>
    

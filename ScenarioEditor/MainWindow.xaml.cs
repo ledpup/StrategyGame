@@ -55,7 +55,7 @@ namespace ScenarioEditor
 
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.GetColour(terrainType));
+                var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.TerrainTypeColour(terrainType));
 
                 var button = new Button
                 {
@@ -71,6 +71,26 @@ namespace ScenarioEditor
                 button.Click += Button_Click;
 
                 TerrainTypeSelector.Children.Add(button);
+            }
+
+            foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
+            {
+                var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.EdgeTypeColour(edgeType));
+
+                var button = new Button
+                {
+                    Content = edgeType.ToString(),
+                    Background = new SolidColorBrush(color),
+                    Foreground = new SolidColorBrush(PerceivedBrightness(color) > 130 ? Colors.Black : Colors.White),
+                    Margin = new Thickness(5),
+                    Width = 60,
+                    FontWeight = FontWeights.Bold,
+                    Tag = edgeType,
+                };
+
+                button.Click += Button_Click;
+
+                EdgeTypeSelector.Children.Add(button);
             }
 
             var wpf = new GameRenderingWpf(_board.Width, _board.Height);

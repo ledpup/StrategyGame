@@ -43,10 +43,12 @@ namespace ScenarioEditor
 
             _board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit() { Location = _board[1, 1] },
-                new MilitaryUnit() { Location = _board[1, 1] },
-                new MilitaryUnit() { Location = _board[1, 1] },
-                new MilitaryUnit() { Location = _board[1, 1], OwnerIndex = 2 }
+                new MilitaryUnit(0) { Location = _board[1, 1] },
+                new MilitaryUnit(1) { Location = _board[1, 1] },
+                new MilitaryUnit(2) { Location = _board[1, 1] },
+                new MilitaryUnit(3) { Location = _board[1, 1], OwnerIndex = 2 },
+                new MilitaryUnit(4, "1st Fleet", 0, _board[0, 0], MovementType.Water),
+                new MilitaryUnit(4, "1st Airborne", 0, _board[3, 2], MovementType.Airborne),
             };
 
             RenderGdiPlusBoard();
@@ -72,7 +74,7 @@ namespace ScenarioEditor
             }
 
             var wpf = new GameRenderingWpf(_board.Width, _board.Height);
-            var gameRenderer = GameRenderer.Render(wpf, RenderPipeline.Board, RenderPipeline.Structures, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures);
+            var gameRenderer = GameRenderer.Render(wpf, RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
             var canvas = (Canvas)gameRenderer.GetBitmap();
             HexGrid hexGrid = null;
 

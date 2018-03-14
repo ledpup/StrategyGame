@@ -108,37 +108,24 @@ namespace GameRendering2D
         public void DrawCircle(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
-            var topLeftCorner = UnitLocationTopLeftCorner(location, position);
-
-            _graphics.FillEllipse(brush, topLeftCorner.xTopLeft, topLeftCorner.yTopLeft, _unitWidth, _unitWidth);
-        }
-
-        private (float xTopLeft, float yTopLeft) UnitLocationTopLeftCorner(Hex location, float position)
-        {
-            float Radius = _hexHeight / 4;
-
             var hexCentre = Layout.HexToPixel(_layout, location);
+            var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
 
-            var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
-            var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
-
-            var xTopLeft = (float)(xOnCircle - (_unitWidth / 2));
-            var yTopLeft = (float)(yOnCircle - (_unitWidth / 2));
-
-            return (xTopLeft, yTopLeft);
+            _graphics.FillEllipse(brush, (float)topLeftCorner.X, (float)topLeftCorner.Y, _unitWidth, _unitWidth);
         }
 
         public void DrawTrapezium(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
-            var topLeftCorner = UnitLocationTopLeftCorner(location, position);
+            var hexCentre = Layout.HexToPixel(_layout, location);
+            var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
 
             PointF[] points =
             {
-                new PointF(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth * .8F, topLeftCorner.yTopLeft + _unitWidth * .65F),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth * .2F, topLeftCorner.yTopLeft + _unitWidth * .65F),
+                new PointF((float)topLeftCorner.X, (float)topLeftCorner.Y),
+                new PointF((float)topLeftCorner.X + _unitWidth, (float)topLeftCorner.Y),
+                new PointF((float)topLeftCorner.X + _unitWidth * .8F, (float)topLeftCorner.Y + _unitWidth * .65F),
+                new PointF((float)topLeftCorner.X + _unitWidth * .2F, (float)topLeftCorner.Y + _unitWidth * .65F),
             };
 
             _graphics.FillPolygon(brush, points);
@@ -157,13 +144,14 @@ namespace GameRendering2D
         public void DrawTriangle(Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
-            var topLeftCorner = UnitLocationTopLeftCorner(location, position);
+            var hexCentre = Layout.HexToPixel(_layout, location);
+            var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
 
             PointF[] points = 
             {
-                new PointF(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth / 2, topLeftCorner.yTopLeft + _unitWidth)
+                new PointF((float)topLeftCorner.X, (float)topLeftCorner.Y),
+                new PointF((float)topLeftCorner.X + _unitWidth, (float)topLeftCorner.Y),
+                new PointF((float)topLeftCorner.X + _unitWidth / 2, (float)topLeftCorner.Y + _unitWidth)
             };
 
             _graphics.FillPolygon(brush, points);

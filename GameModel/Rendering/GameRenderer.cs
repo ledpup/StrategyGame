@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hexagon;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -211,6 +212,19 @@ namespace GameModel.Rendering
                     return Colours.DarkBlue;
             }
             return Colours.Black;
+        }
+
+        public static PointD UnitLocationTopLeftCorner(PointD hexCentre, float position, float hexHeight, float unitWidth)
+        {
+            float Radius = hexHeight / 4;
+
+            var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
+            var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
+
+            var xTopLeft = (float)(xOnCircle - (unitWidth / 2));
+            var yTopLeft = (float)(yOnCircle - (unitWidth / 2));
+
+            return new PointD(xTopLeft, yTopLeft);
         }
     }
 }

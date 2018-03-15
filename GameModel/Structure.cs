@@ -9,8 +9,8 @@ namespace GameModel
     public enum StructureType
     {
         None,
-        Outpost,
         Fortress,
+        Town,
         City
     }
 
@@ -20,8 +20,8 @@ namespace GameModel
         public static Dictionary<StructureType, double> StructureDefenceModifiers = new Dictionary<StructureType, double>
             {
                 { StructureType.City, .4 },
-                { StructureType.Fortress, .6 },
-                { StructureType.Outpost, .8 },
+                { StructureType.Town, .6 },
+                { StructureType.Fortress, .8 },
             };
 
         public int Index;

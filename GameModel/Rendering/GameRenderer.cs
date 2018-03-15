@@ -183,6 +183,8 @@ namespace GameModel.Rendering
                     return Colours.SandyBrown;
                 case EdgeType.Mountain:
                     return Colours.Brown;
+                case EdgeType.Reef:
+                    return Colours.DarkBlue;
                 case EdgeType.Port:
                     return Colours.DarkBlue;
                 default:

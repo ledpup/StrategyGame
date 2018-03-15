@@ -37,6 +37,16 @@ namespace ScenarioEditor
 
         TerrainType _selectedTerrainType;
         Board _board;
+        Activity _activity;
+        StructureType _selectedStructureType;
+        GameRenderingWpf _gameRenderingWpf;
+        enum Activity
+        {
+            Terrain,
+            Edge,
+            Structure,
+            Unit
+        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             _board = new Board(GameBoard, TileEdges, Structures);
@@ -93,8 +103,29 @@ namespace ScenarioEditor
                 EdgeTypeSelector.Children.Add(button);
             }
 
-            var wpf = new GameRenderingWpf(_board.Width, _board.Height);
-            var gameRenderer = GameRenderer.Render(wpf, RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
+            foreach (StructureType structureType in Enum.GetValues(typeof(StructureType)))
+            {
+                //var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.EdgeTypeColour(structureType));
+
+                var button = new Button
+                {
+                    Content = structureType.ToString(),
+                    //Background = new SolidColorBrush(color),
+                    //Foreground = new SolidColorBrush(PerceivedBrightness(color) > 130 ? Colors.Black : Colors.White),
+                    Margin = new Thickness(5),
+                    Width = 60,
+                    FontWeight = FontWeights.Bold,
+                    Tag = structureType,
+                };
+
+                button.Click += Button_Click;
+
+                StructureTypeSelector.Children.Add(button);
+            }
+
+
+            _gameRenderingWpf = new GameRenderingWpf(_board.Width, _board.Height);
+            var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
             var canvas = (Canvas)gameRenderer.GetBitmap();
             HexGrid hexGrid = null;
 
@@ -119,9 +150,40 @@ namespace ScenarioEditor
             MainGrid.Children.Add(canvas);
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var button = ((Button)e.Source);
+            _activity = Activity.Structure;
+            _selectedStructureType = (StructureType)button.Tag;
+        }
+
         private void HexItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            SetTerrainType(sender);
+            switch (_activity)
+            {
+                case Activity.Terrain:
+                    SetTerrainType(sender);
+                    break;
+                case Activity.Structure:
+                    SetStructureType(sender);
+                    break;
+            }
+            
+        }
+
+        private void SetStructureType(object sender)
+        {
+            var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
+            var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
+            _board.Structures.Remove(_board[x, y].Structure);
+            var newStructure = _selectedStructureType == StructureType.None ? null : new Structure(0, _selectedStructureType, _board[x, y], 0);
+            _board[x, y].Structure = newStructure;
+            if (newStructure != null)
+                _board.Structures.Add(newStructure);
+
+            _gameRenderingWpf.DrawRectangle(_board[x, y].Hex, GameRenderer.StructureColour(_board[x, y].Structure));
+
+            RenderGdiPlusBoard();
         }
 
         private void RenderGdiPlusBoard()

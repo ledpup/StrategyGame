@@ -160,15 +160,32 @@ namespace ScenarioEditor
         {
             var offsetCoord = OffsetCoord.QoffsetFromCube(location);
 
-            var rectangle = new System.Windows.Shapes.Rectangle
+            Rectangle rectangle = null;
+
+            foreach (UIElement uiElement in _hexGrid.Children)
             {
-                Width = _structureWidth,
-                Height = _structureWidth,
-                Fill = new SolidColorBrush(ArgbColourToColor(colour))
-            };
-            rectangle.SetValue(Grid.ColumnProperty, offsetCoord.col);
-            rectangle.SetValue(Grid.RowProperty, offsetCoord.row);
-            _hexGrid.Children.Add(rectangle);
+                if (uiElement is Rectangle)
+                {
+                    if ((int)uiElement.GetValue(Grid.ColumnProperty) == offsetCoord.col && (int)uiElement.GetValue(Grid.RowProperty) == offsetCoord.row)
+                    {
+                        rectangle = (Rectangle)uiElement;
+                    }
+                }
+            }
+
+            if (rectangle == null)
+            {
+                rectangle = new Rectangle
+                {
+                    Width = _structureWidth,
+                    Height = _structureWidth,
+                };
+                rectangle.SetValue(Grid.ColumnProperty, offsetCoord.col);
+                rectangle.SetValue(Grid.RowProperty, offsetCoord.row);
+                _hexGrid.Children.Add(rectangle);
+            }
+
+            rectangle.Fill = new SolidColorBrush(ArgbColourToColor(colour));
         }
 
         public void DrawTrapezium(Hex location, float position, ArgbColour colour)

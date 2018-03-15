@@ -7,14 +7,18 @@
         xmlns:local="clr-namespace:ScenarioEditor"
         mc:Ignorable="d"
         Title="MainWindow" Height="1050" Width="1680" Loaded="Window_Loaded">
-   
+
     <Viewbox Stretch="Fill">
         <Grid Name="MainGrid">
             <Image x:Name="Map" Margin="1239,589,0,0" Width="422" Height="420" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
-            <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,10,0,0" VerticalAlignment="Top" Width="264"/>
-            <hx:HexItem Orientation="Horizontal" Margin="0,206,77,0" Name="TerrainType" HorizontalAlignment="Right" VerticalAlignment="Top" Height="102" Width="112" />
-            <WrapPanel x:Name="EdgeTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,328,0,0" VerticalAlignment="Top" Width="264"/>
+            <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Height="61" Margin="1398,36,0,0" VerticalAlignment="Top" Width="326"/>
+            <hx:HexItem Orientation="Horizontal" Margin="0,105,248,0" Name="TerrainType" HorizontalAlignment="Right" VerticalAlignment="Top" Height="73" Width="79" />
+            <WrapPanel x:Name="EdgeTypeSelector" HorizontalAlignment="Left" Height="97" Margin="1397,214,0,0" VerticalAlignment="Top" Width="317"/>
+            <WrapPanel x:Name="StructureTypeSelector" HorizontalAlignment="Left" Height="138" Margin="1398,347,0,0" VerticalAlignment="Top" Width="316"/>
+            <Label Content="Terrain Type Selector" HorizontalAlignment="Left" Margin="1397,10,0,0" VerticalAlignment="Top"/>
+            <Label Content="Edge Type Selector" HorizontalAlignment="Left" Margin="1397,183,0,0" VerticalAlignment="Top"/>
+            <Label Content="Structure Type Selector" HorizontalAlignment="Left" Margin="1398,316,0,0" VerticalAlignment="Top"/>
         </Grid>
     </Viewbox>
-   
+
 </Window>

@@ -22,8 +22,7 @@ namespace Tests
             var structures = new List<Structure>
             {
                 new Structure(0, StructureType.Fortress, null, 1),
-                new Structure(0, StructureType.Outpost, null, 1),
-
+                new Structure(0, StructureType.Town, null, 1),
                 new Structure(0, StructureType.City, null, 2),
             };
 

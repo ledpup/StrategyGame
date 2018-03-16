@@ -145,9 +145,19 @@ namespace GameModel.Rendering
             return gameRenderingEngine;
         }
 
-        internal static ArgbColour PlayerColour(int playerIndex)
+        public static ArgbColour PlayerColour(int playerIndex)
         {
-            return playerIndex == 0 ? Colours.Blue : Colours.Red;
+            switch (playerIndex)
+            {
+                case 0:
+                    return Colours.Blue;
+                case 1:
+                    return Colours.Red;
+                case 2:
+                    return Colours.Green;
+                default:
+                    return Colours.Brown;
+            }
         }
 
         public static ArgbColour UnitColour(MilitaryUnit unit)

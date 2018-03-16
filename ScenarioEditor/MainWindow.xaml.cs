@@ -39,6 +39,7 @@ namespace ScenarioEditor
         Board _board;
         Activity _activity;
         StructureType _selectedStructureType;
+        int _selectedFaction;
         GameRenderingWpf _gameRenderingWpf;
         enum Activity
         {
@@ -56,12 +57,10 @@ namespace ScenarioEditor
                 new MilitaryUnit(0) { Location = _board[1, 1] },
                 new MilitaryUnit(1) { Location = _board[1, 1] },
                 new MilitaryUnit(2) { Location = _board[1, 1] },
-                new MilitaryUnit(3) { Location = _board[1, 1], OwnerIndex = 2 },
+                new MilitaryUnit(3) { Location = _board[1, 1], OwnerIndex = 1 },
                 new MilitaryUnit(4, "1st Fleet", 0, _board[0, 0], MovementType.Water),
                 new MilitaryUnit(4, "1st Airborne", 0, _board[3, 2], MovementType.Airborne),
             };
-
-            RenderGdiPlusBoard();
 
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
@@ -110,8 +109,7 @@ namespace ScenarioEditor
                 var button = new Button
                 {
                     Content = structureType.ToString(),
-                    //Background = new SolidColorBrush(color),
-                    //Foreground = new SolidColorBrush(PerceivedBrightness(color) > 130 ? Colors.Black : Colors.White),
+
                     Margin = new Thickness(5),
                     Width = 60,
                     FontWeight = FontWeights.Bold,
@@ -123,6 +121,26 @@ namespace ScenarioEditor
                 StructureTypeSelector.Children.Add(button);
             }
 
+            for (var i = 0; i < 4; i++)
+            {
+                var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.PlayerColour(i));
+                var radioButton = new RadioButton()
+                {
+                    Content = i,
+                    Tag = i,
+                    Foreground = new SolidColorBrush(color),
+                    GroupName = "Faction",
+                    Width = 50,
+                };
+                radioButton.Click += RadioButton_Click;
+                if (i == 0)
+                {
+                    radioButton.IsChecked = true;
+                    SelectFaction(i);
+                }
+
+                FactionSelector.Children.Add(radioButton);
+            }            
 
             _gameRenderingWpf = new GameRenderingWpf(_board.Width, _board.Height);
             var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
@@ -150,6 +168,26 @@ namespace ScenarioEditor
             MainGrid.Children.Add(canvas);
         }
 
+        private void RadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectFaction((int)((RadioButton)sender).Tag);
+        }
+
+        private void SelectFaction(int faction)
+        {
+            _selectedFaction = faction;
+            foreach (Button structureTypeUiElement in StructureTypeSelector.Children)
+            {
+                var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.PlayerColour(_selectedFaction));
+
+                if ((StructureType)structureTypeUiElement.Tag != StructureType.None)
+                {
+                    structureTypeUiElement.Background = new SolidColorBrush(color);
+                    structureTypeUiElement.Foreground = new SolidColorBrush(PerceivedBrightness(color) > 130 ? Colors.Black : Colors.White);
+                }
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var button = ((Button)e.Source);
@@ -168,31 +206,37 @@ namespace ScenarioEditor
                     SetStructureType(sender);
                     break;
             }
-            
         }
 
         private void SetStructureType(object sender)
         {
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
             var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
+
+            bool sameStructureAsSelected = false;
+
+            if (_board[x, y].Structure != null && _board[x, y].Structure.StructureType == _selectedStructureType)
+            {
+                sameStructureAsSelected = true;
+            }
+
             _board.Structures.Remove(_board[x, y].Structure);
-            var newStructure = _selectedStructureType == StructureType.None ? null : new Structure(0, _selectedStructureType, _board[x, y], 0);
-            _board[x, y].Structure = newStructure;
-            if (newStructure != null)
-                _board.Structures.Add(newStructure);
+            _board[x, y].Structure = null;
+            _gameRenderingWpf.RemoveRectangle(_board[x, y].Hex);
 
-            _gameRenderingWpf.DrawRectangle(_board[x, y].Hex, GameRenderer.StructureColour(_board[x, y].Structure));
+            if (_selectedStructureType == StructureType.None || sameStructureAsSelected)
+            {
+                return;
+            }
+            else
+            {
+                var newStructure = new Structure(0, _selectedStructureType, _board[x, y], _selectedFaction);
+                _board[x, y].Structure = newStructure;
+                if (newStructure != null)
+                    _board.Structures.Add(newStructure);
 
-            RenderGdiPlusBoard();
-        }
-
-        private void RenderGdiPlusBoard()
-        {
-            var drawing2d = new GameRenderingGdiPlus(_board.Width, _board.Height);
-            GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Labels, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
-
-            var bitmap = (Bitmap)drawing2d.GetBitmap();
-            Map.Source = BitmapToBitmapImage(bitmap);
+                _gameRenderingWpf.DrawRectangle(_board[x, y].Hex, GameRenderer.StructureColour(_board[x, y].Structure));
+            }
         }
 
         private void HexItem_MouseEnter(object sender, MouseEventArgs e)
@@ -209,11 +253,12 @@ namespace ScenarioEditor
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
             var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
             _board[x, y].TerrainType = _selectedTerrainType;
-            RenderGdiPlusBoard();
         }
 
         private void TerrainTypeSelected_Click(object sender, RoutedEventArgs e)
         {
+            _activity = Activity.Terrain;
+
             var button = ((Button)e.Source);
             _selectedTerrainType = (TerrainType)button.Tag;
             TerrainType.Content = _selectedTerrainType;

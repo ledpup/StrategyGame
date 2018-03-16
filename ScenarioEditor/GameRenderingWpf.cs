@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 
 namespace ScenarioEditor
 {
-    public class GameRenderingWpf : IGameRenderingEngine
+    public class GameRenderingWpf : IGameRenderingEngine, IReactiveGameRenderingEngine
     {
         float _structureWidth, _hexHeight;
         float _unitWidth;
@@ -113,8 +113,6 @@ namespace ScenarioEditor
             _canvas.Children.Add(circle);
         }
 
-
-
         public void DrawEdge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
         {            
             var direction = Hex.Subtract(origin, destination);
@@ -179,6 +177,7 @@ namespace ScenarioEditor
                 {
                     Width = _structureWidth,
                     Height = _structureWidth,
+                    IsHitTestVisible = false,
                 };
                 rectangle.SetValue(Grid.ColumnProperty, offsetCoord.col);
                 rectangle.SetValue(Grid.RowProperty, offsetCoord.row);
@@ -186,6 +185,26 @@ namespace ScenarioEditor
             }
 
             rectangle.Fill = new SolidColorBrush(ArgbColourToColor(colour));
+        }
+
+        public void RemoveRectangle(Hex location)
+        {
+            var offsetCoord = OffsetCoord.QoffsetFromCube(location);
+
+            Rectangle rectangle = null;
+
+            foreach (UIElement uiElement in _hexGrid.Children)
+            {
+                if (uiElement is Rectangle)
+                {
+                    if ((int)uiElement.GetValue(Grid.ColumnProperty) == offsetCoord.col && (int)uiElement.GetValue(Grid.RowProperty) == offsetCoord.row) rectangle = (Rectangle)uiElement;
+                }
+            }
+
+            if (rectangle != null)
+            {
+                _hexGrid.Children.Remove(rectangle);
+            }
         }
 
         public void DrawTrapezium(Hex location, float position, ArgbColour colour)

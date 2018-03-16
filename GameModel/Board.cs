@@ -215,7 +215,6 @@ namespace GameModel
                 var structureType = (StructureType)Enum.Parse(typeof(StructureType), structureProperties[2]);
                 var structure = new Structure(index, structureType, TileArray[index], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
 
-                
                 structures.Add(structure);
             }
             return structures;

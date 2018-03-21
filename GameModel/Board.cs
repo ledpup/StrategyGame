@@ -430,7 +430,7 @@ namespace GameModel
 
             transportOrders.ForEach(x =>
             {
-                if (x.Unit.Location == x.UnitToTransport.Location && x.Unit.CanTransport(x.UnitToTransport))
+                if (x.Unit.Location == x.UnitToTransport.Location && x.Unit.AbleToTransport(x.UnitToTransport))
                 {
                     x.Unit.Transporting.Add(x.UnitToTransport);
                     x.UnitToTransport.TransportedBy = x.Unit;
@@ -501,7 +501,7 @@ namespace GameModel
                     .ForEach((KeyValuePair<MilitaryUnit, Move> x) =>
                     {
                         var transportedUnit = x.Key;
-                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                        var transports = Units.Where(y => y.MovementType == MovementType.Water && x.Value.Edge.Destination.Hex == y.Location.Hex && y.AbleToTransport(transportedUnit)).OrderBy(y => y.TransportSize);
                         var transport = transports.FirstOrDefault();
                         if (transport != null)
                         {
@@ -621,21 +621,21 @@ namespace GameModel
 
                 var opponentUnitsCount = (double)combatantInBattle.OpponentUnits.Count;
 
-                foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+                foreach (CombatType unitType in Enum.GetValues(typeof(CombatType)))
                 {
-                    combatantInBattle.OpponentUnitTypes[unitType] = combatantInBattle.OpponentUnits.Count(x => x.UnitType == unitType);
-                    var proportion = combatantInBattle.OpponentUnitTypes[unitType] / opponentUnitsCount;
+                    combatantInBattle.OpponentCombatTypes[unitType] = combatantInBattle.OpponentUnits.Count(x => x.CombatType == unitType);
+                    var proportion = combatantInBattle.OpponentCombatTypes[unitType] / opponentUnitsCount;
 
                     combatantInBattle.Units.ForEach(x =>
                     {
-                        x.BattleQualityModifiers[BattleQualityModifier.UnitType] = x.OpponentUnitTypeBattleModifier[unitType] * proportion;
+                        x.BattleQualityModifiers[BattleQualityModifier.CombatType] = x.OpponentCombatTypeBattleModifier[unitType] * proportion;
                     });
                 }
 
                 foreach (var unit in combatantInBattle.Units)
                 {
                     unit.CalculateStrength();
-                    combatantInBattle.UnitStrengthByType[unit.UnitType] += unit.BattleStrength;
+                    combatantInBattle.UnitStrengthByCombatType[unit.CombatType] += unit.BattleStrength;
                 }
 
                 combatantInBattle.UnitStrength = group.Sum(x => x.BattleStrength);
@@ -654,7 +654,7 @@ namespace GameModel
                 if (residentId == combatant.OwnerId && structure != StructureType.None)
                 {
                     var siegeUnitDamage = 0D;
-                    opponents.ForEach(x => siegeUnitDamage += x.UnitStrengthByType[UnitType.Siege]);
+                    opponents.ForEach(x => siegeUnitDamage += x.UnitStrengthByCombatType[CombatType.Siege]);
 
                     combatant.StrengthDamage -= siegeUnitDamage;
                     combatant.StrengthDamage *= (Structure.StructureDefenceModifiers[structure] + (.05 * siegeDuration));
@@ -693,9 +693,9 @@ namespace GameModel
                 Turn = turn,
             };
 
-            foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+            foreach (CombatType unitType in Enum.GetValues(typeof(CombatType)))
             {
-                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
+                units.Where(x => x.CombatType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
             }
 
             units.ForEach(x =>

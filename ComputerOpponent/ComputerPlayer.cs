@@ -246,7 +246,7 @@ namespace ComputerOpponent
                     {
                         var portEdges = board.Edges.Where(x => x.EdgeType == EdgeType.Port);
 
-                        var transportingUnits = units.Where(x => x.IsAlive && x.IsTransporter && portEdges.Any(y => y.CrossesEdge(unit.Location, x.Location) && x.CanTransport(unit)))
+                        var transportingUnits = units.Where(x => x.IsAlive && x.CanTransport && portEdges.Any(y => y.CrossesEdge(unit.Location, x.Location) && x.AbleToTransport(unit)))
                                                         .OrderByDescending(x => x.TransportSize);
                         var transportUnit = transportingUnits.FirstOrDefault();
                         if (transportUnit != null)
@@ -395,7 +395,7 @@ namespace ComputerOpponent
         private static UnitAndPath ClosestAvailableTransportPath(Board board, MilitaryUnit unit, List<MilitaryUnit> units, Func<MilitaryUnit, bool> rule)
         {
             var potentialPickupUnits = units
-                                    .Where(x => rule(x) && x.CanTransport(unit))
+                                    .Where(x => rule(x) && x.AbleToTransport(unit))
                                     .OrderBy(x => Hex.Distance(x.Location.Hex, unit.Location.Hex));
 
             foreach(var potentialPickupUnit in potentialPickupUnits)

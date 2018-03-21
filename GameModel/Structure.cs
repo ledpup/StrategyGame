@@ -25,17 +25,21 @@ namespace GameModel
             };
 
         public int Index;
+        public StructureType StructureType { get; set; }
+        public string Name { get; set; }
         public Tile Location;
         public int OwnerIndex;
         public float Supply;
+        
 
-        public Structure(int index, StructureType structureType, Tile tile, int ownerIndex = 0, int supply = 10)
+        public Structure(int index, StructureType structureType, Tile tile, int ownerIndex = 0, int supply = 10, string name = "Structure")
         {
             Index = index;
             StructureType = structureType;
             Location = tile;
             OwnerIndex = ownerIndex;
             Supply = supply;
+            Name = name == "Structure" ? $"Structure {index}" : name;
 
             if (Location != null)
             {
@@ -43,6 +47,6 @@ namespace GameModel
             }            
         }
 
-        public StructureType StructureType { get; set;}
+        
     }
 }

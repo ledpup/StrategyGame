@@ -53,7 +53,7 @@ namespace Tests
             var air = new MilitaryUnit(movementType: MovementType.Airborne, isTransporter: true);
 
             
-            Assert.IsTrue(air.CanTransport(inf));
+            Assert.IsTrue(air.AbleToTransport(inf));
         }
 
         //[TestMethod]

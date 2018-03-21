@@ -18,14 +18,14 @@ namespace Tests
             {
                 new MilitaryUnit()
                 {
-                    UnitType = UnitType.Melee,
+                    CombatType = CombatType.Melee,
                     BaseQuality = 2,
                     InitialQuantity = 347,
                     InitialMorale = 3,
                 },
                 new MilitaryUnit()
                 {
-                    UnitType = UnitType.Siege,
+                    CombatType = CombatType.Siege,
                     BaseQuality = 2,
                     InitialQuantity = 167,
                     InitialMorale = 3,
@@ -33,7 +33,7 @@ namespace Tests
                 },
                 new MilitaryUnit()
                 {
-                    UnitType = UnitType.Melee,
+                    CombatType = CombatType.Melee,
                     BaseQuality = 1,
                     InitialQuantity = 256,
                     InitialMorale = 2,
@@ -44,7 +44,7 @@ namespace Tests
                 new MilitaryUnit()
                 {
                     OwnerIndex = 1,
-                    UnitType = UnitType.Melee,
+                    CombatType = CombatType.Melee,
                     BaseQuality = 3,
                     InitialQuantity = 245,
                     InitialMorale = 2,
@@ -52,7 +52,7 @@ namespace Tests
                 new MilitaryUnit()
                 {
                     OwnerIndex = 1,
-                    UnitType = UnitType.Cavalry,
+                    CombatType = CombatType.Cavalry,
                     BaseQuality = 3,
                     InitialQuantity = 345,
                     CombatInitiative = 5,
@@ -64,14 +64,14 @@ namespace Tests
                 new MilitaryUnit()
                 {
                     OwnerIndex = 2,
-                    UnitType = UnitType.Cavalry,
+                    CombatType = CombatType.Cavalry,
                     BaseQuality = 3,
                     InitialQuantity = 165,
                     StructureBattleModifier = -1,
                 },
                 new MilitaryUnit() {
                     OwnerIndex = 2,
-                    UnitType = UnitType.Ranged,
+                    CombatType = CombatType.Ranged,
                     BaseQuality = 3,
                     InitialQuantity = 175,
                     CombatInitiative = 5,
@@ -85,13 +85,13 @@ namespace Tests
             units[1].WeatherBattleModifier[Weather.Cold] = -1;
 
             units[4].WeatherBattleModifier[Weather.Wet] = -2;
-            units[4].OpponentUnitTypeBattleModifier[UnitType.Melee] = 2;
+            units[4].OpponentCombatTypeBattleModifier[CombatType.Melee] = 2;
 
             units[5].WeatherBattleModifier[Weather.Wet] = -2;
-            units[5].OpponentUnitTypeBattleModifier[UnitType.Melee] = 2;
+            units[5].OpponentCombatTypeBattleModifier[CombatType.Melee] = 2;
 
-            units[6].OpponentUnitTypeBattleModifier[UnitType.Cavalry] = 1;
-            units[6].OpponentUnitTypeBattleModifier[UnitType.Melee] = 1;
+            units[6].OpponentCombatTypeBattleModifier[CombatType.Cavalry] = 1;
+            units[6].OpponentCombatTypeBattleModifier[CombatType.Melee] = 1;
 
 
             var location = "Tzarian Castle";
@@ -106,7 +106,7 @@ namespace Tests
 
 
 
-            Assert.IsTrue(battleReport.CasualtiesByPlayerAndType[0][UnitType.Melee] > 50);
+            Assert.IsTrue(battleReport.CasualtiesByPlayerAndType[0][CombatType.Melee] > 50);
         }
 
         [TestMethod]

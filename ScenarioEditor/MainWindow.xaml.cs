@@ -18,6 +18,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
 using HexGridControl;
+using System.Runtime.CompilerServices;
+using System.ComponentModel;
 
 namespace ScenarioEditor
 {
@@ -39,6 +41,11 @@ namespace ScenarioEditor
         Board _board;
         Activity _activity;
         StructureType _selectedStructureType;
+
+
+
+        //public StructureViewModel _selectedStructure;
+
         int _selectedFaction;
         GameRenderingWpf _gameRenderingWpf;
         enum Activity
@@ -50,6 +57,8 @@ namespace ScenarioEditor
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            
+
             _board = new Board(GameBoard, TileEdges, Structures);
 
             _board.Units = new List<MilitaryUnit>
@@ -140,8 +149,17 @@ namespace ScenarioEditor
                 }
 
                 FactionSelector.Children.Add(radioButton);
-            }            
+            }
 
+
+            UnitSelector.Items.Add(new ListBoxItem() { Content = "Dwarf Infantry" });
+            UnitSelector.Items.Add(new ListBoxItem() { Content = "Human Cavalry" });
+
+            RenderMap();
+        }
+
+        private void RenderMap()
+        {
             _gameRenderingWpf = new GameRenderingWpf(_board.Width, _board.Height);
             var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
             var canvas = (Canvas)gameRenderer.GetBitmap();
@@ -213,30 +231,35 @@ namespace ScenarioEditor
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
             var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
 
-            bool sameStructureAsSelected = false;
-
-            if (_board[x, y].Structure != null && _board[x, y].Structure.StructureType == _selectedStructureType)
-            {
-                sameStructureAsSelected = true;
-            }
-
-            _board.Structures.Remove(_board[x, y].Structure);
-            _board[x, y].Structure = null;
             _gameRenderingWpf.RemoveRectangle(_board[x, y].Hex);
 
-            if (_selectedStructureType == StructureType.None || sameStructureAsSelected)
+            if (_selectedStructureType == StructureType.None)
             {
-                return;
+                _board.Structures.Remove(_board[x, y].Structure);
+                _board[x, y].Structure = null;
+                Structure.DataContext = null;
+            }
+            else if (_board[x, y].Structure != null)
+            {
+                _board[x, y].Structure.OwnerIndex = _selectedFaction;
+                _board[x, y].Structure.StructureType = _selectedStructureType;
             }
             else
             {
-                var newStructure = new Structure(0, _selectedStructureType, _board[x, y], _selectedFaction);
+                _board.Structures.Remove(_board[x, y].Structure);
+                var newStructure = new Structure(_board[x, y].Index, _selectedStructureType, _board[x, y], _selectedFaction);
+                
                 _board[x, y].Structure = newStructure;
-                if (newStructure != null)
-                    _board.Structures.Add(newStructure);
+                _board.Structures.Add(newStructure);
+                
+            }
 
+            if (_board[x, y].Structure != null)
+            {
+                Structure.DataContext = new StructureViewModel(_board[x, y].Structure);
                 _gameRenderingWpf.DrawRectangle(_board[x, y].Hex, GameRenderer.StructureColour(_board[x, y].Structure));
             }
+            
         }
 
         private void HexItem_MouseEnter(object sender, MouseEventArgs e)

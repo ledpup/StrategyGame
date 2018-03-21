@@ -12,21 +12,21 @@ namespace GameModel
         public double UnitStrength { get; set; }
         public double StrengthDamage { get; set; }
 
-        public Dictionary<UnitType, double> UnitStrengthByType { get; set; }
+        public Dictionary<CombatType, double> UnitStrengthByCombatType { get; set; }
         public List<MilitaryUnit> Units { get; set; }
         public double UnitSurvivalProportion { get; set; }
         public List<MilitaryUnit> OpponentUnits { get; set; }
 
-        public Dictionary<UnitType, int> OpponentUnitTypes { get; set; }
+        public Dictionary<CombatType, int> OpponentCombatTypes { get; set; }
 
         public CombatantInBattle()
         {
-            UnitStrengthByType = new Dictionary<UnitType, double>();
-            OpponentUnitTypes = new Dictionary<UnitType, int>();
-            foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+            UnitStrengthByCombatType = new Dictionary<CombatType, double>();
+            OpponentCombatTypes = new Dictionary<CombatType, int>();
+            foreach (CombatType unitType in Enum.GetValues(typeof(CombatType)))
             {
-                UnitStrengthByType.Add(unitType, 0);
-                OpponentUnitTypes.Add(unitType, 0);
+                UnitStrengthByCombatType.Add(unitType, 0);
+                OpponentCombatTypes.Add(unitType, 0);
             }
         }
 

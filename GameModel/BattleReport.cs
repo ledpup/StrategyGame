@@ -5,18 +5,18 @@ namespace GameModel
 {
     public class BattleReport
     {
-        public Dictionary<UnitType, int>[] CasualtiesByPlayerAndType { get; set; }
+        public Dictionary<CombatType, int>[] CasualtiesByPlayerAndType { get; set; }
         public Tile Tile { get; set; }
         public int Turn { get; set; }
         public List<CasualtyLogEntry> CasualtyLog { get; set; }
 
         public BattleReport(int numberOfCombatants)
         {
-            CasualtiesByPlayerAndType = new Dictionary<UnitType, int>[numberOfCombatants];
+            CasualtiesByPlayerAndType = new Dictionary<CombatType, int>[numberOfCombatants];
             for (var i = 0; i < numberOfCombatants; i++)
             {
-                CasualtiesByPlayerAndType[i] = new Dictionary<UnitType, int>();
-                foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+                CasualtiesByPlayerAndType[i] = new Dictionary<CombatType, int>();
+                foreach (CombatType unitType in Enum.GetValues(typeof(CombatType)))
                 {
                     CasualtiesByPlayerAndType[i].Add(unitType, 0);
                 }

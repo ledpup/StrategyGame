@@ -9,13 +9,12 @@ using System.Threading.Tasks;
 namespace GameModel
 {
 
-    public enum UnitType
+    public enum CombatType
     {
         Melee,
         Ranged,
         Cavalry,
         Siege,
-        Aquatic,
     }
 
     public enum MovementType
@@ -29,7 +28,7 @@ namespace GameModel
     {
         Terrain,
         Weather,
-        UnitType,
+        CombatType,
         Structure,
     }
 
@@ -93,7 +92,7 @@ namespace GameModel
         public int Index;
         public string Name { get; set; }
         public int OwnerIndex { get; set; }
-        public UnitType UnitType { get; set; }
+        public CombatType CombatType { get; set; }
         public MovementType MovementType { get; private set; }
         public int BaseMovementPoints { get; set; }
         public double BaseQuality
@@ -121,14 +120,14 @@ namespace GameModel
 
         public Dictionary<TerrainType, double> TerrainTypeBattleModifier { get; set; }
         public Dictionary<Weather, double> WeatherBattleModifier { get; set; }
-        public Dictionary<UnitType, double> OpponentUnitTypeBattleModifier { get; set; }
+        public Dictionary<CombatType, double> OpponentCombatTypeBattleModifier { get; set; }
 
         public TerrainType CanStopOn;
 
         public Dictionary<TerrainType, int> TerrainMovementCosts { get; set; }
         public Dictionary<EdgeType, int> EdgeMovementCosts { get; set; }
 
-        public bool IsTransporter { get; set; }
+        public bool CanTransport { get; set; }
         public List<MilitaryUnit> Transporting { get; set; }
 
         public int TurnCreated { get; set; }
@@ -137,7 +136,7 @@ namespace GameModel
         {
             return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, float[] moraleMoveCost = null)
+        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, CombatType combatType = CombatType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, float[] moraleMoveCost = null)
         {
             IsAlive = true;
 
@@ -159,10 +158,10 @@ namespace GameModel
                 WeatherBattleModifier.Add(weather, 0);
             }
 
-            OpponentUnitTypeBattleModifier = new Dictionary<UnitType, double>();
-            foreach (UnitType unitTypeEnum in Enum.GetValues(typeof(UnitType)))
+            OpponentCombatTypeBattleModifier = new Dictionary<CombatType, double>();
+            foreach (CombatType combatTypeEnum in Enum.GetValues(typeof(CombatType)))
             {
-                OpponentUnitTypeBattleModifier.Add(unitTypeEnum, 0);
+                OpponentCombatTypeBattleModifier.Add(combatTypeEnum, 0);
             }
 
             TerrainMovementCosts = new Dictionary<TerrainType, int>();
@@ -186,10 +185,10 @@ namespace GameModel
             Location = location;
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
-            UnitType = unitType;
+            CombatType = combatType;
             BaseQuality = baseQuality;
             Size = size;
-            IsTransporter = isTransporter;
+            CanTransport = isTransporter;
             TransportableBy = transportableBy;
             if (TransportableBy == null)
             {
@@ -407,9 +406,9 @@ namespace GameModel
         }
 
 
-        public bool CanTransport(MilitaryUnit transportee)
+        public bool AbleToTransport(MilitaryUnit transportee)
         {
-            if (!IsTransporter)
+            if (!CanTransport)
                 return false;
 
             if (!transportee.TransportableBy.Contains(MovementType))

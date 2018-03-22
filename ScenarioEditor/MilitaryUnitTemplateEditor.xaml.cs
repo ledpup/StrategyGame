@@ -16,13 +16,19 @@ using System.Windows.Shapes;
 namespace ScenarioEditor
 {
     /// <summary>
-    /// Interaction logic for MilitaryUnitEditor.xaml
+    /// Interaction logic for MilitaryUnitTemplateEditor.xaml
     /// </summary>
-    public partial class MilitaryUnitEditor : Window
+    public partial class MilitaryUnitTemplateEditor : Window
     {
-        public MilitaryUnitEditor()
+        public MilitaryUnitTemplateEditor()
         {
             InitializeComponent();
+        }
+
+        MilitaryUnitTemplateViewModel _militaryUnitTemplateViewModel;
+        public MilitaryUnitTemplateEditor(MilitaryUnitTemplate militaryUnitTemplate) :this ()
+        {
+            DataContext = _militaryUnitTemplateViewModel = new MilitaryUnitTemplateViewModel(militaryUnitTemplate);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -34,8 +40,10 @@ namespace ScenarioEditor
                     Content = movementType.ToString(),
                     Tag = (int)movementType,
                     GroupName = "MovementType",
+                    Margin = new Thickness(5),
+                    IsChecked = _militaryUnitTemplateViewModel.MovementType == movementType
                 };
-                //radioButton.Click += RadioButton_Click;
+                radioButton.Click += MovementType_Click;
 
                 MovementTypeSelector.Children.Add(radioButton);
             }
@@ -46,6 +54,7 @@ namespace ScenarioEditor
                 {
                     Content = combatType.ToString(),
                     Tag = (int)combatType,
+                    Margin = new Thickness(5),
                     GroupName = "CombatType",
                 };
                 //radioButton.Click += RadioButton_Click;
@@ -102,6 +111,11 @@ namespace ScenarioEditor
                 EdgeMovementCosts.Children.Add(label);
                 EdgeMovementCosts.Children.Add(textBox);
             }
+        }
+
+        private void MovementType_Click(object sender, RoutedEventArgs e)
+        {
+            _militaryUnitTemplateViewModel.MovementType = (MovementType)((RadioButton)sender).Tag;
         }
     }
 }

@@ -56,6 +56,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BaseViewModel.cs" />
+    <Compile Include="MilitaryUnitTemplateViewModel.cs" />
     <Compile Include="StructureViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -70,14 +72,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MilitaryUnitEditor.xaml">
+    <Page Include="MilitaryUnitTemplateEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MilitaryUnitEditor.xaml.cs">
-      <DependentUpon>MilitaryUnitEditor.xaml</DependentUpon>
+    <Compile Include="MilitaryUnitTemplateEditor.xaml.cs">
+      <DependentUpon>MilitaryUnitTemplateEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

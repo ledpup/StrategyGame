@@ -1,0 +1,26 @@
+﻿<Window x:Class="ScenarioEditor.MilitaryUnitTemplateEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScenarioEditor"
+        mc:Ignorable="d"
+        Title="MilitaryUnitTemplateEditor" Height="1050" Width="600" Loaded="Window_Loaded">
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="10,507,0,0" TextWrapping="Wrap" Text="combat quality, quantity, morale, size, transportable by, combat initiative" VerticalAlignment="Top"/>
+        <WrapPanel x:Name="MovementTypeSelector" HorizontalAlignment="Left" Margin="117,36,0,948" Width="195"/>
+        <WrapPanel x:Name="CombatTypeSelector" HorizontalAlignment="Left" Margin="17,76,0,908" Width="234"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="125,115,0,0" TextWrapping="Wrap" Text="{Binding MovementPoints}" VerticalAlignment="Top" Width="34"/>
+        <Label x:Name="MovementPoints" Content="Movement points" HorizontalAlignment="Left" Margin="17,111,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="MovementPoints_Copy" Content="Terrain type movement costs" HorizontalAlignment="Left" Margin="17,142,0,0" VerticalAlignment="Top"/>
+        <WrapPanel x:Name="TerrainTypeMovementCosts" HorizontalAlignment="Left" Margin="17,173,0,567" Width="228"/>
+        <Label Content="Edge movement costs" HorizontalAlignment="Left" Margin="256,142,0,0" VerticalAlignment="Top"/>
+        <WrapPanel x:Name="EdgeMovementCosts" HorizontalAlignment="Left" Margin="255,173,0,567" Width="153"/>
+        <CheckBox Content="Unit uses roads" HorizontalAlignment="Left" Margin="174,117,0,0" VerticalAlignment="Top" IsChecked="{Binding UsesRoads}" />
+        <CheckBox Content="Unit can transport other units" HorizontalAlignment="Left" Margin="10,469,0,0" VerticalAlignment="Top" IsChecked="{Binding CanTransport}" />
+        <Label Content="Movement type" HorizontalAlignment="Left" Margin="17,36,0,0" VerticalAlignment="Top"/>
+        <Label Content="Template name" HorizontalAlignment="Left" Margin="17,10,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="117,14,0,0" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Top" Width="170"/>
+
+    </Grid>
+</Window>

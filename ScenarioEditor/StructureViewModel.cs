@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace ScenarioEditor
 {
-    public class StructureViewModel : INotifyPropertyChanged
+    public class StructureViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        
 
         Structure _structure;
 
@@ -43,9 +43,6 @@ namespace ScenarioEditor
             get { return _structure.StructureType.ToString(); }
         }
 
-        private void RaisePropertyChanged([CallerMemberName] string caller = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(caller));
-        }
+
     }
 }

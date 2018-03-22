@@ -31,6 +31,9 @@ namespace ScenarioEditor
         public MainWindow()
         {
             InitializeComponent();
+
+
+
         }
 
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
@@ -41,7 +44,7 @@ namespace ScenarioEditor
         Board _board;
         Activity _activity;
         StructureType _selectedStructureType;
-
+        List<MilitaryUnitTemplate> _militaryUnitTemplates;
 
 
         //public StructureViewModel _selectedStructure;
@@ -151,9 +154,16 @@ namespace ScenarioEditor
                 FactionSelector.Children.Add(radioButton);
             }
 
+            _militaryUnitTemplates = new List<MilitaryUnitTemplate>
+            {
+                new MilitaryUnitTemplate("Dwarf Infantry", usesRoads: true),
+                new MilitaryUnitTemplate("Human Cavalry", movementPoints: 3, usesRoads: true),
+                new MilitaryUnitTemplate("Grifon", MovementType.Airborne, 3, false, true),
+            };
 
-            UnitSelector.Items.Add(new ListBoxItem() { Content = "Dwarf Infantry" });
-            UnitSelector.Items.Add(new ListBoxItem() { Content = "Human Cavalry" });
+            foreach (var militaryUnitTemplate in _militaryUnitTemplates)
+                UnitSelector.Items.Add(new ListBoxItem { Content = militaryUnitTemplate.Name });
+
 
             RenderMap();
         }
@@ -309,6 +319,12 @@ namespace ScenarioEditor
             bi.EndInit();
 
             return bi;
+        }
+
+        private void UnitSelector_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var mue = new MilitaryUnitTemplateEditor(_militaryUnitTemplates[((ListBox)sender).SelectedIndex]);
+            mue.Show();
         }
     }
 }

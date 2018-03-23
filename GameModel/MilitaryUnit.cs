@@ -11,9 +11,9 @@ namespace GameModel
 
     public enum CombatType
     {
+        Cavalry,
         Melee,
         Ranged,
-        Cavalry,
         Siege,
     }
 

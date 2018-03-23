@@ -75,5 +75,31 @@ namespace ScenarioEditor
                 RaisePropertyChanged();
             }
         }
+
+        public int CombatQuality
+        {
+            get { return _militaryUnitTemplate.CombatQuality; }
+            set
+            {
+                if (value == _militaryUnitTemplate.CombatQuality)
+                    return;
+
+                _militaryUnitTemplate.CombatQuality = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int CombatInitiative
+        {
+            get { return _militaryUnitTemplate.CombatInitiative; }
+            set
+            {
+                if (value == _militaryUnitTemplate.CombatInitiative)
+                    return;
+
+                _militaryUnitTemplate.CombatInitiative = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

@@ -19,7 +19,7 @@
             <Label Content="Structure Type Selector" HorizontalAlignment="Left" Margin="1398,353,0,630"/>
             <Label Content="Faction Selector" HorizontalAlignment="Left" Margin="1398,270,0,713"/>
             <WrapPanel x:Name="FactionSelector" HorizontalAlignment="Left" Margin="1398,301,0,656" Width="316"/>
-            <ListBox x:Name="UnitSelector" HorizontalAlignment="Left" Margin="1398,529,0,366" Width="316" MouseDoubleClick="UnitSelector_MouseDoubleClick"/>
+            <ListBox x:Name="UnitSelector" HorizontalAlignment="Left" Margin="1398,531,0,364" Width="316" MouseDoubleClick="UnitSelector_MouseDoubleClick"/>
             <Label Content="Unit Selector" HorizontalAlignment="Left" Margin="1398,498,0,485"/>
 
 

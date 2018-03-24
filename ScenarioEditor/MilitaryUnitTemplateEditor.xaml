@@ -7,25 +7,104 @@
         mc:Ignorable="d"
         Title="MilitaryUnitTemplateEditor" Height="1050" Width="600" Loaded="Window_Loaded">
     <Grid>
-        <TextBlock HorizontalAlignment="Left" Margin="24,590,0,0" TextWrapping="Wrap" Text="quantity, morale, size, transportable by, " VerticalAlignment="Top"/>
-        <WrapPanel x:Name="MovementTypeSelector" HorizontalAlignment="Left" Margin="117,36,0,948" Width="195"/>
-        <WrapPanel x:Name="CombatTypeSelector" HorizontalAlignment="Left" Margin="117,463,0,520" Width="319"/>
+        <ListBox ItemsSource="{Binding MovementTypesSelection}" SelectedItem="{Binding MovementTypeSelectedItem}"  Margin="117,36,140,0" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
+            <ListBox.ItemContainerStyle>
+                <!-- Style to get rid of the selection visual -->
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type local:MovementTypeSelector}">
+                    <RadioButton Content="{Binding Name}" GroupName="MovementType" Margin="5">
+                        <!-- Binding IsChecked to IsSelected requires no support code -->
+                        <RadioButton.IsChecked>
+                            <Binding Path="IsSelected"
+                             RelativeSource="{RelativeSource AncestorType=ListBoxItem}"
+                             Mode="TwoWay" />
+                        </RadioButton.IsChecked>
+                    </RadioButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+
+
+        <ListBox ItemsSource="{Binding CombatTypesSelection}" SelectedItem="{Binding CombatTypeSelectedItem}" Margin="124,526,149,0" Width="319" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
+            <ListBox.ItemContainerStyle>
+                <!-- Style to get rid of the selection visual -->
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type local:CombatTypeSelector}">
+                    <RadioButton Content="{Binding Name}" GroupName="CombatType" Margin="5">
+                        <!-- Binding IsChecked to IsSelected requires no support code -->
+                        <RadioButton.IsChecked>
+                            <Binding Path="IsSelected"
+                             RelativeSource="{RelativeSource AncestorType=ListBoxItem}"
+                             Mode="TwoWay" />
+                        </RadioButton.IsChecked>
+                    </RadioButton>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="124,67,0,0" TextWrapping="Wrap" Text="{Binding MovementPoints}" VerticalAlignment="Top" Width="34"/>
         <Label x:Name="MovementPoints" Content="Movement points" HorizontalAlignment="Left" Margin="16,63,0,0" VerticalAlignment="Top"/>
         <Label x:Name="MovementPoints_Copy" Content="Terrain type movement costs" HorizontalAlignment="Left" Margin="16,94,0,0" VerticalAlignment="Top"/>
-        <WrapPanel x:Name="TerrainTypeMovementCosts" HorizontalAlignment="Left" Margin="16,125,0,615" Width="228"/>
+        <WrapPanel x:Name="TerrainTypeMovementCosts" HorizontalAlignment="Left" Margin="16,125,0,581" Width="228"/>
         <Label Content="Edge movement costs" HorizontalAlignment="Left" Margin="255,94,0,0" VerticalAlignment="Top"/>
-        <WrapPanel x:Name="EdgeMovementCosts" HorizontalAlignment="Left" Margin="254,125,0,615" Width="153"/>
+        <WrapPanel x:Name="EdgeMovementCosts" HorizontalAlignment="Left" Margin="254,125,0,581" Width="153"/>
         <CheckBox Content="Unit uses roads" HorizontalAlignment="Left" Margin="173,69,0,0" VerticalAlignment="Top" IsChecked="{Binding UsesRoads}" />
-        <CheckBox Content="Unit can transport other units" HorizontalAlignment="Left" Margin="9,421,0,0" VerticalAlignment="Top" IsChecked="{Binding CanTransport}" />
+        <CheckBox Content="Unit can transport other units" HorizontalAlignment="Left" Margin="9,449,0,0" VerticalAlignment="Top" IsChecked="{Binding CanTransport}" />
         <Label Content="Movement type" HorizontalAlignment="Left" Margin="17,36,0,0" VerticalAlignment="Top"/>
         <Label Content="Template name" HorizontalAlignment="Left" Margin="17,10,0,0" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="117,14,0,0" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Top" Width="170"/>
-        <Label Content="Combat type" HorizontalAlignment="Left" Margin="10,463,0,0" VerticalAlignment="Top"/>
-        <Label Content="Combat quality" HorizontalAlignment="Left" Margin="10,504,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,507,0,0" TextWrapping="Wrap" Text="{Binding CombatQuality}" VerticalAlignment="Top" Width="41"/>
-        <Label Content="Combat initiative" HorizontalAlignment="Left" Margin="17,560,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,564,0,0" TextWrapping="Wrap" Text="{Binding CombatInitiative}" VerticalAlignment="Top" Width="41"/>
-
+        <Label Content="Combat type" HorizontalAlignment="Left" Margin="10,523,0,0" VerticalAlignment="Top"/>
+        <Label Content="Combat ability" HorizontalAlignment="Left" Margin="10,564,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,567,0,0" TextWrapping="Wrap" Text="{Binding CombatQuality}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Combat initiative" HorizontalAlignment="Left" Margin="11,606,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,609,0,0" TextWrapping="Wrap" Text="{Binding CombatInitiative}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Transportable by" HorizontalAlignment="Left" Margin="206,443,0,0" VerticalAlignment="Top"/>
+        <ItemsControl ItemsSource="{Binding Path=MovementTypesTransportableBySelection}" Margin="309,443,22,532">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected}" Margin="5" Click="MovementTypesTransportableBy_Click" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Label Content="Members" HorizontalAlignment="Left" Margin="9,492,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,495,0,0" TextWrapping="Wrap" Text="{Binding Members}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Size" HorizontalAlignment="Left" Margin="206,492,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="242,495,0,0" TextWrapping="Wrap" Text="{Binding Size}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Morale" HorizontalAlignment="Left" Margin="13,649,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="124,652,0,0" TextWrapping="Wrap" Text="{Binding Morale}" VerticalAlignment="Top" Width="41"/>
     </Grid>
 </Window>

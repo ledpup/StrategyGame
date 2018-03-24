@@ -297,9 +297,10 @@ namespace GameModel
 
         void LandUnit()
         {
-            TerrainMovementCosts[TerrainType.Grassland] = 1;
             TerrainMovementCosts[TerrainType.Desert] = 2;
             TerrainMovementCosts[TerrainType.Forest] = 2;
+            TerrainMovementCosts[TerrainType.FrozenWater] = 2;
+            TerrainMovementCosts[TerrainType.Grassland] = 1;
             TerrainMovementCosts[TerrainType.Hill] = 2;
             TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Water] = Terrain.Impassable;
@@ -307,11 +308,12 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Reef] = Terrain.Impassable;
 
             EdgeMovementCosts[EdgeType.None] = 0;
-            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Forest] = 1;
+            EdgeMovementCosts[EdgeType.FrozenRiver] = 1;
             EdgeMovementCosts[EdgeType.Hill] = 1;
             EdgeMovementCosts[EdgeType.Mountain] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Reef] = Terrain.Impassable;
+            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Port] = 1;
 
@@ -325,6 +327,7 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Grassland] = 1;
             TerrainMovementCosts[TerrainType.Desert] = 1;
             TerrainMovementCosts[TerrainType.Forest] = 1;
+            TerrainMovementCosts[TerrainType.FrozenWater] = 1;
             TerrainMovementCosts[TerrainType.Hill] = 1;
             TerrainMovementCosts[TerrainType.Mountain] = 1;
             TerrainMovementCosts[TerrainType.Water] = 1;
@@ -332,11 +335,12 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Reef] = 1;
 
             EdgeMovementCosts[EdgeType.None] = 0;
-            EdgeMovementCosts[EdgeType.River] = 0;
             EdgeMovementCosts[EdgeType.Forest] = 0;
+            EdgeMovementCosts[EdgeType.FrozenRiver] = 0;
             EdgeMovementCosts[EdgeType.Hill] = 0;
             EdgeMovementCosts[EdgeType.Mountain] = 0;
             EdgeMovementCosts[EdgeType.Reef] = 0;
+            EdgeMovementCosts[EdgeType.River] = 0;
             EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
             EdgeMovementCosts[EdgeType.Port] = 0;
 
@@ -348,6 +352,7 @@ namespace GameModel
             TerrainMovementCosts[TerrainType.Grassland] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Desert] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Forest] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.FrozenWater] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Hill] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Water] = 1;

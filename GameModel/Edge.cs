@@ -9,13 +9,14 @@ namespace GameModel
     public enum EdgeType
     {
         None,
-        River,
         Forest,
+        FrozenRiver,
         Hill,
         Mountain,
+        Port,
+        River,
         Reef,
         Wall,
-        Port,
     }
 
     public class Edge

@@ -33,35 +33,20 @@ namespace ScenarioEditor
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            foreach (MovementType movementType in Enum.GetValues(typeof(MovementType)))
-            {
-                var radioButton = new RadioButton()
-                {
-                    Content = movementType.ToString(),
-                    Tag = (int)movementType,
-                    GroupName = "MovementType",
-                    Margin = new Thickness(5),
-                    IsChecked = _militaryUnitTemplateViewModel.MovementType == movementType
-                };
-                radioButton.Click += MovementType_Click;
+            //foreach (MovementType movementType in Enum.GetValues(typeof(MovementType)))
+            //{
+            //    var radioButton = new RadioButton()
+            //    {
+            //        Content = movementType.ToString(),
+            //        Tag = (int)movementType,
+            //        GroupName = "MovementType",
+            //        Margin = new Thickness(5),
+            //        IsChecked = _militaryUnitTemplateViewModel.MovementType == movementType
+            //    };
+            //    radioButton.Click += MovementType_Click;
 
-                MovementTypeSelector.Children.Add(radioButton);
-            }
-
-            foreach (CombatType combatType in Enum.GetValues(typeof(CombatType)))
-            {
-                var radioButton = new RadioButton()
-                {
-                    Content = combatType.ToString(),
-                    Tag = (int)combatType,
-                    Margin = new Thickness(5),
-                    GroupName = "CombatType",
-                };
-                //radioButton.Click += RadioButton_Click;
-
-                CombatTypeSelector.Children.Add(radioButton);
-            }
-
+            //    MovementTypeSelector.Children.Add(radioButton);
+            //}
 
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
@@ -116,6 +101,19 @@ namespace ScenarioEditor
         private void MovementType_Click(object sender, RoutedEventArgs e)
         {
             _militaryUnitTemplateViewModel.MovementType = (MovementType)((RadioButton)sender).Tag;
+        }
+
+        private void MovementTypesTransportableBy_Click(object sender, RoutedEventArgs e)
+        {
+            var movementTypeTransportableBy = (CheckBox)sender;
+            if ((bool)movementTypeTransportableBy.IsChecked)
+            {
+                _militaryUnitTemplateViewModel.MovementTypesTransportableBy.Add((MovementType)Enum.Parse(typeof(MovementType), movementTypeTransportableBy.Content.ToString()));
+            }
+            else
+            {
+                _militaryUnitTemplateViewModel.MovementTypesTransportableBy.Remove((MovementType)Enum.Parse(typeof(MovementType), movementTypeTransportableBy.Content.ToString()));
+            }
         }
     }
 }

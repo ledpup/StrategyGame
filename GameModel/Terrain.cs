@@ -15,14 +15,15 @@ namespace GameModel
     [Flags]
     public enum TerrainType
     {
-        Grassland = 1 << 0,
-        Desert = 1 << 1,
-        Forest = 1 << 2,
-        Hill = 1 << 3,
-        Mountain = 1 << 4,
-        Water = 1 << 5,
-        Wetland = 1 << 6,
-        Reef = 1 << 7,
+        Desert = 1 << 0,
+        Forest = 1 << 1,
+        FrozenWater = 1 << 2,
+        Grassland = 1 << 3,
+        Hill = 1 << 4,
+        Mountain = 1 << 5,
+        Water = 1 << 6,
+        Wetland = 1 << 7,
+        Reef = 1 << 8,
     }
 
     [Flags]
@@ -39,7 +40,7 @@ namespace GameModel
     {
         public const int Impassable = 100;
 
-        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Desert | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
+        public static TerrainType All_Land = TerrainType.Desert | TerrainType.Forest | TerrainType.FrozenWater | TerrainType.Grassland | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
         public static TerrainType All_Water = TerrainType.Water | TerrainType.Reef;
         public static TerrainType Non_Mountainous_Land = All_Land ^ TerrainType.Mountain;
         public static TerrainType Rough_Land = All_Land ^ TerrainType.Grassland;
@@ -81,6 +82,7 @@ namespace GameModel
                 _terrainStackLimit = new Dictionary<TerrainType, int>
                 {
                     { TerrainType.Forest, 3 },
+                    { TerrainType.FrozenWater, 2 },
                     { TerrainType.Grassland, 4 },
                     { TerrainType.Hill, 3 },
                     { TerrainType.Mountain, 2 },

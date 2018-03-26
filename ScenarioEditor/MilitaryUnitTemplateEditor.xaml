@@ -106,5 +106,6 @@
         <TextBox HorizontalAlignment="Left" Height="23" Margin="242,495,0,0" TextWrapping="Wrap" Text="{Binding Size}" VerticalAlignment="Top" Width="41"/>
         <Label Content="Morale" HorizontalAlignment="Left" Margin="13,649,0,0" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="124,652,0,0" TextWrapping="Wrap" Text="{Binding Morale}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="TerrainTypeCombatModifier, WeatherCombatModifier, EnemyCombatTypeCombatModifier, StructureCombatModifier" HorizontalAlignment="Left" Margin="16,760,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

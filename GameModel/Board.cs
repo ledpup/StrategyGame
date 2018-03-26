@@ -10,10 +10,11 @@ namespace GameModel
 {
     public enum Weather
     {
-        Fine,
-        Dry,
-        Wet,
         Cold,
+        Fine,
+        Fog,
+        Hot,
+        Wet,
     }
     public class Board
     {
@@ -601,9 +602,9 @@ namespace GameModel
 
             units.ForEach(x =>
             {
-                x.BattleQualityModifiers[BattleQualityModifier.Terrain] = x.TerrainTypeBattleModifier[terrainType];
-                x.BattleQualityModifiers[BattleQualityModifier.Weather] = x.WeatherBattleModifier[weather];
-                x.BattleQualityModifiers[BattleQualityModifier.Structure] = structure != StructureType.None ? x.StructureBattleModifier : 0;
+                x.CombatAbilityModifiers[CombatAbilityModifier.Terrain] = x.TerrainTypeCombatModifier[terrainType];
+                x.CombatAbilityModifiers[CombatAbilityModifier.Weather] = x.WeatherCombatModifier[weather];
+                x.CombatAbilityModifiers[CombatAbilityModifier.Structure] = structure != StructureType.None ? x.StructureCombatModifier : 0;
             });
 
 
@@ -628,7 +629,7 @@ namespace GameModel
 
                     combatantInBattle.Units.ForEach(x =>
                     {
-                        x.BattleQualityModifiers[BattleQualityModifier.CombatType] = x.OpponentCombatTypeBattleModifier[unitType] * proportion;
+                        x.CombatAbilityModifiers[CombatAbilityModifier.CombatType] = x.EnemyCombatTypeCombatModifier[unitType] * proportion;
                     });
                 }
 
@@ -741,7 +742,7 @@ namespace GameModel
                     }
                     else
                     {
-                        var quantityDecrease = (int)Math.Ceiling(strengthDamageToUnit / unit.Quality);
+                        var quantityDecrease = (int)Math.Ceiling(strengthDamageToUnit / unit.CombatAbility);
                         unit.ChangeQuantity(turn, -quantityDecrease);
                     }
                     assignedStrengthDamage += strengthDamageToUnit;

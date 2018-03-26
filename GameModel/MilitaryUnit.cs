@@ -24,7 +24,7 @@ namespace GameModel
         Water,
     }
 
-    public enum BattleQualityModifier
+    public enum CombatAbilityModifier
     {
         Terrain,
         Weather,
@@ -95,18 +95,18 @@ namespace GameModel
         public CombatType CombatType { get; set; }
         public MovementType MovementType { get; private set; }
         public int BaseMovementPoints { get; set; }
-        public double BaseQuality
+        public double BaseCombatAbility
         {
-            get { return _baseQuality; }
+            get { return _baseCombatAbility; }
             set
             {
-                _baseQuality = value;
-                Quality = _baseQuality;
+                _baseCombatAbility = value;
+                CombatAbility = _baseCombatAbility;
             }
         }
-        private double _baseQuality;
-        public Dictionary<BattleQualityModifier, double> BattleQualityModifiers { get; set; }
-        public double Quality { get; set; }
+        private double _baseCombatAbility;
+        public Dictionary<CombatAbilityModifier, double> CombatAbilityModifiers { get; set; }
+        public double CombatAbility { get; set; }
         public int Quantity { get; private set; }
         public double Strength { get; set; }
         public double BattleStrength { get; set; }
@@ -118,9 +118,10 @@ namespace GameModel
         public int Speed { get; set; }
         public bool IsAlive { get; private set; }
 
-        public Dictionary<TerrainType, double> TerrainTypeBattleModifier { get; set; }
-        public Dictionary<Weather, double> WeatherBattleModifier { get; set; }
-        public Dictionary<CombatType, double> OpponentCombatTypeBattleModifier { get; set; }
+        public Dictionary<TerrainType, double> TerrainTypeCombatModifier { get; set; }
+        public Dictionary<Weather, double> WeatherCombatModifier { get; set; }
+        public Dictionary<CombatType, double> EnemyCombatTypeCombatModifier { get; set; }
+        public double StructureCombatModifier { get; set; }
 
         public TerrainType CanStopOn;
 
@@ -140,28 +141,28 @@ namespace GameModel
         {
             IsAlive = true;
 
-            BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>();
-            foreach (BattleQualityModifier battleQualityModifier in Enum.GetValues(typeof(BattleQualityModifier)))
+            CombatAbilityModifiers = new Dictionary<CombatAbilityModifier, double>();
+            foreach (CombatAbilityModifier battleQualityModifier in Enum.GetValues(typeof(CombatAbilityModifier)))
             {
-                BattleQualityModifiers.Add(battleQualityModifier, 0);
+                CombatAbilityModifiers.Add(battleQualityModifier, 0);
             }
 
-            TerrainTypeBattleModifier = new Dictionary<TerrainType, double>();
+            TerrainTypeCombatModifier = new Dictionary<TerrainType, double>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                TerrainTypeBattleModifier.Add(terrainType, 0);
+                TerrainTypeCombatModifier.Add(terrainType, 0);
             }
 
-            WeatherBattleModifier = new Dictionary<Weather, double>();
+            WeatherCombatModifier = new Dictionary<Weather, double>();
             foreach (Weather weather in Enum.GetValues(typeof(Weather)))
             {
-                WeatherBattleModifier.Add(weather, 0);
+                WeatherCombatModifier.Add(weather, 0);
             }
 
-            OpponentCombatTypeBattleModifier = new Dictionary<CombatType, double>();
+            EnemyCombatTypeCombatModifier = new Dictionary<CombatType, double>();
             foreach (CombatType combatTypeEnum in Enum.GetValues(typeof(CombatType)))
             {
-                OpponentCombatTypeBattleModifier.Add(combatTypeEnum, 0);
+                EnemyCombatTypeCombatModifier.Add(combatTypeEnum, 0);
             }
 
             TerrainMovementCosts = new Dictionary<TerrainType, int>();
@@ -186,7 +187,7 @@ namespace GameModel
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
             CombatType = combatType;
-            BaseQuality = baseQuality;
+            BaseCombatAbility = baseQuality;
             Size = size;
             CanTransport = isTransporter;
             TransportableBy = transportableBy;
@@ -262,9 +263,9 @@ namespace GameModel
 
         public void CalculateStrength()
         {
-            Strength = Quality * Quantity;
+            Strength = CombatAbility * Quantity;
 
-            var battleQuality = Quality + BattleQualityModifiers.Values.Sum();
+            var battleQuality = CombatAbility + CombatAbilityModifiers.Values.Sum();
             if (battleQuality < .1)
                 battleQuality = .1;
 
@@ -428,7 +429,7 @@ namespace GameModel
         }
 
         public int RoadMovementBonus { get; set; }
-        public double StructureBattleModifier { get; set; }
+        
         public MilitaryUnit TransportedBy { get; set; }
         public List<MovementType> TransportableBy { get; private set; }
         public bool UsesRoads { get; private set; }

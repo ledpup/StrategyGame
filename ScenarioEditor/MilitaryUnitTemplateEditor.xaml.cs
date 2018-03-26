@@ -26,9 +26,9 @@ namespace ScenarioEditor
         }
 
         MilitaryUnitTemplateViewModel _militaryUnitTemplateViewModel;
-        public MilitaryUnitTemplateEditor(MilitaryUnitTemplate militaryUnitTemplate) :this ()
+        public MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModel militaryUnitTemplateViewModel) :this ()
         {
-            DataContext = _militaryUnitTemplateViewModel = new MilitaryUnitTemplateViewModel(militaryUnitTemplate);
+            DataContext = _militaryUnitTemplateViewModel = militaryUnitTemplateViewModel;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

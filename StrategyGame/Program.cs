@@ -51,10 +51,10 @@ namespace StrategyGame
 
             board.Units = aiUnits.Select(x => x.Unit).ToList();
 
-            board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
-            board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
+            board.Units[0].TerrainTypeCombatModifier[TerrainType.Wetland] = 1;
+            board.Units[1].TerrainTypeCombatModifier[TerrainType.Forest] = 1;
 
-            board.Units[3].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            board.Units[3].TerrainTypeCombatModifier[TerrainType.Wetland] = 1;
             board.Units[3].EdgeMovementCosts[EdgeType.River] = 0;
 
             var gameOver = false;

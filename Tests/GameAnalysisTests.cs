@@ -30,13 +30,13 @@ namespace Tests
             {
                 new MilitaryUnit(0, "1st Infantry", 1)
                 {
-                    BaseQuality = 2,
+                    BaseCombatAbility = 2,
                     InitialQuantity = 300,
                 },
 
                 new MilitaryUnit(1, "1st Blue Infantry", 2)
                 {
-                    BaseQuality = 2,
+                    BaseCombatAbility = 2,
                     InitialQuantity = 500,
                 },
             };

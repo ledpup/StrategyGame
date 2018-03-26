@@ -204,7 +204,7 @@ namespace Tests
                 new AiMilitaryUnit(new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne })),
             };
 
-            aiUnits[2].Unit.TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            aiUnits[2].Unit.TerrainTypeCombatModifier[TerrainType.Wetland] = 1;
             aiUnits[2].Unit.EdgeMovementCosts[EdgeType.River] = 0;
 
             var units = aiUnits.Select(x => x.Unit).ToList();

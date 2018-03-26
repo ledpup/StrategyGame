@@ -42,8 +42,8 @@ namespace Tests
                 new MilitaryUnit(7, "3rd Infantry", 1, board[168]),
             };
 
-            board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
-            board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
+            board.Units[0].TerrainTypeCombatModifier[TerrainType.Wetland] = 1;
+            board.Units[1].TerrainTypeCombatModifier[TerrainType.Forest] = 1;
 
             var computerPlayer = new ComputerPlayer(board.Units);
 

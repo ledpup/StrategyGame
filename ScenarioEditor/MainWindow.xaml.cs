@@ -20,6 +20,7 @@ using System.Drawing;
 using HexGridControl;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace ScenarioEditor
 {
@@ -31,9 +32,17 @@ namespace ScenarioEditor
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
 
+            var militaryUnitTemplates = new List<MilitaryUnitTemplate>
+            {
+                new MilitaryUnitTemplate("Dwarf Infantry", usesRoads: true),
+                new MilitaryUnitTemplate("Human Cavalry", movementPoints: 3, usesRoads: true),
+                new MilitaryUnitTemplate("Grifon", MovementType.Airborne, 3, false, true),
+            };
 
-
+            var militaryUnitTemplateViewModels = militaryUnitTemplates.Select(x => new MilitaryUnitTemplateViewModel(x)).ToList();
+            MilitaryUnitTemplateViewModels = new ObservableCollection<MilitaryUnitTemplateViewModel>(militaryUnitTemplateViewModels);
         }
 
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
@@ -44,7 +53,7 @@ namespace ScenarioEditor
         Board _board;
         Activity _activity;
         StructureType _selectedStructureType;
-        List<MilitaryUnitTemplate> _militaryUnitTemplates;
+        public ObservableCollection<MilitaryUnitTemplateViewModel> MilitaryUnitTemplateViewModels { get; set; }
 
 
         //public StructureViewModel _selectedStructure;
@@ -109,8 +118,6 @@ namespace ScenarioEditor
                     Tag = edgeType,
                 };
 
-                //button.Click += Button_Click;
-
                 EdgeTypeSelector.Children.Add(button);
             }
 
@@ -153,17 +160,6 @@ namespace ScenarioEditor
 
                 FactionSelector.Children.Add(radioButton);
             }
-
-            _militaryUnitTemplates = new List<MilitaryUnitTemplate>
-            {
-                new MilitaryUnitTemplate("Dwarf Infantry", usesRoads: true),
-                new MilitaryUnitTemplate("Human Cavalry", movementPoints: 3, usesRoads: true),
-                new MilitaryUnitTemplate("Grifon", MovementType.Airborne, 3, false, true),
-            };
-
-            foreach (var militaryUnitTemplate in _militaryUnitTemplates)
-                UnitSelector.Items.Add(new ListBoxItem { Content = militaryUnitTemplate.Name });
-
 
             RenderMap();
         }
@@ -323,7 +319,7 @@ namespace ScenarioEditor
 
         private void UnitSelector_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var mue = new MilitaryUnitTemplateEditor(_militaryUnitTemplates[((ListBox)sender).SelectedIndex]);
+            var mue = new MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModels[((ListBox)sender).SelectedIndex]);
             mue.Show();
         }
     }

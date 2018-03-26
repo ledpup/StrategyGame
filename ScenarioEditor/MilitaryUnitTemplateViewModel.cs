@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ScenarioEditor
 {
-    internal class MilitaryUnitTemplateViewModel : BaseViewModel
+    public class MilitaryUnitTemplateViewModel : BaseViewModel
     {
         private MilitaryUnitTemplate _militaryUnitTemplate;
         

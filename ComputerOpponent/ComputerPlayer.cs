@@ -504,7 +504,7 @@ namespace ComputerOpponent
                 aliveUnits.ForEach(y =>
                 {
                     if (!x.TerrainAndWeatherInfluenceByUnit.ContainsKey(y.Index))
-                        x.TerrainAndWeatherInfluenceByUnit.Add(y.Index, y.TerrainTypeBattleModifier[x.TerrainType] + y.WeatherBattleModifier[x.Weather]);
+                        x.TerrainAndWeatherInfluenceByUnit.Add(y.Index, y.TerrainTypeCombatModifier[x.TerrainType] + y.WeatherCombatModifier[x.Weather]);
                 });
 
             });

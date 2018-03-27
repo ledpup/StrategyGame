@@ -21,6 +21,7 @@ using HexGridControl;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using ScenarioEditor.ViewModels;
 
 namespace ScenarioEditor
 {
@@ -43,6 +44,13 @@ namespace ScenarioEditor
 
             var militaryUnitTemplateViewModels = militaryUnitTemplates.Select(x => new MilitaryUnitTemplateViewModel(x)).ToList();
             MilitaryUnitTemplateViewModels = new ObservableCollection<MilitaryUnitTemplateViewModel>(militaryUnitTemplateViewModels);
+
+            FactionViewModels = new ObservableCollection<FactionViewModel>();
+            for (var i = 0; i < 4; i++)
+            {
+                var faction = new Faction(i, $"Faction {i}", GameRenderer.PlayerColour(i));
+                FactionViewModels.Add(new FactionViewModel(faction));
+            }
         }
 
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
@@ -54,6 +62,7 @@ namespace ScenarioEditor
         Activity _activity;
         StructureType _selectedStructureType;
         public ObservableCollection<MilitaryUnitTemplateViewModel> MilitaryUnitTemplateViewModels { get; set; }
+        public ObservableCollection<FactionViewModel> FactionViewModels { get; set; }
 
 
         //public StructureViewModel _selectedStructure;
@@ -140,26 +149,26 @@ namespace ScenarioEditor
                 StructureTypeSelector.Children.Add(button);
             }
 
-            for (var i = 0; i < 4; i++)
-            {
-                var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.PlayerColour(i));
-                var radioButton = new RadioButton()
-                {
-                    Content = i,
-                    Tag = i,
-                    Foreground = new SolidColorBrush(color),
-                    GroupName = "Faction",
-                    Width = 50,
-                };
-                radioButton.Click += RadioButton_Click;
-                if (i == 0)
-                {
-                    radioButton.IsChecked = true;
-                    SelectFaction(i);
-                }
+            //for (var i = 0; i < 4; i++)
+            //{
+            //    var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.PlayerColour(i));
+            //    var radioButton = new RadioButton()
+            //    {
+            //        Content = i,
+            //        Tag = i,
+            //        Foreground = new SolidColorBrush(color),
+            //        GroupName = "Faction",
+            //        Width = 50,
+            //    };
+            //    radioButton.Click += RadioButton_Click;
+            //    if (i == 0)
+            //    {
+            //        radioButton.IsChecked = true;
+            //        SelectFaction(i);
+            //    }
 
-                FactionSelector.Children.Add(radioButton);
-            }
+            //    FactionSelector.Children.Add(radioButton);
+            //}
 
             RenderMap();
         }
@@ -320,6 +329,12 @@ namespace ScenarioEditor
         private void UnitSelector_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var mue = new MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModels[((ListBox)sender).SelectedIndex]);
+            mue.Show();
+        }
+
+        private void FactionSelector_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var mue = new FactionEditor(FactionViewModels[((ListBox)sender).SelectedIndex]);
             mue.Show();
         }
     }

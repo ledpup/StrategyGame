@@ -43,7 +43,7 @@
 
         public static ArgbColour LightBlue { get { return new ArgbColour(255, 173, 216, 230); } }
 
-        public static ArgbColour Green { get { return new ArgbColour(255, 0, 255, 0); } }
+        public static ArgbColour Green { get { return new ArgbColour(255, 42, 255, 42); } }
 
         public static ArgbColour GreenYellow { get { return new ArgbColour(255, 173, 255, 47); } }
 

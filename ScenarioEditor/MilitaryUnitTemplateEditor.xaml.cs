@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using ScenarioEditor.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace ScenarioEditor
         }
 
         MilitaryUnitTemplateViewModel _militaryUnitTemplateViewModel;
-        public MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModel militaryUnitTemplateViewModel) :this ()
+        public MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModel militaryUnitTemplateViewModel) : this ()
         {
             DataContext = _militaryUnitTemplateViewModel = militaryUnitTemplateViewModel;
         }

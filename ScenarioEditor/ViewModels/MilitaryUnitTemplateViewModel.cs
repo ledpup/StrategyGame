@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ScenarioEditor
+namespace ScenarioEditor.ViewModels
 {
     public class MilitaryUnitTemplateViewModel : BaseViewModel
     {
@@ -207,29 +207,5 @@ namespace ScenarioEditor
                 RaisePropertyChanged();
             }
         }
-    }
-
-    public class CombatTypeSelector
-    {
-        public CombatTypeSelector(CombatType combatType, bool isSelected)
-        {
-            Name = combatType.ToString();
-            IsSelected = isSelected;
-        }
-
-        public string Name { get; set; }
-        public bool IsSelected { get; set; }
-    }
-
-    public class MovementTypeSelector
-    {
-        public MovementTypeSelector(MovementType movementType, bool isSelected)
-        {
-            Name = movementType.ToString();
-            IsSelected = isSelected;
-        }
-
-        public string Name { get; set; }
-        public bool IsSelected { get; set; }
     }
 }

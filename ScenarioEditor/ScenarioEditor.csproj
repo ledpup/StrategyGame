@@ -56,9 +56,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BaseViewModel.cs" />
-    <Compile Include="MilitaryUnitTemplateViewModel.cs" />
-    <Compile Include="StructureViewModel.cs" />
+    <Compile Include="CombatTypeSelector.cs" />
+    <Compile Include="FactionEditor.xaml.cs">
+      <DependentUpon>FactionEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MovementTypeSelector.cs" />
+    <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\FactionViewModel.cs" />
+    <Compile Include="ViewModels\MilitaryUnitTemplateViewModel.cs" />
+    <Compile Include="ViewModels\StructureViewModel.cs" />
+    <Page Include="FactionEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

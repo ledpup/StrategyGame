@@ -48,6 +48,7 @@
     <Compile Include="CalculateRange.cs" />
     <Compile Include="CasualtyLogEntry.cs" />
     <Compile Include="CombatantInBattle.cs" />
+    <Compile Include="Faction.cs" />
     <Compile Include="IHasNeighbours.cs" />
     <Compile Include="IUnitOrder.cs" />
     <Compile Include="MilitaryUnitTemplate.cs" />

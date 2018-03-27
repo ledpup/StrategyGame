@@ -1,0 +1,21 @@
+﻿<Window x:Class="ScenarioEditor.FactionEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScenarioEditor"
+        mc:Ignorable="d"
+        Title="FactionEditor" Height="260.735" Width="361.292">
+    <Grid>
+        <Label Content="Faction name" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="96,14,0,0" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Top" Width="245"/>
+        <Label Content="Colour" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+        <Label Content="Red" HorizontalAlignment="Left" Margin="96,41,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="131,46,0,0" TextWrapping="Wrap" Text="{Binding Red}" VerticalAlignment="Top" Width="40"/>
+        <Label Content="Green" HorizontalAlignment="Left" Margin="176,41,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="223,46,0,0" TextWrapping="Wrap" Text="{Binding Green}" VerticalAlignment="Top" Width="40"/>
+        <Label Content="Blue" HorizontalAlignment="Left" Margin="268,41,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.118,0.6"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="301,46,0,0" TextWrapping="Wrap" Text="{Binding Blue}" VerticalAlignment="Top" Width="40" RenderTransformOrigin="0.166,0.527"/>
+
+    </Grid>
+</Window>

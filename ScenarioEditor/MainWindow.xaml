@@ -4,25 +4,32 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hx="clr-namespace:HexGridControl;assembly=HexGridControl"
-        xmlns:local="clr-namespace:ScenarioEditor"
+        xmlns:local="clr-namespace:ScenarioEditor.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="1050" Width="1680" Loaded="Window_Loaded">
 
     <Viewbox Stretch="Fill">
         <Grid Name="MainGrid">
-            <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Margin="1398,36,0,885" Width="326"/>
+            <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Margin="1398,36,0,0" Width="316" Height="88" VerticalAlignment="Top"/>
             <hx:HexItem Orientation="Horizontal" Margin="1397,129,0,0" Name="TerrainType" HorizontalAlignment="Left" Width="50" RenderTransformOrigin="-4.566,0.379" Height="49" VerticalAlignment="Top" />
-            <WrapPanel x:Name="EdgeTypeSelector" HorizontalAlignment="Left" Margin="1397,214,0,710" Width="317"/>
-            <WrapPanel x:Name="StructureTypeSelector" HorizontalAlignment="Left" Margin="1398,418,0,563" Width="316"/>
-            <Label Content="Terrain Type Selector" HorizontalAlignment="Left" Margin="1397,10,0,973"/>
-            <Label Content="Edge Type Selector" HorizontalAlignment="Left" Margin="1397,183,0,800"/>
-            <Label Content="Structure Type Selector" HorizontalAlignment="Left" Margin="1398,387,0,596"/>
+            <WrapPanel x:Name="EdgeTypeSelector" HorizontalAlignment="Left" Margin="1397,214,0,0" Width="317" Height="85" VerticalAlignment="Top"/>
+            <WrapPanel x:Name="StructureTypeSelector" HorizontalAlignment="Left" Margin="1398,478,0,0" Width="316" Height="28" VerticalAlignment="Top"/>
+            <Label Content="Terrain Type Selector" HorizontalAlignment="Left" Margin="1397,10,0,0" Height="26" VerticalAlignment="Top"/>
+            <Label Content="Edge Type Selector" HorizontalAlignment="Left" Margin="1397,183,0,0" Height="31" VerticalAlignment="Top"/>
+            <Label Content="Structure Type Selector" HorizontalAlignment="Left" Margin="1398,447,0,0" Height="31" VerticalAlignment="Top"/>
 
             <Label Content="Faction Selector" HorizontalAlignment="Left" Margin="1398,304,0,679"/>
-            <WrapPanel x:Name="FactionSelector" HorizontalAlignment="Left" Margin="1398,335,0,622" Width="316"/>
+            <ListBox x:Name="FactionSelector" HorizontalAlignment="Left" Margin="1398,335,0,0" Width="306" ItemsSource="{Binding FactionViewModels}" MouseDoubleClick="FactionSelector_MouseDoubleClick" Height="107" VerticalAlignment="Top">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:FactionViewModel}">
+                        <TextBlock Text="{Binding Name}" Foreground="{Binding Color}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
-            <Label Content="Unit template selection" HorizontalAlignment="Left" Margin="1398,532,0,451"/>
-            <ListBox x:Name="UnitSelector" HorizontalAlignment="Left" Margin="1398,565,0,0" Width="316" ItemsSource="{Binding MilitaryUnitTemplateViewModels}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top">
+
+            <Label Content="Unit template selection" HorizontalAlignment="Left" Margin="1398,592,0,451"/>
+            <ListBox x:Name="UnitSelector" HorizontalAlignment="Left" Margin="1398,625,0,0" Width="306" ItemsSource="{Binding MilitaryUnitTemplateViewModels}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:MilitaryUnitTemplateViewModel}">
                         <TextBlock Text="{Binding Name}"/>
@@ -31,11 +38,11 @@
             </ListBox>
 
 
-            <Grid Name="Structure" HorizontalAlignment="Left" Height="55" Margin="1398,451,0,0" VerticalAlignment="Top" Width="316">
+            <Grid Name="Structure" HorizontalAlignment="Left" Height="55" Margin="1398,511,0,0" VerticalAlignment="Top" Width="316">
                 <Label Content="Structure name" HorizontalAlignment="Left"  VerticalAlignment="Top" />
-                <TextBox x:Name="StructureName"  HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Top" Width="177" Margin="96,1,0,0" />
-                <Label Content="Structure type" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0,26,0,0" />
-                <Label Content="{Binding StructureType}" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="96,26,0,0" />
+                <TextBox x:Name="StructureName" TextWrapping="Wrap" Text="{Binding Name}" Margin="96,1,0,0" HorizontalAlignment="Left" Width="177" Height="23" VerticalAlignment="Top" />
+                <Label Content="Structure type" HorizontalAlignment="Left" Margin="0,26,0,0" Height="26" VerticalAlignment="Top" />
+                <Label Content="{Binding StructureType}" Margin="96,26,0,0" HorizontalAlignment="Left" Width="177" Height="26" VerticalAlignment="Top" />
             </Grid>
 
 

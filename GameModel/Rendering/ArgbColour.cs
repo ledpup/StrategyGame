@@ -4,6 +4,10 @@
     {
         public short Alpha, Red, Green, Blue;
 
+        public ArgbColour(short red, short green, short blue) : this (255, red, green, blue)
+        {
+        }
+
         public ArgbColour(short alpha, short red, short green, short blue)
         {
             Alpha = alpha;

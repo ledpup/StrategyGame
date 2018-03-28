@@ -337,5 +337,10 @@ namespace ScenarioEditor
             var mue = new FactionEditor(FactionViewModels[((ListBox)sender).SelectedIndex]);
             mue.Show();
         }
+
+        private void FactionSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SelectFaction(((FactionViewModel)e.AddedItems[0]).Id);
+        }
     }
 }

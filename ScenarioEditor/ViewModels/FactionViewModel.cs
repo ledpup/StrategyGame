@@ -17,6 +17,8 @@ namespace ScenarioEditor.ViewModels
             _faction = faction;
         }
 
+        public int Id { get { return _faction.Id; } }
+
         public string Name
         {
             get
@@ -46,8 +48,8 @@ namespace ScenarioEditor.ViewModels
                 if (value == _faction.Colour.Red)
                     return;
 
-                _faction.Colour = new GameModel.Rendering.ArgbColour(0, value, _faction.Colour.Green, _faction.Colour.Blue);
-                RaisePropertyChanged();
+                _faction.Colour = new GameModel.Rendering.ArgbColour(value, _faction.Colour.Green, _faction.Colour.Blue);
+                RaisePropertyChanged("Color");
             }
         }
 
@@ -63,8 +65,8 @@ namespace ScenarioEditor.ViewModels
                 if (value == _faction.Colour.Green)
                     return;
 
-                _faction.Colour = new GameModel.Rendering.ArgbColour(0, _faction.Colour.Red, value, _faction.Colour.Blue);
-                RaisePropertyChanged();
+                _faction.Colour = new GameModel.Rendering.ArgbColour(_faction.Colour.Red, value, _faction.Colour.Blue);
+                RaisePropertyChanged("Color");
             }
         }
 
@@ -80,8 +82,8 @@ namespace ScenarioEditor.ViewModels
                 if (value == _faction.Colour.Blue)
                     return;
 
-                _faction.Colour = new GameModel.Rendering.ArgbColour(0, _faction.Colour.Red, _faction.Colour.Green, value);
-                RaisePropertyChanged();
+                _faction.Colour = new GameModel.Rendering.ArgbColour(_faction.Colour.Red, _faction.Colour.Green, value);
+                RaisePropertyChanged("Color");
             }
         }
 

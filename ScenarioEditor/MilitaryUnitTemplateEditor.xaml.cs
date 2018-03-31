@@ -32,28 +32,15 @@ namespace ScenarioEditor
         public MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModel militaryUnitTemplateViewModel) : this ()
         {
             DataContext = _militaryUnitTemplateViewModel = militaryUnitTemplateViewModel;
+
+            _militaryUnitTemplateViewModel.TerrainMovementViewModels.ForEach(x => x.PropertyChanged += X_PropertyChanged);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void X_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
+            if (e.PropertyName == "Traversable")
             {
-                var label = new Label
-                {
-                    Content = edgeType.ToString(),
-                    Margin = new Thickness(5),
-                    Width = 70,
-                };
-
-                var textBox = new TextBox
-                {
-                    Text = "0",
-                    Margin = new Thickness(5),
-                    Width = 20,
-                };
-
-                EdgeMovementCosts.Children.Add(label);
-                EdgeMovementCosts.Children.Add(textBox);
+                var dsa = TerrainMovement.Items[0];
             }
         }
 
@@ -73,6 +60,32 @@ namespace ScenarioEditor
             {
                 _militaryUnitTemplateViewModel.MovementTypesTransportableBy.Remove((MovementType)Enum.Parse(typeof(MovementType), movementTypeTransportableBy.Content.ToString()));
             }
+        }
+
+        private void TerrainMovement_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            var terrainMovementViewModel = (TerrainMovementViewModel)e.Row.Item;
+            if (!terrainMovementViewModel.Traversable)
+            {
+                if (e.Column.DisplayIndex == 2 || e.Column.DisplayIndex == 3)
+                    e.Cancel = true;
+            }
+        }
+
+        private void EdgeMovement_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            var edgeMovementViewModel = (EdgeMovementViewModel)e.Row.Item;
+            if (!edgeMovementViewModel.Traversable)
+            {
+                if (e.Column.DisplayIndex == 2)
+                    e.Cancel = true;
+            }
+        }
+
+        private void DataGrid_Unloaded(object sender, RoutedEventArgs e)
+        {
+            var grid = (DataGrid)sender;
+            grid.CommitEdit(DataGridEditingUnit.Row, true);
         }
     }
 }

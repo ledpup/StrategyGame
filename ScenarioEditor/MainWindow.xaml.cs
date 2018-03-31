@@ -39,6 +39,7 @@ namespace ScenarioEditor
             {
                 new MilitaryUnitTemplate("Dwarf Infantry", usesRoads: true),
                 new MilitaryUnitTemplate("Human Cavalry", movementPoints: 3, usesRoads: true),
+                new MilitaryUnitTemplate("Fleet", MovementType.Water, 3, false, true),
                 new MilitaryUnitTemplate("Grifon", MovementType.Airborne, 3, false, true),
             };
 
@@ -148,27 +149,6 @@ namespace ScenarioEditor
 
                 StructureTypeSelector.Children.Add(button);
             }
-
-            //for (var i = 0; i < 4; i++)
-            //{
-            //    var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.PlayerColour(i));
-            //    var radioButton = new RadioButton()
-            //    {
-            //        Content = i,
-            //        Tag = i,
-            //        Foreground = new SolidColorBrush(color),
-            //        GroupName = "Faction",
-            //        Width = 50,
-            //    };
-            //    radioButton.Click += RadioButton_Click;
-            //    if (i == 0)
-            //    {
-            //        radioButton.IsChecked = true;
-            //        SelectFaction(i);
-            //    }
-
-            //    FactionSelector.Children.Add(radioButton);
-            //}
 
             RenderMap();
         }

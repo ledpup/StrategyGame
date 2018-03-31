@@ -32,14 +32,77 @@ namespace ScenarioEditor.ViewModels
                 CombatTypesSelection.Add(new CombatTypeSelector(ct, ct == militaryUnitTemplate.CombatType));
             }
 
-            TerrainMovementViewModels = new ObservableCollection<TerrainMovementViewModel>();
+            TerrainMovementViewModels = new List<TerrainMovementViewModel>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                TerrainMovementViewModels.Add(new TerrainMovementViewModel(terrainType));
+                var traversable = true;
+                var movementCost = 1;
+                var canStopOn = true;
+                switch (_militaryUnitTemplate.MovementType)
+                {
+                    case MovementType.Airborne:
+                        if (Terrain.All_Water.HasFlag(terrainType))
+                        {
+                            canStopOn = false;
+                        }
+                        break;
+                    case MovementType.Land:
+                        if (Terrain.All_Water.HasFlag(terrainType))
+                        {
+                            traversable = false;
+                            canStopOn = false;
+                        }
+                        if (Terrain.Rough_Land.HasFlag(terrainType))
+                        {
+                            movementCost = 2;
+                        }
+                        break;
+                    case MovementType.Water:
+                        if (Terrain.All_Land.HasFlag(terrainType))
+                        {
+                            traversable = false;
+                            canStopOn = true;
+                        }
+                        break;
+                }
+                if (terrainType == TerrainType.Mountain)
+                {
+                    canStopOn = false;
+                }
+
+                TerrainMovementViewModels.Add(new TerrainMovementViewModel(terrainType, traversable, movementCost, canStopOn));
+            }
+
+            EdgeMovementCosts = new List<EdgeMovementViewModel>();
+            foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
+            {
+                var traversable = true;
+                var movementCost = 0;
+                switch (_militaryUnitTemplate.MovementType)
+                {
+                    case MovementType.Land:
+                        if (Edge.All_Water.HasFlag(edgeType) && edgeType != EdgeType.None)
+                        {
+                            traversable = false;
+                        }
+                        if (Edge.All_Land.HasFlag(edgeType))
+                        {
+                            movementCost = 1;
+                        }
+                        break;
+                    case MovementType.Water:
+                        if (Edge.All_Land.HasFlag(edgeType))
+                        {
+                            traversable = false;
+                        }
+                        break;
+                }
+                EdgeMovementCosts.Add(new EdgeMovementViewModel(edgeType, traversable, movementCost));
             }
         }
 
-        public ObservableCollection<TerrainMovementViewModel> TerrainMovementViewModels { get; set; }
+        public List<TerrainMovementViewModel> TerrainMovementViewModels { get; private set; }
+        public List<EdgeMovementViewModel> EdgeMovementCosts { get; private set; }
         public string Name
         {
             get { return _militaryUnitTemplate.Name; }

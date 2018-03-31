@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="MovementTypeSelector.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\EdgeMovementViewModel.cs" />
     <Compile Include="ViewModels\FactionViewModel.cs" />
     <Compile Include="ViewModels\MilitaryUnitTemplateViewModel.cs" />
     <Compile Include="ViewModels\StructureViewModel.cs" />

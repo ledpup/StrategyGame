@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace ScenarioEditor.ViewModels
 {
-    public class TerrainMovementViewModel : BaseViewModel
+    public class EdgeMovementViewModel : BaseViewModel
     {
-        public TerrainMovementViewModel(TerrainType terrainType, bool traversable, int movementCost, bool canStopOn)
+        public EdgeMovementViewModel(EdgeType edgeType, bool traversable, int movementCost)
         {
-            TerrainType = terrainType.ToString();
+            EdgeType = edgeType.ToString();
             Traversable = traversable;
             MovementCost = movementCost;
-            CanStopOn = canStopOn;
         }
-        public string TerrainType { get; private set; }
+
+        public string EdgeType { get; set; }
         public bool Traversable
         {
             get
@@ -34,6 +34,5 @@ namespace ScenarioEditor.ViewModels
         }
         bool _traversable;
         public int MovementCost { get; set; }
-        public bool CanStopOn { get; set; }
     }
 }

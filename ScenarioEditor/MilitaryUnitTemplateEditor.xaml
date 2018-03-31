@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScenarioEditor"
         mc:Ignorable="d"
-        Title="MilitaryUnitTemplateEditor" Height="1050" Width="600" Loaded="Window_Loaded">
+        Title="MilitaryUnitTemplateEditor" Height="711" Width="624">
     <Grid>
         <ListBox ItemsSource="{Binding MovementTypesSelection}" SelectedItem="{Binding MovementTypeSelectedItem}"  Margin="117,36,140,0" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
             <ListBox.ItemContainerStyle>
@@ -40,7 +40,7 @@
         </ListBox>
 
 
-        <ListBox ItemsSource="{Binding CombatTypesSelection}" SelectedItem="{Binding CombatTypeSelectedItem}" Margin="124,526,149,0" Width="319" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
+        <ListBox ItemsSource="{Binding CombatTypesSelection}" SelectedItem="{Binding CombatTypeSelectedItem}" Margin="124,389,149,0" Width="319" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
             <ListBox.ItemContainerStyle>
                 <!-- Style to get rid of the selection visual -->
                 <Style TargetType="{x:Type ListBoxItem}">
@@ -71,35 +71,80 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
-        
+
         <Label x:Name="MovementPoints" Content="Movement points" HorizontalAlignment="Left" Margin="16,63,0,0" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="124,67,0,0" TextWrapping="Wrap" Text="{Binding MovementPoints}" VerticalAlignment="Top" Width="34"/>
-        
+
         <Label Content="Terrain type movement costs" HorizontalAlignment="Left" Margin="16,94,0,0" VerticalAlignment="Top"/>
-        <DataGrid DataContext="{Binding Path=DataContext.TerrainMovementViewModels}"  Margin="16,125,0,0" HorizontalAlignment="Left" Width="228" Height="313" VerticalAlignment="Top">
+        <DataGrid Name="TerrainMovement" ItemsSource="{Binding TerrainMovementViewModels}" Margin="16,125,0,0" HorizontalAlignment="Left" Width="320" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
+                  CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                  BeginningEdit="TerrainMovement_BeginningEdit"
+                  Unloaded="DataGrid_Unloaded">
+
+            <DataGrid.Resources>
+                <Style TargetType="{x:Type CheckBox}" x:Key="CheckBoxStyle">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Traversable}" Value="False">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="{x:Type TextBlock}" x:Key="TextStyle">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Traversable}" Value="False">
+                            <Setter Property="Foreground" Value="LightGray" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Terrain Type" Binding="{Binding TerrainType}" IsReadOnly="True" />
-                <DataGridCheckBoxColumn Header="Traversable" Binding="{Binding Traversable}" />
-                <DataGridTextColumn Header="Movement Cost" Binding="{Binding MovementCost}" />
-                <DataGridCheckBoxColumn Header="Can Stop On" Binding="{Binding CanStopOn}" />
+                <DataGridCheckBoxColumn Header="Traversable" Binding="{Binding Traversable, UpdateSourceTrigger=PropertyChanged}" />
+                <DataGridTextColumn Header="Movement Cost" Binding="{Binding MovementCost}" ElementStyle="{StaticResource TextStyle}" />
+                <DataGridCheckBoxColumn Header="Can Stop On" Binding="{Binding CanStopOn}" ElementStyle="{StaticResource CheckBoxStyle}" />
             </DataGrid.Columns>
         </DataGrid>
 
-        <Label Content="Edge movement costs" HorizontalAlignment="Left" Margin="255,94,0,0" VerticalAlignment="Top"/>
-        <WrapPanel x:Name="EdgeMovementCosts" HorizontalAlignment="Left" Margin="254,125,0,581" Width="153"/>
-        
+        <Label Content="Edge movement costs" HorizontalAlignment="Left" Margin="346,94,0,0" VerticalAlignment="Top"/>
+        <DataGrid ItemsSource="{Binding EdgeMovementCosts}" HorizontalAlignment="Left" Margin="346,125,0,0" Width="238" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False"
+                  CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                  BeginningEdit="EdgeMovement_BeginningEdit"
+                  Unloaded="DataGrid_Unloaded">
+
+            <DataGrid.Resources>
+                <Style TargetType="{x:Type TextBlock}" x:Key="TextStyle">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Traversable}" Value="False">
+                            <Setter Property="Foreground" Value="LightGray" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Edge Type" Binding="{Binding EdgeType}" IsReadOnly="True" />
+                <DataGridCheckBoxColumn Header="Traversable" Binding="{Binding Traversable, UpdateSourceTrigger=PropertyChanged}" />
+                <DataGridTextColumn Header="Movement Cost" Binding="{Binding MovementCost}" ElementStyle="{StaticResource TextStyle}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
         <CheckBox Content="Unit uses roads" HorizontalAlignment="Left" Margin="173,69,0,0" VerticalAlignment="Top" IsChecked="{Binding UsesRoads}" />
-        <CheckBox Content="Unit can transport other units" HorizontalAlignment="Left" Margin="9,449,0,0" VerticalAlignment="Top" IsChecked="{Binding CanTransport}" />
+        <CheckBox Content="Unit can transport other units" HorizontalAlignment="Left" Margin="16,332,0,0" VerticalAlignment="Top" IsChecked="{Binding CanTransport}" />
         <Label Content="Movement type" HorizontalAlignment="Left" Margin="17,36,0,0" VerticalAlignment="Top"/>
         <Label Content="Template name" HorizontalAlignment="Left" Margin="17,10,0,0" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="117,14,0,0" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Top" Width="170"/>
-        <Label Content="Combat type" HorizontalAlignment="Left" Margin="10,523,0,0" VerticalAlignment="Top"/>
-        <Label Content="Combat ability" HorizontalAlignment="Left" Margin="10,564,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,567,0,0" TextWrapping="Wrap" Text="{Binding CombatQuality}" VerticalAlignment="Top" Width="41"/>
-        <Label Content="Depletion rank" HorizontalAlignment="Left" Margin="11,606,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,609,0,0" TextWrapping="Wrap" Text="{Binding DepletionOrder}" VerticalAlignment="Top" Width="41"/>
-        <Label Content="Transportable by" HorizontalAlignment="Left" Margin="206,443,0,0" VerticalAlignment="Top"/>
-        <ItemsControl ItemsSource="{Binding Path=MovementTypesTransportableBySelection}" Margin="309,443,22,532">
+        <Label Content="Combat type" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top"/>
+        <Label Content="Combat ability" HorizontalAlignment="Left" Margin="10,427,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,430,0,0" TextWrapping="Wrap" Text="{Binding CombatQuality}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Depletion rank" HorizontalAlignment="Left" Margin="10,458,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,461,0,0" TextWrapping="Wrap" Text="{Binding DepletionOrder}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Transportable by" HorizontalAlignment="Left" Margin="205,326,0,0" VerticalAlignment="Top"/>
+        <ItemsControl ItemsSource="{Binding Path=MovementTypesTransportableBySelection}" Margin="308,329,23,646">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"/>
@@ -111,15 +156,15 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Label Content="Members" HorizontalAlignment="Left" Margin="9,492,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,495,0,0" TextWrapping="Wrap" Text="{Binding Members}" VerticalAlignment="Top" Width="41"/>
-        
-        <Label Content="Size" HorizontalAlignment="Left" Margin="206,492,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="242,495,0,0" TextWrapping="Wrap" Text="{Binding Size}" VerticalAlignment="Top" Width="41"/>
-        
-        <Label Content="Morale" HorizontalAlignment="Left" Margin="13,649,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="124,652,0,0" TextWrapping="Wrap" Text="{Binding Morale}" VerticalAlignment="Top" Width="41"/>
-        
-        <Label Content="TerrainTypeCombatModifier, WeatherCombatModifier, EnemyCombatTypeCombatModifier, StructureCombatModifier" HorizontalAlignment="Left" Margin="16,760,0,0" VerticalAlignment="Top"/>
+        <Label Content="Members" HorizontalAlignment="Left" Margin="9,355,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,358,0,0" TextWrapping="Wrap" Text="{Binding Members}" VerticalAlignment="Top" Width="41"/>
+
+        <Label Content="Size" HorizontalAlignment="Left" Margin="206,355,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="242,358,0,0" TextWrapping="Wrap" Text="{Binding Size}" VerticalAlignment="Top" Width="41"/>
+
+        <Label Content="Morale" HorizontalAlignment="Left" Margin="10,489,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,492,0,0" TextWrapping="Wrap" Text="{Binding Morale}" VerticalAlignment="Top" Width="41"/>
+
+        <Label Content="TerrainTypeCombatModifier, WeatherCombatModifier, EnemyCombatTypeCombatModifier, StructureCombatModifier" HorizontalAlignment="Left" Margin="16,623,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

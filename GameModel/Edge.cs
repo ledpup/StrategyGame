@@ -6,21 +6,25 @@ using System.Threading.Tasks;
 
 namespace GameModel
 {
+    [Flags]
     public enum EdgeType
     {
-        None,
-        Forest,
-        FrozenRiver,
-        Hill,
-        Mountain,
-        Port,
-        River,
-        Reef,
-        Wall,
+        None = 1 << 0,
+        Forest = 1 << 1,
+        FrozenRiver = 1 << 2,
+        Hill = 1 << 3,
+        Mountain = 1 << 4,
+        Port = 1 << 5,
+        River = 1 << 6,
+        Reef = 1 << 7,
+        Wall = 1 << 8,
+        Wetland = 1 << 9,
     }
 
     public class Edge
     {
+        public static EdgeType All_Land = EdgeType.Forest | EdgeType.FrozenRiver | EdgeType.Hill | EdgeType.Mountain | EdgeType.Port | EdgeType.Wetland;
+        public static EdgeType All_Water = EdgeType.River | EdgeType.Reef;
         public Edge(EdgeType edgeType, Tile origin, Tile destination, bool hasRoad)
         {
             EdgeType = edgeType;

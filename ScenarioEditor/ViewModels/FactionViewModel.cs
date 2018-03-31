@@ -49,7 +49,7 @@ namespace ScenarioEditor.ViewModels
                     return;
 
                 _faction.Colour = new GameModel.Rendering.ArgbColour(value, _faction.Colour.Green, _faction.Colour.Blue);
-                RaisePropertyChanged("Color");
+                RaisePropertyChanged(nameof(Color));
             }
         }
 
@@ -66,7 +66,7 @@ namespace ScenarioEditor.ViewModels
                     return;
 
                 _faction.Colour = new GameModel.Rendering.ArgbColour(_faction.Colour.Red, value, _faction.Colour.Blue);
-                RaisePropertyChanged("Color");
+                RaisePropertyChanged(nameof(Color));
             }
         }
 
@@ -83,7 +83,7 @@ namespace ScenarioEditor.ViewModels
                     return;
 
                 _faction.Colour = new GameModel.Rendering.ArgbColour(_faction.Colour.Red, _faction.Colour.Green, value);
-                RaisePropertyChanged("Color");
+                RaisePropertyChanged(nameof(Color));
             }
         }
 

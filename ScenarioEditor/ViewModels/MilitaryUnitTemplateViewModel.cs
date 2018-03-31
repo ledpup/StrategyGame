@@ -1,6 +1,7 @@
 ﻿using GameModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace ScenarioEditor.ViewModels
@@ -9,7 +10,6 @@ namespace ScenarioEditor.ViewModels
     {
         private MilitaryUnitTemplate _militaryUnitTemplate;
         
-
         public MilitaryUnitTemplateViewModel(MilitaryUnitTemplate militaryUnitTemplate)
         {
             _militaryUnitTemplate = militaryUnitTemplate;
@@ -31,8 +31,15 @@ namespace ScenarioEditor.ViewModels
             {
                 CombatTypesSelection.Add(new CombatTypeSelector(ct, ct == militaryUnitTemplate.CombatType));
             }
+
+            TerrainMovementViewModels = new ObservableCollection<TerrainMovementViewModel>();
+            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
+            {
+                TerrainMovementViewModels.Add(new TerrainMovementViewModel(terrainType));
+            }
         }
-        
+
+        public ObservableCollection<TerrainMovementViewModel> TerrainMovementViewModels { get; set; }
         public string Name
         {
             get { return _militaryUnitTemplate.Name; }
@@ -182,15 +189,15 @@ namespace ScenarioEditor.ViewModels
             }
         }
 
-        public int CombatInitiative
+        public int DepletionOrder
         {
-            get { return _militaryUnitTemplate.CombatInitiative; }
+            get { return _militaryUnitTemplate.DepletionOrder; }
             set
             {
-                if (value == _militaryUnitTemplate.CombatInitiative)
+                if (value == _militaryUnitTemplate.DepletionOrder)
                     return;
 
-                _militaryUnitTemplate.CombatInitiative = value;
+                _militaryUnitTemplate.DepletionOrder = value;
                 RaisePropertyChanged();
             }
         }

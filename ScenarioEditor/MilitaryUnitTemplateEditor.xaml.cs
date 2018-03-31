@@ -2,6 +2,7 @@
 using ScenarioEditor.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace ScenarioEditor
         }
 
         MilitaryUnitTemplateViewModel _militaryUnitTemplateViewModel;
+        
         public MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModel militaryUnitTemplateViewModel) : this ()
         {
             DataContext = _militaryUnitTemplateViewModel = militaryUnitTemplateViewModel;
@@ -34,50 +36,6 @@ namespace ScenarioEditor
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //foreach (MovementType movementType in Enum.GetValues(typeof(MovementType)))
-            //{
-            //    var radioButton = new RadioButton()
-            //    {
-            //        Content = movementType.ToString(),
-            //        Tag = (int)movementType,
-            //        GroupName = "MovementType",
-            //        Margin = new Thickness(5),
-            //        IsChecked = _militaryUnitTemplateViewModel.MovementType == movementType
-            //    };
-            //    radioButton.Click += MovementType_Click;
-
-            //    MovementTypeSelector.Children.Add(radioButton);
-            //}
-
-            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
-            {
-                var label = new Label
-                {
-                    Content = terrainType.ToString(),
-                    Margin = new Thickness(5),
-                    Width = 70,
-                };
-
-                var textBox = new TextBox
-                {
-                    Text = "1",
-                    Margin = new Thickness(5),
-                    Width = 20,
-                };
-
-                var checkBox = new CheckBox
-                {
-                    Name = terrainType.ToString(),
-                    Content = "Can stop on",
-                    Margin = new Thickness(5, 10, 5, 0),
-                    IsChecked = true,
-                };
-
-                TerrainTypeMovementCosts.Children.Add(label);
-                TerrainTypeMovementCosts.Children.Add(textBox);
-                TerrainTypeMovementCosts.Children.Add(checkBox);
-            }
-
             foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
             {
                 var label = new Label
@@ -89,7 +47,7 @@ namespace ScenarioEditor
 
                 var textBox = new TextBox
                 {
-                    Text = "1",
+                    Text = "0",
                     Margin = new Thickness(5),
                     Width = 20,
                 };

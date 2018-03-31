@@ -8,7 +8,7 @@ namespace GameModel
 {
     public class MilitaryUnitTemplate
     {
-        public MilitaryUnitTemplate(string name, MovementType movementType = MovementType.Land, int movementPoints = 2, bool usesRoads = false, bool canTransport = false, List<MovementType> movementTypesTransportableBy = null, int members = 500, float size = 1, CombatType combatType = CombatType.Melee, int combatAbility = 1, int combatInitiative = 10, int morale = 5)
+        public MilitaryUnitTemplate(string name, MovementType movementType = MovementType.Land, int movementPoints = 2, bool usesRoads = false, bool canTransport = false, List<MovementType> movementTypesTransportableBy = null, int members = 500, float size = 1, CombatType combatType = CombatType.Melee, int combatAbility = 1, int depletionOrder = 10, int morale = 5)
         {
             Name = name;
             MovementType = movementType;
@@ -18,7 +18,7 @@ namespace GameModel
             MovementTypesTransportableBy = movementTypesTransportableBy == null ? new List<MovementType>() { MovementType.Water } : movementTypesTransportableBy;
             CombatType = combatType;
             CombatAbility = combatAbility;
-            CombatInitiative = combatInitiative;
+            DepletionOrder = depletionOrder;
             Members = members;
             Size = size;
             Morale = morale;
@@ -34,13 +34,9 @@ namespace GameModel
         public int MovementPoints { get; set; }
         public CombatType CombatType { get; set; }
         public int CombatAbility { get; set; }
-        public int CombatInitiative { get; set; }
+        public int DepletionOrder { get; set; }
         public float Size { get; set; }
         public int Members { get; set; }
         public int Morale { get; set; }
-
-        
     }
-
-
 }

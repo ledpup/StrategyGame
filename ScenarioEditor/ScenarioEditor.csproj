@@ -65,6 +65,7 @@
     <Compile Include="ViewModels\FactionViewModel.cs" />
     <Compile Include="ViewModels\MilitaryUnitTemplateViewModel.cs" />
     <Compile Include="ViewModels\StructureViewModel.cs" />
+    <Compile Include="ViewModels\TerrainMovementViewModel.cs" />
     <Page Include="FactionEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

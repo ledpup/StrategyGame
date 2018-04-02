@@ -38,10 +38,6 @@ namespace ScenarioEditor
 
         private void X_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Traversable")
-            {
-                var dsa = TerrainMovement.Items[0];
-            }
         }
 
         private void MovementType_Click(object sender, RoutedEventArgs e)

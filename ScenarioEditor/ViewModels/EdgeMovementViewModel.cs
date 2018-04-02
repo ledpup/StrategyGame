@@ -9,11 +9,11 @@ namespace ScenarioEditor.ViewModels
 {
     public class EdgeMovementViewModel : BaseViewModel
     {
-        public EdgeMovementViewModel(EdgeType edgeType, bool traversable, int movementCost)
+        public EdgeMovementViewModel(EdgeType edgeType)
         {
             EdgeType = edgeType.ToString();
-            Traversable = traversable;
-            MovementCost = movementCost;
+            Traversable = true;
+            MovementCost = 0;
         }
 
         public string EdgeType { get; set; }

@@ -9,12 +9,12 @@ namespace ScenarioEditor.ViewModels
 {
     public class TerrainMovementViewModel : BaseViewModel
     {
-        public TerrainMovementViewModel(TerrainType terrainType, bool traversable, int movementCost, bool canStopOn)
+        public TerrainMovementViewModel(TerrainType terrainType)
         {
             TerrainType = terrainType.ToString();
-            Traversable = traversable;
-            MovementCost = movementCost;
-            CanStopOn = canStopOn;
+            Traversable = true;
+            MovementCost = 1;
+            CanStopOn = true;
         }
         public string TerrainType { get; private set; }
         public bool Traversable

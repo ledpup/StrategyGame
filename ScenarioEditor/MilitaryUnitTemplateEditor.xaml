@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScenarioEditor"
         mc:Ignorable="d"
-        Title="MilitaryUnitTemplateEditor" Height="711" Width="624">
+        Title="MilitaryUnitTemplateEditor" Height="730" Width="649">
     <Grid>
         <ListBox ItemsSource="{Binding MovementTypesSelection}" SelectedItem="{Binding MovementTypeSelectedItem}"  Margin="117,36,140,0" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
             <ListBox.ItemContainerStyle>
@@ -40,7 +40,7 @@
         </ListBox>
 
 
-        <ListBox ItemsSource="{Binding CombatTypesSelection}" SelectedItem="{Binding CombatTypeSelectedItem}" Margin="124,389,149,0" Width="319" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
+        <ListBox ItemsSource="{Binding CombatTypesSelection}" SelectedItem="{Binding CombatTypeSelectedItem}" Margin="102,389,195,0" Width="319" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
             <ListBox.ItemContainerStyle>
                 <!-- Style to get rid of the selection visual -->
                 <Style TargetType="{x:Type ListBoxItem}">
@@ -72,11 +72,11 @@
             </ListBox.ItemsPanel>
         </ListBox>
 
-        <Label x:Name="MovementPoints" Content="Movement points" HorizontalAlignment="Left" Margin="16,63,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="MovementPoints" Content="Movement points" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="124,67,0,0" TextWrapping="Wrap" Text="{Binding MovementPoints}" VerticalAlignment="Top" Width="34"/>
 
-        <Label Content="Terrain type movement costs" HorizontalAlignment="Left" Margin="16,94,0,0" VerticalAlignment="Top"/>
-        <DataGrid Name="TerrainMovement" ItemsSource="{Binding TerrainMovementViewModels}" Margin="16,125,0,0" HorizontalAlignment="Left" Width="320" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
+        <Label Content="Terrain movement" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top"/>
+        <DataGrid ItemsSource="{Binding TerrainMovementViewModels}" Margin="10,125,0,0" HorizontalAlignment="Left" Width="320" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
                   CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -101,14 +101,14 @@
             </DataGrid.Resources>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Terrain Type" Binding="{Binding TerrainType}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Terrain" Binding="{Binding TerrainType}" IsReadOnly="True" />
                 <DataGridCheckBoxColumn Header="Traversable" Binding="{Binding Traversable, UpdateSourceTrigger=PropertyChanged}" />
                 <DataGridTextColumn Header="Movement Cost" Binding="{Binding MovementCost}" ElementStyle="{StaticResource TextStyle}" />
                 <DataGridCheckBoxColumn Header="Can Stop On" Binding="{Binding CanStopOn}" ElementStyle="{StaticResource CheckBoxStyle}" />
             </DataGrid.Columns>
         </DataGrid>
 
-        <Label Content="Edge movement costs" HorizontalAlignment="Left" Margin="346,94,0,0" VerticalAlignment="Top"/>
+        <Label Content="Edge movement" HorizontalAlignment="Left" Margin="346,94,0,0" VerticalAlignment="Top"/>
         <DataGrid ItemsSource="{Binding EdgeMovementCosts}" HorizontalAlignment="Left" Margin="346,125,0,0" Width="238" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False"
                   CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -127,7 +127,7 @@
             </DataGrid.Resources>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Edge Type" Binding="{Binding EdgeType}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Edge" Binding="{Binding EdgeType}" IsReadOnly="True" />
                 <DataGridCheckBoxColumn Header="Traversable" Binding="{Binding Traversable, UpdateSourceTrigger=PropertyChanged}" />
                 <DataGridTextColumn Header="Movement Cost" Binding="{Binding MovementCost}" ElementStyle="{StaticResource TextStyle}" />
             </DataGrid.Columns>
@@ -135,16 +135,16 @@
 
         <CheckBox Content="Unit uses roads" HorizontalAlignment="Left" Margin="173,69,0,0" VerticalAlignment="Top" IsChecked="{Binding UsesRoads}" />
         <CheckBox Content="Unit can transport other units" HorizontalAlignment="Left" Margin="16,332,0,0" VerticalAlignment="Top" IsChecked="{Binding CanTransport}" />
-        <Label Content="Movement type" HorizontalAlignment="Left" Margin="17,36,0,0" VerticalAlignment="Top"/>
-        <Label Content="Template name" HorizontalAlignment="Left" Margin="17,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="Movement type" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
+        <Label Content="Template name" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="117,14,0,0" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Top" Width="170"/>
-        <Label Content="Combat type" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top"/>
+        <Label Content="Combat type" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.291,0.462"/>
         <Label Content="Combat ability" HorizontalAlignment="Left" Margin="10,427,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,430,0,0" TextWrapping="Wrap" Text="{Binding CombatQuality}" VerticalAlignment="Top" Width="41"/>
-        <Label Content="Depletion rank" HorizontalAlignment="Left" Margin="10,458,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,461,0,0" TextWrapping="Wrap" Text="{Binding DepletionOrder}" VerticalAlignment="Top" Width="41"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="102,430,0,0" TextWrapping="Wrap" Text="{Binding CombatQuality}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Depletion rank" HorizontalAlignment="Left" Margin="161,427,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="254,430,0,0" TextWrapping="Wrap" Text="{Binding DepletionOrder}" VerticalAlignment="Top" Width="41"/>
         <Label Content="Transportable by" HorizontalAlignment="Left" Margin="205,326,0,0" VerticalAlignment="Top"/>
-        <ItemsControl ItemsSource="{Binding Path=MovementTypesTransportableBySelection}" Margin="308,329,23,646">
+        <ItemsControl ItemsSource="{Binding Path=MovementTypesTransportableBySelection}" Margin="308,329,0,0" Height="39" VerticalAlignment="Top" HorizontalAlignment="Left" Width="301">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"/>
@@ -156,15 +156,66 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Label Content="Members" HorizontalAlignment="Left" Margin="9,355,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,358,0,0" TextWrapping="Wrap" Text="{Binding Members}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Members" HorizontalAlignment="Left" Margin="10,355,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="102,358,0,0" TextWrapping="Wrap" Text="{Binding Members}" VerticalAlignment="Top" Width="41" RenderTransformOrigin="-0.024,0.478"/>
 
-        <Label Content="Size" HorizontalAlignment="Left" Margin="206,355,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="242,358,0,0" TextWrapping="Wrap" Text="{Binding Size}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Size" HorizontalAlignment="Left" Margin="161,355,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.516,0.538"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="205,358,0,0" TextWrapping="Wrap" Text="{Binding Size}" VerticalAlignment="Top" Width="41"/>
 
-        <Label Content="Morale" HorizontalAlignment="Left" Margin="10,489,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="122,492,0,0" TextWrapping="Wrap" Text="{Binding Morale}" VerticalAlignment="Top" Width="41"/>
+        <Label Content="Morale" HorizontalAlignment="Left" Margin="308,427,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="360,430,0,0" TextWrapping="Wrap" Text="{Binding Morale}" VerticalAlignment="Top" Width="41"/>
 
-        <Label Content="TerrainTypeCombatModifier, WeatherCombatModifier, EnemyCombatTypeCombatModifier, StructureCombatModifier" HorizontalAlignment="Left" Margin="16,623,0,0" VerticalAlignment="Top"/>
+
+        <Label Content="Terrain combat modifiers" HorizontalAlignment="Left" Margin="10,458,0,0" VerticalAlignment="Top"/>
+        <DataGrid ItemsSource="{Binding TerrainCombatModifiers}" Margin="10,484,0,0" HorizontalAlignment="Left" Width="133" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
+            CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+            Unloaded="DataGrid_Unloaded">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Terrain" Binding="{Binding Key}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Modifier" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Label Content="Weather combat modifiers" HorizontalAlignment="Left" Margin="157,458,0,0" VerticalAlignment="Top" Width="157"/>
+        <DataGrid ItemsSource="{Binding WeatherCombatModifiers}" Margin="157,484,0,0" HorizontalAlignment="Left" Width="133" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
+            CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+            Unloaded="DataGrid_Unloaded">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Weather" Binding="{Binding Key}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Modifier" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <Label Content="Enemy combat type modifiers" HorizontalAlignment="Left" Margin="310,458,0,0" VerticalAlignment="Top" Width="178"/>
+        <DataGrid ItemsSource="{Binding EnemyCombatTypeCombatModifiers}" Margin="310,484,0,0" HorizontalAlignment="Left" Width="144" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
+            CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+            Unloaded="DataGrid_Unloaded">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Combat type" Binding="{Binding Key}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Modifier" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <Label Content="Structure combat modifiers" HorizontalAlignment="Left" Margin="483,458,0,0" VerticalAlignment="Top" Width="158"/>
+        <DataGrid ItemsSource="{Binding StructureCombatModifiers}" Margin="483,484,0,0" HorizontalAlignment="Left" Width="126" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
+            CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+            Unloaded="DataGrid_Unloaded">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Structure" Binding="{Binding Key}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Modifier" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

@@ -27,80 +27,44 @@ namespace ScenarioEditor.ViewModels
             }
 
             CombatTypesSelection = new List<CombatTypeSelector>();
+            EnemyCombatTypeCombatModifiers = new List<KeyValueViewModel<CombatType>>();
             foreach (CombatType ct in Enum.GetValues(typeof(CombatType)))
             {
                 CombatTypesSelection.Add(new CombatTypeSelector(ct, ct == militaryUnitTemplate.CombatType));
+                EnemyCombatTypeCombatModifiers.Add(new KeyValueViewModel<CombatType>(ct));
             }
 
             TerrainMovementViewModels = new List<TerrainMovementViewModel>();
+            TerrainCombatModifiers = new List<KeyValueViewModel<TerrainType>>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                var traversable = true;
-                var movementCost = 1;
-                var canStopOn = true;
-                switch (_militaryUnitTemplate.MovementType)
-                {
-                    case MovementType.Airborne:
-                        if (Terrain.All_Water.HasFlag(terrainType))
-                        {
-                            canStopOn = false;
-                        }
-                        break;
-                    case MovementType.Land:
-                        if (Terrain.All_Water.HasFlag(terrainType))
-                        {
-                            traversable = false;
-                            canStopOn = false;
-                        }
-                        if (Terrain.Rough_Land.HasFlag(terrainType))
-                        {
-                            movementCost = 2;
-                        }
-                        break;
-                    case MovementType.Water:
-                        if (Terrain.All_Land.HasFlag(terrainType))
-                        {
-                            traversable = false;
-                            canStopOn = true;
-                        }
-                        break;
-                }
-                if (terrainType == TerrainType.Mountain)
-                {
-                    canStopOn = false;
-                }
-
-                TerrainMovementViewModels.Add(new TerrainMovementViewModel(terrainType, traversable, movementCost, canStopOn));
+                TerrainMovementViewModels.Add(new TerrainMovementViewModel(terrainType));
+                TerrainCombatModifiers.Add(new KeyValueViewModel<TerrainType>(terrainType));
             }
 
             EdgeMovementCosts = new List<EdgeMovementViewModel>();
             foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
             {
-                var traversable = true;
-                var movementCost = 0;
-                switch (_militaryUnitTemplate.MovementType)
-                {
-                    case MovementType.Land:
-                        if (Edge.All_Water.HasFlag(edgeType) && edgeType != EdgeType.None)
-                        {
-                            traversable = false;
-                        }
-                        if (Edge.All_Land.HasFlag(edgeType))
-                        {
-                            movementCost = 1;
-                        }
-                        break;
-                    case MovementType.Water:
-                        if (Edge.All_Land.HasFlag(edgeType))
-                        {
-                            traversable = false;
-                        }
-                        break;
-                }
-                EdgeMovementCosts.Add(new EdgeMovementViewModel(edgeType, traversable, movementCost));
+                EdgeMovementCosts.Add(new EdgeMovementViewModel(edgeType));
+            }
+
+            WeatherCombatModifiers = new List<KeyValueViewModel<Weather>>();
+            foreach (Weather weather in Enum.GetValues(typeof(Weather)))
+            {
+                WeatherCombatModifiers.Add(new KeyValueViewModel<Weather>(weather));
+            }
+
+            StructureCombatModifiers = new List<KeyValueViewModel<StructureType>>();
+            foreach (StructureType structureType in Enum.GetValues(typeof(StructureType)))
+            {
+                StructureCombatModifiers.Add(new KeyValueViewModel<StructureType>(structureType));
             }
         }
 
+        public List<KeyValueViewModel<StructureType>> StructureCombatModifiers { get; set; }
+        public List<KeyValueViewModel<CombatType>> EnemyCombatTypeCombatModifiers { get; set; }
+        public List<KeyValueViewModel<Weather>> WeatherCombatModifiers { get; set; }
+        public List<KeyValueViewModel<TerrainType>> TerrainCombatModifiers { get; set; }
         public List<TerrainMovementViewModel> TerrainMovementViewModels { get; private set; }
         public List<EdgeMovementViewModel> EdgeMovementCosts { get; private set; }
         public string Name

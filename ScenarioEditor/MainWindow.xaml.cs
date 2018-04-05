@@ -36,7 +36,7 @@ namespace ScenarioEditor
             InitializeComponent();
             DataContext = this;
 
-            _scenario = new Scenario(GameBoard, TileEdges, Structures);
+            _scenario = new Scenario("Scenario_01");
 
             var militaryUnitTemplateViewModels = _scenario.MilitaryUnitTemplates.Select(x => new MilitaryUnitTemplateViewModel(x)).ToList();
             MilitaryUnitTemplateViewModels = new ObservableCollection<MilitaryUnitTemplateViewModel>(militaryUnitTemplateViewModels);
@@ -45,10 +45,6 @@ namespace ScenarioEditor
         }
 
         Scenario _scenario;
-
-        static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
-        static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
-        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
         TerrainType _selectedTerrainType;
         

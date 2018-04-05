@@ -12,8 +12,14 @@ namespace Manager
 {
     public class Scenario
     {
-        public Scenario(string[] gameBoard, string[] tileEdges, string[] structures)
+        public Scenario(string folder)
         {
+            Folder = folder;
+
+            var gameBoard = File.ReadAllLines($"{Folder}\\Board.txt");
+            var tileEdges = File.ReadAllLines($"{Folder}\\Edges.txt");
+            var structures = File.ReadAllLines($"{Folder}\\Structures.txt");
+
             Board = new Board(gameBoard, tileEdges, structures);
 
             Board.Units = new List<MilitaryUnit>
@@ -26,6 +32,8 @@ namespace Manager
                 new MilitaryUnit(4, "1st Airborne", 0, Board[3, 2], MovementType.Airborne),
             };
 
+            
+
             Load();
 
             Factions = new List<Faction>();
@@ -37,6 +45,8 @@ namespace Manager
         }
         public int Id { get; set; }
         public string Name { get; set; }
+
+        public string Folder { get; set; }
         public Board Board { get; set; }
 
         public List<MilitaryUnitTemplate> MilitaryUnitTemplates { get; set; }
@@ -65,14 +75,14 @@ namespace Manager
 
         public void Load()
         {
-            var militaryUnitTemplates = File.ReadAllText("MilitaryUnitTemplates.json");
+            var militaryUnitTemplates = File.ReadAllText($"{Folder}\\MilitaryUnitTemplates.json");
             MilitaryUnitTemplates = JsonConvert.DeserializeObject<List<MilitaryUnitTemplate>>(militaryUnitTemplates);
         }
 
         public void Save()
         {
             var militaryUnitTemplates = JsonConvert.SerializeObject(MilitaryUnitTemplates, Formatting.Indented);
-            File.WriteAllText("MilitaryUnitTemplates.json", militaryUnitTemplates);
+            File.WriteAllText($"{Folder}\\MilitaryUnitTemplates.json", militaryUnitTemplates);
         }
     }
 }

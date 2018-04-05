@@ -1,0 +1,502 @@
+[
+  {
+    "Name": "Dwarf Infantry",
+    "MovementType": 1,
+    "CanTransport": false,
+    "UsesRoads": true,
+    "RoadMovementBonusPoints": 1,
+    "MovementTypesTransportableBy": [
+      2
+    ],
+    "MovementPoints": 2,
+    "CombatType": 1,
+    "CombatAbility": 1,
+    "DepletionOrder": 10,
+    "Size": 1.0,
+    "Members": 500,
+    "Morale": 5,
+    "TerrainMovements": [
+      {
+        "TerrainType": "Desert",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Forest",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "FrozenWater",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Grassland",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Hill",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Mountain",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Water",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Wetland",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Reef",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      }
+    ],
+    "EdgeMovements": [
+      {
+        "EdgeType": "None",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Forest",
+        "Traversable": true,
+        "MovementCost": 1
+      },
+      {
+        "EdgeType": "FrozenRiver",
+        "Traversable": true,
+        "MovementCost": 1
+      },
+      {
+        "EdgeType": "Hill",
+        "Traversable": true,
+        "MovementCost": 1
+      },
+      {
+        "EdgeType": "Mountain",
+        "Traversable": false,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Port",
+        "Traversable": true,
+        "MovementCost": 1
+      },
+      {
+        "EdgeType": "River",
+        "Traversable": false,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Reef",
+        "Traversable": false,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wall",
+        "Traversable": false,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wetland",
+        "Traversable": true,
+        "MovementCost": 0
+      }
+    ]
+  },
+  {
+    "Name": "Human Cavalry",
+    "MovementType": 1,
+    "CanTransport": false,
+    "UsesRoads": true,
+    "RoadMovementBonusPoints": 1,
+    "MovementTypesTransportableBy": [
+      2
+    ],
+    "MovementPoints": 3,
+    "CombatType": 0,
+    "CombatAbility": 1,
+    "DepletionOrder": 10,
+    "Size": 1.0,
+    "Members": 500,
+    "Morale": 5,
+    "TerrainMovements": [
+      {
+        "TerrainType": "Desert",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Forest",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "FrozenWater",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Grassland",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Hill",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Mountain",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Water",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Wetland",
+        "Traversable": true,
+        "MovementCost": 2,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Reef",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      }
+    ],
+    "EdgeMovements": [
+      {
+        "EdgeType": "None",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Forest",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "FrozenRiver",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Hill",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Mountain",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Port",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "River",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Reef",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wall",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wetland",
+        "Traversable": true,
+        "MovementCost": 0
+      }
+    ]
+  },
+  {
+    "Name": "Fleet",
+    "MovementType": 1,
+    "CanTransport": false,
+    "UsesRoads": true,
+    "RoadMovementBonusPoints": 1,
+    "MovementTypesTransportableBy": [
+      2
+    ],
+    "MovementPoints": 2,
+    "CombatType": 1,
+    "CombatAbility": 1,
+    "DepletionOrder": 10,
+    "Size": 1.0,
+    "Members": 500,
+    "Morale": 5,
+    "TerrainMovements": [
+      {
+        "TerrainType": "Desert",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Forest",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "FrozenWater",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Grassland",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Hill",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Mountain",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Water",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Wetland",
+        "Traversable": false,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Reef",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      }
+    ],
+    "EdgeMovements": [
+      {
+        "EdgeType": "None",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Forest",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "FrozenRiver",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Hill",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Mountain",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Port",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "River",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Reef",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wall",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wetland",
+        "Traversable": true,
+        "MovementCost": 0
+      }
+    ]
+  },
+  {
+    "Name": "Griffon",
+    "MovementType": 1,
+    "CanTransport": false,
+    "UsesRoads": true,
+    "RoadMovementBonusPoints": 1,
+    "MovementTypesTransportableBy": [
+      2
+    ],
+    "MovementPoints": 2,
+    "CombatType": 1,
+    "CombatAbility": 1,
+    "DepletionOrder": 10,
+    "Size": 1.0,
+    "Members": 500,
+    "Morale": 5,
+    "TerrainMovements": [
+      {
+        "TerrainType": "Desert",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Forest",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "FrozenWater",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Grassland",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Hill",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Mountain",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Water",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Wetland",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      },
+      {
+        "TerrainType": "Reef",
+        "Traversable": true,
+        "MovementCost": 1,
+        "CanStopOn": true
+      }
+    ],
+    "EdgeMovements": [
+      {
+        "EdgeType": "None",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Forest",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "FrozenRiver",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Hill",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Mountain",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Port",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "River",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Reef",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wall",
+        "Traversable": true,
+        "MovementCost": 0
+      },
+      {
+        "EdgeType": "Wetland",
+        "Traversable": true,
+        "MovementCost": 0
+      }
+    ]
+  }
+]

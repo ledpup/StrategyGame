@@ -43,11 +43,7 @@ namespace ScenarioEditor.ViewModels
                 TerrainCombatModifiers.Add(new KeyValueViewModel<TerrainType>(terrainType));
             }
 
-            EdgeMovementCosts = new List<EdgeMovementViewModel>();
-            foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
-            {
-                EdgeMovementCosts.Add(new EdgeMovementViewModel(edgeType));
-            }
+            EdgeMovementCosts = _militaryUnitTemplate.EdgeMovements.Select(x => new EdgeMovementViewModel(x)).ToList();
 
             WeatherCombatModifiers = new List<KeyValueViewModel<Weather>>();
             foreach (Weather weather in Enum.GetValues(typeof(Weather)))

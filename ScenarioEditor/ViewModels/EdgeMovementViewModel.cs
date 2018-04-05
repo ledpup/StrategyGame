@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,30 +10,43 @@ namespace ScenarioEditor.ViewModels
 {
     public class EdgeMovementViewModel : BaseViewModel
     {
-        public EdgeMovementViewModel(EdgeType edgeType)
+        UnitEdgeMovement _unitEdgeMovement;
+        public EdgeMovementViewModel(UnitEdgeMovement unitEdgeMovement)
         {
-            EdgeType = edgeType.ToString();
-            Traversable = true;
-            MovementCost = 0;
+            _unitEdgeMovement = unitEdgeMovement;
         }
 
-        public string EdgeType { get; set; }
+        public string EdgeType { get { return _unitEdgeMovement.EdgeType.ToString(); } }
         public bool Traversable
         {
             get
             {
-                return _traversable;
+                return _unitEdgeMovement.Traversable;
             }
             set
             {
-                if (value == _traversable)
+                if (value == _unitEdgeMovement.Traversable)
                     return;
 
-                _traversable = value;
+                _unitEdgeMovement.Traversable = value;
                 RaisePropertyChanged();
             }
         }
-        bool _traversable;
-        public int MovementCost { get; set; }
+
+        public int MovementCost
+        {
+            get
+            {
+                return _unitEdgeMovement.MovementCost;
+            }
+            set
+            {
+                if (value == _unitEdgeMovement.MovementCost)
+                    return;
+
+                _unitEdgeMovement.MovementCost = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

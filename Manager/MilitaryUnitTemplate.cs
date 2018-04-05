@@ -29,9 +29,13 @@ namespace Manager
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
                 TerrainMovements.Add(new UnitTerrainMovement(terrainType));
-                //TerrainCombatModifiers.Add(new KeyValueViewModel<TerrainType>(terrainType));
             }
-            
+
+            EdgeMovements = new List<UnitEdgeMovement>();
+            foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
+            {
+                EdgeMovements.Add(new UnitEdgeMovement(edgeType));
+            }
         }
 
         public string Name;
@@ -49,5 +53,7 @@ namespace Manager
         public int Morale { get; set; }
 
         public List<UnitTerrainMovement> TerrainMovements { get; set; }
+
+        public List<UnitEdgeMovement> EdgeMovements { get; set; }
     }
 }

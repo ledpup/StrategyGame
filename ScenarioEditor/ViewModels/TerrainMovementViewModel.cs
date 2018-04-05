@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,31 +10,58 @@ namespace ScenarioEditor.ViewModels
 {
     public class TerrainMovementViewModel : BaseViewModel
     {
-        public TerrainMovementViewModel(TerrainType terrainType)
+        UnitTerrainMovement _unitTerrainMovement;
+        public TerrainMovementViewModel(UnitTerrainMovement unitTerrainMovement)
         {
-            TerrainType = terrainType.ToString();
-            Traversable = true;
-            MovementCost = 1;
-            CanStopOn = true;
+            _unitTerrainMovement = unitTerrainMovement;
         }
-        public string TerrainType { get; private set; }
+        public string TerrainType { get { return _unitTerrainMovement.TerrainType.ToString(); } }
         public bool Traversable
         {
             get
             {
-                return _traversable;
+                return _unitTerrainMovement.Traversable;
             }
             set
             {
-                if (value == _traversable)
+                if (value == _unitTerrainMovement.Traversable)
                     return;
 
-                _traversable = value;
+                _unitTerrainMovement.Traversable = value;
                 RaisePropertyChanged();
             }
         }
-        bool _traversable;
-        public int MovementCost { get; set; }
-        public bool CanStopOn { get; set; }
+
+        public int MovementCost
+        {
+            get
+            {
+                return _unitTerrainMovement.MovementCost;
+            }
+            set
+            {
+                if (value == _unitTerrainMovement.MovementCost)
+                    return;
+
+                _unitTerrainMovement.MovementCost = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool CanStopOn
+        {
+            get
+            {
+                return _unitTerrainMovement.CanStopOn;
+            }
+            set
+            {
+                if (value == _unitTerrainMovement.CanStopOn)
+                    return;
+
+                _unitTerrainMovement.CanStopOn = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

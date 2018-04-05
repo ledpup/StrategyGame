@@ -51,7 +51,6 @@
     <Compile Include="Faction.cs" />
     <Compile Include="IHasNeighbours.cs" />
     <Compile Include="IUnitOrder.cs" />
-    <Compile Include="MilitaryUnitTemplate.cs" />
     <Compile Include="PathFind.cs" />
     <Compile Include="PathFindTile.cs" />
     <Compile Include="Player.cs" />

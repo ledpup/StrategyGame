@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,11 +35,11 @@ namespace ScenarioEditor.ViewModels
                 EnemyCombatTypeCombatModifiers.Add(new KeyValueViewModel<CombatType>(ct));
             }
 
-            TerrainMovementViewModels = new List<TerrainMovementViewModel>();
+            TerrainMovementViewModels = _militaryUnitTemplate.TerrainMovements.Select(x => new TerrainMovementViewModel(x)).ToList();
+
             TerrainCombatModifiers = new List<KeyValueViewModel<TerrainType>>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
-                TerrainMovementViewModels.Add(new TerrainMovementViewModel(terrainType));
                 TerrainCombatModifiers.Add(new KeyValueViewModel<TerrainType>(terrainType));
             }
 

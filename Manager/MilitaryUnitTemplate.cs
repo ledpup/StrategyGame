@@ -1,10 +1,11 @@
-﻿using System;
+﻿using GameModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameModel
+namespace Manager
 {
     public class MilitaryUnitTemplate
     {
@@ -23,6 +24,14 @@ namespace GameModel
             Members = 500;
             Size = 1;
             Morale = 5;
+
+            TerrainMovements = new List<UnitTerrainMovement>();
+            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
+            {
+                TerrainMovements.Add(new UnitTerrainMovement(terrainType));
+                //TerrainCombatModifiers.Add(new KeyValueViewModel<TerrainType>(terrainType));
+            }
+            
         }
 
         public string Name;
@@ -38,5 +47,7 @@ namespace GameModel
         public float Size { get; set; }
         public int Members { get; set; }
         public int Morale { get; set; }
+
+        public List<UnitTerrainMovement> TerrainMovements { get; set; }
     }
 }

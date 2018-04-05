@@ -26,13 +26,7 @@ namespace Manager
                 new MilitaryUnit(4, "1st Airborne", 0, Board[3, 2], MovementType.Airborne),
             };
 
-            MilitaryUnitTemplates = new List<MilitaryUnitTemplate>
-            {
-                new MilitaryUnitTemplate("Dwarf Infantry"),
-                new MilitaryUnitTemplate("Human Cavalry"),
-                new MilitaryUnitTemplate("Fleet"),
-                new MilitaryUnitTemplate("Griffon"),
-            };
+            Load();
 
             Factions = new List<Faction>();
             for (var i = 0; i < 4; i++)
@@ -67,6 +61,12 @@ namespace Manager
                 Board[x, y].Structure = newStructure;
                 Board.Structures.Add(newStructure);
             }
+        }
+
+        public void Load()
+        {
+            var militaryUnitTemplates = File.ReadAllText("MilitaryUnitTemplates.json");
+            MilitaryUnitTemplates = JsonConvert.DeserializeObject<List<MilitaryUnitTemplate>>(militaryUnitTemplates);
         }
 
         public void Save()

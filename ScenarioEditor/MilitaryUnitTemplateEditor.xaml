@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:ScenarioEditor"
         mc:Ignorable="d"
         Title="MilitaryUnitTemplateEditor" Height="730" Width="649">
+
     <Grid>
         <ListBox ItemsSource="{Binding MovementTypesSelection}" SelectedItem="{Binding MovementTypeSelectedItem}"  Margin="117,36,140,0" BorderBrush="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="36" VerticalAlignment="Top">
             <ListBox.ItemContainerStyle>
@@ -73,7 +74,12 @@
         </ListBox>
 
         <Label x:Name="MovementPoints" Content="Movement points" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="124,67,0,0" TextWrapping="Wrap" Text="{Binding MovementPoints}" VerticalAlignment="Top" Width="34"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="119,71,0,0" TextWrapping="Wrap" Text="{Binding MovementPoints}" VerticalAlignment="Top" Width="34"/>
+
+        <CheckBox Content="Unit uses roads" HorizontalAlignment="Left" Margin="176,72,0,0" VerticalAlignment="Top" IsChecked="{Binding UsesRoads}" />
+
+        <Label Content="Road movement bonus points" HorizontalAlignment="Left" Margin="298,66,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="472,71,0,0" TextWrapping="Wrap" Text="{Binding RoadMovementBonusPoints}" VerticalAlignment="Top" Width="34" IsEnabled="{Binding UsesRoads}" RenderTransformOrigin="0.471,1.261"/>
 
         <Label Content="Terrain movement" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top"/>
         <DataGrid ItemsSource="{Binding TerrainMovementViewModels}" Margin="10,125,0,0" HorizontalAlignment="Left" Width="320" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
@@ -133,7 +139,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <CheckBox Content="Unit uses roads" HorizontalAlignment="Left" Margin="173,69,0,0" VerticalAlignment="Top" IsChecked="{Binding UsesRoads}" />
+
         <CheckBox Content="Unit can transport other units" HorizontalAlignment="Left" Margin="16,332,0,0" VerticalAlignment="Top" IsChecked="{Binding CanTransport}" />
         <Label Content="Movement type" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
         <Label Content="Template name" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -191,7 +197,7 @@
                 <DataGridTextColumn Header="Modifier" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
             </DataGrid.Columns>
         </DataGrid>
-        
+
         <Label Content="Enemy combat type modifiers" HorizontalAlignment="Left" Margin="310,458,0,0" VerticalAlignment="Top" Width="178"/>
         <DataGrid ItemsSource="{Binding EnemyCombatTypeCombatModifiers}" Margin="310,484,0,0" HorizontalAlignment="Left" Width="144" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
             CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
@@ -204,7 +210,7 @@
                 <DataGridTextColumn Header="Modifier" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
             </DataGrid.Columns>
         </DataGrid>
-        
+
         <Label Content="Structure combat modifiers" HorizontalAlignment="Left" Margin="483,458,0,0" VerticalAlignment="Top" Width="158"/>
         <DataGrid ItemsSource="{Binding StructureCombatModifiers}" Margin="483,484,0,0" HorizontalAlignment="Left" Width="126" Height="199" VerticalAlignment="Top" AutoGenerateColumns="False" 
             CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
@@ -217,5 +223,6 @@
                 <DataGridTextColumn Header="Modifier" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
             </DataGrid.Columns>
         </DataGrid>
+
     </Grid>
 </Window>

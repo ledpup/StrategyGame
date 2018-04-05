@@ -22,6 +22,7 @@ using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using ScenarioEditor.ViewModels;
+using Manager;
 
 namespace ScenarioEditor
 {
@@ -35,31 +36,22 @@ namespace ScenarioEditor
             InitializeComponent();
             DataContext = this;
 
-            var militaryUnitTemplates = new List<MilitaryUnitTemplate>
-            {
-                new MilitaryUnitTemplate("Dwarf Infantry", usesRoads: true),
-                new MilitaryUnitTemplate("Human Cavalry", movementPoints: 3, usesRoads: true),
-                new MilitaryUnitTemplate("Fleet", MovementType.Water, 3, false, true),
-                new MilitaryUnitTemplate("Grifon", MovementType.Airborne, 3, false, true),
-            };
+            _scenario = new Scenario(GameBoard, TileEdges, Structures);
 
-            var militaryUnitTemplateViewModels = militaryUnitTemplates.Select(x => new MilitaryUnitTemplateViewModel(x)).ToList();
+            var militaryUnitTemplateViewModels = _scenario.MilitaryUnitTemplates.Select(x => new MilitaryUnitTemplateViewModel(x)).ToList();
             MilitaryUnitTemplateViewModels = new ObservableCollection<MilitaryUnitTemplateViewModel>(militaryUnitTemplateViewModels);
 
-            FactionViewModels = new ObservableCollection<FactionViewModel>();
-            for (var i = 0; i < 4; i++)
-            {
-                var faction = new Faction(i, $"Faction {i}", GameRenderer.PlayerColour(i));
-                FactionViewModels.Add(new FactionViewModel(faction));
-            }
+            FactionViewModels = new ObservableCollection<FactionViewModel>(_scenario.Factions.Select(x => new FactionViewModel(x)));
         }
+
+        Scenario _scenario;
 
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
         static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
         static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
         TerrainType _selectedTerrainType;
-        Board _board;
+        
         Activity _activity;
         StructureType _selectedStructureType;
         public ObservableCollection<MilitaryUnitTemplateViewModel> MilitaryUnitTemplateViewModels { get; set; }
@@ -79,20 +71,6 @@ namespace ScenarioEditor
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
-
-            _board = new Board(GameBoard, TileEdges, Structures);
-
-            _board.Units = new List<MilitaryUnit>
-            {
-                new MilitaryUnit(0) { Location = _board[1, 1] },
-                new MilitaryUnit(1) { Location = _board[1, 1] },
-                new MilitaryUnit(2) { Location = _board[1, 1] },
-                new MilitaryUnit(3) { Location = _board[1, 1], OwnerIndex = 1 },
-                new MilitaryUnit(4, "1st Fleet", 0, _board[0, 0], MovementType.Water),
-                new MilitaryUnit(4, "1st Airborne", 0, _board[3, 2], MovementType.Airborne),
-            };
-
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
             {
                 var color = GameRenderingWpf.ArgbColourToColor(GameRenderer.TerrainTypeColour(terrainType));
@@ -155,9 +133,10 @@ namespace ScenarioEditor
 
         private void RenderMap()
         {
-            _gameRenderingWpf = new GameRenderingWpf(_board.Width, _board.Height);
-            var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, units: _board.Units);
+            _gameRenderingWpf = new GameRenderingWpf(_scenario.Board.Width, _scenario.Board.Height);
+            var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _scenario.Board.Width, _scenario.Board.Height, _scenario.Board.Tiles, _scenario.Board.Edges, _scenario.Board.Structures, units: _scenario.Board.Units);
             var canvas = (Canvas)gameRenderer.GetBitmap();
+            canvas.Margin = new Thickness(5, 30, 0, 0);
             HexGrid hexGrid = null;
 
             foreach (UIElement uiElement in canvas.Children)
@@ -226,35 +205,20 @@ namespace ScenarioEditor
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
             var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
 
-            _gameRenderingWpf.RemoveRectangle(_board[x, y].Hex);
+            _gameRenderingWpf.RemoveRectangle(_scenario.Board[x, y].Hex);
+
+            _scenario.SetStructure(_selectedStructureType, _selectedFaction, x, y);
 
             if (_selectedStructureType == StructureType.None)
             {
-                _board.Structures.Remove(_board[x, y].Structure);
-                _board[x, y].Structure = null;
                 Structure.DataContext = null;
             }
-            else if (_board[x, y].Structure != null)
-            {
-                _board[x, y].Structure.OwnerIndex = _selectedFaction;
-                _board[x, y].Structure.StructureType = _selectedStructureType;
-            }
-            else
-            {
-                _board.Structures.Remove(_board[x, y].Structure);
-                var newStructure = new Structure(_board[x, y].Index, _selectedStructureType, _board[x, y], _selectedFaction);
-                
-                _board[x, y].Structure = newStructure;
-                _board.Structures.Add(newStructure);
-                
-            }
 
-            if (_board[x, y].Structure != null)
+            if (_scenario.Board[x, y].Structure != null)
             {
-                Structure.DataContext = new StructureViewModel(_board[x, y].Structure);
-                _gameRenderingWpf.DrawRectangle(_board[x, y].Hex, GameRenderer.StructureColour(_board[x, y].Structure));
+                Structure.DataContext = new StructureViewModel(_scenario.Board[x, y].Structure);
+                _gameRenderingWpf.DrawRectangle(_scenario.Board[x, y].Hex, GameRenderer.StructureColour(_scenario.Board[x, y].Structure));
             }
-            
         }
 
         private void HexItem_MouseEnter(object sender, MouseEventArgs e)
@@ -270,7 +234,7 @@ namespace ScenarioEditor
             ((HexItem)sender).Background = TerrainType.Background;
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
             var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
-            _board[x, y].TerrainType = _selectedTerrainType;
+            _scenario.Board[x, y].TerrainType = _selectedTerrainType;
         }
 
         private void TerrainTypeSelected_Click(object sender, RoutedEventArgs e)
@@ -321,6 +285,11 @@ namespace ScenarioEditor
         private void FactionSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SelectFaction(((FactionViewModel)e.AddedItems[0]).Id);
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            _scenario.Save();
         }
     }
 }

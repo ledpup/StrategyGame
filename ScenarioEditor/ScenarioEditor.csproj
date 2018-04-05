@@ -111,6 +111,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -131,6 +132,10 @@
     <ProjectReference Include="..\HexGridControl\HexGridControl.csproj">
       <Project>{942134ac-6ea2-4500-8f22-0f739b70a05f}</Project>
       <Name>HexGridControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Manager\Manager.csproj">
+      <Project>{abda7321-1418-44b5-8725-4acc0acfe1d3}</Project>
+      <Name>Manager</Name>
     </ProjectReference>
     <ProjectReference Include="..\Visualise\GameRendering2D.csproj">
       <Project>{922935d8-0781-4c27-8019-10d84c6797a0}</Project>

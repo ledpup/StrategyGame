@@ -24,8 +24,6 @@
             </DockPanel>
 
             <Grid Name="MainGrid" Margin="0,25,0,0">
-                <Ellipse Width="15" Height="15" Margin="118,1016,0,38" HorizontalAlignment="Left" StrokeThickness="0" Fill="Black"  />
-                <Polygon Width="15" Height="15" Points="0,0 15,0 15,15 0,15" Margin="40,1016,0,38" HorizontalAlignment="Left" Fill="Black" />
                 <Label Content="Terrain Type Selector" HorizontalAlignment="Left" Margin="1397,10,0,0" Height="26" VerticalAlignment="Top"/>
                 <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Margin="1398,36,0,0" Width="316" Height="88" VerticalAlignment="Top"/>
 

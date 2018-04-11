@@ -63,6 +63,7 @@
     <Compile Include="Rendering\Centreline.cs" />
     <Compile Include="Rendering\Edge.cs" />
     <Compile Include="Rendering\GameRenderer.cs" />
+    <Compile Include="Rendering\IGameModelForRendering.cs" />
     <Compile Include="Rendering\IGameRenderingEngine.cs" />
     <Compile Include="Rendering\IReactiveGameRenderingEngine.cs" />
     <Compile Include="Stack.cs" />

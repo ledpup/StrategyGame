@@ -15,6 +15,11 @@ namespace GameModel.Rendering
     }
     public class GameRenderer
     {
+        public static IGameRenderingEngine Render(IGameRenderingEngine gameRenderingEngine, RenderPipeline renderBegin, RenderPipeline renderUntil, IGameModelForRendering gameModel)
+        {
+            throw new NotImplementedException();
+            //int boardWidth, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null
+        }
         public static IGameRenderingEngine Render(IGameRenderingEngine gameRenderingEngine, RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
             //var gameBoardDrawing2D = new GameBoardDrawing2D(boardWidth, boardHeight);
@@ -111,26 +116,10 @@ namespace GameModel.Rendering
 
                     foreach (var group in unitsByLocation)
                     {
+                        var hex = group.Key.Hex;
                         var unitsAtLocation = group.OrderBy(x => x.OwnerIndex).ToList();
 
-                        for (var i = 0; i < unitsAtLocation.Count; i++)
-                        {
-                            var colour = UnitColour(unitsAtLocation[i]);
-                            switch (unitsAtLocation[i].MovementType)
-                            {
-                                case MovementType.Airborne:
-                                    gameRenderingEngine.DrawTriangle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
-                                    break;
-
-                                case MovementType.Water:
-                                    gameRenderingEngine.DrawTrapezium(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
-                                    break;
-
-                                case MovementType.Land:
-                                    gameRenderingEngine.DrawCircle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
-                                    break;
-                            }
-                        }
+                        RenderUnitsAtLocation(gameRenderingEngine, hex, unitsAtLocation);
                     }
                 }
             }
@@ -143,6 +132,29 @@ namespace GameModel.Rendering
             }
             
             return gameRenderingEngine;
+        }
+
+        public static void RenderUnitsAtLocation(IGameRenderingEngine gameRenderingEngine, Hex hex, List<MilitaryUnit> unitsAtLocation)
+        {
+            for (var i = 0; i < unitsAtLocation.Count; i++)
+            {
+                var colour = UnitColour(unitsAtLocation[i]);
+                var position = (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2);
+                switch (unitsAtLocation[i].MovementType)
+                {
+                    case MovementType.Airborne:
+                        gameRenderingEngine.DrawTriangle(hex, position, colour);
+                        break;
+
+                    case MovementType.Water:
+                        gameRenderingEngine.DrawTrapezium(hex, position, colour);
+                        break;
+
+                    case MovementType.Land:
+                        gameRenderingEngine.DrawCircle(hex, position, colour);
+                        break;
+                }
+            }
         }
 
         public static ArgbColour PlayerColour(int playerIndex)
@@ -228,10 +240,10 @@ namespace GameModel.Rendering
 
         public static PointD UnitLocationTopLeftCorner(PointD hexCentre, float position, float hexHeight, float unitWidth)
         {
-            float Radius = hexHeight / 4;
+            float radius = hexHeight / 4;
 
-            var xOnCircle = (float)Math.Cos(position) * Radius + hexCentre.X;
-            var yOnCircle = (float)Math.Sin(position) * Radius + hexCentre.Y;
+            var xOnCircle = (float)Math.Cos(position) * radius + hexCentre.X;
+            var yOnCircle = (float)Math.Sin(position) * radius + hexCentre.Y;
 
             var xTopLeft = (float)(xOnCircle - (unitWidth / 2));
             var yTopLeft = (float)(yOnCircle - (unitWidth / 2));

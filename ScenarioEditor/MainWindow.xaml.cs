@@ -50,6 +50,7 @@ namespace ScenarioEditor
         
         Activity _activity;
         StructureType _selectedStructureType;
+        MilitaryUnitTemplate _selectedUnitTemplate;
         public ObservableCollection<MilitaryUnitTemplateViewModel> MilitaryUnitTemplateViewModels { get; set; }
         public ObservableCollection<FactionViewModel> FactionViewModels { get; set; }
 
@@ -125,6 +126,12 @@ namespace ScenarioEditor
             }
 
             RenderMap();
+
+            var drawing2d = new GameRenderingGdiPlus(_scenario.Board.Width, _scenario.Board.Height);
+            GameRenderer.Render(drawing2d, RenderPipeline.Board, RenderPipeline.Labels, _scenario.Board.Width, _scenario.Board.Height, _scenario.Board.Tiles, _scenario.Board.Edges, _scenario.Board.Structures, units: _scenario.Board.Units);
+
+            var bitmap = (Bitmap)drawing2d.GetBitmap();
+            Map.Source = BitmapToBitmapImage(bitmap);
         }
 
         private void RenderMap()
@@ -132,7 +139,7 @@ namespace ScenarioEditor
             _gameRenderingWpf = new GameRenderingWpf(_scenario.Board.Width, _scenario.Board.Height);
             var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _scenario.Board.Width, _scenario.Board.Height, _scenario.Board.Tiles, _scenario.Board.Edges, _scenario.Board.Structures, units: _scenario.Board.Units);
             var canvas = (Canvas)gameRenderer.GetBitmap();
-            canvas.Margin = new Thickness(5, 30, 0, 0);
+            canvas.Margin = new Thickness(10, 0, 0, 0);
             HexGrid hexGrid = null;
 
             foreach (UIElement uiElement in canvas.Children)
@@ -188,29 +195,55 @@ namespace ScenarioEditor
             switch (_activity)
             {
                 case Activity.Terrain:
-                    SetTerrainType(sender);
+                    SetTerrain(sender);
                     break;
                 case Activity.Structure:
-                    SetStructureType(sender);
+                    PlaceStructure(sender);
+                    break;
+                case Activity.Unit:
+                    PlaceUnit(sender);
                     break;
             }
         }
 
-        private void SetStructureType(object sender)
+        private void PlaceUnit(object sender)
+        {
+            var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
+            var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
+
+            var militaryUnit = _scenario.PlaceUnit(_selectedUnitTemplate, _selectedFaction, x, y);
+
+
+            switch (militaryUnit.MovementType)
+            {
+                case MovementType.Airborne:
+                    _gameRenderingWpf.DrawTriangle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
+                    break;
+                case MovementType.Land:
+                    _gameRenderingWpf.DrawCircle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
+                    break;
+                case MovementType.Water:
+                    _gameRenderingWpf.DrawTrapezium(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
+                    break;
+            }
+
+            _gameRenderingWpf.RepositionUnits(_scenario.Board[x, y].Hex);
+        }
+
+        private void PlaceStructure(object sender)
         {
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
             var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
 
             _gameRenderingWpf.RemoveRectangle(_scenario.Board[x, y].Hex);
 
-            _scenario.SetStructure(_selectedStructureType, _selectedFaction, x, y);
+            _scenario.PlaceStructure(_selectedStructureType, _selectedFaction, x, y);
 
             if (_selectedStructureType == StructureType.None)
             {
                 Structure.DataContext = null;
             }
-
-            if (_scenario.Board[x, y].Structure != null)
+            else if (_scenario.Board[x, y].Structure != null)
             {
                 Structure.DataContext = new StructureViewModel(_scenario.Board[x, y].Structure);
                 _gameRenderingWpf.DrawRectangle(_scenario.Board[x, y].Hex, GameRenderer.StructureColour(_scenario.Board[x, y].Structure));
@@ -221,11 +254,11 @@ namespace ScenarioEditor
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                SetTerrainType(sender);
+                SetTerrain(sender);
             }
         }
 
-        private void SetTerrainType(object sender)
+        private void SetTerrain(object sender)
         {
             ((HexItem)sender).Background = TerrainType.Background;
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
@@ -281,6 +314,13 @@ namespace ScenarioEditor
         private void FactionSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SelectFaction(((FactionViewModel)e.AddedItems[0]).Id);
+        }
+
+        private void UnitSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var id = ((MilitaryUnitTemplateViewModel)e.AddedItems[0]).Id;
+            _activity = Activity.Unit;
+            _selectedUnitTemplate = _scenario.MilitaryUnitTemplates.Single(x => x.Id == id);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)

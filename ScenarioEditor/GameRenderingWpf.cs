@@ -21,9 +21,24 @@ namespace ScenarioEditor
         HexGrid _hexGrid;
         Canvas _canvas;
         Layout _layout;
+        int _boardWidth, _boardHeight;
+        List<Shape>[] _shapesAtLocation;
+
+        public enum ShapeType
+        {
+            Circle,
+            Triangle,
+            Trapizium
+        }
 
         public GameRenderingWpf(int boardWidth, int boardHeight)
         {
+            _boardWidth = boardWidth;
+            _boardHeight = boardHeight;
+            _shapesAtLocation = new List<Shape>[_boardWidth * _boardHeight];
+            for (var i = 0; i < _boardWidth * _boardHeight; i++)
+                _shapesAtLocation[i] = new List<Shape>();
+
             var hexWidth = EdgeLength * 2;
             _hexHeight = (float)Math.Sqrt(3) / 2 * hexWidth;
 
@@ -36,8 +51,8 @@ namespace ScenarioEditor
 
             _hexGrid = new HexGrid
             {
-                ColumnCount = boardWidth,
-                RowCount = boardHeight,
+                ColumnCount = _boardWidth,
+                RowCount = _boardHeight,
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
                 Width = imageWidth,
                 Height = imageHeight,
@@ -70,19 +85,12 @@ namespace ScenarioEditor
             }
         }
 
-        //private PointF[] PointDtoF(List<PointD> points)
-        //{
-        //    return points
-        //        .Select(x => new PointF((float)x.X, (float)x.Y))
-        //        .ToArray();
-        //}
-
         public void DrawCentreline(Hex origin, Hex destination, ArgbColour colour, int width)
         {
             var point1 = Layout.HexToPixel(_layout, origin);
             var point2 = Layout.HexToPixel(_layout, destination);
 
-            var line = new System.Windows.Shapes.Line
+            var line = new Line
             {
                 X1 = point1.X,
                 Y1 = point1.Y,
@@ -97,18 +105,18 @@ namespace ScenarioEditor
 
         public void DrawCircle(Hex location, float position, ArgbColour colour)
         {
-            var hexCentre = Layout.HexToPixel(_layout, location);
-            var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
-
             var circle = new Ellipse
             {
                 Width = _unitWidth,
                 Height = _unitWidth,
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
+                Tag = ShapeType.Circle,
             };
 
-            Canvas.SetLeft(circle, topLeftCorner.X);
-            Canvas.SetTop(circle, topLeftCorner.Y);
+            PositionShape(circle, location, position);
+
+            var index = Hex.HexToIndex(location, _boardWidth, _boardHeight);
+            _shapesAtLocation[index].Add(circle);
 
             _canvas.Children.Add(circle);
         }
@@ -209,22 +217,17 @@ namespace ScenarioEditor
 
         public void DrawTrapezium(Hex location, float position, ArgbColour colour)
         {
-            var hexCentre = Layout.HexToPixel(_layout, location);
-            var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
-
             var polygon = new Polygon
             {
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                Tag = ShapeType.Trapizium,
             };
 
-            var pointCollection = new PointCollection(TrapeziumPoints(topLeftCorner));
+            PositionShape(polygon, location, position);
 
-            Canvas.SetLeft(polygon, topLeftCorner.X);
-            Canvas.SetTop(polygon, topLeftCorner.Y);
+            var index = Hex.HexToIndex(location, _boardWidth, _boardHeight);
+            _shapesAtLocation[index].Add(polygon);
 
-            polygon.Points = pointCollection;
             _canvas.Children.Add(polygon);
         }
 
@@ -240,6 +243,22 @@ namespace ScenarioEditor
             return points;
         }
 
+        public void DrawTriangle(Hex location, float position, ArgbColour colour)
+        {
+            var polygon = new Polygon
+            {
+                Fill = new SolidColorBrush(ArgbColourToColor(colour)),
+                Tag = ShapeType.Triangle,
+            };
+
+            var index = Hex.HexToIndex(location, _boardWidth, _boardHeight);
+            _shapesAtLocation[index].Add(polygon);
+
+            PositionShape(polygon, location, position);
+
+            _canvas.Children.Add(polygon);
+        }
+
         private Point[] TrianglePoints(PointD topLeftCorner)
         {
             Point[] points =
@@ -249,27 +268,6 @@ namespace ScenarioEditor
                 new Point(topLeftCorner.X + _unitWidth / 2, topLeftCorner.Y + _unitWidth)
             };
             return points;
-        }
-
-        public void DrawTriangle(Hex location, float position, ArgbColour colour)
-        {
-            var hexCentre = Layout.HexToPixel(_layout, location);
-            var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
-
-            var polygon = new Polygon
-            {
-                Fill = new SolidColorBrush(ArgbColourToColor(colour)),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            var pointCollection = new PointCollection(TrianglePoints(topLeftCorner));
-
-            Canvas.SetLeft(polygon, topLeftCorner.X);
-            Canvas.SetTop(polygon, topLeftCorner.Y);
-
-            polygon.Points = pointCollection;
-            _canvas.Children.Add(polygon);
         }
 
         public object GetBitmap()
@@ -286,7 +284,36 @@ namespace ScenarioEditor
         {
             throw new NotImplementedException();
         }
+
+        public void RepositionUnits(Hex location)
+        {
+            var index = Hex.HexToIndex(location, _boardWidth, _boardHeight);
+            var numberOfUnits = _shapesAtLocation[index].Count;
+            for (var j = 0; j <  numberOfUnits; j ++)
+            {
+                var position = (float)(((j + 1) / (float)numberOfUnits) * Math.PI * 2);
+                PositionShape(_shapesAtLocation[index][j], location, position);
+            }
+        }
+
+        void PositionShape(Shape shape, Hex location, float position)
+        {
+            switch ((ShapeType)shape.Tag)
+            {
+                case ShapeType.Triangle:
+                    var pointCollection = new PointCollection(TrianglePoints(new PointD(0, 0)));
+                    ((Polygon)shape).Points = pointCollection;
+                    break;
+                case ShapeType.Trapizium:
+                    pointCollection = new PointCollection(TrapeziumPoints(new PointD(0, 0)));
+                    ((Polygon)shape).Points = pointCollection;
+                    break;
+            }
+
+            var hexCentre = Layout.HexToPixel(_layout, location);
+            var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
+            Canvas.SetLeft(shape, topLeftCorner.X);
+            Canvas.SetTop(shape, topLeftCorner.Y);
+        }
     }
-
-
 }

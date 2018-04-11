@@ -9,5 +9,7 @@ namespace GameModel.Rendering
     public interface IReactiveGameRenderingEngine
     {
         void RemoveRectangle(Hexagon.Hex location);
+
+        void RepositionUnits(Hexagon.Hex location);
     }
 }

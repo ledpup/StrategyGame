@@ -9,8 +9,9 @@ namespace Manager
 {
     public class MilitaryUnitTemplate
     {
-        public MilitaryUnitTemplate(string name)
+        public MilitaryUnitTemplate(int id, string name)
         {
+            Id = id;
             Name = name;
             MovementType = MovementType.Land;
             MovementPoints = 2;
@@ -38,6 +39,7 @@ namespace Manager
             }
         }
 
+        public int Id;
         public string Name;
         public MovementType MovementType;
         public bool UsesRoads { get; set; }
@@ -55,5 +57,7 @@ namespace Manager
         public List<UnitTerrainMovement> TerrainMovements { get; set; }
 
         public List<UnitEdgeMovement> EdgeMovements { get; set; }
+
+
     }
 }

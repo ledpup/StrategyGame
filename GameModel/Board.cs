@@ -1,4 +1,5 @@
-﻿using Hexagon;
+﻿using GameModel.Rendering;
+using Hexagon;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -16,19 +17,19 @@ namespace GameModel
         Hot,
         Wet,
     }
-    public class Board
+    public class Board : IGameModelForRendering
     {
         Tile[] _tiles;
 
-        public int Width;
-        public int Height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
         public List<MilitaryUnit> Units { get; set; }
 
         public Dictionary<int, List<MoveOrder>> MoveOrders;
 
         public static Logger Logger;
 
-        public List<Structure> Structures;
+        public List<Structure> Structures { get; private set; }
 
         public int Turn;
 
@@ -398,7 +399,7 @@ namespace GameModel
 
         public Dictionary<TerrainType, double> TerrainTemperatureModifiers { get; private set; }
 
-        public List<Edge> Edges;
+        public List<Edge> Edges { get; private set; }
 
         public void ResolveOrders(List<IUnitOrder> unitOrders)
         {

@@ -1,5 +1,6 @@
 [
   {
+    "Id": 0,
     "Name": "Dwarf Infantry",
     "MovementType": 1,
     "CanTransport": false,
@@ -125,6 +126,7 @@
     ]
   },
   {
+    "Id": 1,
     "Name": "Human Cavalry",
     "MovementType": 1,
     "CanTransport": false,
@@ -250,8 +252,9 @@
     ]
   },
   {
+    "Id": 2,
     "Name": "Fleet",
-    "MovementType": 1,
+    "MovementType": 2,
     "CanTransport": false,
     "UsesRoads": true,
     "RoadMovementBonusPoints": 1,
@@ -375,8 +378,9 @@
     ]
   },
   {
+    "Id": 3,
     "Name": "Griffon",
-    "MovementType": 1,
+    "MovementType": 0,
     "CanTransport": false,
     "UsesRoads": true,
     "RoadMovementBonusPoints": 1,

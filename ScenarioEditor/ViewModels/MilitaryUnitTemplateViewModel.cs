@@ -64,6 +64,8 @@ namespace ScenarioEditor.ViewModels
         public List<KeyValueViewModel<TerrainType>> TerrainCombatModifiers { get; set; }
         public List<TerrainMovementViewModel> TerrainMovementViewModels { get; private set; }
         public List<EdgeMovementViewModel> EdgeMovementCosts { get; private set; }
+
+        public int Id { get { return _militaryUnitTemplate.Id; } }
         public string Name
         {
             get { return _militaryUnitTemplate.Name; }

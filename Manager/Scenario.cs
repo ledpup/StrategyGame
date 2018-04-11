@@ -51,7 +51,7 @@ namespace Manager
 
         public List<MilitaryUnitTemplate> MilitaryUnitTemplates { get; set; }
         public List<Faction> Factions { get; set; }
-        public void SetStructure (StructureType structureType, int faction, int x, int y)
+        public void PlaceStructure (StructureType structureType, int faction, int x, int y)
         {
             if (structureType == StructureType.None)
             {
@@ -72,6 +72,12 @@ namespace Manager
                 Board.Structures.Add(newStructure);
             }
         }
+        public MilitaryUnit PlaceUnit(MilitaryUnitTemplate unitTemplate, int selectedFaction, int x, int y)
+        {
+            var militaryUnit = new MilitaryUnit(Board.Units.Count + 1, unitTemplate.Name, selectedFaction, Board[x, y], unitTemplate.MovementType, unitTemplate.MovementPoints, unitTemplate.RoadMovementBonusPoints, unitTemplate.CombatType, unitTemplate.CombatAbility, unitTemplate.Members, unitTemplate.Size, unitTemplate.CanTransport, unitTemplate.MovementTypesTransportableBy, unitTemplate.DepletionOrder, unitTemplate.Morale, 0);
+            Board.Units.Add(militaryUnit);
+            return militaryUnit;
+        }
 
         public void Load()
         {
@@ -84,5 +90,7 @@ namespace Manager
             var militaryUnitTemplates = JsonConvert.SerializeObject(MilitaryUnitTemplates, Formatting.Indented);
             File.WriteAllText($"{Folder}\\MilitaryUnitTemplates.json", militaryUnitTemplates);
         }
+
+
     }
 }

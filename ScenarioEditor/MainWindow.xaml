@@ -23,7 +23,9 @@
                 <StackPanel></StackPanel>
             </DockPanel>
 
-            <Grid Name="MainGrid">
+            <Grid Name="MainGrid" Margin="0,25,0,0">
+                <Ellipse Width="15" Height="15" Margin="118,1016,0,38" HorizontalAlignment="Left" StrokeThickness="0" Fill="Black"  />
+                <Polygon Width="15" Height="15" Points="0,0 15,0 15,15 0,15" Margin="40,1016,0,38" HorizontalAlignment="Left" Fill="Black" />
                 <Label Content="Terrain Type Selector" HorizontalAlignment="Left" Margin="1397,10,0,0" Height="26" VerticalAlignment="Top"/>
                 <WrapPanel x:Name="TerrainTypeSelector" HorizontalAlignment="Left" Margin="1398,36,0,0" Width="316" Height="88" VerticalAlignment="Top"/>
 
@@ -45,10 +47,10 @@
                 </ListBox>
 
                 <Label Content="Unit template selection" HorizontalAlignment="Left" Margin="1398,592,0,451"/>
-                <ListBox x:Name="UnitSelector" HorizontalAlignment="Left" Margin="1398,625,0,0" Width="306" ItemsSource="{Binding MilitaryUnitTemplateViewModels}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top">
+                <ListBox x:Name="UnitSelector" HorizontalAlignment="Left" Margin="1398,625,0,0" Width="306" ItemsSource="{Binding MilitaryUnitTemplateViewModels}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top" SelectionChanged="UnitSelector_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type local:MilitaryUnitTemplateViewModel}">
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Text="{Binding Name}" Tag="{Binding Id}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -60,12 +62,10 @@
                     <Label Content="Structure type" HorizontalAlignment="Left" Margin="0,26,0,0" Height="26" VerticalAlignment="Top" />
                     <Label Content="{Binding StructureType}" Margin="96,26,0,0" HorizontalAlignment="Left" Width="177" Height="26" VerticalAlignment="Top" />
                 </Grid>
-
-
-
+                <Image x:Name="Map" HorizontalAlignment="Left" Height="304" Margin="1301,755,0,0" VerticalAlignment="Top" Width="403"/>
             </Grid>
         </Grid>
-        
+
     </Viewbox>
 
 </Window>

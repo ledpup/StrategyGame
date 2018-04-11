@@ -429,7 +429,7 @@
         "TerrainType": "Mountain",
         "Traversable": true,
         "MovementCost": 1,
-        "CanStopOn": true
+        "CanStopOn": false
       },
       {
         "TerrainType": "Water",

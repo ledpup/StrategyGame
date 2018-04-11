@@ -211,23 +211,27 @@ namespace ScenarioEditor
             var x = (int)((HexItem)sender).GetValue(Grid.ColumnProperty);
             var y = (int)((HexItem)sender).GetValue(Grid.RowProperty);
 
-            var militaryUnit = _scenario.PlaceUnit(_selectedUnitTemplate, _selectedFaction, x, y);
+            var terrainMovement = _selectedUnitTemplate.TerrainMovements.Single(t => t.TerrainType == _scenario.Board[x, y].TerrainType.ToString());
 
-
-            switch (militaryUnit.MovementType)
+            if (terrainMovement.Traversable && terrainMovement.CanStopOn)
             {
-                case MovementType.Airborne:
-                    _gameRenderingWpf.DrawTriangle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
-                    break;
-                case MovementType.Land:
-                    _gameRenderingWpf.DrawCircle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
-                    break;
-                case MovementType.Water:
-                    _gameRenderingWpf.DrawTrapezium(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
-                    break;
-            }
+                var militaryUnit = _scenario.PlaceUnit(_selectedUnitTemplate, _selectedFaction, x, y);
 
-            _gameRenderingWpf.RepositionUnits(_scenario.Board[x, y].Hex);
+                switch (militaryUnit.MovementType)
+                {
+                    case MovementType.Airborne:
+                        _gameRenderingWpf.DrawTriangle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
+                        break;
+                    case MovementType.Land:
+                        _gameRenderingWpf.DrawCircle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
+                        break;
+                    case MovementType.Water:
+                        _gameRenderingWpf.DrawTrapezium(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
+                        break;
+                }
+
+                _gameRenderingWpf.RepositionUnits(_scenario.Board[x, y].Hex);
+            }
         }
 
         private void PlaceStructure(object sender)

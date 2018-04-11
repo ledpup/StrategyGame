@@ -223,6 +223,9 @@ namespace ScenarioEditor
                 Tag = ShapeType.Trapizium,
             };
 
+            var pointCollection = new PointCollection(TrianglePoints(new PointD(0, 0)));
+            ((Polygon)polygon).Points = pointCollection;
+
             PositionShape(polygon, location, position);
 
             var index = Hex.HexToIndex(location, _boardWidth, _boardHeight);
@@ -250,6 +253,9 @@ namespace ScenarioEditor
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
                 Tag = ShapeType.Triangle,
             };
+
+            var pointCollection = new PointCollection(TrapeziumPoints(new PointD(0, 0)));
+            ((Polygon)polygon).Points = pointCollection;
 
             var index = Hex.HexToIndex(location, _boardWidth, _boardHeight);
             _shapesAtLocation[index].Add(polygon);
@@ -298,18 +304,6 @@ namespace ScenarioEditor
 
         void PositionShape(Shape shape, Hex location, float position)
         {
-            switch ((ShapeType)shape.Tag)
-            {
-                case ShapeType.Triangle:
-                    var pointCollection = new PointCollection(TrianglePoints(new PointD(0, 0)));
-                    ((Polygon)shape).Points = pointCollection;
-                    break;
-                case ShapeType.Trapizium:
-                    pointCollection = new PointCollection(TrapeziumPoints(new PointD(0, 0)));
-                    ((Polygon)shape).Points = pointCollection;
-                    break;
-            }
-
             var hexCentre = Layout.HexToPixel(_layout, location);
             var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
             Canvas.SetLeft(shape, topLeftCorner.X);

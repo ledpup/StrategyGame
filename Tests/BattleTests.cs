@@ -43,7 +43,7 @@ namespace Tests
 
                 new MilitaryUnit()
                 {
-                    OwnerIndex = 1,
+                    FactionId = 1,
                     CombatType = CombatType.Melee,
                     BaseCombatAbility = 3,
                     InitialQuantity = 245,
@@ -51,7 +51,7 @@ namespace Tests
                 },
                 new MilitaryUnit()
                 {
-                    OwnerIndex = 1,
+                    FactionId = 1,
                     CombatType = CombatType.Cavalry,
                     BaseCombatAbility = 3,
                     InitialQuantity = 345,
@@ -63,14 +63,14 @@ namespace Tests
 
                 new MilitaryUnit()
                 {
-                    OwnerIndex = 2,
+                    FactionId = 2,
                     CombatType = CombatType.Cavalry,
                     BaseCombatAbility = 3,
                     InitialQuantity = 165,
                     StructureCombatModifier = -1,
                 },
                 new MilitaryUnit() {
-                    OwnerIndex = 2,
+                    FactionId = 2,
                     CombatType = CombatType.Ranged,
                     BaseCombatAbility = 3,
                     InitialQuantity = 175,

@@ -27,7 +27,7 @@ namespace Manager
                 new MilitaryUnit(0) { Location = Board[1, 1] },
                 new MilitaryUnit(1) { Location = Board[1, 1] },
                 new MilitaryUnit(2) { Location = Board[1, 1] },
-                new MilitaryUnit(3) { Location = Board[1, 1], OwnerIndex = 1 },
+                new MilitaryUnit(3) { Location = Board[1, 1], FactionId = 1 },
                 new MilitaryUnit(4, "1st Fleet", 0, Board[0, 0], MovementType.Water),
                 new MilitaryUnit(4, "1st Airborne", 0, Board[3, 2], MovementType.Airborne),
             };
@@ -50,6 +50,7 @@ namespace Manager
         public Board Board { get; set; }
 
         public List<MilitaryUnitTemplate> MilitaryUnitTemplates { get; set; }
+        public List<MilitaryUnitInstance> MilitaryUnitInstances { get; set; }
         public List<Faction> Factions { get; set; }
         public void PlaceStructure (StructureType structureType, int faction, int x, int y)
         {
@@ -74,7 +75,9 @@ namespace Manager
         }
         public MilitaryUnit PlaceUnit(MilitaryUnitTemplate unitTemplate, int selectedFaction, int x, int y)
         {
-            var militaryUnit = new MilitaryUnit(Board.Units.Count + 1, unitTemplate.Name, selectedFaction, Board[x, y], unitTemplate.MovementType, unitTemplate.MovementPoints, unitTemplate.RoadMovementBonusPoints, unitTemplate.CombatType, unitTemplate.CombatAbility, unitTemplate.Members, unitTemplate.Size, unitTemplate.CanTransport, unitTemplate.MovementTypesTransportableBy, unitTemplate.DepletionOrder, unitTemplate.Morale, 0);
+            MilitaryUnit militaryUnit1 = new MilitaryUnit(Board.Units.Count + 1, unitTemplate.Name, selectedFaction, Board[x, y], unitTemplate.MovementType, unitTemplate.MovementPoints, unitTemplate.RoadMovementBonusPoints, unitTemplate.CombatType, unitTemplate.CombatAbility, unitTemplate.Members, unitTemplate.Size, unitTemplate.CanTransport, unitTemplate.MovementTypesTransportableBy, unitTemplate.DepletionOrder, unitTemplate.Morale, 0);
+            var militaryUnit = militaryUnit1;
+            militaryUnit.TemplateId = unitTemplate.Id;
             Board.Units.Add(militaryUnit);
             return militaryUnit;
         }
@@ -83,12 +86,22 @@ namespace Manager
         {
             var militaryUnitTemplates = File.ReadAllText($"{Folder}\\MilitaryUnitTemplates.json");
             MilitaryUnitTemplates = JsonConvert.DeserializeObject<List<MilitaryUnitTemplate>>(militaryUnitTemplates);
+
+            MilitaryUnitInstances = new List<MilitaryUnitInstance>();
+            if (File.Exists($"{Folder}\\MilitaryUnitInstances.json"))
+            {
+                var militaryUnitInstances = File.ReadAllText($"{Folder}\\MilitaryUnitInstances.json");
+                MilitaryUnitInstances = JsonConvert.DeserializeObject<List<MilitaryUnitInstance>>(militaryUnitInstances);
+            }
         }
 
         public void Save()
         {
             var militaryUnitTemplates = JsonConvert.SerializeObject(MilitaryUnitTemplates, Formatting.Indented);
             File.WriteAllText($"{Folder}\\MilitaryUnitTemplates.json", militaryUnitTemplates);
+
+            var militaryUnitInstances = JsonConvert.SerializeObject(MilitaryUnitInstances, Formatting.Indented);
+            File.WriteAllText($"{Folder}\\MilitaryUnitInstances.json", militaryUnitInstances);
         }
 
 

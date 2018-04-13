@@ -89,9 +89,10 @@ namespace GameModel
         }
         static List<Role> _roles;
 
-        public int Index;
+        public int Id { get; private set; }
         public string Name { get; set; }
-        public int OwnerIndex { get; set; }
+        public int TemplateId { get; set; }
+        public int FactionId { get; set; }
         public CombatType CombatType { get; set; }
         public MovementType MovementType { get; private set; }
         public int BaseMovementPoints { get; set; }
@@ -137,7 +138,7 @@ namespace GameModel
         {
             return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, CombatType combatType = CombatType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, float[] moraleMoveCost = null)
+        public MilitaryUnit(int id = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, CombatType combatType = CombatType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, float[] moraleMoveCost = null)
         {
             IsAlive = true;
 
@@ -176,13 +177,13 @@ namespace GameModel
                 EdgeMovementCosts.Add(edgeType, Terrain.Impassable);
             }
 
-            Index = index;
+            Id = id;
             if (name == null)
             {
-                name = "Unit " + index + " (owned by " + ownerIndex + ")";
+                name = "Unit " + Id + " (owned by " + ownerIndex + ")";
             }
             Name = name;
-            OwnerIndex = ownerIndex;
+            FactionId = ownerIndex;
             Location = location;
             MovementType = movementType;
             BaseMovementPoints = baseMovementPoints;
@@ -294,7 +295,7 @@ namespace GameModel
         }
 
 
-        public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Location == o.Location && p.MovementType == o.MovementType;
+        public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.FactionId != o.FactionId && p.Location == o.Location && p.MovementType == o.MovementType;
 
         void LandUnit()
         {
@@ -389,7 +390,7 @@ namespace GameModel
 
         public override int GetHashCode()
         {
-            return Index;
+            return Id;
         }
 
         public int MovementPoints

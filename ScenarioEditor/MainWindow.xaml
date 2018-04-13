@@ -32,9 +32,6 @@
                 <Label Content="Edge Type Selector" HorizontalAlignment="Left" Margin="1397,183,0,0" Height="31" VerticalAlignment="Top"/>
                 <WrapPanel x:Name="EdgeTypeSelector" HorizontalAlignment="Left" Margin="1397,214,0,0" Width="317" Height="85" VerticalAlignment="Top"/>
 
-                <Label Content="Structure Type Selector" HorizontalAlignment="Left" Margin="1398,447,0,0" Height="31" VerticalAlignment="Top"/>
-                <WrapPanel x:Name="StructureTypeSelector" HorizontalAlignment="Left" Margin="1398,478,0,0" Width="316" Height="28" VerticalAlignment="Top"/>
-
                 <Label Content="Faction Selector" HorizontalAlignment="Left" Margin="1398,304,0,679"/>
                 <ListBox x:Name="FactionSelector" HorizontalAlignment="Left" Margin="1398,335,0,0" Width="306" ItemsSource="{Binding FactionViewModels}" MouseDoubleClick="FactionSelector_MouseDoubleClick" Height="107" VerticalAlignment="Top" SelectionChanged="FactionSelector_SelectionChanged">
                     <ListBox.ItemTemplate>
@@ -44,15 +41,8 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <Label Content="Unit template selection" HorizontalAlignment="Left" Margin="1398,592,0,451"/>
-                <ListBox x:Name="UnitSelector" HorizontalAlignment="Left" Margin="1398,625,0,0" Width="306" ItemsSource="{Binding MilitaryUnitTemplateViewModels}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top" SelectionChanged="UnitSelector_SelectionChanged">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type local:MilitaryUnitTemplateViewModel}">
-                            <TextBlock Text="{Binding Name}" Tag="{Binding Id}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-
+                <Label Content="Structure Type Selector" HorizontalAlignment="Left" Margin="1398,447,0,0" Height="31" VerticalAlignment="Top"/>
+                <WrapPanel x:Name="StructureTypeSelector" HorizontalAlignment="Left" Margin="1398,478,0,0" Width="316" Height="28" VerticalAlignment="Top"/>
 
                 <Grid Name="Structure" HorizontalAlignment="Left" Height="55" Margin="1398,511,0,0" VerticalAlignment="Top" Width="316">
                     <Label Content="Structure name" HorizontalAlignment="Left"  VerticalAlignment="Top" />
@@ -60,7 +50,25 @@
                     <Label Content="Structure type" HorizontalAlignment="Left" Margin="0,26,0,0" Height="26" VerticalAlignment="Top" />
                     <Label Content="{Binding StructureType}" Margin="96,26,0,0" HorizontalAlignment="Left" Width="177" Height="26" VerticalAlignment="Top" />
                 </Grid>
-                <Image x:Name="Map" HorizontalAlignment="Left" Height="304" Margin="1301,755,0,0" VerticalAlignment="Top" Width="403"/>
+
+                <Label Content="Unit template selection" HorizontalAlignment="Left" Margin="1398,592,0,451"/>
+                <ListBox HorizontalAlignment="Left" Margin="1398,625,0,0" Width="306" ItemsSource="{Binding MilitaryUnitTemplateViewModels}" MouseDoubleClick="UnitTemplateSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top" SelectionChanged="UnitTemplateSelector_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:MilitaryUnitTemplateViewModel}">
+                            <TextBlock Text="{Binding Name}" Tag="{Binding Id}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+               
+                <Label Content="Units at selected location" HorizontalAlignment="Left" Margin="1398,744,0,299"/>
+                <ListBox HorizontalAlignment="Left" Margin="1398,775,0,0" Width="306" ItemsSource="{Binding UnitsAtSelectedLocation}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:MilitaryUnitInstanceViewModel}">
+                            <TextBlock Text="{Binding Name}" Tag="{Binding Id}" Foreground="{Binding FactionColour}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Content="Remove" HorizontalAlignment="Left" Margin="1398,894,0,0" VerticalAlignment="Top" Width="75" Click="RemoveUnitInstance_Click"/>
             </Grid>
         </Grid>
 

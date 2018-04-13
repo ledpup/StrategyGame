@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Manager
 {
-    public class MilitaryUnitTemplate
+    public class MilitaryUnitTemplate : IMilitaryUnit
     {
         public MilitaryUnitTemplate(int id, string name)
         {
@@ -39,12 +39,12 @@ namespace Manager
             }
         }
 
-        public int Id;
-        public string Name;
-        public MovementType MovementType;
+        public int Id { get; }
+        public string Name { get; set; }
+        public MovementType MovementType { get; set; }
         public bool UsesRoads { get; set; }
         public int RoadMovementBonusPoints { get; set; }
-        public bool CanTransport;
+        public bool CanTransport { get; set; }
         public List<MovementType> MovementTypesTransportableBy { get; set; }
         public int MovementPoints { get; set; }
         public CombatType CombatType { get; set; }

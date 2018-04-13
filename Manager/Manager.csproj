@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IMilitaryUnit.cs" />
+    <Compile Include="MilitaryUnitInstance.cs" />
     <Compile Include="UnitEdgeMovement.cs" />
     <Compile Include="MilitaryUnitTemplate.cs" />
     <Compile Include="Scenario.cs" />

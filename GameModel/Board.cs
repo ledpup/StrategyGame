@@ -75,7 +75,7 @@ namespace GameModel
                     {
                         var overStackLimitCount = x.OverStackLimitCount(playerIndex);
                         x.Units
-                            .Where(y => y.IsAlive && y.OwnerIndex == playerIndex)
+                            .Where(y => y.IsAlive && y.FactionId == playerIndex)
                             .ToList()
                             .ForEach(y => y.ChangeMorale(Turn, - .5 * overStackLimitCount, $"Units are over the stack limit of {x.StackLimit} by {overStackLimitCount} units"));
                     });
@@ -186,7 +186,7 @@ namespace GameModel
         {
             Structures.ForEach(x => 
             {
-                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
+                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.FactionId).ToList();
                 if (unitsAtStructureByOwner.Count() == 1)
                 {
                     if (x.OwnerIndex == unitsAtStructureByOwner.First().Key)
@@ -485,10 +485,10 @@ namespace GameModel
                 var removeUnitMoves = new Dictionary<MilitaryUnit, Move>();
                 foreach (var stepMove in unitStepMoves)
                 {
-                    if (unitStepMoves.Any(x => x.Value.Edge.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
+                    if (unitStepMoves.Any(x => x.Value.Edge.Destination == stepMove.Value.Origin && x.Key.FactionId != stepMove.Key.FactionId))
                     {
-                        var originStrength = stepMove.Value.Origin.Units.Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
-                        var destinationStrength = stepMove.Value.Edge.Destination.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var originStrength = stepMove.Value.Origin.Units.Where(x => x.FactionId == stepMove.Key.FactionId).Sum(x => x.Strength);
+                        var destinationStrength = stepMove.Value.Edge.Destination.Units.Where(x => x.FactionId != stepMove.Key.FactionId).Sum(x => x.Strength);
 
                         if (originStrength <= destinationStrength)
                         {
@@ -593,10 +593,10 @@ namespace GameModel
 
         public static void ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None , int siegeDuration = 1)
         {
-            var groupedUnits = units.GroupBy(x => x.OwnerIndex);
+            var groupedUnits = units.GroupBy(x => x.FactionId);
             if (groupedUnits.Count() == 1)
             {
-                throw new Exception("Battle can not occur because all units in tile are owned by " + units[0].OwnerIndex);
+                throw new Exception("Battle can not occur because all units in tile are owned by " + units[0].FactionId);
             }
 
             //Logger.Info("Battle between {0} combatants at {1} on {2} terrain in {3} weather on turn {4}", groupedUnits.Count(), location, terrainType, weather, turn);
@@ -618,7 +618,7 @@ namespace GameModel
                 {
                     OwnerId = group.Key,
                     Units = group.ToList(),
-                    OpponentUnits = units.Where(x => x.OwnerIndex != group.Key).ToList(),
+                    OpponentUnits = units.Where(x => x.FactionId != group.Key).ToList(),
                 };
 
                 var opponentUnitsCount = (double)combatantInBattle.OpponentUnits.Count;
@@ -687,7 +687,7 @@ namespace GameModel
 
         public static BattleReport CreateBattleReport(Tile tile, int turn, List<MilitaryUnit> units)
         {
-            var numberOfPlayers = units.GroupBy(x => x.OwnerIndex).Select(x => x.Key).Count();
+            var numberOfPlayers = units.GroupBy(x => x.FactionId).Select(x => x.Key).Count();
 
             var battleReport = new BattleReport(numberOfPlayers)
             {
@@ -697,7 +697,7 @@ namespace GameModel
 
             foreach (CombatType unitType in Enum.GetValues(typeof(CombatType)))
             {
-                units.Where(x => x.CombatType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
+                units.Where(x => x.CombatType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.FactionId][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
             }
 
             units.ForEach(x =>
@@ -706,7 +706,7 @@ namespace GameModel
 
                 battleReport.CasualtyLog.Add(new CasualtyLogEntry
                 {
-                    OwnerIndex = x.OwnerIndex,
+                    OwnerIndex = x.FactionId,
                     Text = x.IsAlive ? losses > 1
                                         ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : "", x.Quantity)
                                         : string.Format("{0} no losses", x.Name)

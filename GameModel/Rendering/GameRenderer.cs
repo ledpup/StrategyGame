@@ -117,7 +117,7 @@ namespace GameModel.Rendering
                     foreach (var group in unitsByLocation)
                     {
                         var hex = group.Key.Hex;
-                        var unitsAtLocation = group.OrderBy(x => x.OwnerIndex).ToList();
+                        var unitsAtLocation = group.OrderBy(x => x.FactionId).ToList();
 
                         RenderUnitsAtLocation(gameRenderingEngine, hex, unitsAtLocation);
                     }
@@ -174,7 +174,7 @@ namespace GameModel.Rendering
 
         public static ArgbColour UnitColour(MilitaryUnit unit)
         {
-            return unit.IsAlive ? PlayerColour(unit.OwnerIndex) : Colours.Black;
+            return unit.IsAlive ? PlayerColour(unit.FactionId) : Colours.Black;
         }
 
         public static ArgbColour StructureColour(Structure structure)

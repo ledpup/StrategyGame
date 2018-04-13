@@ -65,6 +65,7 @@
     <Compile Include="ViewModels\EdgeMovementViewModel.cs" />
     <Compile Include="ViewModels\FactionViewModel.cs" />
     <Compile Include="ViewModels\KeyValueViewModel.cs" />
+    <Compile Include="ViewModels\MilitaryUnitInstanceViewModel.cs" />
     <Compile Include="ViewModels\MilitaryUnitTemplateViewModel.cs" />
     <Compile Include="ViewModels\StructureViewModel.cs" />
     <Compile Include="ViewModels\TerrainMovementViewModel.cs" />
@@ -85,14 +86,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MilitaryUnitTemplateEditor.xaml">
+    <Page Include="MilitaryUnitEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MilitaryUnitTemplateEditor.xaml.cs">
-      <DependentUpon>MilitaryUnitTemplateEditor.xaml</DependentUpon>
+    <Compile Include="MilitaryUnitEditor.xaml.cs">
+      <DependentUpon>MilitaryUnitEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

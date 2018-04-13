@@ -18,22 +18,22 @@ using System.Windows.Shapes;
 namespace ScenarioEditor
 {
     /// <summary>
-    /// Interaction logic for MilitaryUnitTemplateEditor.xaml
+    /// Interaction logic for MilitaryUnitEditor.xaml
     /// </summary>
-    public partial class MilitaryUnitTemplateEditor : Window
+    public partial class MilitaryUnitEditor : Window
     {
-        public MilitaryUnitTemplateEditor()
+        public MilitaryUnitEditor()
         {
             InitializeComponent();
         }
 
-        MilitaryUnitTemplateViewModel _militaryUnitTemplateViewModel;
+        MilitaryUnitTemplateViewModel _militaryUnitViewModel;
         
-        public MilitaryUnitTemplateEditor(MilitaryUnitTemplateViewModel militaryUnitTemplateViewModel) : this ()
+        public MilitaryUnitEditor(MilitaryUnitTemplateViewModel militaryUnitViewModel) : this ()
         {
-            DataContext = _militaryUnitTemplateViewModel = militaryUnitTemplateViewModel;
+            DataContext = _militaryUnitViewModel = militaryUnitViewModel;
 
-            _militaryUnitTemplateViewModel.TerrainMovementViewModels.ForEach(x => x.PropertyChanged += X_PropertyChanged);
+            _militaryUnitViewModel.TerrainMovementViewModels.ForEach(x => x.PropertyChanged += X_PropertyChanged);
         }
 
         private void X_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -42,7 +42,7 @@ namespace ScenarioEditor
 
         private void MovementType_Click(object sender, RoutedEventArgs e)
         {
-            _militaryUnitTemplateViewModel.MovementType = (MovementType)((RadioButton)sender).Tag;
+            _militaryUnitViewModel.MovementType = (MovementType)((RadioButton)sender).Tag;
         }
 
         private void MovementTypesTransportableBy_Click(object sender, RoutedEventArgs e)
@@ -50,11 +50,11 @@ namespace ScenarioEditor
             var movementTypeTransportableBy = (CheckBox)sender;
             if ((bool)movementTypeTransportableBy.IsChecked)
             {
-                _militaryUnitTemplateViewModel.MovementTypesTransportableBy.Add((MovementType)Enum.Parse(typeof(MovementType), movementTypeTransportableBy.Content.ToString()));
+                _militaryUnitViewModel.MovementTypesTransportableBy.Add((MovementType)Enum.Parse(typeof(MovementType), movementTypeTransportableBy.Content.ToString()));
             }
             else
             {
-                _militaryUnitTemplateViewModel.MovementTypesTransportableBy.Remove((MovementType)Enum.Parse(typeof(MovementType), movementTypeTransportableBy.Content.ToString()));
+                _militaryUnitViewModel.MovementTypesTransportableBy.Remove((MovementType)Enum.Parse(typeof(MovementType), movementTypeTransportableBy.Content.ToString()));
             }
         }
 

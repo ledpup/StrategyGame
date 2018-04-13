@@ -28,13 +28,13 @@ namespace ComputerOpponent
         public ComputerPlayer(List<MilitaryUnit> units)
         {
             AiUnits = new Dictionary<int, AiMilitaryUnit>();
-            units.ForEach(x => AiUnits.Add(x.Index, new AiMilitaryUnit(x)));
+            units.ForEach(x => AiUnits.Add(x.Id, new AiMilitaryUnit(x)));
         }
 
         public ComputerPlayer(List<AiMilitaryUnit> aiUnits)
         {
             AiUnits = new Dictionary<int, AiMilitaryUnit>();
-            aiUnits.ForEach(x => AiUnits.Add(x.Unit.Index, x));
+            aiUnits.ForEach(x => AiUnits.Add(x.Unit.Id, x));
         }
         Dictionary<Role, double> FriendlyUnitInfluenceModifier
         {
@@ -126,7 +126,7 @@ namespace ComputerOpponent
                 {
                     case MovementType.Airborne:
                         // If there are any enemy land or airborne units that are nearby, don't do pickup or airlift
-                        if (board.Units.Any(x => x.OwnerIndex != unit.OwnerIndex &&
+                        if (board.Units.Any(x => x.FactionId != unit.FactionId &&
                                     (x.MovementType == MovementType.Land || x.MovementType == MovementType.Airborne) &&
                                     (unit.Location == x.Location 
                                     || ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5)))
@@ -147,8 +147,8 @@ namespace ComputerOpponent
                         // and there are no enemy structures or units nearby
                         if (unit.TransportedBy == null &&
                                     aiUnit.Role != Role.Defensive &&
-                                    !board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex) &&
-                                    !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)
+                                    !board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.FactionId) &&
+                                    !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.FactionId != unit.FactionId)
                                     )
                         {
                             aiUnit.StrategicAction = StrategicAction.Embark;
@@ -161,7 +161,7 @@ namespace ComputerOpponent
                     case MovementType.Water:
                         // If there are any enemy units nearby, don't dock or transport to destination
                         if (board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId
-                                            && x.OwnerIndex != unit.OwnerIndex
+                                            && x.FactionId != unit.FactionId
                                             && ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5))
                         {
                             break;
@@ -199,7 +199,7 @@ namespace ComputerOpponent
         {
             var unitOrders = new List<IUnitOrder>();
 
-            var aiUnit = AiUnits[unit.Index];
+            var aiUnit = AiUnits[unit.Id];
 
             switch (aiUnit.StrategicAction)
             {
@@ -211,7 +211,7 @@ namespace ComputerOpponent
                         break;
                     }
                 case StrategicAction.Embark:
-                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && AiUnits[x.Index].StrategicAction == StrategicAction.Pickup;
+                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && AiUnits[x.Id].StrategicAction == StrategicAction.Pickup;
                     var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule);
 
                     //Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;
@@ -269,7 +269,7 @@ namespace ComputerOpponent
                 case StrategicAction.Disembark:
                     if (unit.TransportedBy.MovementType == MovementType.Airborne)
                     {
-                        if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
+                        if (board.Structures.Any(x => x.OwnerIndex != unit.FactionId && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
                         {
                             unitOrders.Add(new UnloadOrder(unit));
                         }
@@ -280,7 +280,7 @@ namespace ComputerOpponent
                         if (board.Structures.Any(y => tileEdges.Any(z => 
                                                                         z.EdgeType == EdgeType.Port 
                                                                         && (z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) || (z.Origin.ContiguousRegionId == y.Location.ContiguousRegionId))
-                                                                        && y.OwnerIndex != unit.OwnerIndex))
+                                                                        && y.OwnerIndex != unit.FactionId))
                         {
                             unitOrders.Add(unit.PossibleMoves().First().GetMoveOrder(unit));
                             unit.TransportedBy.Transporting.Remove(unit);
@@ -356,7 +356,7 @@ namespace ComputerOpponent
                             if (moveOrder != null)
                                 unitOrders.Add(moveOrder);
 
-                            if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
+                            if (board.Structures.Any(x => x.OwnerIndex != unit.FactionId && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
                             {
                                 unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Edge.Destination)));
                             }
@@ -371,7 +371,7 @@ namespace ComputerOpponent
         private MilitaryUnit ClosestEmbarkingUnitPath(Board board, List<MilitaryUnit> units, Tile origin)
         {
             var closestUnit = units
-                                    .Where(x => AiUnits[x.Index].StrategicAction == StrategicAction.Embark)
+                                    .Where(x => AiUnits[x.Id].StrategicAction == StrategicAction.Embark)
                                     .OrderBy(x => Hex.Distance(x.Location.Hex, origin.Hex))
                                     .FirstOrDefault();
 
@@ -421,7 +421,7 @@ namespace ComputerOpponent
         public static IEnumerable<PathFindTile> ClosestEnemyStructurePath(Board board, MilitaryUnit unit)
         {
             var structures = board.Structures
-                .Where(x => x.OwnerIndex != unit.OwnerIndex)
+                .Where(x => x.OwnerIndex != unit.FactionId)
                 .OrderBy(x => Hex.Distance(unit.Location.Hex, x.Location.Hex))
                 .ToList();
 
@@ -447,12 +447,12 @@ namespace ComputerOpponent
                         {
                             case StrategicAction.Dock:
                                 // Only go to a port that has units that want to embark
-                                if (!board.Units.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && AiUnits[y.Index].StrategicAction == StrategicAction.Embark))
+                                if (!board.Units.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && AiUnits[y.Id].StrategicAction == StrategicAction.Embark))
                                     return;
                                 break;
                             case StrategicAction.TransportToDestination:
                                 // Only go to a port that has enemy structure(s)
-                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != aiUnit.Unit.OwnerIndex))
+                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != aiUnit.Unit.FactionId))
                                     return;
                                 break;
                         }
@@ -503,15 +503,15 @@ namespace ComputerOpponent
 
                 aliveUnits.ForEach(y =>
                 {
-                    if (!x.TerrainAndWeatherInfluenceByUnit.ContainsKey(y.Index))
-                        x.TerrainAndWeatherInfluenceByUnit.Add(y.Index, y.TerrainTypeCombatModifier[x.TerrainType] + y.WeatherCombatModifier[x.Weather]);
+                    if (!x.TerrainAndWeatherInfluenceByUnit.ContainsKey(y.Id))
+                        x.TerrainAndWeatherInfluenceByUnit.Add(y.Id, y.TerrainTypeCombatModifier[x.TerrainType] + y.WeatherCombatModifier[x.Weather]);
                 });
 
             });
 
             foreach (var unit in aliveUnits)
             {
-                var playerIndex = unit.OwnerIndex;
+                var playerIndex = unit.FactionId;
                 CalculateUnitInfluence(board, numberOfPlayers, unit, playerIndex);
             }
 
@@ -616,7 +616,7 @@ namespace ComputerOpponent
 
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => x.AggregateInfluence[aiUnit.RoleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[aiUnit.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
+                .OrderByDescending(x => x.AggregateInfluence[aiUnit.RoleMovementType][unit.FactionId] - (1 * FriendlyUnitInfluenceModifier[aiUnit.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
                 .ToList();
 
             IEnumerable<PathFindTile> bestPossibleDestination = null;

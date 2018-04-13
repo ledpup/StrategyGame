@@ -137,7 +137,7 @@ namespace StrategyGame
 
                 board.Turn++;
 
-                gameOver = board.Units.GroupBy(x => x.OwnerIndex).Count() == 1 
+                gameOver = board.Units.GroupBy(x => x.FactionId).Count() == 1 
                                     || board.Structures.GroupBy(x => x.OwnerIndex).Count() == 1 
                                     || board.Turn == 20;
 

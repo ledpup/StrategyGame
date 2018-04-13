@@ -53,7 +53,7 @@ namespace Tests
 
             board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
             {
-                var moveOrder = computerPlayer.FindBestMoveOrderForUnit(computerPlayer.AiUnits[x.Index], board);
+                var moveOrder = computerPlayer.FindBestMoveOrderForUnit(computerPlayer.AiUnits[x.Id], board);
                 if (moveOrder != null)
                     moveOrders.Add(moveOrder);
             });
@@ -101,7 +101,7 @@ namespace Tests
 
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => x.AggregateInfluence[computerPlayer.AiUnits[1].RoleMovementType][board.Units[1].OwnerIndex])
+                .OrderByDescending(x => x.AggregateInfluence[computerPlayer.AiUnits[1].RoleMovementType][board.Units[1].FactionId])
                 .ToList();
 
             IEnumerable<PathFindTile> bestPossibleDestination = null;

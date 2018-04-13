@@ -33,7 +33,7 @@ namespace ComputerOpponent
             MaxParameterValue = new double[players.Length];
 
             var structuresByPlayer = structures.GroupBy(x => x.OwnerIndex).ToList();
-            var unitsByPlayer = units.GroupBy(x => x.OwnerIndex).ToList();
+            var unitsByPlayer = units.GroupBy(x => x.FactionId).ToList();
 
             ObjectiveFunctionParameterWeight = new Dictionary<ObjFuncParameter, double>
             {

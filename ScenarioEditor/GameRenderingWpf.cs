@@ -24,13 +24,6 @@ namespace ScenarioEditor
         int _boardWidth, _boardHeight;
         List<Shape>[] _shapesAtLocation;
 
-        public enum ShapeType
-        {
-            Circle,
-            Triangle,
-            Trapizium
-        }
-
         public GameRenderingWpf(int boardWidth, int boardHeight)
         {
             _boardWidth = boardWidth;
@@ -110,7 +103,6 @@ namespace ScenarioEditor
                 Width = _unitWidth,
                 Height = _unitWidth,
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
-                Tag = ShapeType.Circle,
             };
 
             PositionShape(circle, location, position);
@@ -220,11 +212,10 @@ namespace ScenarioEditor
             var polygon = new Polygon
             {
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
-                Tag = ShapeType.Trapizium,
             };
 
-            var pointCollection = new PointCollection(TrianglePoints(new PointD(0, 0)));
-            ((Polygon)polygon).Points = pointCollection;
+            var pointCollection = new PointCollection(TrapeziumPoints(new PointD(0, 0)));
+            polygon.Points = pointCollection;
 
             PositionShape(polygon, location, position);
 
@@ -251,11 +242,10 @@ namespace ScenarioEditor
             var polygon = new Polygon
             {
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
-                Tag = ShapeType.Triangle,
             };
 
-            var pointCollection = new PointCollection(TrapeziumPoints(new PointD(0, 0)));
-            ((Polygon)polygon).Points = pointCollection;
+            var pointCollection = new PointCollection(TrianglePoints(new PointD(0, 0)));
+            polygon.Points = pointCollection;
 
             var index = Hex.HexToIndex(location, _boardWidth, _boardHeight);
             _shapesAtLocation[index].Add(polygon);

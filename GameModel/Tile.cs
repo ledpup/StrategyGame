@@ -204,14 +204,14 @@ namespace GameModel
 
         public int OverStackLimitCount(int playerIndex)
         {
-            return Units.Count(x => x.IsAlive && x.OwnerIndex == playerIndex) - StackLimit;
+            return Units.Count(x => x.IsAlive && x.FactionId == playerIndex) - StackLimit;
         }
 
         public bool IsInConflict
         {
             get
             {
-                var units = Units.Where(x => x.IsAlive).GroupBy(x => x.OwnerIndex);
+                var units = Units.Where(x => x.IsAlive).GroupBy(x => x.FactionId);
                 if (units.Count() > 1)
                     return true;
                 return false;

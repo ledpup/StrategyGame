@@ -9,11 +9,11 @@ namespace ScenarioEditor.ViewModels
 {
     public class MilitaryUnitTemplateViewModel : BaseViewModel
     {
-        private MilitaryUnitTemplate _militaryUnitTemplate;
+        private IMilitaryUnit _militaryUnit;
         
-        public MilitaryUnitTemplateViewModel(MilitaryUnitTemplate militaryUnitTemplate)
+        public MilitaryUnitTemplateViewModel(IMilitaryUnit militaryUnitTemplate)
         {
-            _militaryUnitTemplate = militaryUnitTemplate;
+            _militaryUnit = militaryUnitTemplate;
 
             MovementTypesSelection = new List<MovementTypeSelector>();
             foreach (MovementType mt in Enum.GetValues(typeof(MovementType)))
@@ -35,7 +35,7 @@ namespace ScenarioEditor.ViewModels
                 EnemyCombatTypeCombatModifiers.Add(new KeyValueViewModel<CombatType>(ct));
             }
 
-            TerrainMovementViewModels = _militaryUnitTemplate.TerrainMovements.Select(x => new TerrainMovementViewModel(x)).ToList();
+            TerrainMovementViewModels = _militaryUnit.TerrainMovements.Select(x => new TerrainMovementViewModel(x)).ToList();
 
             TerrainCombatModifiers = new List<KeyValueViewModel<TerrainType>>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
@@ -43,7 +43,7 @@ namespace ScenarioEditor.ViewModels
                 TerrainCombatModifiers.Add(new KeyValueViewModel<TerrainType>(terrainType));
             }
 
-            EdgeMovementCosts = _militaryUnitTemplate.EdgeMovements.Select(x => new EdgeMovementViewModel(x)).ToList();
+            EdgeMovementCosts = _militaryUnit.EdgeMovements.Select(x => new EdgeMovementViewModel(x)).ToList();
 
             WeatherCombatModifiers = new List<KeyValueViewModel<Weather>>();
             foreach (Weather weather in Enum.GetValues(typeof(Weather)))
@@ -65,16 +65,16 @@ namespace ScenarioEditor.ViewModels
         public List<TerrainMovementViewModel> TerrainMovementViewModels { get; private set; }
         public List<EdgeMovementViewModel> EdgeMovementCosts { get; private set; }
 
-        public int Id { get { return _militaryUnitTemplate.Id; } }
+        public int Id { get { return _militaryUnit.Id; } }
         public string Name
         {
-            get { return _militaryUnitTemplate.Name; }
+            get { return _militaryUnit.Name; }
             set
             {
-                if (value == _militaryUnitTemplate.Name)
+                if (value == _militaryUnit.Name)
                     return;
 
-                _militaryUnitTemplate.Name = value;
+                _militaryUnit.Name = value;
                 RaisePropertyChanged();
             }
         }
@@ -85,62 +85,62 @@ namespace ScenarioEditor.ViewModels
             get { return MovementTypesSelection.Single(x => x.IsSelected); }
             set
             {
-                if (value.Name == _militaryUnitTemplate.MovementType.ToString())
+                if (value.Name == _militaryUnit.MovementType.ToString())
                     return;
 
-                _militaryUnitTemplate.MovementType = (MovementType)Enum.Parse(typeof(MovementType), value.Name);
+                _militaryUnit.MovementType = (MovementType)Enum.Parse(typeof(MovementType), value.Name);
                 RaisePropertyChanged();
             }
         }
 
         public MovementType MovementType
         {
-            get { return _militaryUnitTemplate.MovementType; }
+            get { return _militaryUnit.MovementType; }
             set
             {
-                if (value == _militaryUnitTemplate.MovementType)
+                if (value == _militaryUnit.MovementType)
                     return;
 
-                _militaryUnitTemplate.MovementType = value;
+                _militaryUnit.MovementType = value;
                 RaisePropertyChanged();
             }
         }
 
         public bool UsesRoads
         {
-            get { return _militaryUnitTemplate.UsesRoads; }
+            get { return _militaryUnit.UsesRoads; }
             set
             {
-                if (value == _militaryUnitTemplate.UsesRoads)
+                if (value == _militaryUnit.UsesRoads)
                     return;
 
-                _militaryUnitTemplate.UsesRoads = value;
+                _militaryUnit.UsesRoads = value;
                 RaisePropertyChanged();
             }
         }
 
         public int MovementPoints
         {
-            get { return _militaryUnitTemplate.MovementPoints; }
+            get { return _militaryUnit.MovementPoints; }
             set
             {
-                if (value == _militaryUnitTemplate.MovementPoints)
+                if (value == _militaryUnit.MovementPoints)
                     return;
 
-                _militaryUnitTemplate.MovementPoints = value;
+                _militaryUnit.MovementPoints = value;
                 RaisePropertyChanged();
             }
         }
 
         public bool CanTransport
         {
-            get { return _militaryUnitTemplate.CanTransport; }
+            get { return _militaryUnit.CanTransport; }
             set
             {
-                if (value == _militaryUnitTemplate.CanTransport)
+                if (value == _militaryUnit.CanTransport)
                     return;
 
-                _militaryUnitTemplate.CanTransport = value;
+                _militaryUnit.CanTransport = value;
                 RaisePropertyChanged();
             }
         }
@@ -151,39 +151,39 @@ namespace ScenarioEditor.ViewModels
 
         public List<MovementType> MovementTypesTransportableBy
         {
-            get { return _militaryUnitTemplate.MovementTypesTransportableBy; }
+            get { return _militaryUnit.MovementTypesTransportableBy; }
             set
             {
-                if (value == _militaryUnitTemplate.MovementTypesTransportableBy)
+                if (value == _militaryUnit.MovementTypesTransportableBy)
                     return;
 
-                _militaryUnitTemplate.MovementTypesTransportableBy = value;
+                _militaryUnit.MovementTypesTransportableBy = value;
                 RaisePropertyChanged();
             }
         }
 
         public int Members
         {
-            get { return _militaryUnitTemplate.Members; }
+            get { return _militaryUnit.Members; }
             set
             {
-                if (value == _militaryUnitTemplate.Members)
+                if (value == _militaryUnit.Members)
                     return;
 
-                _militaryUnitTemplate.Members = value;
+                _militaryUnit.Members = value;
                 RaisePropertyChanged();
             }
         }
 
         public float Size
         {
-            get { return _militaryUnitTemplate.Size; }
+            get { return _militaryUnit.Size; }
             set
             {
-                if (value == _militaryUnitTemplate.Size)
+                if (value == _militaryUnit.Size)
                     return;
 
-                _militaryUnitTemplate.Size = value;
+                _militaryUnit.Size = value;
                 RaisePropertyChanged();
             }
         }
@@ -194,51 +194,58 @@ namespace ScenarioEditor.ViewModels
             get { return CombatTypesSelection.Single(x => x.IsSelected); }
             set
             {
-                if (value.Name == _militaryUnitTemplate.CombatType.ToString())
+                if (value.Name == _militaryUnit.CombatType.ToString())
                     return;
 
-                _militaryUnitTemplate.CombatType = (CombatType)Enum.Parse(typeof(CombatType), value.Name);
+                _militaryUnit.CombatType = (CombatType)Enum.Parse(typeof(CombatType), value.Name);
                 RaisePropertyChanged();
             }
         }
 
         public int CombatQuality
         {
-            get { return _militaryUnitTemplate.CombatAbility; }
+            get { return _militaryUnit.CombatAbility; }
             set
             {
-                if (value == _militaryUnitTemplate.CombatAbility)
+                if (value == _militaryUnit.CombatAbility)
                     return;
 
-                _militaryUnitTemplate.CombatAbility = value;
+                _militaryUnit.CombatAbility = value;
                 RaisePropertyChanged();
             }
         }
 
         public int DepletionOrder
         {
-            get { return _militaryUnitTemplate.DepletionOrder; }
+            get { return _militaryUnit.DepletionOrder; }
             set
             {
-                if (value == _militaryUnitTemplate.DepletionOrder)
+                if (value == _militaryUnit.DepletionOrder)
                     return;
 
-                _militaryUnitTemplate.DepletionOrder = value;
+                _militaryUnit.DepletionOrder = value;
                 RaisePropertyChanged();
             }
         }
 
         public int Morale
         {
-            get { return _militaryUnitTemplate.Morale; }
+            get { return _militaryUnit.Morale; }
             set
             {
-                if (value == _militaryUnitTemplate.Morale)
+                if (value == _militaryUnit.Morale)
                     return;
 
-                _militaryUnitTemplate.Morale = value;
+                _militaryUnit.Morale = value;
                 RaisePropertyChanged();
             }
         }
+        public bool EditTerrainMovements { get; set; } = true;
+        public bool EditEdgeMovements { get; set; } = true;
+        public bool EditBaseCharacteristics { get; set; } = true;
+
+        public bool EditRoadMovementBonusPoints { get { return EditBaseCharacteristics && UsesRoads; } }
+
+        public bool EditCombatModifiers { get; set; } = true;
     }
 }

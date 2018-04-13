@@ -706,7 +706,7 @@ namespace Tests
             var units = new List<MilitaryUnit> 
             { 
                             new MilitaryUnit() { Location = tile1, }, 
-                            new MilitaryUnit() { OwnerIndex = 2, Location = tile1, },
+                            new MilitaryUnit() { FactionId = 2, Location = tile1, },
                             new MilitaryUnit() { Location = tile2, },
             };
 

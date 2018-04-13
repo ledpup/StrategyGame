@@ -54,7 +54,7 @@ namespace Tests
                 new MilitaryUnit() { Location = board[1, 1] },
                 new MilitaryUnit() { Location = board[1, 1] },
                 new MilitaryUnit() { Location = board[1, 1] },
-                new MilitaryUnit() { Location = board[1, 1], OwnerIndex = 2 }
+                new MilitaryUnit() { Location = board[1, 1], FactionId = 2 }
             };
 
             var drawing2d = new GameRenderingGdiPlus(board.Width, board.Height);

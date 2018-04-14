@@ -1,4 +1,5 @@
-﻿using GameModel.Rendering;
+﻿using GameModel;
+using GameModel.Rendering;
 using Hexagon;
 using HexGridControl;
 using System;
@@ -96,13 +97,14 @@ namespace ScenarioEditor
             _canvas.Children.Add(line);
         }
 
-        public void DrawCircle(Hex location, float position, ArgbColour colour)
+        public void DrawCircle(int unitId, Hex location, float position, ArgbColour colour)
         {
             var circle = new Ellipse
             {
                 Width = _unitWidth,
                 Height = _unitWidth,
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
+                Tag = unitId,
             };
 
             PositionShape(circle, location, position);
@@ -207,11 +209,12 @@ namespace ScenarioEditor
             }
         }
 
-        public void DrawTrapezium(Hex location, float position, ArgbColour colour)
+        public void DrawTrapezium(int unitId, Hex location, float position, ArgbColour colour)
         {
             var polygon = new Polygon
             {
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
+                Tag = unitId,
             };
 
             var pointCollection = new PointCollection(TrapeziumPoints(new PointD(0, 0)));
@@ -237,11 +240,12 @@ namespace ScenarioEditor
             return points;
         }
 
-        public void DrawTriangle(Hex location, float position, ArgbColour colour)
+        public void DrawTriangle(int unitId, Hex location, float position, ArgbColour colour)
         {
             var polygon = new Polygon
             {
                 Fill = new SolidColorBrush(ArgbColourToColor(colour)),
+                Tag = unitId,
             };
 
             var pointCollection = new PointCollection(TrianglePoints(new PointD(0, 0)));
@@ -298,6 +302,37 @@ namespace ScenarioEditor
             var topLeftCorner = GameRenderer.UnitLocationTopLeftCorner(hexCentre, position, _hexHeight, _unitWidth);
             Canvas.SetLeft(shape, topLeftCorner.X);
             Canvas.SetTop(shape, topLeftCorner.Y);
+        }
+
+        internal void RemoveUnit(int id, int locationIndex)
+        {
+            Shape unitToRemove = null;
+            foreach (UIElement uiElement in _canvas.Children)
+            {
+                if (uiElement is Shape && ((Shape)uiElement).Tag != null)
+                {
+                    if ((int)((Shape)uiElement).Tag == id)
+                        unitToRemove = (Shape)uiElement;
+                }
+            }
+            _canvas.Children.Remove(unitToRemove);
+            _shapesAtLocation[locationIndex].Remove(unitToRemove);
+        }
+
+        public void PlaceUnit(MovementType movementType, int unitId, Hex hex, int position, ArgbColour colour)
+        {
+            switch (movementType)
+            {
+                case MovementType.Airborne:
+                    DrawTriangle(unitId, hex, position, colour);
+                    break;
+                case MovementType.Land:
+                    DrawCircle(unitId, hex, position, colour);
+                    break;
+                case MovementType.Water:
+                    DrawTrapezium(unitId, hex, position, colour);
+                    break;
+            }
         }
     }
 }

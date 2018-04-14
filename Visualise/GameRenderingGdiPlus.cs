@@ -105,7 +105,7 @@ namespace GameRendering2D
             _graphics.DrawLine(pen, points.pt1, points.pt2);
         }
 
-        public void DrawCircle(Hex location, float position, ArgbColour colour)
+        public void DrawCircle(int unitId, Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
             var hexCentre = Layout.HexToPixel(_layout, location);
@@ -114,7 +114,7 @@ namespace GameRendering2D
             _graphics.FillEllipse(brush, (float)topLeftCorner.X, (float)topLeftCorner.Y, _unitWidth, _unitWidth);
         }
 
-        public void DrawTrapezium(Hex location, float position, ArgbColour colour)
+        public void DrawTrapezium(int unitId, Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
             var hexCentre = Layout.HexToPixel(_layout, location);
@@ -141,7 +141,7 @@ namespace GameRendering2D
             return _bitmap;
         }
 
-        public void DrawTriangle(Hex location, float position, ArgbColour colour)
+        public void DrawTriangle(int unitId, Hex location, float position, ArgbColour colour)
         {
             var brush = ArgbColourToBrush(colour);
             var hexCentre = Layout.HexToPixel(_layout, location);

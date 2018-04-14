@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace Manager
 {
+    public enum NumberingConvention
+    {
+        Alphabetic,
+        Ordinal,
+        RomanNumeral,
+    }
     public class MilitaryUnitTemplate : IMilitaryUnit
     {
         public MilitaryUnitTemplate(int id, string name)
@@ -53,11 +59,10 @@ namespace Manager
         public float Size { get; set; }
         public int Members { get; set; }
         public int Morale { get; set; }
+        public NumberingConvention NumberingConvention { get; set; }
 
         public List<UnitTerrainMovement> TerrainMovements { get; set; }
 
         public List<UnitEdgeMovement> EdgeMovements { get; set; }
-
-
     }
 }

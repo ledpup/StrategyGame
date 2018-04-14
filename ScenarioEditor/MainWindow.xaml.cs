@@ -41,7 +41,7 @@ namespace ScenarioEditor
             var militaryUnitTemplateViewModels = _scenario.MilitaryUnitTemplates.Select(x => new MilitaryUnitTemplateViewModel(x)).ToList();
             MilitaryUnitTemplateViewModels = new ObservableCollection<MilitaryUnitTemplateViewModel>(militaryUnitTemplateViewModels);
 
-            var militaryUnitInstanceViewModels = _scenario.MilitaryUnitInstances.Select(x => new MilitaryUnitInstanceViewModel(x)).ToList();
+            var militaryUnitInstanceViewModels = _scenario.MilitaryUnitInstances.Select(x => new MilitaryUnitInstanceViewModel(x, _scenario.Factions.Single(y => y.Id == x.FactionId).Colour)).ToList();
             MilitaryUnitInstanceViewModels = new ObservableCollection<MilitaryUnitInstanceViewModel>(militaryUnitInstanceViewModels);
 
             FactionViewModels = new ObservableCollection<FactionViewModel>(_scenario.Factions.Select(x => new FactionViewModel(x)));
@@ -145,7 +145,8 @@ namespace ScenarioEditor
         private void RenderMap()
         {
             _gameRenderingWpf = new GameRenderingWpf(_scenario.Board.Width, _scenario.Board.Height);
-            var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _scenario.Board.Width, _scenario.Board.Height, _scenario.Board.Tiles, _scenario.Board.Edges, _scenario.Board.Structures, units: _scenario.Board.Units);
+            var gameRenderer = GameRenderer.Render(_gameRenderingWpf, RenderPipeline.Board, RenderPipeline.Units, _scenario.Board.Width, _scenario.Board.Height, _scenario.Board.Tiles, _scenario.Board.Edges, _scenario.Board.Structures);
+
             var canvas = (Canvas)gameRenderer.GetBitmap();
             canvas.Margin = new Thickness(10, 0, 0, 0);
             HexGrid hexGrid = null;
@@ -217,9 +218,9 @@ namespace ScenarioEditor
             }
 
             UnitsAtSelectedLocation.Clear();
-            _scenario.Board[x, y].Units.Select(u => new MilitaryUnitInstanceViewModel(new MilitaryUnitInstance(u.Id, u.Name, _scenario.Factions.Single(f => f.Id == u.FactionId), _scenario.MilitaryUnitTemplates.Single(t => t.Id == u.TemplateId))))
+            MilitaryUnitInstanceViewModels.Where(l => l.LocationIndex == _scenario.Board[x, y].Index)
                 .ToList()
-                .ForEach(u => UnitsAtSelectedLocation.Add(u));
+                .ForEach(u => UnitsAtSelectedLocation.Add(u));            
         }
 
         private void PlaceUnit(int x, int y)
@@ -228,20 +229,10 @@ namespace ScenarioEditor
 
             if (terrainMovement.Traversable && terrainMovement.CanStopOn)
             {
-                var militaryUnit = _scenario.PlaceUnit(_selectedUnitTemplate, _selectedFaction, x, y);
+                var militaryUnitInstance = _scenario.PlaceUnit(_selectedUnitTemplate, _selectedFaction, x, y);
+                MilitaryUnitInstanceViewModels.Add(new MilitaryUnitInstanceViewModel(militaryUnitInstance, _scenario.Factions.Single(f => f.Id == militaryUnitInstance.FactionId).Colour));
 
-                switch (militaryUnit.MovementType)
-                {
-                    case MovementType.Airborne:
-                        _gameRenderingWpf.DrawTriangle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
-                        break;
-                    case MovementType.Land:
-                        _gameRenderingWpf.DrawCircle(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
-                        break;
-                    case MovementType.Water:
-                        _gameRenderingWpf.DrawTrapezium(_scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
-                        break;
-                }
+                _gameRenderingWpf.PlaceUnit(militaryUnitInstance.MovementType, militaryUnitInstance.Id, _scenario.Board[x, y].Hex, _scenario.Board[x, y].Units.Count, _scenario.Factions[_selectedFaction].Colour);
 
                 _gameRenderingWpf.RepositionUnits(_scenario.Board[x, y].Hex);
             }
@@ -352,15 +343,28 @@ namespace ScenarioEditor
 
         private void UnitSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var id = ((MilitaryUnitInstanceViewModel)e.AddedItems[0]).Id;
-            _activity = Activity.Unit;
-            _selectedUnitInstance = _scenario.MilitaryUnitInstances.Single(x => x.Id == id);
+            if (e.AddedItems.Count > 0)
+            {
+                var id = ((MilitaryUnitInstanceViewModel)e.AddedItems[0]).Id;
+                _activity = Activity.Unit;
+                _selectedUnitInstance = _scenario.MilitaryUnitInstances.Single(x => x.Id == id);
+            }
         }
 
         private void RemoveUnitInstance_Click(object sender, RoutedEventArgs e)
         {
+            if (_selectedUnitInstance == null)
+                return;
+
             _scenario.MilitaryUnitInstances.Remove(_selectedUnitInstance);
-            MilitaryUnitInstanceViewModels.Remove(MilitaryUnitInstanceViewModels.Single(x => x.Id == _selectedUnitInstance.Id));
+            var muivm = MilitaryUnitInstanceViewModels.Single(x => x.Id == _selectedUnitInstance.Id);
+            MilitaryUnitInstanceViewModels.Remove(muivm);
+            UnitsAtSelectedLocation.Remove(muivm);
+
+            _gameRenderingWpf.RemoveUnit(_selectedUnitInstance.Id, _selectedUnitInstance.LocationIndex);
+            _gameRenderingWpf.RepositionUnits(_scenario.Board[_selectedUnitInstance.LocationIndex].Hex);
+
+            _selectedUnitInstance = null;
         }
     }
 }

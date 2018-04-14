@@ -582,6 +582,13 @@ namespace GameModel
             var moveOrders = new MoveOrder(moves.ToArray(), this);
             return moveOrders;
         }
+
+
+
+
+
+
+
     }
 }
 

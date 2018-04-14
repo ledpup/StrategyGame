@@ -75,6 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TransportOrder.cs" />
     <Compile Include="UnitAndPath.cs" />
+    <Compile Include="UnitNumberingExtensions.cs" />
     <Compile Include="UnloadOrder.cs" />
   </ItemGroup>
   <ItemGroup>

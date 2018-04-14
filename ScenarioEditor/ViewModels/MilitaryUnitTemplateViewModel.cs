@@ -7,13 +7,14 @@ using System.Linq;
 
 namespace ScenarioEditor.ViewModels
 {
+
     public class MilitaryUnitTemplateViewModel : BaseViewModel
     {
-        private IMilitaryUnit _militaryUnit;
+        private IMilitaryUnit _militaryUnitTemplate;
         
         public MilitaryUnitTemplateViewModel(IMilitaryUnit militaryUnitTemplate)
         {
-            _militaryUnit = militaryUnitTemplate;
+            _militaryUnitTemplate = militaryUnitTemplate;
 
             MovementTypesSelection = new List<MovementTypeSelector>();
             foreach (MovementType mt in Enum.GetValues(typeof(MovementType)))
@@ -35,7 +36,7 @@ namespace ScenarioEditor.ViewModels
                 EnemyCombatTypeCombatModifiers.Add(new KeyValueViewModel<CombatType>(ct));
             }
 
-            TerrainMovementViewModels = _militaryUnit.TerrainMovements.Select(x => new TerrainMovementViewModel(x)).ToList();
+            TerrainMovementViewModels = _militaryUnitTemplate.TerrainMovements.Select(x => new TerrainMovementViewModel(x)).ToList();
 
             TerrainCombatModifiers = new List<KeyValueViewModel<TerrainType>>();
             foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
@@ -43,7 +44,7 @@ namespace ScenarioEditor.ViewModels
                 TerrainCombatModifiers.Add(new KeyValueViewModel<TerrainType>(terrainType));
             }
 
-            EdgeMovementCosts = _militaryUnit.EdgeMovements.Select(x => new EdgeMovementViewModel(x)).ToList();
+            EdgeMovementCosts = _militaryUnitTemplate.EdgeMovements.Select(x => new EdgeMovementViewModel(x)).ToList();
 
             WeatherCombatModifiers = new List<KeyValueViewModel<Weather>>();
             foreach (Weather weather in Enum.GetValues(typeof(Weather)))
@@ -65,16 +66,16 @@ namespace ScenarioEditor.ViewModels
         public List<TerrainMovementViewModel> TerrainMovementViewModels { get; private set; }
         public List<EdgeMovementViewModel> EdgeMovementCosts { get; private set; }
 
-        public int Id { get { return _militaryUnit.Id; } }
+        public int Id { get { return _militaryUnitTemplate.Id; } }
         public string Name
         {
-            get { return _militaryUnit.Name; }
+            get { return _militaryUnitTemplate.Name; }
             set
             {
-                if (value == _militaryUnit.Name)
+                if (value == _militaryUnitTemplate.Name)
                     return;
 
-                _militaryUnit.Name = value;
+                _militaryUnitTemplate.Name = value;
                 RaisePropertyChanged();
             }
         }
@@ -85,62 +86,62 @@ namespace ScenarioEditor.ViewModels
             get { return MovementTypesSelection.Single(x => x.IsSelected); }
             set
             {
-                if (value.Name == _militaryUnit.MovementType.ToString())
+                if (value.Name == _militaryUnitTemplate.MovementType.ToString())
                     return;
 
-                _militaryUnit.MovementType = (MovementType)Enum.Parse(typeof(MovementType), value.Name);
+                _militaryUnitTemplate.MovementType = (MovementType)Enum.Parse(typeof(MovementType), value.Name);
                 RaisePropertyChanged();
             }
         }
 
         public MovementType MovementType
         {
-            get { return _militaryUnit.MovementType; }
+            get { return _militaryUnitTemplate.MovementType; }
             set
             {
-                if (value == _militaryUnit.MovementType)
+                if (value == _militaryUnitTemplate.MovementType)
                     return;
 
-                _militaryUnit.MovementType = value;
+                _militaryUnitTemplate.MovementType = value;
                 RaisePropertyChanged();
             }
         }
 
         public bool UsesRoads
         {
-            get { return _militaryUnit.UsesRoads; }
+            get { return _militaryUnitTemplate.UsesRoads; }
             set
             {
-                if (value == _militaryUnit.UsesRoads)
+                if (value == _militaryUnitTemplate.UsesRoads)
                     return;
 
-                _militaryUnit.UsesRoads = value;
+                _militaryUnitTemplate.UsesRoads = value;
                 RaisePropertyChanged();
             }
         }
 
         public int MovementPoints
         {
-            get { return _militaryUnit.MovementPoints; }
+            get { return _militaryUnitTemplate.MovementPoints; }
             set
             {
-                if (value == _militaryUnit.MovementPoints)
+                if (value == _militaryUnitTemplate.MovementPoints)
                     return;
 
-                _militaryUnit.MovementPoints = value;
+                _militaryUnitTemplate.MovementPoints = value;
                 RaisePropertyChanged();
             }
         }
 
         public bool CanTransport
         {
-            get { return _militaryUnit.CanTransport; }
+            get { return _militaryUnitTemplate.CanTransport; }
             set
             {
-                if (value == _militaryUnit.CanTransport)
+                if (value == _militaryUnitTemplate.CanTransport)
                     return;
 
-                _militaryUnit.CanTransport = value;
+                _militaryUnitTemplate.CanTransport = value;
                 RaisePropertyChanged();
             }
         }
@@ -151,39 +152,39 @@ namespace ScenarioEditor.ViewModels
 
         public List<MovementType> MovementTypesTransportableBy
         {
-            get { return _militaryUnit.MovementTypesTransportableBy; }
+            get { return _militaryUnitTemplate.MovementTypesTransportableBy; }
             set
             {
-                if (value == _militaryUnit.MovementTypesTransportableBy)
+                if (value == _militaryUnitTemplate.MovementTypesTransportableBy)
                     return;
 
-                _militaryUnit.MovementTypesTransportableBy = value;
+                _militaryUnitTemplate.MovementTypesTransportableBy = value;
                 RaisePropertyChanged();
             }
         }
 
         public int Members
         {
-            get { return _militaryUnit.Members; }
+            get { return _militaryUnitTemplate.Members; }
             set
             {
-                if (value == _militaryUnit.Members)
+                if (value == _militaryUnitTemplate.Members)
                     return;
 
-                _militaryUnit.Members = value;
+                _militaryUnitTemplate.Members = value;
                 RaisePropertyChanged();
             }
         }
 
         public float Size
         {
-            get { return _militaryUnit.Size; }
+            get { return _militaryUnitTemplate.Size; }
             set
             {
-                if (value == _militaryUnit.Size)
+                if (value == _militaryUnitTemplate.Size)
                     return;
 
-                _militaryUnit.Size = value;
+                _militaryUnitTemplate.Size = value;
                 RaisePropertyChanged();
             }
         }
@@ -194,58 +195,76 @@ namespace ScenarioEditor.ViewModels
             get { return CombatTypesSelection.Single(x => x.IsSelected); }
             set
             {
-                if (value.Name == _militaryUnit.CombatType.ToString())
+                if (value.Name == _militaryUnitTemplate.CombatType.ToString())
                     return;
 
-                _militaryUnit.CombatType = (CombatType)Enum.Parse(typeof(CombatType), value.Name);
+                _militaryUnitTemplate.CombatType = (CombatType)Enum.Parse(typeof(CombatType), value.Name);
                 RaisePropertyChanged();
             }
         }
 
         public int CombatQuality
         {
-            get { return _militaryUnit.CombatAbility; }
+            get { return _militaryUnitTemplate.CombatAbility; }
             set
             {
-                if (value == _militaryUnit.CombatAbility)
+                if (value == _militaryUnitTemplate.CombatAbility)
                     return;
 
-                _militaryUnit.CombatAbility = value;
+                _militaryUnitTemplate.CombatAbility = value;
                 RaisePropertyChanged();
             }
         }
 
         public int DepletionOrder
         {
-            get { return _militaryUnit.DepletionOrder; }
+            get { return _militaryUnitTemplate.DepletionOrder; }
             set
             {
-                if (value == _militaryUnit.DepletionOrder)
+                if (value == _militaryUnitTemplate.DepletionOrder)
                     return;
 
-                _militaryUnit.DepletionOrder = value;
+                _militaryUnitTemplate.DepletionOrder = value;
                 RaisePropertyChanged();
             }
         }
 
         public int Morale
         {
-            get { return _militaryUnit.Morale; }
+            get { return _militaryUnitTemplate.Morale; }
             set
             {
-                if (value == _militaryUnit.Morale)
+                if (value == _militaryUnitTemplate.Morale)
                     return;
 
-                _militaryUnit.Morale = value;
+                _militaryUnitTemplate.Morale = value;
                 RaisePropertyChanged();
             }
         }
         public bool EditTerrainMovements { get; set; } = true;
         public bool EditEdgeMovements { get; set; } = true;
         public bool EditBaseCharacteristics { get; set; } = true;
-
         public bool EditRoadMovementBonusPoints { get { return EditBaseCharacteristics && UsesRoads; } }
-
         public bool EditCombatModifiers { get; set; } = true;
+
+        public NumberingConvention NumberingConvention
+        {
+            get { return _militaryUnitTemplate.NumberingConvention; }
+            set
+            {
+                if (value == _militaryUnitTemplate.NumberingConvention)
+                    return;
+
+                _militaryUnitTemplate.NumberingConvention = value;
+                RaisePropertyChanged();
+            }
+        }
+        public IList<NumberingConvention> NumberingConventions
+        {
+            get
+            {
+                return Enum.GetValues(typeof(NumberingConvention)).Cast<NumberingConvention>().ToList<NumberingConvention>();
+            }
+        }
     }
 }

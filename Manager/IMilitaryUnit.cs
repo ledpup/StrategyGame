@@ -23,5 +23,6 @@ namespace Manager
         List<UnitTerrainMovement> TerrainMovements { get; set; }
 
         List<UnitEdgeMovement> EdgeMovements { get; set; }
+        NumberingConvention NumberingConvention { get; set; }
     }
 }

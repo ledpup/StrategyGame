@@ -143,15 +143,15 @@ namespace GameModel.Rendering
                 switch (unitsAtLocation[i].MovementType)
                 {
                     case MovementType.Airborne:
-                        gameRenderingEngine.DrawTriangle(hex, position, colour);
+                        gameRenderingEngine.DrawTriangle(unitsAtLocation[i].Id, hex, position, colour);
                         break;
 
                     case MovementType.Water:
-                        gameRenderingEngine.DrawTrapezium(hex, position, colour);
+                        gameRenderingEngine.DrawTrapezium(unitsAtLocation[i].Id, hex, position, colour);
                         break;
 
                     case MovementType.Land:
-                        gameRenderingEngine.DrawCircle(hex, position, colour);
+                        gameRenderingEngine.DrawCircle(unitsAtLocation[i].Id, hex, position, colour);
                         break;
                 }
             }

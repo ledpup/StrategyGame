@@ -61,7 +61,7 @@
                 </ListBox>
                
                 <Label Content="Units at selected location" HorizontalAlignment="Left" Margin="1398,744,0,299"/>
-                <ListBox HorizontalAlignment="Left" Margin="1398,775,0,0" Width="306" ItemsSource="{Binding UnitsAtSelectedLocation}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top">
+                <ListBox HorizontalAlignment="Left" Margin="1398,775,0,0" Width="306" ItemsSource="{Binding UnitsAtSelectedLocation}" MouseDoubleClick="UnitSelector_MouseDoubleClick" Height="114" VerticalAlignment="Top" SelectionChanged="UnitSelector_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type local:MilitaryUnitInstanceViewModel}">
                             <TextBlock Text="{Binding Name}" Tag="{Binding Id}" Foreground="{Binding FactionColour}" />

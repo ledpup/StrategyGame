@@ -21,19 +21,7 @@ namespace Manager
             var structures = File.ReadAllLines($"{Folder}\\Structures.txt");
 
             Board = new Board(gameBoard, tileEdges, structures);
-
-            Board.Units = new List<MilitaryUnit>
-            {
-                new MilitaryUnit(0) { Location = Board[1, 1] },
-                new MilitaryUnit(1) { Location = Board[1, 1] },
-                new MilitaryUnit(2) { Location = Board[1, 1] },
-                new MilitaryUnit(3) { Location = Board[1, 1], FactionId = 1 },
-                new MilitaryUnit(4, "1st Fleet", 0, Board[0, 0], MovementType.Water),
-                new MilitaryUnit(4, "1st Airborne", 0, Board[3, 2], MovementType.Airborne),
-            };
-
-            
-
+          
             Load();
 
             Factions = new List<Faction>();
@@ -73,14 +61,17 @@ namespace Manager
                 Board.Structures.Add(newStructure);
             }
         }
-        public MilitaryUnit PlaceUnit(MilitaryUnitTemplate unitTemplate, int selectedFaction, int x, int y)
+        public MilitaryUnitInstance PlaceUnit(MilitaryUnitTemplate unitTemplate, int selectedFactionId, int x, int y)
         {
-            MilitaryUnit militaryUnit1 = new MilitaryUnit(Board.Units.Count + 1, unitTemplate.Name, selectedFaction, Board[x, y], unitTemplate.MovementType, unitTemplate.MovementPoints, unitTemplate.RoadMovementBonusPoints, unitTemplate.CombatType, unitTemplate.CombatAbility, unitTemplate.Members, unitTemplate.Size, unitTemplate.CanTransport, unitTemplate.MovementTypesTransportableBy, unitTemplate.DepletionOrder, unitTemplate.Morale, 0);
-            var militaryUnit = militaryUnit1;
-            militaryUnit.TemplateId = unitTemplate.Id;
-            Board.Units.Add(militaryUnit);
-            return militaryUnit;
+            var unitNumber = MilitaryUnitInstances.Count(u => u.FactionId == selectedFactionId && u.UnitTemplateId == unitTemplate.Id) + 1;
+
+            var militaryUnitInstance = new MilitaryUnitInstance(MilitaryUnitInstances.Count + 1, unitNumber, unitTemplate.Name, selectedFactionId, Board[x, y].Index, unitTemplate);
+            MilitaryUnitInstances.Add(militaryUnitInstance);
+
+            return militaryUnitInstance;
         }
+
+
 
         public void Load()
         {

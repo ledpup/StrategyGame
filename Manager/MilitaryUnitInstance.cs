@@ -10,36 +10,52 @@ namespace Manager
 {
     public class MilitaryUnitInstance : IMilitaryUnit
     {
-        MilitaryUnitTemplate _militaryUnitTemplate;
-        Faction _faction;
-
-        public MilitaryUnitInstance(int id, string name, Faction faction, MilitaryUnitTemplate militaryUnitTemplate)
+        
+        public MilitaryUnitInstance()
+        { }
+        public MilitaryUnitInstance(int id, int unitNumber, string name, int factionId, int locationIndex, MilitaryUnitTemplate militaryUnitTemplate)
         {
             Id = id;
-            Name = name;
-            _faction = faction;
-            _militaryUnitTemplate = militaryUnitTemplate;
 
-            MovementType = _militaryUnitTemplate.MovementType;
-            UsesRoads = _militaryUnitTemplate.UsesRoads;
-            RoadMovementBonusPoints = _militaryUnitTemplate.RoadMovementBonusPoints;
-            CanTransport = _militaryUnitTemplate.CanTransport;
-            MovementTypesTransportableBy = _militaryUnitTemplate.MovementTypesTransportableBy;
-            MovementPoints = _militaryUnitTemplate.MovementPoints;
-            CombatType = _militaryUnitTemplate.CombatType;
-            CombatAbility = _militaryUnitTemplate.CombatAbility;
-            DepletionOrder = _militaryUnitTemplate.DepletionOrder;
-            Size = _militaryUnitTemplate.Size;
-            Members = _militaryUnitTemplate.Members;
-            Morale = _militaryUnitTemplate.Morale;
-            TerrainMovements = _militaryUnitTemplate.TerrainMovements;
-            EdgeMovements = _militaryUnitTemplate.EdgeMovements;
+            FactionId = factionId;
+            LocationIndex = locationIndex;
+
+            MovementType = militaryUnitTemplate.MovementType;
+            UsesRoads = militaryUnitTemplate.UsesRoads;
+            RoadMovementBonusPoints = militaryUnitTemplate.RoadMovementBonusPoints;
+            CanTransport = militaryUnitTemplate.CanTransport;
+            MovementTypesTransportableBy = militaryUnitTemplate.MovementTypesTransportableBy;
+            MovementPoints = militaryUnitTemplate.MovementPoints;
+            CombatType = militaryUnitTemplate.CombatType;
+            CombatAbility = militaryUnitTemplate.CombatAbility;
+            DepletionOrder = militaryUnitTemplate.DepletionOrder;
+            Size = militaryUnitTemplate.Size;
+            Members = militaryUnitTemplate.Members;
+            Morale = militaryUnitTemplate.Morale;
+            TerrainMovements = militaryUnitTemplate.TerrainMovements;
+            EdgeMovements = militaryUnitTemplate.EdgeMovements;
+            NumberingConvention = militaryUnitTemplate.NumberingConvention;
+            UnitTemplateId = militaryUnitTemplate.Id;
+
+            string unitName = name;
+            switch (militaryUnitTemplate.NumberingConvention)
+            {
+                case NumberingConvention.Alphabetic:
+                    unitName = $"{name} {unitNumber.ToAlphabetic()}";
+                    break;
+                case NumberingConvention.Ordinal:
+                    unitName = $"{unitNumber.ToOrdinal()} {name}";
+                    break;
+                case NumberingConvention.RomanNumeral:
+                    unitName = $"{unitNumber.ToRoman()} {name}";
+                    break;
+            }
+            Name = unitName;
         }
 
         public int Id { get; private set; }
         public string Name { get; set; }
-        public ArgbColour FactionColour { get { return _faction.Colour; } }
-
+        public int FactionId { get; set; }
         public MovementType MovementType { get; set; }
         public bool UsesRoads { get; set; }
         public int RoadMovementBonusPoints { get; set; }
@@ -55,6 +71,11 @@ namespace Manager
 
         public List<UnitTerrainMovement> TerrainMovements { get; set; }
         public List<UnitEdgeMovement> EdgeMovements { get; set; }
+
+
+        public int LocationIndex { get; }
+        public int UnitTemplateId { get; set; }
+        public NumberingConvention NumberingConvention { get; set; }
     }
 }
  

@@ -197,17 +197,17 @@ namespace StrategyGame
             {
                 case EditorTool.Terrain:
                     _board = BoardEditorService.SetTerrain(_board, tile, (TerrainType)_terrainComboBox.SelectedItem);
-                    _selectedTile = _board[tile.Index];
+                    _selectedTile = null;
                     SetStatus($"Terrain changed at tile {tile.Index}");
                     break;
                 case EditorTool.Structure:
                     _board = BoardEditorService.SetStructure(_board, tile, (StructureType)_structureTypeComboBox.SelectedItem, (int)_ownerNumeric.Value);
-                    _selectedTile = _board[tile.Index];
+                    _selectedTile = null;
                     SetStatus($"Structure updated at tile {tile.Index}");
                     break;
                 case EditorTool.Unit:
                     _board = BoardEditorService.AddUnit(_board, tile, (UnitType)_unitTypeComboBox.SelectedItem, (MovementType)_movementTypeComboBox.SelectedItem, (int)_ownerNumeric.Value);
-                    _selectedTile = _board[tile.Index];
+                    _selectedTile = null;
                     SetStatus($"Unit added at tile {tile.Index}");
                     break;
                 case EditorTool.Erase:
@@ -215,13 +215,14 @@ namespace StrategyGame
                     {
                         _board = BoardEditorService.SetEdge(_board, _board[_selectedTile.Index], _board[tile.Index], EdgeType.None, false);
                         SetStatus($"Edge removed between {_selectedTile.Index} and {tile.Index}");
+                        _selectedTile = null;
                     }
                     else
                     {
                         _board = BoardEditorService.EraseTileContent(_board, tile);
                         SetStatus($"Tile content removed at {tile.Index}");
+                        _selectedTile = null;
                     }
-                    _selectedTile = _board[tile.Index];
                     break;
                 case EditorTool.Edge:
                     if (_selectedTile == null)
@@ -251,9 +252,11 @@ namespace StrategyGame
 
         void RenderBoard()
         {
+            var selectedTool = _toolComboBox.SelectedItem is EditorTool tool ? tool : EditorTool.Terrain;
+            var showSelectedTile = selectedTool == EditorTool.Edge && _selectedTile != null;
             foreach (var tile in _board.Tiles)
             {
-                tile.IsSelected = _selectedTile != null && tile.Index == _selectedTile.Index;
+                tile.IsSelected = showSelectedTile && tile.Index == _selectedTile.Index;
             }
 
             var drawing = GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, null, null, _board.Units);

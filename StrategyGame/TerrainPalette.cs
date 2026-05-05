@@ -66,7 +66,7 @@ namespace StrategyGame
             return (totalW, hexH + 4);
         }
 
-        PointF[] HexCorners(float cx, float cy)
+        static PointF[] HexCorners(float cx, float cy)
         {
             // Pointy-top hex corners to match the map renderer
             var pts = new PointF[6];
@@ -105,14 +105,12 @@ namespace StrategyGame
 
                 // Label
                 var name = terrain.ToString();
-                using (var font = new Font("Arial", 6f))
-                using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-                {
-                    var textColor = IsLightColour(color) ? Color.Black : Color.White;
-                    using (var tb = new SolidBrush(textColor))
-                        g.DrawString(name.Length > 6 ? name.Substring(0, 5) : name, font, tb,
-                            cx + i * hexW, cy, sf);
-                }
+                using var font = new Font("Arial", 6f);
+                using var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+                var textColor = IsLightColour(color) ? Color.Black : Color.White;
+                using var tb = new SolidBrush(textColor);
+                g.DrawString(name.Length > 6 ? name.Substring(0, 5) : name, font, tb,
+                    cx + i * hexW, cy, sf);
             }
         }
 

@@ -147,27 +147,18 @@ namespace StrategyGame
 
         internal static char TerrainToChar(TerrainType terrainType)
         {
-            switch (terrainType)
+            return terrainType switch
             {
-                case TerrainType.Grassland:
-                    return 'G';
-                case TerrainType.Desert:
-                    return 'D';
-                case TerrainType.Forest:
-                    return 'F';
-                case TerrainType.Hill:
-                    return 'H';
-                case TerrainType.Mountain:
-                    return 'M';
-                case TerrainType.Water:
-                    return 'L';
-                case TerrainType.Wetland:
-                    return 'W';
-                case TerrainType.Reef:
-                    return 'R';
-                default:
-                    throw new InvalidOperationException($"Unsupported terrain type {terrainType}");
-            }
+                TerrainType.Grassland => 'G',
+                TerrainType.Desert => 'D',
+                TerrainType.Forest => 'F',
+                TerrainType.Hill => 'H',
+                TerrainType.Mountain => 'M',
+                TerrainType.Water => 'L',
+                TerrainType.Wetland => 'W',
+                TerrainType.Reef => 'R',
+                _ => throw new InvalidOperationException($"Unsupported terrain type {terrainType}"),
+            };
         }
     }
 

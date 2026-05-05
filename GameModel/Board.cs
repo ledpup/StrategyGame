@@ -102,16 +102,25 @@ namespace GameModel
             }
         }
 
-        private void AssignContiguousTilesToRegion(Tile tile, int id, bool isMountainRange)
+        private void AssignContiguousTilesToRegion(Tile start, int id, bool isMountainRange)
         {
-            tile.Neighbours
-                .Where(x => x.Destination.ContiguousRegionId == 0 && x.Destination.BaseTerrainType == tile.BaseTerrainType && (x.HasRoad || ((tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain) || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain && isMountainRange))))
-                .ToList()
-                .ForEach(x => 
+            var stack = new Stack<Tile>();
+            stack.Push(start);
+            while (stack.Count > 0)
+            {
+                var tile = stack.Pop();
+                foreach (var x in tile.Neighbours)
+                {
+                    if (x.Destination.ContiguousRegionId == 0
+                        && x.Destination.BaseTerrainType == tile.BaseTerrainType
+                        && (x.HasRoad || ((tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain)
+                            || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain && isMountainRange))))
                     {
                         x.Destination.ContiguousRegionId = id;
-                        AssignContiguousTilesToRegion(x.Destination, id, isMountainRange);
-                    });
+                        stack.Push(x.Destination);
+                    }
+                }
+            }
         }
 
         public void InitialiseSupply()
@@ -232,37 +241,36 @@ namespace GameModel
 
         private void CalculateTileDistanceFromTheSea()
         {
-            Tiles.ToList().ForEach(x =>
-            {
-                var searched = new List<Tile>();
-                x.DistanceFromWater = GetWaterDistanceToSea(x, 0, ref searched);
-            });
-        }
+            // Multi-source BFS from all sea tiles simultaneously - O(tiles) instead of O(tiles²).
+            var queue = new Queue<Tile>();
 
-        private int GetWaterDistanceToSea(Tile tile, int distance, ref List<Tile> searched)
-        {
-            searched.Add(tile);
-            if (tile.IsSea)
+            foreach (var tile in _tiles)
             {
-                return distance;
-            }
-            distance += 1;
-            if (tile.Neighbours.Any(x => x.Destination.IsSea))
-            {
-                return distance;
-            }
-                      
-            var minDistance = 100;
-            foreach (var neighbour in tile.Neighbours)
-            {
-                if (!searched.Contains(neighbour.Destination))
+                if (tile.IsSea)
                 {
-                    var result = GetWaterDistanceToSea(neighbour.Destination, distance, ref searched);
-                    if (result < minDistance)
-                        minDistance = result;
+                    tile.DistanceFromWater = 0;
+                    queue.Enqueue(tile);
+                }
+                else
+                {
+                    tile.DistanceFromWater = int.MaxValue;
                 }
             }
-            return minDistance;
+
+            while (queue.Count > 0)
+            {
+                var tile = queue.Dequeue();
+                foreach (var neighbour in tile.Neighbours)
+                {
+                    var dest = neighbour.Destination;
+                    var newDist = tile.DistanceFromWater + 1;
+                    if (newDist < dest.DistanceFromWater)
+                    {
+                        dest.DistanceFromWater = newDist;
+                        queue.Enqueue(dest);
+                    }
+                }
+            }
         }
 
         public void CalculateTemperature(int? turnParameter = null)

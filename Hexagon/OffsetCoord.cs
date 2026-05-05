@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hexagon
+﻿namespace Hexagon
 {
     /// <summary>
     /// There are four offset types: odd-r, even-r, odd-q, even-q. The “r” types are used with with pointy top hexagons and the “q” types are used with flat top. Whether it’s even or odd can be encoded as +1 or -1.

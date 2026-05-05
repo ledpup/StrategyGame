@@ -24,6 +24,9 @@ namespace StrategyGame
         Board _board;
         string _currentFilePath;
         Tile _selectedTile;
+        bool _isPaintingTerrain;
+        int? _lastPaintedTileIndex;
+        TerrainType _lastPaintedTerrainType;
 
         public MainForm()
         {
@@ -100,6 +103,9 @@ namespace StrategyGame
             saveAsButton.Click += (_, __) => SaveMap(true);
             simulateButton.Click += (_, __) => SimulateGame();
             _canvas.MouseClick += CanvasMouseClick;
+            _canvas.MouseDown += CanvasMouseDown;
+            _canvas.MouseMove += CanvasMouseMove;
+            _canvas.MouseUp += CanvasMouseUp;
 
             LoadDefaultMap();
         }
@@ -187,6 +193,58 @@ namespace StrategyGame
             SetStatus($"Simulated {result.TurnsCompleted} turns. Units alive: {result.RemainingUnits}. Structures: {owners}");
         }
 
+        void CanvasMouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+                return;
+
+            var selectedTool = _toolComboBox.SelectedItem is EditorTool tool ? tool : EditorTool.Terrain;
+            if (selectedTool != EditorTool.Terrain)
+                return;
+
+            _isPaintingTerrain = true;
+            _lastPaintedTileIndex = null;
+            _lastPaintedTerrainType = (TerrainType)_terrainComboBox.SelectedItem;
+            PaintTerrainAt(e.X, e.Y);
+        }
+
+        void CanvasMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_isPaintingTerrain || e.Button != MouseButtons.Left)
+                return;
+
+            PaintTerrainAt(e.X, e.Y);
+        }
+
+        void CanvasMouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+                return;
+
+            if (_isPaintingTerrain && _lastPaintedTileIndex.HasValue)
+            {
+                // Full board rebuild happens once here, after the drag is finished.
+                _board = BoardEditorService.RebuildBoard(_board);
+            }
+
+            _isPaintingTerrain = false;
+            _lastPaintedTileIndex = null;
+        }
+
+        void PaintTerrainAt(int x, int y)
+        {
+            var tile = BoardEditorService.HitTest(_board, x, y);
+            if (tile == null || _lastPaintedTileIndex == tile.Index)
+                return;
+
+            // Mutate in-place during drag for performance; board is rebuilt once on mouse-up.
+            BoardEditorService.SetTerrainDirect(tile, _lastPaintedTerrainType);
+            _selectedTile = null;
+            _lastPaintedTileIndex = tile.Index;
+            SetStatus($"Terrain changed at tile {tile.Index}");
+            RenderBoard();
+        }
+
         void CanvasMouseClick(object sender, MouseEventArgs e)
         {
             var tile = BoardEditorService.HitTest(_board, e.X, e.Y);
@@ -196,10 +254,7 @@ namespace StrategyGame
             switch ((EditorTool)_toolComboBox.SelectedItem)
             {
                 case EditorTool.Terrain:
-                    _board = BoardEditorService.SetTerrain(_board, tile, (TerrainType)_terrainComboBox.SelectedItem);
-                    _selectedTile = null;
-                    SetStatus($"Terrain changed at tile {tile.Index}");
-                    break;
+                    return;
                 case EditorTool.Structure:
                     _board = BoardEditorService.SetStructure(_board, tile, (StructureType)_structureTypeComboBox.SelectedItem, (int)_ownerNumeric.Value);
                     _selectedTile = null;
@@ -260,15 +315,9 @@ namespace StrategyGame
             }
 
             var drawing = GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, null, null, _board.Units);
-            using (var stream = new MemoryStream())
-            {
-                drawing.Save(stream);
-                stream.Position = 0;
-                var image = Image.FromStream(stream);
-                var previous = _canvas.Image;
-                _canvas.Image = new Bitmap(image);
-                previous?.Dispose();
-            }
+            var previous = _canvas.Image;
+            _canvas.Image = new Bitmap(drawing.ToBitmap());
+            previous?.Dispose();
         }
 
         void SetStatus(string message)

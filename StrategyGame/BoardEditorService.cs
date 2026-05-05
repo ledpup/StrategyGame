@@ -14,6 +14,11 @@ namespace StrategyGame
             return MapDocument.CreateDefault(width, height).ToBoard();
         }
 
+        public static Board RebuildBoard(Board board)
+        {
+            return MapDocument.FromBoard(board).ToBoard();
+        }
+
         public static Tile HitTest(Board board, int x, int y)
         {
             var point = new PointD(x, y);
@@ -35,6 +40,14 @@ namespace StrategyGame
                 return false;
 
             return first.Neighbours.Any(x => x.Destination == second);
+        }
+
+        public static void SetTerrainDirect(Tile tile, TerrainType terrainType)
+        {
+            tile.TerrainType = terrainType;
+            tile.BaseTerrainType = terrainType.HasFlag(TerrainType.Water) || terrainType.HasFlag(TerrainType.Reef)
+                ? BaseTerrainType.Water
+                : BaseTerrainType.Land;
         }
 
         public static Board SetTerrain(Board board, Tile tile, TerrainType terrainType)

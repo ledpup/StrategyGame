@@ -199,6 +199,11 @@ namespace Visualise
             _graphics.FillPolygon(brush, points);
         }
 
+        public Bitmap ToBitmap()
+        {
+            return _bitmap;
+        }
+
         internal void Save(string fileName)
         {
             _bitmap.Save(fileName);

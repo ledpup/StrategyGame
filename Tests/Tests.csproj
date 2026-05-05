@@ -1,121 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E14BF1B2-2E57-42DB-A316-A4442EB301CA}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tests</RootNamespace>
-    <AssemblyName>Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.4\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.8.3" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.8.3" />
+    <PackageReference Include="NLog" Version="5.0.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="BattleTests.cs" />
-    <Compile Include="BoardTests.cs" />
-    <Compile Include="InfluenceMapTests.cs" />
-    <Compile Include="GameAnalysisTests.cs" />
-    <Compile Include="MathsTests.cs" />
-    <Compile Include="MoveTests.cs" />
-    <Compile Include="RedBlobTests.cs" />
-    <Compile Include="StrategicActionTests.cs" />
-    <Compile Include="StructureTests.cs" />
-    <Compile Include="SupplyTests.cs" />
-    <Compile Include="TemperatureTests.cs" />
-    <Compile Include="TransportTests.cs" />
-    <Compile Include="VisualiseTests.cs" />
-    <Compile Include="PathFindTests.cs" />
-    <Compile Include="StackTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <ProjectReference Include="..\ComputerOpponent\ComputerOpponent.csproj" />
+    <ProjectReference Include="..\GameModel\GameModel.csproj" />
+    <ProjectReference Include="..\Hexagon\Hexagon.csproj" />
+    <ProjectReference Include="..\PathFind\PathFind.csproj" />
+    <ProjectReference Include="..\Visualise\Visualise.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\ComputerOpponent\ComputerOpponent.csproj">
-      <Project>{40377a4b-2f06-4d82-aa53-59dea7315426}</Project>
-      <Name>ComputerOpponent</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GameModel\GameModel.csproj">
-      <Project>{4c5f1b73-0737-4624-8e1c-f6f180067d88}</Project>
-      <Name>GameModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Hexagon\Hexagon.csproj">
-      <Project>{04cd3988-f271-4897-b43d-0802e8c1a48c}</Project>
-      <Name>Hexagon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PathFind\PathFind.csproj">
-      <Project>{2caef444-6049-4d0e-b492-d3fe21800ea4}</Project>
-      <Name>PathFind</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Visualise\Visualise.csproj">
-      <Project>{922935d8-0781-4c27-8019-10d84c6797a0}</Project>
-      <Name>Visualise</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="BasicBoard.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BasicBoardEdges.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BasicBoardStructures.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ContiguousRegionTestEdges.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ContiguousRegionTestBoard.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NLog.config">
+    <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
+    <None Update="BasicBoard.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="BasicBoardEdges.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="BasicBoardStructures.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ContiguousRegionTestEdges.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ContiguousRegionTestBoard.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

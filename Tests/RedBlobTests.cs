@@ -15,7 +15,6 @@ namespace Tests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
 
-        [TestMethod]
         public static void EqualHex(String name, Hex a, Hex b)
         {
             if (!(a.q == b.q && a.s == b.s && a.r == b.r))
@@ -25,7 +24,6 @@ namespace Tests
         }
 
 
-        [TestMethod]
         public void EqualOffsetcoord(String name, OffsetCoord a, OffsetCoord b)
         {
             if (!(a.col == b.col && a.row == b.row))
@@ -35,7 +33,6 @@ namespace Tests
         }
 
 
-        [TestMethod]
         public static  void EqualInt(String name, int a, int b)
         {
             if (!(a == b))
@@ -45,7 +42,6 @@ namespace Tests
         }
 
 
-        [TestMethod]
         public static void EqualHexArray(String name, List<Hex> a, List<Hex> b)
         {
             HexTests.EqualInt(name, a.Count, b.Count);

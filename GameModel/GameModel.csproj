@@ -1,93 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4C5F1B73-0737-4624-8E1C-F6F180067D88}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GameModel</RootNamespace>
-    <AssemblyName>GameModel</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.4\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="NLog" Version="5.0.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="BattleReport.cs" />
-    <Compile Include="Board.cs" />
-    <Compile Include="CalculateRange.cs" />
-    <Compile Include="CasualtyLogEntry.cs" />
-    <Compile Include="CombatantInBattle.cs" />
-    <Compile Include="IHasNeighbours.cs" />
-    <Compile Include="IUnitOrder.cs" />
-    <Compile Include="PathFind.cs" />
-    <Compile Include="PathFindTile.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="MoraleChangeEvent.cs" />
-    <Compile Include="MoveOrder.cs" />
-    <Compile Include="Move.cs" />
-    <Compile Include="MoveOrderDto.cs" />
-    <Compile Include="QuantityChangeEvent.cs" />
-    <Compile Include="Stack.cs" />
-    <Compile Include="Structure.cs" />
-    <Compile Include="Terrain.cs" />
-    <Compile Include="Tile.cs" />
-    <Compile Include="Edge.cs" />
-    <Compile Include="MilitaryUnit.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TransportOrder.cs" />
-    <Compile Include="UnitAndPath.cs" />
-    <Compile Include="UnloadOrder.cs" />
+    <ProjectReference Include="..\Hexagon\Hexagon.csproj" />
+    <ProjectReference Include="..\PathFind\PathFind.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Hexagon\Hexagon.csproj">
-      <Project>{04cd3988-f271-4897-b43d-0802e8c1a48c}</Project>
-      <Name>Hexagon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PathFind\PathFind.csproj">
-      <Project>{2caef444-6049-4d0e-b492-d3fe21800ea4}</Project>
-      <Name>PathFind</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

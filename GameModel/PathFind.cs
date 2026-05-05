@@ -34,7 +34,7 @@ namespace GameModel
             loadedPathFindTiles.Add(origin);
             loadedPathFindTiles.Add(destination);
 
-            var queue = new PriorityQueue<double, Path<Node>>();
+            var queue = new global::PathFind.PriorityQueue<double, Path<Node>>();
 
             queue.Enqueue(0, new Path<Node>(origin));
 

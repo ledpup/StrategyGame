@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using Hexagon;
 
@@ -200,6 +202,11 @@ namespace Visualise
         internal void Save(string fileName)
         {
             _bitmap.Save(fileName);
+        }
+
+        public void Save(Stream stream)
+        {
+            _bitmap.Save(stream, ImageFormat.Png);
         }
 
         static Color ArgbColourToColor(ArgbColour colour)

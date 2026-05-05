@@ -27,21 +27,28 @@ namespace Tests
             var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
-            var aiUnits = new List<AiMilitaryUnit>
+            var units = new List<MilitaryUnit>
             {
-                new AiMilitaryUnit(new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true)) { Role = Role.Besieger },
-                new AiMilitaryUnit(new MilitaryUnit(1, location: board[3, 10], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true)) { Role = Role.Besieger },
-                new AiMilitaryUnit(new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1)),
-                new AiMilitaryUnit(new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water })) { Role = Role.Defensive },
-                new AiMilitaryUnit(new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water })) { Role = Role.Besieger },
+                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true),
+                new MilitaryUnit(1, location: board[3, 10], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true),
+                new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
+                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
+                new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
             };
 
-            aiUnits[3].Unit.TerrainMovementCosts[TerrainType.Wetland] = 1;
-            aiUnits[3].Unit.EdgeMovementCosts[EdgeType.River] = 0;
+            units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;
+            units[3].EdgeMovementCosts[EdgeType.River] = 0;
 
-            board.Units = aiUnits.Select(x => x.Unit).ToList();
+            board.Units = units;
 
-            var computerPlayer = new ComputerPlayer(aiUnits);
+            var computerPlayer = new ComputerPlayer(new Dictionary<MilitaryUnit, Role>
+            {
+                [units[0]] = Role.Besieger,
+                [units[1]] = Role.Besieger,
+                [units[2]] = Role.Balanced,
+                [units[3]] = Role.Defensive,
+                [units[4]] = Role.Besieger,
+            });
 
             for (board.Turn = 0; board.Turn < 30; board.Turn++)
             {
@@ -50,9 +57,9 @@ namespace Tests
                 GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
-                var units = board.Units.Where(x => x.IsAlive).ToList();
+                var aliveUnits = board.Units.Where(x => x.IsAlive).ToList();
                 computerPlayer.SetStrategicAction(board);
-                var moveOrders = computerPlayer.CreateOrders(board, units);
+                var moveOrders = computerPlayer.CreateOrders(board, aliveUnits);
 
                 var lines = new List<Centreline>();
                 moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
@@ -194,22 +201,26 @@ namespace Tests
             var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
-            var aiUnits = new List<AiMilitaryUnit>
+            var units = new List<MilitaryUnit>
             {
-                new AiMilitaryUnit(new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true)),
-                new AiMilitaryUnit(new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1)),
-                new AiMilitaryUnit(new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne })) { Role = Role.Defensive },
-                new AiMilitaryUnit(new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne })),
+                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true),
+                new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
+                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
+                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
             };
 
-            aiUnits[2].Unit.TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
-            aiUnits[2].Unit.EdgeMovementCosts[EdgeType.River] = 0;
-
-            var units = aiUnits.Select(x => x.Unit).ToList();
+            units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            units[2].EdgeMovementCosts[EdgeType.River] = 0;
 
             board.Units = units;
 
-            var computerPlayer = new ComputerPlayer(aiUnits);
+            var computerPlayer = new ComputerPlayer(new Dictionary<MilitaryUnit, Role>
+            {
+                [units[0]] = Role.Balanced,
+                [units[1]] = Role.Balanced,
+                [units[2]] = Role.Defensive,
+                [units[3]] = Role.Balanced,
+            });
 
             for (var turn = 0; turn < 25; turn++)
             {

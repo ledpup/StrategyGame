@@ -32,7 +32,7 @@ namespace Tests
             var computerPlayer = new ComputerPlayer(board.Units);
             computerPlayer.SetStrategicAction(board);
 
-            Assert.AreEqual(StrategicAction.None, computerPlayer.AiUnits[0].StrategicAction);
+            Assert.AreEqual(StrategicAction.None, computerPlayer.GetUnitState(board.Units[0]).StrategicAction);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace Tests
             var computerPlayer = new ComputerPlayer(board.Units);
             computerPlayer.SetStrategicAction(board);
 
-            Assert.AreEqual(StrategicAction.Dock, computerPlayer.AiUnits[units[0].Index].StrategicAction);
+            Assert.AreEqual(StrategicAction.Dock, computerPlayer.GetUnitState(units[0]).StrategicAction);
         }
 
 
@@ -74,7 +74,7 @@ namespace Tests
             var computerPlayer = new ComputerPlayer(board.Units);
             computerPlayer.SetStrategicAction(board);
 
-            Assert.AreEqual(StrategicAction.None, computerPlayer.AiUnits[units[0].Index].StrategicAction);
+            Assert.AreEqual(StrategicAction.None, computerPlayer.GetUnitState(units[0]).StrategicAction);
         }
 
         [TestMethod]
@@ -94,7 +94,7 @@ namespace Tests
             var computerPlayer = new ComputerPlayer(board.Units);
             computerPlayer.SetStrategicAction(board);
 
-            Assert.AreEqual(StrategicAction.Pickup, computerPlayer.AiUnits[units[0].Index].StrategicAction);
+            Assert.AreEqual(StrategicAction.Pickup, computerPlayer.GetUnitState(units[0]).StrategicAction);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Tests
 
             board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
             {
-                var moveOrder = computerPlayer.FindBestMoveOrderForUnit(computerPlayer.AiUnits[x.Index], board);
+                var moveOrder = computerPlayer.FindBestMoveOrderForUnit(x, board);
                 if (moveOrder != null)
                     moveOrders.Add(moveOrder);
             });
@@ -96,9 +96,10 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
 
+            var roleMovementType = computerPlayer.GetUnitState(board.Units[1]).GetRoleMovementType(board.Units[1]);
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => x.AggregateInfluence[computerPlayer.AiUnits[1].RoleMovementType][board.Units[1].OwnerIndex])
+                .OrderByDescending(x => x.AggregateInfluence[roleMovementType][board.Units[1].OwnerIndex])
                 .ToList();
 
             IEnumerable<PathFindTile> bestPossibleDestination = null;

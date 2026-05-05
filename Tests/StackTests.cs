@@ -33,9 +33,10 @@ namespace Tests
                 new MilitaryUnit(location: board[6, 1]),
                 new MilitaryUnit(location: board[6, 1]),
             };
+            board.Units.AddRange(units);
 
             Assert.AreEqual(2, board[6, 1].StackLimit);
-            Assert.IsTrue(board[6, 1].OverStackLimit(0));
+            Assert.IsTrue(board.OverStackLimit(board[6, 1], 0));
 
             board.ResolveStackLimits(0);
 

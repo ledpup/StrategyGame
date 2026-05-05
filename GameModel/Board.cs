@@ -36,6 +36,7 @@ namespace GameModel
 
             InitialiseTiles(Width, Height, tiles);
             IntitaliseEdges(edges);
+            BuildEdgeLookup();
             InitialiseNeighbours(Edges);
             CalculateTileDistanceFromTheSea();
             Structures = IntitaliseStructures(structures);
@@ -60,21 +61,31 @@ namespace GameModel
 
             Turn = turn;
 
+            Units = new List<MilitaryUnit>();
+
             CalculateTemperature(Turn);
         }
 
+        public IEnumerable<MilitaryUnit> UnitsAt(Tile tile) =>
+            Units.Where(x => x.Location == tile);
+
+        public bool OverStackLimit(Tile tile, int playerIndex) =>
+            tile.OverStackLimit(UnitsAt(tile), playerIndex);
+
         public void ResolveStackLimits(int playerIndex)
         {
-            Tiles.Where(x => x.OverStackLimit(playerIndex))
-                .ToList()
-                .ForEach(x =>
+            Tiles.ToList().ForEach(x =>
+                {
+                    var tileUnits = UnitsAt(x).ToList();
+                    if (x.OverStackLimit(tileUnits, playerIndex))
                     {
-                        var overStackLimitCount = x.OverStackLimitCount(playerIndex);
-                        x.Units
+                        var overStackLimitCount = x.OverStackLimitCount(tileUnits, playerIndex);
+                        tileUnits
                             .Where(y => y.IsAlive && y.OwnerIndex == playerIndex)
                             .ToList()
                             .ForEach(y => y.ChangeMorale(Turn, - .5 * overStackLimitCount, $"Units are over the stack limit of {x.StackLimit} by {overStackLimitCount} units"));
-                    });
+                    }
+                });
         }
 
         private void CalculateContiguousRegions()
@@ -106,14 +117,14 @@ namespace GameModel
         public void InitialiseSupply()
         {
             Tiles.ToList().ForEach(x => x.Supply = null);
-            var supplyCalculated = new List<Tile>();
+            var supplyCalculated = new HashSet<Tile>();
             foreach (var structure in Structures)
             {
                 CalculateSupply(this[structure.Index], structure.OwnerIndex, structure.Supply, supplyCalculated);
             }
         }
 
-        private void CalculateSupply(Tile tile, int ownerId, float supply, List<Tile> supplyCalculated)
+        private void CalculateSupply(Tile tile, int ownerId, float supply, HashSet<Tile> supplyCalculated)
         {
             if (supplyCalculated.Contains(tile))
             {
@@ -139,7 +150,7 @@ namespace GameModel
                     float neighbourSupply = 0;
                     if (neighbour.Destination.OwnerId == ownerId || neighbour.Destination.OwnerId == null)
                     {
-                        var tileEdge = Edges.SingleOrDefault(x => x.CrossesEdge(tile, neighbour.Destination));
+                        var tileEdge = GetEdgeBetween(tile, neighbour.Destination);
                         if (tileEdge != null)
                         {
                             if (tileEdge.EdgeType != EdgeType.Mountain)
@@ -398,6 +409,26 @@ namespace GameModel
 
         public List<Edge> Edges;
 
+        private Dictionary<(int, int), Edge> _edgeLookup;
+
+        private void BuildEdgeLookup()
+        {
+            _edgeLookup = new Dictionary<(int, int), Edge>(Edges.Count);
+            foreach (var edge in Edges)
+            {
+                var key1 = (Math.Min(edge.Origin.Index, edge.Destination.Index), Math.Max(edge.Origin.Index, edge.Destination.Index));
+                _edgeLookup[key1] = edge;
+            }
+        }
+
+        private Edge GetEdgeBetween(Tile a, Tile b)
+        {
+            if (_edgeLookup == null) return Edges?.SingleOrDefault(x => x.CrossesEdge(a, b));
+            var key = (Math.Min(a.Index, b.Index), Math.Max(a.Index, b.Index));
+            _edgeLookup.TryGetValue(key, out var edge);
+            return edge;
+        }
+
         public void ResolveOrders(List<IUnitOrder> unitOrders)
         {
             ResolveTransportOrders(unitOrders);
@@ -484,8 +515,8 @@ namespace GameModel
                 {
                     if (unitStepMoves.Any(x => x.Value.Edge.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
                     {
-                        var originStrength = stepMove.Value.Origin.Units.Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
-                        var destinationStrength = stepMove.Value.Edge.Destination.Units.Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var originStrength = UnitsAt(stepMove.Value.Origin).Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var destinationStrength = UnitsAt(stepMove.Value.Edge.Destination).Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
 
                         if (originStrength <= destinationStrength)
                         {
@@ -578,10 +609,11 @@ namespace GameModel
             var battleReports = new List<BattleReport>();
             Tiles.ToList().ForEach(x =>
             {
-                if (x.IsInConflict)
+                var tileUnits = UnitsAt(x).ToList();
+                if (x.IsInConflict(tileUnits))
                 {
-                    ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, x.Units, 3, StructureType.Fortress, 2);
-                    battleReports.Add(CreateBattleReport(x, Turn, x.Units));
+                    ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, 3, StructureType.Fortress, 2);
+                    battleReports.Add(CreateBattleReport(x, Turn, tileUnits));
                 }
             });
 

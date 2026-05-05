@@ -13,7 +13,6 @@ namespace GameModel
         public BaseTerrainType BaseTerrainType;
         public TerrainType TerrainType;
         public Weather Weather;
-        public List<MilitaryUnit> Units;
 
         public Dictionary<MovementType, double[]> FriendlyStructureInfluence;
         public Dictionary<MovementType, double[]> EnemyStructureInfluence;
@@ -28,8 +27,6 @@ namespace GameModel
 
         public Tile(int x, int y, int width, TerrainType terrainType = TerrainType.Grassland, bool isEdgeOfMap = false)
         {
-            Units = new List<MilitaryUnit>();
-
             X = x;
             Y = y;
 
@@ -194,25 +191,19 @@ namespace GameModel
         int _stackLimit = 0;
         
 
-        public bool OverStackLimit(int playerIndex)
+        public bool OverStackLimit(IEnumerable<MilitaryUnit> tileUnits, int playerIndex)
         {
-            return OverStackLimitCount(playerIndex) > 0;
+            return OverStackLimitCount(tileUnits, playerIndex) > 0;
         }
 
-        public int OverStackLimitCount(int playerIndex)
+        internal int OverStackLimitCount(IEnumerable<MilitaryUnit> tileUnits, int playerIndex)
         {
-            return Units.Count(x => x.IsAlive && x.OwnerIndex == playerIndex) - StackLimit;
+            return tileUnits.Count(x => x.IsAlive && x.OwnerIndex == playerIndex) - StackLimit;
         }
 
-        public bool IsInConflict
+        internal bool IsInConflict(IEnumerable<MilitaryUnit> tileUnits)
         {
-            get
-            {
-                var units = Units.Where(x => x.IsAlive).GroupBy(x => x.OwnerIndex);
-                if (units.Count() > 1)
-                    return true;
-                return false;
-            }
+            return tileUnits.Where(x => x.IsAlive).GroupBy(x => x.OwnerIndex).Count() > 1;
         }
 
         public bool IsEdgeOfMap { get; private set; }
@@ -240,5 +231,7 @@ namespace GameModel
 
             return Index == tile.Index;
         }
+
+        public override int GetHashCode() => Index;
     }
 }

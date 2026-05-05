@@ -366,15 +366,7 @@ namespace GameModel
         public Tile Location
         {
             get { return _location; }
-            set
-            {
-                if (_location != null)
-                    _location.Units.Remove(this);
-
-                _location = value;
-                if (_location != null)
-                    _location.Units.Add(this);
-            }
+            set { _location = value; }
         }
         Tile _location;
 

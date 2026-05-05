@@ -13,7 +13,7 @@ namespace GameModel
     public enum TerrainType
     {
         Grassland = 1 << 0,
-        Steppe = 1 << 1,
+        Desert = 1 << 1,
         Forest = 1 << 2,
         Hill = 1 << 3,
         Mountain = 1 << 4,
@@ -36,7 +36,7 @@ namespace GameModel
     {
         public const int Impassable = 100;
 
-        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Steppe | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
+        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Desert | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
         public static TerrainType All_Water = TerrainType.Water | TerrainType.Reef;
         public static TerrainType Non_Mountainous_Land = All_Land ^ TerrainType.Mountain;
         public static TerrainType Rough_Land = All_Land ^ TerrainType.Grassland;
@@ -44,28 +44,19 @@ namespace GameModel
 
         public static TerrainType ConvertCharToTerrainType(char character)
         {
-            switch (character)
+            return character switch
             {
-                case 'G':
-                    return TerrainType.Grassland;
-                case 'F':
-                    return TerrainType.Forest;
-                case 'D':
-                    return TerrainType.Steppe;
-                case 'M':
-                    return TerrainType.Mountain;
-                case 'H':
-                    return TerrainType.Hill;
-                case 'W':
-                    return TerrainType.Wetland;
-                case 'L':
-                    return TerrainType.Water;
-                case 'S':
-                    return TerrainType.Water;
-                case 'R':
-                    return TerrainType.Reef;
-            }
-            throw new Exception(string.Format("{0} is an unknown terrain type.", character));
+                'G' => TerrainType.Grassland,
+                'F' => TerrainType.Forest,
+                'D' => TerrainType.Desert,
+                'M' => TerrainType.Mountain,
+                'H' => TerrainType.Hill,
+                'W' => TerrainType.Wetland,
+                'L' => TerrainType.Water,
+                'S' => TerrainType.Water,
+                'R' => TerrainType.Reef,
+                _ => throw new Exception(string.Format("{0} is an unknown terrain type.", character)),
+            };
         }
 
         public static Dictionary<TerrainType, int> TerrainStackLimit
@@ -81,7 +72,7 @@ namespace GameModel
                     { TerrainType.Grassland, 4 },
                     { TerrainType.Hill, 3 },
                     { TerrainType.Mountain, 2 },
-                    { TerrainType.Steppe, 2 },
+                    { TerrainType.Desert, 2 },
                     { TerrainType.Wetland, 2 },
 
                     { TerrainType.Reef, 2 },

@@ -14,7 +14,7 @@ namespace Tests
         [TestMethod]
         public void TerrainTypeTests()
         {
-            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Steppe));
+            Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Desert));
             Assert.IsTrue(Terrain.All_Land.HasFlag(TerrainType.Hill));
 
             Assert.IsTrue(!Terrain.Non_Mountainous_Land.HasFlag(TerrainType.Mountain));

@@ -295,7 +295,7 @@ namespace GameModel
         void LandUnit()
         {
             TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Steppe] = 2;
+            TerrainMovementCosts[TerrainType.Desert] = 2;
             TerrainMovementCosts[TerrainType.Forest] = 2;
             TerrainMovementCosts[TerrainType.Hill] = 2;
             TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
@@ -320,7 +320,7 @@ namespace GameModel
         void AirborneUnit()
         {
             TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Steppe] = 1;
+            TerrainMovementCosts[TerrainType.Desert] = 1;
             TerrainMovementCosts[TerrainType.Forest] = 1;
             TerrainMovementCosts[TerrainType.Hill] = 1;
             TerrainMovementCosts[TerrainType.Mountain] = 1;
@@ -343,7 +343,7 @@ namespace GameModel
         void WaterUnit()
         {
             TerrainMovementCosts[TerrainType.Grassland] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Steppe] = Terrain.Impassable;
+            TerrainMovementCosts[TerrainType.Desert] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Forest] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Hill] = Terrain.Impassable;
             TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;

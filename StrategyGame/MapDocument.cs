@@ -151,7 +151,7 @@ namespace StrategyGame
             {
                 case TerrainType.Grassland:
                     return 'G';
-                case TerrainType.Steppe:
+                case TerrainType.Desert:
                     return 'D';
                 case TerrainType.Forest:
                     return 'F';

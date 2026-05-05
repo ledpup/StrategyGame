@@ -16,7 +16,7 @@ namespace StrategyGame
         static readonly TerrainType[] Terrains =
         {
             TerrainType.Grassland,
-            TerrainType.Steppe,
+            TerrainType.Desert,
             TerrainType.Forest,
             TerrainType.Hill,
             TerrainType.Mountain,
@@ -28,7 +28,7 @@ namespace StrategyGame
         static readonly Dictionary<TerrainType, Color> TerrainColours = new Dictionary<TerrainType, Color>
         {
             { TerrainType.Grassland, Color.FromArgb(173, 255, 47) },
-            { TerrainType.Steppe,    Color.FromArgb(255, 255, 0) },
+            { TerrainType.Desert,    Color.FromArgb(255, 255, 0) },
             { TerrainType.Forest,    Color.FromArgb(0,   100, 0) },
             { TerrainType.Hill,      Color.FromArgb(244, 164, 96) },
             { TerrainType.Mountain,  Color.FromArgb(165, 42,  42) },

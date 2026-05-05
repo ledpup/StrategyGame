@@ -99,18 +99,18 @@ namespace GameModel
         {
             get
             {
-                if (_isTileSearchedForSea)
-                    return _isSea;
+                if (isTileSearchedForSea)
+                    return isSea;
 
-                _isTileSearchedForSea = true;
+                isTileSearchedForSea = true;
 
-                _isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.Destination.IsSea) || IsEdgeOfMap);
+                isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.Destination.IsSea) || IsEdgeOfMap);
 
-                return _isSea;
+                return isSea;
             }
         }
-        bool _isSea;
-        bool _isTileSearchedForSea;
+        bool isSea;
+        bool isTileSearchedForSea;
 
         public bool IsLake
         {
@@ -146,7 +146,7 @@ namespace GameModel
                     }
                     if (temperature > 30)
                     {
-                        return TerrainType.Steppe;
+                        return TerrainType.Desert;
                     }
                     return TerrainType.Grassland;
 
@@ -158,10 +158,10 @@ namespace GameModel
                     }
                     return TerrainType.Water;
 
-                case TerrainType.Steppe:
+                case TerrainType.Desert:
                     if (temperature < 10)
                         return TerrainType.Grassland;
-                    return TerrainType.Steppe;
+                    return TerrainType.Desert;
 
                 case TerrainType.Wetland:
                     if (temperature < 10)

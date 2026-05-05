@@ -10,16 +10,23 @@ namespace StrategyGame
 {
     internal class MainForm : Form
     {
-        readonly PictureBox _canvas;
-        readonly ComboBox _toolComboBox;
-        readonly ComboBox _terrainComboBox;
-        readonly ComboBox _edgeComboBox;
-        readonly CheckBox _roadCheckBox;
-        readonly ComboBox _unitTypeComboBox;
-        readonly ComboBox _movementTypeComboBox;
-        readonly ComboBox _structureTypeComboBox;
-        readonly NumericUpDown _ownerNumeric;
-        readonly TextBox _statusTextBox;
+        readonly PictureBox canvas;
+        readonly ComboBox toolComboBox;
+        readonly TerrainPalette terrainPalette;
+        readonly ComboBox edgeComboBox;
+        readonly CheckBox roadCheckBox;
+        readonly ComboBox unitTypeComboBox;
+        readonly ComboBox movementTypeComboBox;
+        readonly ComboBox structureTypeComboBox;
+        readonly NumericUpDown ownerNumeric;
+        readonly TextBox statusTextBox;
+
+        // Per-tool panels – shown/hidden when the active tool changes
+        readonly Panel _terrainPanel;
+        readonly Panel _edgePanel;
+        readonly Panel _unitPanel;
+        readonly Panel _structurePanel;
+        readonly Panel _ownerPanel;
 
         Board _board;
         string _currentFilePath;
@@ -34,92 +41,143 @@ namespace StrategyGame
             Width = 1400;
             Height = 900;
 
+            // ── toolbar ──────────────────────────────────────────────────
             var toolPanel = new FlowLayoutPanel
             {
                 Dock = DockStyle.Top,
-                Height = 100,
+                Height = 70,
                 AutoSize = false,
-                WrapContents = true,
+                WrapContents = false,
+                Padding = new Padding(4, 4, 0, 0),
             };
 
-            var newButton = new Button { Text = "New", Width = 80 };
-            var openButton = new Button { Text = "Open", Width = 80 };
-            var saveButton = new Button { Text = "Save", Width = 80 };
-            var saveAsButton = new Button { Text = "Save As", Width = 80 };
-            var simulateButton = new Button { Text = "Simulate", Width = 100 };
+            var newButton      = new Button { Text = "New",      Width = 70, Height = 28 };
+            var openButton     = new Button { Text = "Open",     Width = 70, Height = 28 };
+            var saveButton     = new Button { Text = "Save",     Width = 70, Height = 28 };
+            var saveAsButton   = new Button { Text = "Save As",  Width = 70, Height = 28 };
+            var simulateButton = new Button { Text = "Simulate", Width = 80, Height = 28 };
 
-            _toolComboBox = CreateComboBox(typeof(EditorTool));
-            _terrainComboBox = CreateComboBox(typeof(TerrainType));
-            _edgeComboBox = CreateComboBox(typeof(EdgeType));
-            _unitTypeComboBox = CreateComboBox(typeof(UnitType));
-            _movementTypeComboBox = CreateComboBox(typeof(MovementType));
-            _structureTypeComboBox = CreateComboBox(typeof(StructureType));
-            _roadCheckBox = new CheckBox { Text = "Road", AutoSize = true };
-            _ownerNumeric = new NumericUpDown { Minimum = 0, Maximum = 7, Width = 60 };
-            _statusTextBox = new TextBox { Width = 500, ReadOnly = true };
+            toolComboBox = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 100,
+                Height = 28,
+                DataSource = Enum.GetValues(typeof(EditorTool)),
+            };
+
+            // ── terrain palette panel ────────────────────────────────────
+            terrainPalette = new TerrainPalette { Margin = new Padding(6, 4, 0, 0) };
+            _terrainPanel = new Panel { AutoSize = true, Margin = new Padding(0) };
+            _terrainPanel.Controls.Add(terrainPalette);
+
+            // ── edge panel ───────────────────────────────────────────────
+            edgeComboBox = CreateComboBox(typeof(EdgeType));
+            roadCheckBox = new CheckBox { Text = "Road", AutoSize = true, Margin = new Padding(4, 8, 0, 0) };
+            _edgePanel = MakePanel(
+                Label("Edge"),
+                edgeComboBox,
+                roadCheckBox);
+
+            // ── unit panel ───────────────────────────────────────────────
+            unitTypeComboBox     = CreateComboBox(typeof(UnitType));
+            movementTypeComboBox = CreateComboBox(typeof(MovementType));
+            _unitPanel = MakePanel(
+                Label("Unit"),
+                unitTypeComboBox,
+                Label("Move"),
+                movementTypeComboBox);
+
+            // ── structure panel ──────────────────────────────────────────
+            structureTypeComboBox = CreateComboBox(typeof(StructureType));
+            _structurePanel = MakePanel(
+                Label("Structure"),
+                structureTypeComboBox);
+
+            // ── owner panel (unit + structure) ───────────────────────────
+            ownerNumeric = new NumericUpDown { Minimum = 0, Maximum = 7, Width = 55 };
+            _ownerPanel = MakePanel(Label("Owner"), ownerNumeric);
+
+            // ── status ───────────────────────────────────────────────────
+            statusTextBox = new TextBox { Width = 380, ReadOnly = true, Margin = new Padding(8, 8, 0, 0) };
 
             toolPanel.Controls.Add(newButton);
             toolPanel.Controls.Add(openButton);
             toolPanel.Controls.Add(saveButton);
             toolPanel.Controls.Add(saveAsButton);
             toolPanel.Controls.Add(simulateButton);
-            toolPanel.Controls.Add(new Label { Text = "Tool", AutoSize = true, Padding = new Padding(10, 8, 0, 0) });
-            toolPanel.Controls.Add(_toolComboBox);
-            toolPanel.Controls.Add(new Label { Text = "Terrain", AutoSize = true, Padding = new Padding(10, 8, 0, 0) });
-            toolPanel.Controls.Add(_terrainComboBox);
-            toolPanel.Controls.Add(new Label { Text = "Edge", AutoSize = true, Padding = new Padding(10, 8, 0, 0) });
-            toolPanel.Controls.Add(_edgeComboBox);
-            toolPanel.Controls.Add(_roadCheckBox);
-            toolPanel.Controls.Add(new Label { Text = "Unit", AutoSize = true, Padding = new Padding(10, 8, 0, 0) });
-            toolPanel.Controls.Add(_unitTypeComboBox);
-            toolPanel.Controls.Add(new Label { Text = "Move", AutoSize = true, Padding = new Padding(10, 8, 0, 0) });
-            toolPanel.Controls.Add(_movementTypeComboBox);
-            toolPanel.Controls.Add(new Label { Text = "Structure", AutoSize = true, Padding = new Padding(10, 8, 0, 0) });
-            toolPanel.Controls.Add(_structureTypeComboBox);
-            toolPanel.Controls.Add(new Label { Text = "Owner", AutoSize = true, Padding = new Padding(10, 8, 0, 0) });
-            toolPanel.Controls.Add(_ownerNumeric);
-            toolPanel.Controls.Add(_statusTextBox);
+            toolPanel.Controls.Add(Label("Tool", leftPad: 10));
+            toolPanel.Controls.Add(toolComboBox);
+            toolPanel.Controls.Add(_terrainPanel);
+            toolPanel.Controls.Add(_edgePanel);
+            toolPanel.Controls.Add(_unitPanel);
+            toolPanel.Controls.Add(_structurePanel);
+            toolPanel.Controls.Add(_ownerPanel);
+            toolPanel.Controls.Add(statusTextBox);
 
-            _canvas = new PictureBox
+            // ── canvas ───────────────────────────────────────────────────
+            canvas = new PictureBox
             {
                 Dock = DockStyle.Fill,
                 SizeMode = PictureBoxSizeMode.AutoSize,
                 BackColor = Color.White,
             };
 
-            var scrollPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
-            };
-            scrollPanel.Controls.Add(_canvas);
+            var scrollPanel = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+            scrollPanel.Controls.Add(canvas);
 
             Controls.Add(scrollPanel);
             Controls.Add(toolPanel);
 
-            newButton.Click += (_, __) => CreateNewMap();
-            openButton.Click += (_, __) => OpenMap();
-            saveButton.Click += (_, __) => SaveMap(false);
-            saveAsButton.Click += (_, __) => SaveMap(true);
+            // ── events ───────────────────────────────────────────────────
+            newButton.Click      += (_, __) => CreateNewMap();
+            openButton.Click     += (_, __) => OpenMap();
+            saveButton.Click     += (_, __) => SaveMap(false);
+            saveAsButton.Click   += (_, __) => SaveMap(true);
             simulateButton.Click += (_, __) => SimulateGame();
-            _canvas.MouseClick += CanvasMouseClick;
-            _canvas.MouseDown += CanvasMouseDown;
-            _canvas.MouseMove += CanvasMouseMove;
-            _canvas.MouseUp += CanvasMouseUp;
+            canvas.MouseClick   += CanvasMouseClick;
+            canvas.MouseDown    += CanvasMouseDown;
+            canvas.MouseMove    += CanvasMouseMove;
+            canvas.MouseUp      += CanvasMouseUp;
+            toolComboBox.SelectedIndexChanged += (_, __) => UpdateToolPanels();
+            terrainPalette.SelectionChanged += (_, t) => _lastPaintedTerrainType = t;
 
+            UpdateToolPanels();
             LoadDefaultMap();
         }
 
-        static ComboBox CreateComboBox(Type enumType)
-        {
-            var comboBox = new ComboBox
+        // ── helpers ──────────────────────────────────────────────────────
+
+        static ComboBox CreateComboBox(Type enumType) =>
+            new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 110,
                 DataSource = Enum.GetValues(enumType),
             };
-            return comboBox;
+
+        static Label Label(string text, int leftPad = 4) =>
+            new Label { Text = text, AutoSize = true, Padding = new Padding(leftPad, 8, 0, 0) };
+
+        static Panel MakePanel(params Control[] controls)
+        {
+            var p = new FlowLayoutPanel { AutoSize = true, Margin = new Padding(0), WrapContents = false };
+            foreach (var c in controls)
+                p.Controls.Add(c);
+            return p;
         }
+
+        void UpdateToolPanels()
+        {
+            var tool = toolComboBox.SelectedItem is EditorTool t ? t : EditorTool.Terrain;
+
+            _terrainPanel.Visible   = tool == EditorTool.Terrain;
+            _edgePanel.Visible      = tool == EditorTool.Edge;
+            _unitPanel.Visible      = tool == EditorTool.Unit;
+            _structurePanel.Visible = tool == EditorTool.Structure;
+            _ownerPanel.Visible     = tool == EditorTool.Unit || tool == EditorTool.Structure;
+        }
+
+        // ── map operations ───────────────────────────────────────────────
 
         void LoadDefaultMap()
         {
@@ -128,7 +186,6 @@ namespace StrategyGame
                 File.ReadAllLines(Path.Combine(basePath, "BasicBoard.txt")),
                 File.ReadAllLines(Path.Combine(basePath, "BasicBoardEdges.txt")),
                 File.ReadAllLines(Path.Combine(basePath, "BasicBoardStructures.txt")));
-            _board.Units = new System.Collections.Generic.List<MilitaryUnit>();
             _currentFilePath = null;
             _selectedTile = null;
             RenderBoard();
@@ -193,18 +250,20 @@ namespace StrategyGame
             SetStatus($"Simulated {result.TurnsCompleted} turns. Units alive: {result.RemainingUnits}. Structures: {owners}");
         }
 
+        // ── mouse handling ───────────────────────────────────────────────
+
         void CanvasMouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
                 return;
 
-            var selectedTool = _toolComboBox.SelectedItem is EditorTool tool ? tool : EditorTool.Terrain;
+            var selectedTool = toolComboBox.SelectedItem is EditorTool tool ? tool : EditorTool.Terrain;
             if (selectedTool != EditorTool.Terrain)
                 return;
 
             _isPaintingTerrain = true;
             _lastPaintedTileIndex = null;
-            _lastPaintedTerrainType = (TerrainType)_terrainComboBox.SelectedItem;
+            _lastPaintedTerrainType = terrainPalette.SelectedTerrain;
             PaintTerrainAt(e.X, e.Y);
         }
 
@@ -222,10 +281,7 @@ namespace StrategyGame
                 return;
 
             if (_isPaintingTerrain && _lastPaintedTileIndex.HasValue)
-            {
-                // Full board rebuild happens once here, after the drag is finished.
                 _board = BoardEditorService.RebuildBoard(_board);
-            }
 
             _isPaintingTerrain = false;
             _lastPaintedTileIndex = null;
@@ -237,7 +293,6 @@ namespace StrategyGame
             if (tile == null || _lastPaintedTileIndex == tile.Index)
                 return;
 
-            // Mutate in-place during drag for performance; board is rebuilt once on mouse-up.
             BoardEditorService.SetTerrainDirect(tile, _lastPaintedTerrainType);
             _selectedTile = null;
             _lastPaintedTileIndex = tile.Index;
@@ -251,17 +306,17 @@ namespace StrategyGame
             if (tile == null)
                 return;
 
-            switch ((EditorTool)_toolComboBox.SelectedItem)
+            switch ((EditorTool)toolComboBox.SelectedItem)
             {
                 case EditorTool.Terrain:
                     return;
                 case EditorTool.Structure:
-                    _board = BoardEditorService.SetStructure(_board, tile, (StructureType)_structureTypeComboBox.SelectedItem, (int)_ownerNumeric.Value);
+                    _board = BoardEditorService.SetStructure(_board, tile, (StructureType)structureTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
                     _selectedTile = null;
                     SetStatus($"Structure updated at tile {tile.Index}");
                     break;
                 case EditorTool.Unit:
-                    _board = BoardEditorService.AddUnit(_board, tile, (UnitType)_unitTypeComboBox.SelectedItem, (MovementType)_movementTypeComboBox.SelectedItem, (int)_ownerNumeric.Value);
+                    _board = BoardEditorService.AddUnit(_board, tile, (UnitType)unitTypeComboBox.SelectedItem, (MovementType)movementTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
                     _selectedTile = null;
                     SetStatus($"Unit added at tile {tile.Index}");
                     break;
@@ -296,7 +351,7 @@ namespace StrategyGame
                         return;
                     }
 
-                    _board = BoardEditorService.SetEdge(_board, _board[_selectedTile.Index], _board[tile.Index], (EdgeType)_edgeComboBox.SelectedItem, _roadCheckBox.Checked);
+                    _board = BoardEditorService.SetEdge(_board, _board[_selectedTile.Index], _board[tile.Index], (EdgeType)edgeComboBox.SelectedItem, roadCheckBox.Checked);
                     SetStatus($"Edge updated between {_selectedTile.Index} and {tile.Index}");
                     _selectedTile = null;
                     break;
@@ -305,24 +360,21 @@ namespace StrategyGame
             RenderBoard();
         }
 
+        // ── rendering ────────────────────────────────────────────────────
+
         void RenderBoard()
         {
-            var selectedTool = _toolComboBox.SelectedItem is EditorTool tool ? tool : EditorTool.Terrain;
+            var selectedTool = toolComboBox.SelectedItem is EditorTool tool ? tool : EditorTool.Terrain;
             var showSelectedTile = selectedTool == EditorTool.Edge && _selectedTile != null;
             foreach (var tile in _board.Tiles)
-            {
                 tile.IsSelected = showSelectedTile && tile.Index == _selectedTile.Index;
-            }
 
             var drawing = GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, _board.Width, _board.Height, _board.Tiles, _board.Edges, _board.Structures, null, null, _board.Units);
-            var previous = _canvas.Image;
-            _canvas.Image = new Bitmap(drawing.ToBitmap());
+            var previous = canvas.Image;
+            canvas.Image = new Bitmap(drawing.ToBitmap());
             previous?.Dispose();
         }
 
-        void SetStatus(string message)
-        {
-            _statusTextBox.Text = message;
-        }
+        void SetStatus(string message) => statusTextBox.Text = message;
     }
 }

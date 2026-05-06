@@ -10,7 +10,5 @@
             Moves = moves;
             Unit = unit;
         }
-
-
     }
 }

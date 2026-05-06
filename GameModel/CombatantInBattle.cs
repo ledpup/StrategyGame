@@ -19,9 +19,9 @@ namespace GameModel
 
         public CombatantInBattle()
         {
-            UnitStrengthByType = new Dictionary<UnitType, double>();
-            OpponentUnitTypes = new Dictionary<UnitType, int>();
-            foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+            UnitStrengthByType = [];
+            OpponentUnitTypes = [];
+            foreach (UnitType unitType in Enum.GetValues<UnitType>())
             {
                 UnitStrengthByType.Add(unitType, 0);
                 OpponentUnitTypes.Add(unitType, 0);

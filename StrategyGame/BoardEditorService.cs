@@ -153,43 +153,129 @@ namespace StrategyGame
             return document.ToBoard();
         }
 
-        public static SimulationResult Simulate(Board board, int maxTurns = 20)
-        {
-            var simulation = MapDocument.FromBoard(board).ToBoard();
-            var ownerCount = simulation.Units.Select(x => x.OwnerIndex).DefaultIfEmpty(0).Distinct().Count();
-            var numberOfPlayers = Math.Max(2, ownerCount);
-            var computerPlayer = new ComputerPlayer(simulation.Units);
-
-            while (simulation.Turn < maxTurns
-                && simulation.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count() > 1
-                && simulation.Structures.Select(x => x.OwnerIndex).Distinct().Count() > 1)
-            {
-                computerPlayer.GenerateInfluenceMaps(simulation, numberOfPlayers);
-                computerPlayer.SetStrategicAction(simulation);
-                var orders = computerPlayer.CreateOrders(simulation, simulation.Units.Where(x => x.IsAlive).ToList());
-                simulation.ResolveOrders(orders);
-                for (var i = 0; i < numberOfPlayers; i++)
-                {
-                    simulation.ResolveStackLimits(i);
-                }
-                simulation.ConductBattles();
-                simulation.ChangeStructureOwners();
-                simulation.Turn++;
-            }
-
-            return new SimulationResult
-            {
-                Board = simulation,
-                TurnsCompleted = simulation.Turn,
-                RemainingUnits = simulation.Units.Count(x => x.IsAlive),
-                StructuresByOwner = simulation.Structures.GroupBy(x => x.OwnerIndex).ToDictionary(x => x.Key, x => x.Count()),
-            };
-        }
+        public static SimulationSession StartSimulation(Board board, int maxTurns = 50) =>
+            new SimulationSession(board, maxTurns);
     }
 
     internal static class EditorLayout
     {
         public static readonly Layout Layout = new Layout(Layout.flat, new PointD(25, 25), new PointD(25, 21.650635094610966));
+    }
+
+    /// <summary>
+    /// Holds a lazily-computed sequence of per-turn board states so the UI can
+    /// step forward and backward through a simulation without re-running turns.
+    /// </summary>
+    internal class SimulationSession
+    {
+        private readonly int _maxTurns;
+        private readonly int _numberOfPlayers;
+        private readonly ComputerPlayer _computerPlayer;
+
+        // Index 0 = initial board (turn 0, before any simulation).
+        // Each subsequent entry is the board after that turn resolved.
+        private readonly List<MapDocument> _snapshots = new();
+
+        private int _currentIndex = 0;
+
+        public int CurrentTurn => _currentIndex;
+        public bool IsFinished { get; private set; }
+
+        public bool CanStepForward =>
+            !IsFinished || _currentIndex < _snapshots.Count - 1;
+
+        public bool CanStepBack => _currentIndex > 0;
+
+        public Board CurrentBoard { get; private set; }
+
+        private readonly int _initialUnitOwners;
+        private readonly int _initialStructureOwners;
+
+        internal SimulationSession(Board board, int maxTurns)
+        {
+            _maxTurns = maxTurns;
+
+            // Take a clean copy as turn-0 snapshot
+            CurrentBoard = MapDocument.FromBoard(board).ToBoard();
+            _snapshots.Add(MapDocument.FromBoard(CurrentBoard));
+
+            var ownerCount = CurrentBoard.Units.Select(x => x.OwnerIndex).DefaultIfEmpty(0).Distinct().Count();
+            _numberOfPlayers = Math.Max(2, ownerCount);
+            _computerPlayer = new ComputerPlayer(CurrentBoard.Units);
+
+            _initialUnitOwners      = CurrentBoard.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
+            _initialStructureOwners = CurrentBoard.Structures.Select(x => x.OwnerIndex).Distinct().Count();
+        }
+
+        public string StatusLine()
+        {
+            var alive  = CurrentBoard.Units.Count(u => u.IsAlive);
+            var owners = string.Join(", ",
+                CurrentBoard.Structures
+                    .GroupBy(s => s.OwnerIndex)
+                    .OrderBy(g => g.Key)
+                    .Select(g => $"P{g.Key}:{g.Count()}"));
+            return $"Turn {CurrentTurn}  |  Units alive: {alive}  |  Structures: {owners}";
+        }
+
+        /// <summary>Advances one turn. Returns false if already at the end.</summary>
+        public bool StepForward()
+        {
+            // If we already have the next snapshot cached, just move the pointer.
+            if (_currentIndex < _snapshots.Count - 1)
+            {
+                _currentIndex++;
+                CurrentBoard = _snapshots[_currentIndex].ToBoard();
+                return true;
+            }
+
+            if (IsFinished) return false;
+
+            // Compute and cache the next turn.
+            var sim = _snapshots[_currentIndex].ToBoard();
+            _computerPlayer.GenerateInfluenceMaps(sim, _numberOfPlayers);
+            _computerPlayer.SetStrategicAction(sim);
+            var orders = _computerPlayer.CreateOrders(sim, sim.Units.Where(x => x.IsAlive).ToList());
+            sim.ResolveOrders(orders);
+            for (var i = 0; i < _numberOfPlayers; i++)
+                sim.ResolveStackLimits(i);
+            sim.ConductBattles();
+            sim.ChangeStructureOwners();
+            sim.Turn++;
+
+            _snapshots.Add(MapDocument.FromBoard(sim));
+            _currentIndex++;
+            CurrentBoard = sim;
+
+            // Check end conditions — only stop early if sides have actually been eliminated
+            var aliveOwners     = sim.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
+            var structureOwners = sim.Structures.Select(x => x.OwnerIndex).Distinct().Count();
+            if (sim.Turn >= _maxTurns
+                || (_initialUnitOwners      > 1 && aliveOwners     <= 1)
+                || (_initialStructureOwners > 1 && structureOwners <= 1))
+            {
+                IsFinished = true;
+            }
+
+            return true;
+        }
+
+        /// <summary>Steps back to the previous turn. Returns false if already at turn 0.</summary>
+        public bool StepBack()
+        {
+            if (!CanStepBack) return false;
+            _currentIndex--;
+            CurrentBoard = _snapshots[_currentIndex].ToBoard();
+            return true;
+        }
+
+        /// <summary>Jumps back to turn 0.</summary>
+        public void Restart()
+        {
+            _currentIndex = 0;
+            IsFinished = false;
+            CurrentBoard = _snapshots[0].ToBoard();
+        }
     }
 
     internal class SimulationResult

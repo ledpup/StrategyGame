@@ -38,6 +38,14 @@ namespace StrategyGame
         Button _undoButton;
         Button _redoButton;
 
+        // Simulation mode
+        SimulationSession _session;
+        readonly Panel _simPanel;
+        readonly Button _simPrevButton;
+        readonly Button _simNextButton;
+        readonly Button _simRestartButton;
+        readonly Button _simExitButton;
+
         public MainForm()
         {
             Text = "StrategyGame Map Editor";
@@ -61,6 +69,19 @@ namespace StrategyGame
             var simulateButton = new Button { Text = "Simulate", Width = 80, Height = 28 };
             _undoButton        = new Button { Text = "Undo",     Width = 70, Height = 28, Enabled = false };
             _redoButton        = new Button { Text = "Redo",     Width = 70, Height = 28, Enabled = false };
+
+            // ── simulation controls (hidden until simulation mode) ────────
+            _simPrevButton     = new Button { Text = "◀ Prev",    Width = 80, Height = 28 };
+            _simNextButton     = new Button { Text = "Next ▶",    Width = 80, Height = 28 };
+            _simRestartButton  = new Button { Text = "↺ Restart", Width = 85, Height = 28 };
+            _simExitButton     = new Button { Text = "✕ Exit",    Width = 80, Height = 28 };
+            _simPanel = MakePanel(
+                Label("Simulation:", leftPad: 6),
+                _simPrevButton,
+                _simNextButton,
+                _simRestartButton,
+                _simExitButton);
+            _simPanel.Visible = false;
 
             toolComboBox = new ComboBox
             {
@@ -112,6 +133,7 @@ namespace StrategyGame
             toolPanel.Controls.Add(simulateButton);
             toolPanel.Controls.Add(_undoButton);
             toolPanel.Controls.Add(_redoButton);
+            toolPanel.Controls.Add(_simPanel);
             toolPanel.Controls.Add(Label("Tool", leftPad: 10));
             toolPanel.Controls.Add(toolComboBox);
             toolPanel.Controls.Add(_terrainPanel);
@@ -140,9 +162,13 @@ namespace StrategyGame
             openButton.Click     += (_, __) => OpenMap();
             saveButton.Click     += (_, __) => SaveMap(false);
             saveAsButton.Click   += (_, __) => SaveMap(true);
-            simulateButton.Click += (_, __) => SimulateGame();
+            simulateButton.Click += (_, __) => EnterSimulation();
             _undoButton.Click    += (_, __) => PerformUndo();
             _redoButton.Click    += (_, __) => PerformRedo();
+            _simPrevButton.Click    += (_, __) => SimStepBack();
+            _simNextButton.Click    += (_, __) => SimStepForward();
+            _simRestartButton.Click += (_, __) => SimRestart();
+            _simExitButton.Click    += (_, __) => ExitSimulation();
             KeyPreview = true;
             KeyDown += MainForm_KeyDown;
             canvas.MouseClick   += CanvasMouseClick;
@@ -190,6 +216,14 @@ namespace StrategyGame
 
         void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            if (_session != null)
+            {
+                if (e.KeyCode == Keys.Right)       { SimStepForward(); e.Handled = true; }
+                else if (e.KeyCode == Keys.Left)   { SimStepBack();    e.Handled = true; }
+                else if (e.KeyCode == Keys.Home)   { SimRestart();     e.Handled = true; }
+                else if (e.KeyCode == Keys.Escape) { ExitSimulation(); e.Handled = true; }
+                return;
+            }
             if (e.Control && e.KeyCode == Keys.Z) { PerformUndo(); e.Handled = true; }
             else if (e.Control && e.KeyCode == Keys.Y) { PerformRedo(); e.Handled = true; }
         }
@@ -306,17 +340,71 @@ namespace StrategyGame
             SetStatus($"Saved {Path.GetFileName(path)}");
         }
 
-        void SimulateGame()
+        void EnterSimulation()
         {
-            BeginEdit();
-            var result = BoardEditorService.Simulate(_board);
-            _board = result.Board;
-            _selectedTile = null;
-            var owners = string.Join(", ", result.StructuresByOwner.OrderBy(x => x.Key).Select(x => $"P{x.Key}:{x.Value}"));
-            var statusMsg = $"Simulated {result.TurnsCompleted} turns. Units alive: {result.RemainingUnits}. Structures: {owners}";
-            CommitEdit("Simulate");
+            _session = BoardEditorService.StartSimulation(_board);
+            _simPanel.Visible = true;
+            _undoButton.Visible = false;
+            _redoButton.Visible = false;
+            canvas.MouseClick -= CanvasMouseClick;
+            canvas.MouseDown  -= CanvasMouseDown;
+            canvas.MouseMove  -= CanvasMouseMove;
+            canvas.MouseUp    -= CanvasMouseUp;
+            UpdateSimButtons();
+            _board = _session.CurrentBoard;
             RenderBoard();
-            SetStatus(statusMsg);
+            SetStatus(_session.StatusLine());
+        }
+
+        void ExitSimulation()
+        {
+            _session = null;
+            _simPanel.Visible = false;
+            _undoButton.Visible = true;
+            _redoButton.Visible = true;
+            canvas.MouseClick += CanvasMouseClick;
+            canvas.MouseDown  += CanvasMouseDown;
+            canvas.MouseMove  += CanvasMouseMove;
+            canvas.MouseUp    += CanvasMouseUp;
+            RenderBoard();
+            SetStatus("Simulation exited.");
+        }
+
+        void SimStepForward()
+        {
+            if (_session == null) return;
+            _session.StepForward();
+            _board = _session.CurrentBoard;
+            UpdateSimButtons();
+            RenderBoard();
+            SetStatus(_session.StatusLine() + (_session.IsFinished && !_session.CanStepForward ? "  [Simulation ended]" : ""));
+        }
+
+        void SimStepBack()
+        {
+            if (_session == null) return;
+            _session.StepBack();
+            _board = _session.CurrentBoard;
+            UpdateSimButtons();
+            RenderBoard();
+            SetStatus(_session.StatusLine());
+        }
+
+        void SimRestart()
+        {
+            if (_session == null) return;
+            _session.Restart();
+            _board = _session.CurrentBoard;
+            UpdateSimButtons();
+            RenderBoard();
+            SetStatus(_session.StatusLine());
+        }
+
+        void UpdateSimButtons()
+        {
+            _simPrevButton.Enabled    = _session?.CanStepBack ?? false;
+            _simNextButton.Enabled    = _session?.CanStepForward ?? false;
+            _simRestartButton.Enabled = _session?.CanStepBack ?? false;
         }
 
         // ── mouse handling ───────────────────────────────────────────────

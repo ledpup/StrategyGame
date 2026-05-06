@@ -20,7 +20,7 @@ namespace ComputerOpponent
     {
         public ComputerPlayer()
         {
-            UnitStates = new Dictionary<int, UnitAiState>();
+            UnitStates = [];
         }
 
         public ComputerPlayer(List<MilitaryUnit> units)
@@ -43,10 +43,10 @@ namespace ComputerOpponent
             {
                 if (_friendlyUnitInfluenceModifier == null)
                 {
-                    _friendlyUnitInfluenceModifier = new Dictionary<Role, double>();
-                    foreach (var role in Enum.GetValues(typeof(Role)))
+                    _friendlyUnitInfluenceModifier = [];
+                    foreach (var role in Enum.GetValues<Role>())
                     {
-                        _friendlyUnitInfluenceModifier.Add((Role)role, 0.5);
+                        _friendlyUnitInfluenceModifier.Add(role, 0.5);
                     }
                     _friendlyUnitInfluenceModifier[Role.Defensive] = 1;
                     _friendlyUnitInfluenceModifier[Role.Scout] = -0.5;
@@ -62,10 +62,10 @@ namespace ComputerOpponent
             {
                 if (_enemyUnitInfluenceModifier == null)
                 {
-                    _enemyUnitInfluenceModifier = new Dictionary<Role, double>();
-                    foreach (var role in Enum.GetValues(typeof(Role)))
+                    _enemyUnitInfluenceModifier = [];
+                    foreach (var role in Enum.GetValues<Role>())
                     {
-                        _enemyUnitInfluenceModifier.Add((Role)role, 1);
+                        _enemyUnitInfluenceModifier.Add(role, 1);
                     }
                     _enemyUnitInfluenceModifier[Role.Defensive] = -0.5;
                     _enemyUnitInfluenceModifier[Role.Offensive] = 1.5;
@@ -81,10 +81,10 @@ namespace ComputerOpponent
             {
                 if (_friendlyStructureInfluence == null)
                 {
-                    _friendlyStructureInfluence = new Dictionary<Role, double>();
-                    foreach (var role in Enum.GetValues(typeof(Role)))
+                    _friendlyStructureInfluence = [];
+                    foreach (var role in Enum.GetValues<Role>())
                     {
-                        _friendlyStructureInfluence.Add((Role)role, -1);
+                        _friendlyStructureInfluence.Add(role, -1);
                     }
                     _friendlyStructureInfluence[Role.Defensive] = 2;
                     _friendlyStructureInfluence[Role.Scout] = -2;
@@ -95,16 +95,16 @@ namespace ComputerOpponent
         }
         Dictionary<Role, double> _friendlyStructureInfluence;
 
-        Dictionary<Role, double> EnemyStructureInfluence
+        static Dictionary<Role, double> EnemyStructureInfluence
         {
             get
             {
                 if (_enemyStructureInfluence == null)
                 {
-                    _enemyStructureInfluence = new Dictionary<Role, double>();
-                    foreach (var role in Enum.GetValues(typeof(Role)))
+                    _enemyStructureInfluence = [];
+                    foreach (var role in Enum.GetValues<Role>())
                     {
-                        _enemyStructureInfluence.Add((Role)role, 1);
+                        _enemyStructureInfluence.Add(role, 1);
                     }
                     _enemyStructureInfluence[Role.Besieger] = 2;
                     _enemyStructureInfluence[Role.Defensive] = -2;
@@ -115,6 +115,25 @@ namespace ComputerOpponent
         }
 
         public Dictionary<int, UnitAiState> UnitStates { get; set; }
+
+        public Dictionary<int, Dictionary<RoleMovementType, double[]>> AggregateInfluence { get; private set; }
+        public Dictionary<int, double[]> FriendlyUnitInfluence { get; private set; }
+        public Dictionary<int, double[]> EnemyUnitInfluence { get; private set; }
+        public Dictionary<int, Dictionary<MovementType, double[]>> FriendlyStructureInfluenceMap { get; private set; }
+        public Dictionary<int, Dictionary<MovementType, double[]>> EnemyStructureInfluenceMap { get; private set; }
+
+        public static List<Role> Roles
+        {
+            get
+            {
+                if (_roles == null)
+                {
+                    _roles = [.. Enum.GetValues<Role>()];
+                }
+                return _roles;
+            }
+        }
+        static List<Role> _roles;
 
         public UnitAiState TrackUnit(MilitaryUnit unit, Role role = Role.Balanced)
         {
@@ -518,26 +537,27 @@ namespace ComputerOpponent
         {
             var aliveUnits = board.Units.Where(x => x.IsAlive).ToList();
 
+            AggregateInfluence = [];
+            FriendlyUnitInfluence = [];
+            EnemyUnitInfluence = [];
+            FriendlyStructureInfluenceMap = [];
+            EnemyStructureInfluenceMap = [];
+
             board.Tiles.ToList().ForEach(x =>
             {
-                x.FriendlyUnitInfluence = new double[numberOfPlayers];
-                x.EnemyUnitInfluence = new double[numberOfPlayers];
-                x.FriendlyStructureInfluence = new Dictionary<MovementType, double[]>();
-                x.EnemyStructureInfluence = new Dictionary<MovementType, double[]>();
+                FriendlyUnitInfluence[x.Index] = new double[numberOfPlayers];
+                EnemyUnitInfluence[x.Index] = new double[numberOfPlayers];
+                FriendlyStructureInfluenceMap[x.Index] = [];
+                EnemyStructureInfluenceMap[x.Index] = [];
 
                 MilitaryUnit.MovementTypes.ForEach(y => {
-                    x.FriendlyStructureInfluence.Add(y, new double[numberOfPlayers]);
-                    x.EnemyStructureInfluence.Add(y, new double[numberOfPlayers]);
+                    FriendlyStructureInfluenceMap[x.Index].Add(y, new double[numberOfPlayers]);
+                    EnemyStructureInfluenceMap[x.Index].Add(y, new double[numberOfPlayers]);
                 });
 
-                x.AggregateInfluence = new Dictionary<RoleMovementType, double[]>();
-                MilitaryUnit.Roles.ForEach(y => MilitaryUnit.MovementTypes.ForEach(z => x.AggregateInfluence.Add(new RoleMovementType(z, y), new double[numberOfPlayers])));
-
-                aliveUnits.ForEach(y =>
-                {
-                    if (!x.TerrainAndWeatherInfluenceByUnit.ContainsKey(y.Index))
-                        x.TerrainAndWeatherInfluenceByUnit.Add(y.Index, y.TerrainTypeBattleModifier[x.TerrainType] + y.WeatherBattleModifier[x.Weather]);
-                });
+                var tileInfluence = new Dictionary<RoleMovementType, double[]>();
+                Roles.ForEach(y => MilitaryUnit.MovementTypes.ForEach(z => tileInfluence.Add(new RoleMovementType(z, y), new double[numberOfPlayers])));
+                AggregateInfluence[x.Index] = tileInfluence;
 
             });
 
@@ -562,22 +582,22 @@ namespace ComputerOpponent
                             {
                                 if (structure.OwnerIndex == i)
                                 {
-                                    board[index].FriendlyStructureInfluence[MovementType.Airborne][i] += 1D / (distance + 1);
+                                    FriendlyStructureInfluenceMap[index][MovementType.Airborne][i] += 1D / (distance + 1);
                                     if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
                                     {
-                                        board[index].FriendlyStructureInfluence[MovementType.Land][i] += 1D / (distance + 1);
-                                        board[index].FriendlyStructureInfluence[MovementType.Water][i] += 1D / (distance + 1);
+                                        FriendlyStructureInfluenceMap[index][MovementType.Land][i] += 1D / (distance + 1);
+                                        FriendlyStructureInfluenceMap[index][MovementType.Water][i] += 1D / (distance + 1);
                                     }
                                 }
                                 else
                                 {
-                                    board[index].EnemyStructureInfluence[MovementType.Airborne][i] += 1D / (distance + 1);
+                                    EnemyStructureInfluenceMap[index][MovementType.Airborne][i] += 1D / (distance + 1);
                                     if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
                                     {
-                                        board[index].EnemyStructureInfluence[MovementType.Land][i] += 1D / (distance + 1);
-                                        board[index].EnemyStructureInfluence[MovementType.Water][i] += 1D / (distance + 1);
+                                        EnemyStructureInfluenceMap[index][MovementType.Land][i] += 1D / (distance + 1);
+                                        EnemyStructureInfluenceMap[index][MovementType.Water][i] += 1D / (distance + 1);
                                     }
-                                }  
+                                }
                             }
                         });
                     }  
@@ -586,7 +606,7 @@ namespace ComputerOpponent
 
                 board.Tiles.ToList().ForEach(x =>
                 {
-                    MilitaryUnit.Roles
+                    Roles
                         .ForEach(y => 
                         {
                             MilitaryUnit.MovementTypes.ForEach(z => CalculateAggregateInfluence(x, i, y, z));
@@ -595,7 +615,7 @@ namespace ComputerOpponent
             }
         }
 
-        private static void CalculateUnitInfluence(Board board, int numberOfPlayers, MilitaryUnit unit, int playerIndex)
+        private void CalculateUnitInfluence(Board board, int numberOfPlayers, MilitaryUnit unit, int playerIndex)
         {
             for (var i = 0; i < 4; i++)
             {
@@ -608,13 +628,13 @@ namespace ComputerOpponent
                     {
                         if (unit.CanStopOn.HasFlag(board[index].TerrainType))
                         {
-                            board[index].FriendlyUnitInfluence[playerIndex] += 1D / (i + 1);
+                            FriendlyUnitInfluence[index][playerIndex] += 1D / (i + 1);
                             for (var j = 0; j < numberOfPlayers; j++)
                             {
                                 if (playerIndex == j)
                                     continue;
 
-                                board[index].EnemyUnitInfluence[j] += 1D / (i + 1);
+                                EnemyUnitInfluence[index][j] += 1D / (i + 1);
                             }
                         }
                     }
@@ -626,11 +646,11 @@ namespace ComputerOpponent
         {
             var rmt = new RoleMovementType(movementType, role);
 
-            tile.AggregateInfluence[rmt][playerIndex] = 
-                  (tile.FriendlyUnitInfluence[playerIndex] * FriendlyUnitInfluenceModifier[role])
-                + (tile.EnemyUnitInfluence[playerIndex] * EnemyUnitInfluenceModifier[role])
-                + (tile.FriendlyStructureInfluence[movementType][playerIndex] * FriendlyStructureInfluence[role]) 
-                + (tile.EnemyStructureInfluence[movementType][playerIndex] * EnemyStructureInfluence[role]);
+            AggregateInfluence[tile.Index][rmt][playerIndex] = 
+                  (FriendlyUnitInfluence[tile.Index][playerIndex] * FriendlyUnitInfluenceModifier[role])
+                + (EnemyUnitInfluence[tile.Index][playerIndex] * EnemyUnitInfluenceModifier[role])
+                + (FriendlyStructureInfluenceMap[tile.Index][movementType][playerIndex] * FriendlyStructureInfluence[role])
+                + (EnemyStructureInfluenceMap[tile.Index][movementType][playerIndex] * EnemyStructureInfluence[role]);
         }
 
         public MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit, Board board)
@@ -649,7 +669,7 @@ namespace ComputerOpponent
             var roleMovementType = unitState.GetRoleMovementType(unit);
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => x.AggregateInfluence[roleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unitState.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
+                .OrderByDescending(x => AggregateInfluence[x.Index][roleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unitState.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
                 .ToList();
 
             IEnumerable<PathFindTile> bestPossibleDestination = null;

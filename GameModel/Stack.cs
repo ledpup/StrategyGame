@@ -4,7 +4,7 @@ namespace GameModel
 {
     public class Stack
     {
-        List<MilitaryUnit> Units;
+        readonly List<MilitaryUnit> Units;
 
         public Stack(List<MilitaryUnit> units)
         {

@@ -96,7 +96,7 @@ namespace Tests
             var roleMovementType = computerPlayer.GetUnitState(board.Units[1]).GetRoleMovementType(board.Units[1]);
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => x.AggregateInfluence[roleMovementType][board.Units[1].OwnerIndex])
+                .OrderByDescending(x => computerPlayer.AggregateInfluence[x.Index][roleMovementType][board.Units[1].OwnerIndex])
                 .ToList();
 
             IEnumerable<PathFindTile> bestPossibleDestination = null;

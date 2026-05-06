@@ -53,17 +53,5 @@ namespace GameModel
             return new MoveOrder(moveList.ToArray(), unit);
         }
 
-        public double TerrainAndWeatherModifers(int unitIndex)
-        {
-            var mod = 0D;
-            var currentMove = this;
-            while (currentMove != null)
-            {
-                mod += currentMove.Edge.Destination.TerrainAndWeatherInfluenceByUnit[unitIndex];
-                currentMove = currentMove.PreviousMove;
             }
-
-            return mod;
         }
-    }
-}

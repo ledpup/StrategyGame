@@ -14,13 +14,6 @@ namespace GameModel
         public TerrainType TerrainType;
         public Weather Weather;
 
-        public Dictionary<MovementType, double[]> FriendlyStructureInfluence;
-        public Dictionary<MovementType, double[]> EnemyStructureInfluence;
-        public double[] FriendlyUnitInfluence;
-        public double[] EnemyUnitInfluence;
-        public Dictionary<RoleMovementType, double[]> AggregateInfluence;
-        public Dictionary<int, double> TerrainAndWeatherInfluenceByUnit;
-
         public int ContiguousRegionId { get; set; }
 
         public int X, Y;
@@ -39,10 +32,7 @@ namespace GameModel
             TerrainType = terrainType;
             IsEdgeOfMap = isEdgeOfMap;
 
-            AggregateInfluence = new Dictionary<RoleMovementType, double[]>();
-
-            TerrainAndWeatherInfluenceByUnit = new Dictionary<int, double>();
-        }
+            }
 
         public string ToOffsetCoordsString()
         {
@@ -82,27 +72,27 @@ namespace GameModel
         {
             get
             {
-                if (_isTileSearchedForCoast)
-                    return _isCoast;
+                if (searchedForCoast)
+                    return isCoast;
 
-                _isTileSearchedForCoast = true;
+                searchedForCoast = true;
 
-                _isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.Destination.TerrainType));
+                isCoast = Terrain.All_Water.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.All_Land.HasFlag(x.Destination.TerrainType));
 
-                return _isCoast;
+                return isCoast;
             }
         }
-        bool _isCoast;
-        bool _isTileSearchedForCoast;
+        bool isCoast;
+        bool searchedForCoast;
 
         public bool IsSea
         {
             get
             {
-                if (isTileSearchedForSea)
+                if (searchedForSea)
                     return isSea;
 
-                isTileSearchedForSea = true;
+                searchedForSea = true;
 
                 isSea = Terrain.All_Water.HasFlag(TerrainType) && (Neighbours.Any(x => x.Destination.IsSea) || IsEdgeOfMap);
 
@@ -110,24 +100,24 @@ namespace GameModel
             }
         }
         bool isSea;
-        bool isTileSearchedForSea;
+        bool searchedForSea;
 
         public bool IsLake
         {
             get
             {
-                if (_isTileSearchedForLake)
-                    return _isLake;
+                if (searchedForLake)
+                    return isLake;
 
-                _isTileSearchedForLake = true;
+                searchedForLake = true;
 
-                _isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Destination.IsSea);
+                isLake = Terrain.All_Water.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Destination.IsSea);
 
-                return _isLake;
+                return isLake;
             }
         }
-        bool _isLake;
-        bool _isTileSearchedForLake;
+        bool isLake;
+        bool searchedForLake;
 
         public TerrainType GetTerrainTypeByTemperature(double temperature)
         {
@@ -177,18 +167,18 @@ namespace GameModel
         {
             get
             {
-                if (_stackLimit == 0)
+                if (stackLimit == 0)
                 {
-                    _stackLimit = Terrain.TerrainStackLimit[TerrainType];
+                    stackLimit = Terrain.TerrainStackLimit[TerrainType];
                     if (Structure != null)
                     {
-                        _stackLimit++;
+                        stackLimit++;
                     }
                 }
-                return _stackLimit;
+                return stackLimit;
             }
         }
-        int _stackLimit = 0;
+        int stackLimit = 0;
         
 
         public bool OverStackLimit(IEnumerable<MilitaryUnit> tileUnits, int playerIndex)
@@ -224,7 +214,7 @@ namespace GameModel
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Tile))
+            if (obj is not Tile)
                 return false;
 
             var tile = (Tile)obj;

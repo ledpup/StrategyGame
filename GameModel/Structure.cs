@@ -13,12 +13,12 @@ namespace GameModel
     
     public class Structure
     {
-        public static Dictionary<StructureType, double> StructureDefenceModifiers = new Dictionary<StructureType, double>
-            {
-                { StructureType.City, .4 },
-                { StructureType.Fortress, .6 },
-                { StructureType.Outpost, .8 },
-            };
+        public static Dictionary<StructureType, double> StructureDefenceModifiers = new()
+        {
+            { StructureType.City, .4 },
+            { StructureType.Fortress, .6 },
+            { StructureType.Outpost, .8 },
+        };
 
         public int Index;
         public Tile Location;
@@ -33,10 +33,7 @@ namespace GameModel
             OwnerIndex = ownerIndex;
             Supply = supply;
 
-            if (Location != null)
-            {
-                Location.Structure = this;
-            }            
+            Location?.Structure = this;            
         }
 
         public StructureType StructureType { get; set;}

@@ -11,7 +11,6 @@ namespace GameModel
         Ranged,
         Cavalry,
         Siege,
-        Aquatic,
     }
 
     public enum MovementType
@@ -29,26 +28,6 @@ namespace GameModel
         Structure,
     }
 
-    public enum Role
-    {
-        Balanced,
-        Besieger,
-        Offensive,
-        Defensive,
-        Scout,
-    }
-
-    public struct RoleMovementType
-    {
-        public MovementType MovementType;
-        public Role Role;
-
-        public RoleMovementType(MovementType movementType, Role role)
-        {
-            MovementType = movementType;
-            Role = role;
-        }
-    }
     public class MilitaryUnit
     {
 
@@ -56,35 +35,18 @@ namespace GameModel
         {
             get
             {
-                if (_movementTypes == null)
+                if (movementTypes == null)
                 {
-                    _movementTypes = new List<MovementType>();
-                    foreach (var role in Enum.GetValues(typeof(MovementType)))
+                    movementTypes = [];
+                    foreach (var role in Enum.GetValues<MovementType>())
                     {
-                        _movementTypes.Add((MovementType)role);
+                        movementTypes.Add(role);
                     }
                 }
-                return _movementTypes;
+                return movementTypes;
             }
         }
-        static List<MovementType> _movementTypes;
-
-        public static List<Role> Roles
-        {
-            get
-            {
-                if (_roles == null)
-                {
-                    _roles = new List<Role>();
-                    foreach (var role in Enum.GetValues(typeof(Role)))
-                    {
-                        _roles.Add((Role)role);
-                    }
-                }
-                return _roles;
-            }
-        }
-        static List<Role> _roles;
+        static List<MovementType> movementTypes;
 
         public int Index;
         public string Name { get; set; }

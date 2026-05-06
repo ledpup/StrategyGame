@@ -65,44 +65,45 @@ namespace StrategyGame
 
         public void Save(string filePath)
         {
-            var lines = new List<string>
-            {
-                "[Tiles]"
-            };
-            lines.AddRange(Tiles);
-            lines.Add("[Edges]");
-            lines.AddRange(Edges);
-            lines.Add("[Structures]");
-            lines.AddRange(Structures);
-            lines.Add("[Units]");
-            lines.AddRange(Units.Select(x => x.ToLine()));
-            File.WriteAllLines(filePath, lines);
+            using var writer = new StreamWriter(filePath);
+            WriteTo(writer);
         }
 
-        public static MapDocument Load(string filePath)
+        public void WriteTo(TextWriter writer)
+        {
+            writer.WriteLine("[Tiles]");
+            foreach (var t in Tiles) writer.WriteLine(t);
+            writer.WriteLine("[Edges]");
+            foreach (var e in Edges) writer.WriteLine(e);
+            writer.WriteLine("[Structures]");
+            foreach (var s in Structures) writer.WriteLine(s);
+            writer.WriteLine("[Units]");
+            foreach (var u in Units) writer.WriteLine(u.ToLine());
+        }
+
+        public static MapDocument Load(string filePath) =>
+            ParseFromLines(File.ReadAllLines(filePath));
+
+        public static MapDocument ParseFromLines(IEnumerable<string> rawLines)
         {
             var sections = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             string currentSection = null;
-            foreach (var rawLine in File.ReadAllLines(filePath))
+            foreach (var rawLine in rawLines)
             {
                 var line = rawLine.Trim();
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                if (line.StartsWith("[") && line.EndsWith("]"))
+                if (line.StartsWith("[") && line.EndsWith("]") && line != "[Snapshot]")
                 {
                     currentSection = line;
                     if (!sections.ContainsKey(currentSection))
-                    {
                         sections[currentSection] = new List<string>();
-                    }
                     continue;
                 }
 
-                if (currentSection == null)
-                    throw new InvalidDataException("Map file is missing a section header.");
-
-                sections[currentSection].Add(line);
+                if (currentSection != null)
+                    sections[currentSection].Add(line);
             }
 
             return new MapDocument
@@ -116,12 +117,8 @@ namespace StrategyGame
 
         private static List<string> GetSection(Dictionary<string, List<string>> sections, string name)
         {
-            if (!sections.TryGetValue(name, out var lines))
-            {
-                return new List<string>();
-            }
-
-            return lines;
+            sections.TryGetValue(name, out var lines);
+            return lines ?? new List<string>();
         }
 
         private static Func<UnitDocument, MilitaryUnit> ToMilitaryUnit(Board board)

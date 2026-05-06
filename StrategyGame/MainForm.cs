@@ -34,6 +34,9 @@ namespace StrategyGame
         bool _isPaintingTerrain;
         int? _lastPaintedTileIndex;
         TerrainType _lastPaintedTerrainType;
+        readonly MapHistory _history = new();
+        Button _undoButton;
+        Button _redoButton;
 
         public MainForm()
         {
@@ -56,6 +59,8 @@ namespace StrategyGame
             var saveButton     = new Button { Text = "Save",     Width = 70, Height = 28 };
             var saveAsButton   = new Button { Text = "Save As",  Width = 70, Height = 28 };
             var simulateButton = new Button { Text = "Simulate", Width = 80, Height = 28 };
+            _undoButton        = new Button { Text = "Undo",     Width = 70, Height = 28, Enabled = false };
+            _redoButton        = new Button { Text = "Redo",     Width = 70, Height = 28, Enabled = false };
 
             toolComboBox = new ComboBox
             {
@@ -105,6 +110,8 @@ namespace StrategyGame
             toolPanel.Controls.Add(saveButton);
             toolPanel.Controls.Add(saveAsButton);
             toolPanel.Controls.Add(simulateButton);
+            toolPanel.Controls.Add(_undoButton);
+            toolPanel.Controls.Add(_redoButton);
             toolPanel.Controls.Add(Label("Tool", leftPad: 10));
             toolPanel.Controls.Add(toolComboBox);
             toolPanel.Controls.Add(_terrainPanel);
@@ -134,6 +141,10 @@ namespace StrategyGame
             saveButton.Click     += (_, __) => SaveMap(false);
             saveAsButton.Click   += (_, __) => SaveMap(true);
             simulateButton.Click += (_, __) => SimulateGame();
+            _undoButton.Click    += (_, __) => PerformUndo();
+            _redoButton.Click    += (_, __) => PerformRedo();
+            KeyPreview = true;
+            KeyDown += MainForm_KeyDown;
             canvas.MouseClick   += CanvasMouseClick;
             canvas.MouseDown    += CanvasMouseDown;
             canvas.MouseMove    += CanvasMouseMove;
@@ -177,6 +188,55 @@ namespace StrategyGame
             _ownerPanel.Visible     = tool == EditorTool.Unit || tool == EditorTool.Structure;
         }
 
+        void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.Z) { PerformUndo(); e.Handled = true; }
+            else if (e.Control && e.KeyCode == Keys.Y) { PerformRedo(); e.Handled = true; }
+        }
+
+        void PerformUndo()
+        {
+            if (!_history.CanUndo) return;
+            var doc = _history.Undo(MapDocument.FromBoard(_board));
+            _board = doc.ToBoard();
+            _selectedTile = null;
+            UpdateUndoRedoButtons();
+            RenderBoard();
+            SetStatus("Undo");
+        }
+
+        void PerformRedo()
+        {
+            if (!_history.CanRedo) return;
+            var doc = _history.Redo(MapDocument.FromBoard(_board));
+            _board = doc.ToBoard();
+            _selectedTile = null;
+            UpdateUndoRedoButtons();
+            RenderBoard();
+            SetStatus("Redo");
+        }
+
+        // Captured before-state for the current edit gesture.
+        MapDocument _editBefore;
+
+        /// <summary>Snapshot the current state before a mutation begins.</summary>
+        void BeginEdit() => _editBefore = MapDocument.FromBoard(_board);
+
+        /// <summary>Diff before→after and push to undo stack; call after the mutation is applied.</summary>
+        void CommitEdit(string description)
+        {
+            if (_editBefore == null) return;
+            _history.Commit(_editBefore, MapDocument.FromBoard(_board), description);
+            _editBefore = null;
+            UpdateUndoRedoButtons();
+        }
+
+        void UpdateUndoRedoButtons()
+        {
+            _undoButton.Enabled = _history.CanUndo;
+            _redoButton.Enabled = _history.CanRedo;
+        }
+
         // ── map operations ───────────────────────────────────────────────
 
         void LoadDefaultMap()
@@ -201,6 +261,8 @@ namespace StrategyGame
                 _board = BoardEditorService.CreateDefaultBoard(dialog.MapWidth, dialog.MapHeight);
                 _currentFilePath = null;
                 _selectedTile = null;
+                _history.Clear();
+                UpdateUndoRedoButtons();
                 RenderBoard();
             }
         }
@@ -216,6 +278,9 @@ namespace StrategyGame
                 _board = MapDocument.Load(dialog.FileName).ToBoard();
                 _currentFilePath = dialog.FileName;
                 _selectedTile = null;
+                _history.Clear();
+                _history.TryLoad(dialog.FileName);
+                UpdateUndoRedoButtons();
                 RenderBoard();
             }
         }
@@ -236,18 +301,22 @@ namespace StrategyGame
             }
 
             MapDocument.FromBoard(_board).Save(path);
+            _history.Save(path);
             _currentFilePath = path;
             SetStatus($"Saved {Path.GetFileName(path)}");
         }
 
         void SimulateGame()
         {
+            BeginEdit();
             var result = BoardEditorService.Simulate(_board);
             _board = result.Board;
             _selectedTile = null;
-            RenderBoard();
             var owners = string.Join(", ", result.StructuresByOwner.OrderBy(x => x.Key).Select(x => $"P{x.Key}:{x.Value}"));
-            SetStatus($"Simulated {result.TurnsCompleted} turns. Units alive: {result.RemainingUnits}. Structures: {owners}");
+            var statusMsg = $"Simulated {result.TurnsCompleted} turns. Units alive: {result.RemainingUnits}. Structures: {owners}";
+            CommitEdit("Simulate");
+            RenderBoard();
+            SetStatus(statusMsg);
         }
 
         // ── mouse handling ───────────────────────────────────────────────
@@ -261,6 +330,7 @@ namespace StrategyGame
             if (selectedTool != EditorTool.Terrain)
                 return;
 
+            BeginEdit();
             _isPaintingTerrain = true;
             _lastPaintedTileIndex = null;
             _lastPaintedTerrainType = terrainPalette.SelectedTerrain;
@@ -281,7 +351,10 @@ namespace StrategyGame
                 return;
 
             if (_isPaintingTerrain && _lastPaintedTileIndex.HasValue)
+            {
                 _board = BoardEditorService.RebuildBoard(_board);
+                CommitEdit("Paint terrain");
+            }
 
             _isPaintingTerrain = false;
             _lastPaintedTileIndex = null;
@@ -311,25 +384,32 @@ namespace StrategyGame
                 case EditorTool.Terrain:
                     return;
                 case EditorTool.Structure:
+                    BeginEdit();
                     _board = BoardEditorService.SetStructure(_board, tile, (StructureType)structureTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
+                    CommitEdit($"Set structure at {tile.Index}");
                     _selectedTile = null;
                     SetStatus($"Structure updated at tile {tile.Index}");
                     break;
                 case EditorTool.Unit:
+                    BeginEdit();
                     _board = BoardEditorService.AddUnit(_board, tile, (UnitType)unitTypeComboBox.SelectedItem, (MovementType)movementTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
+                    CommitEdit($"Add unit at {tile.Index}");
                     _selectedTile = null;
                     SetStatus($"Unit added at tile {tile.Index}");
                     break;
                 case EditorTool.Erase:
+                    BeginEdit();
                     if (_selectedTile != null && BoardEditorService.AreAdjacent(_board[_selectedTile.Index], _board[tile.Index]))
                     {
                         _board = BoardEditorService.SetEdge(_board, _board[_selectedTile.Index], _board[tile.Index], EdgeType.None, false);
+                        CommitEdit($"Remove edge {_selectedTile.Index}-{tile.Index}");
                         SetStatus($"Edge removed between {_selectedTile.Index} and {tile.Index}");
                         _selectedTile = null;
                     }
                     else
                     {
                         _board = BoardEditorService.EraseTileContent(_board, tile);
+                        CommitEdit($"Erase tile {tile.Index}");
                         SetStatus($"Tile content removed at {tile.Index}");
                         _selectedTile = null;
                     }
@@ -351,7 +431,9 @@ namespace StrategyGame
                         return;
                     }
 
+                    BeginEdit();
                     _board = BoardEditorService.SetEdge(_board, _board[_selectedTile.Index], _board[tile.Index], (EdgeType)edgeComboBox.SelectedItem, roadCheckBox.Checked);
+                    CommitEdit($"Set edge {_selectedTile.Index}-{tile.Index}");
                     SetStatus($"Edge updated between {_selectedTile.Index} and {tile.Index}");
                     _selectedTile = null;
                     break;

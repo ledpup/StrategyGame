@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
@@ -19,6 +20,7 @@
     <ProjectReference Include="..\Hexagon\Hexagon.csproj" />
     <ProjectReference Include="..\PathFind\PathFind.csproj" />
     <ProjectReference Include="..\Visualise\Visualise.csproj" />
+    <ProjectReference Include="..\StrategyGame\StrategyGame.csproj" />
   </ItemGroup>
 
   <ItemGroup>

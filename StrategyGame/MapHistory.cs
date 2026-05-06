@@ -149,11 +149,11 @@ namespace StrategyGame
 
     internal sealed class MapHistory
     {
-        private readonly Stack<MapEditGroup> _undoStack = new();
-        private readonly Stack<MapEditGroup> _redoStack = new();
+        private readonly Stack<MapEditGroup> undoStack = new();
+        private readonly Stack<MapEditGroup> redoStack = new();
 
-        public bool CanUndo => _undoStack.Count > 0;
-        public bool CanRedo => _redoStack.Count > 0;
+        public bool CanUndo => undoStack.Count > 0;
+        public bool CanRedo => redoStack.Count > 0;
 
         // ── diff & commit ─────────────────────────────────────────────────
 
@@ -166,8 +166,8 @@ namespace StrategyGame
         {
             var group = Diff(before, after, description);
             if (group.IsEmpty) return false;
-            _undoStack.Push(group);
-            _redoStack.Clear();
+            undoStack.Push(group);
+            redoStack.Clear();
             return true;
         }
 
@@ -184,10 +184,10 @@ namespace StrategyGame
         public MapDocument Undo(MapDocument current)
         {
             if (!CanUndo) throw new InvalidOperationException("Nothing to undo.");
-            var group = _undoStack.Pop();
+            var group = undoStack.Pop();
             var doc   = Clone(current);
             group.Invert(doc);
-            _redoStack.Push(group);   // same forward group; Redo will re-apply it
+            redoStack.Push(group);   // same forward group; Redo will re-apply it
             return doc;
         }
 
@@ -198,14 +198,14 @@ namespace StrategyGame
         public MapDocument Redo(MapDocument current)
         {
             if (!CanRedo) throw new InvalidOperationException("Nothing to redo.");
-            var group = _redoStack.Pop();
+            var group = redoStack.Pop();
             var doc   = Clone(current);
             group.Apply(doc);
-            _undoStack.Push(group);   // same forward group; Undo will invert it again
+            undoStack.Push(group);   // same forward group; Undo will invert it again
             return doc;
         }
 
-        public void Clear() { _undoStack.Clear(); _redoStack.Clear(); }
+        public void Clear() { undoStack.Clear(); redoStack.Clear(); }
 
         // ── serialisation ─────────────────────────────────────────────────
 
@@ -216,10 +216,10 @@ namespace StrategyGame
         {
             using var w = new StreamWriter(HistoryPathFor(mapPath), append: false, Encoding.UTF8);
             w.WriteLine("[UndoStack]");
-            foreach (var g in ((IEnumerable<MapEditGroup>)_undoStack).Reverse())
+            foreach (var g in ((IEnumerable<MapEditGroup>)undoStack).Reverse())
                 g.WriteTo(w);
             w.WriteLine("[RedoStack]");
-            foreach (var g in _redoStack)   // top-first
+            foreach (var g in redoStack)   // top-first
                 g.WriteTo(w);
         }
 
@@ -228,8 +228,8 @@ namespace StrategyGame
             var path = HistoryPathFor(mapPath);
             if (!File.Exists(path)) return false;
 
-            _undoStack.Clear();
-            _redoStack.Clear();
+            undoStack.Clear();
+            redoStack.Clear();
 
             string topSection = null;
             string editDescription = null;
@@ -239,8 +239,8 @@ namespace StrategyGame
             {
                 if (editDescription == null || editLines.Count == 0) return;
                 var g = MapEditGroup.ParseFrom(editDescription, editLines);
-                if (topSection == "[UndoStack]") _undoStack.Push(g);
-                else if (topSection == "[RedoStack]") _redoStack.Push(g);
+                if (topSection == "[UndoStack]") undoStack.Push(g);
+                else if (topSection == "[RedoStack]") redoStack.Push(g);
                 editLines = new List<string>();
                 editDescription = null;
             }

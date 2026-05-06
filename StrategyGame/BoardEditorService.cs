@@ -168,43 +168,43 @@ namespace StrategyGame
     /// </summary>
     internal class SimulationSession
     {
-        private readonly int _maxTurns;
-        private readonly int _numberOfPlayers;
-        private readonly ComputerPlayer _computerPlayer;
+        private readonly int maxTurns;
+        private readonly int numberOfPlayers;
+        private readonly ComputerPlayer computerPlayer;
 
         // Index 0 = initial board (turn 0, before any simulation).
         // Each subsequent entry is the board after that turn resolved.
-        private readonly List<MapDocument> _snapshots = new();
+        private readonly List<MapDocument> snapshots = new();
 
-        private int _currentIndex = 0;
+        private int currentIndex = 0;
 
-        public int CurrentTurn => _currentIndex;
+        public int CurrentTurn => currentIndex;
         public bool IsFinished { get; private set; }
 
         public bool CanStepForward =>
-            !IsFinished || _currentIndex < _snapshots.Count - 1;
+            !IsFinished || currentIndex < snapshots.Count - 1;
 
-        public bool CanStepBack => _currentIndex > 0;
+        public bool CanStepBack => currentIndex > 0;
 
         public Board CurrentBoard { get; private set; }
 
-        private readonly int _initialUnitOwners;
-        private readonly int _initialStructureOwners;
+        private readonly int initialUnitOwners;
+        private readonly int initialStructureOwners;
 
         internal SimulationSession(Board board, int maxTurns)
         {
-            _maxTurns = maxTurns;
+            this.maxTurns = maxTurns;
 
             // Take a clean copy as turn-0 snapshot
             CurrentBoard = MapDocument.FromBoard(board).ToBoard();
-            _snapshots.Add(MapDocument.FromBoard(CurrentBoard));
+            snapshots.Add(MapDocument.FromBoard(CurrentBoard));
 
             var ownerCount = CurrentBoard.Units.Select(x => x.OwnerIndex).DefaultIfEmpty(0).Distinct().Count();
-            _numberOfPlayers = Math.Max(2, ownerCount);
-            _computerPlayer = new ComputerPlayer(CurrentBoard.Units);
+            numberOfPlayers = Math.Max(2, ownerCount);
+            computerPlayer = new ComputerPlayer(CurrentBoard.Units);
 
-            _initialUnitOwners      = CurrentBoard.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
-            _initialStructureOwners = CurrentBoard.Structures.Select(x => x.OwnerIndex).Distinct().Count();
+            initialUnitOwners      = CurrentBoard.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
+            initialStructureOwners = CurrentBoard.Structures.Select(x => x.OwnerIndex).Distinct().Count();
         }
 
         public string StatusLine()
@@ -222,37 +222,37 @@ namespace StrategyGame
         public bool StepForward()
         {
             // If we already have the next snapshot cached, just move the pointer.
-            if (_currentIndex < _snapshots.Count - 1)
+            if (currentIndex < snapshots.Count - 1)
             {
-                _currentIndex++;
-                CurrentBoard = _snapshots[_currentIndex].ToBoard();
+                currentIndex++;
+                CurrentBoard = snapshots[currentIndex].ToBoard();
                 return true;
             }
 
             if (IsFinished) return false;
 
             // Compute and cache the next turn.
-            var sim = _snapshots[_currentIndex].ToBoard();
-            _computerPlayer.GenerateInfluenceMaps(sim, _numberOfPlayers);
-            _computerPlayer.SetStrategicAction(sim);
-            var orders = _computerPlayer.CreateOrders(sim, sim.Units.Where(x => x.IsAlive).ToList());
+            var sim = snapshots[currentIndex].ToBoard();
+            computerPlayer.GenerateInfluenceMaps(sim, numberOfPlayers);
+            computerPlayer.SetStrategicAction(sim);
+            var orders = computerPlayer.CreateOrders(sim, sim.Units.Where(x => x.IsAlive).ToList());
             sim.ResolveOrders(orders);
-            for (var i = 0; i < _numberOfPlayers; i++)
+            for (var i = 0; i < numberOfPlayers; i++)
                 sim.ResolveStackLimits(i);
             sim.ConductBattles();
             sim.ChangeStructureOwners();
             sim.Turn++;
 
-            _snapshots.Add(MapDocument.FromBoard(sim));
-            _currentIndex++;
+            snapshots.Add(MapDocument.FromBoard(sim));
+            currentIndex++;
             CurrentBoard = sim;
 
             // Check end conditions — only stop early if sides have actually been eliminated
             var aliveOwners     = sim.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
             var structureOwners = sim.Structures.Select(x => x.OwnerIndex).Distinct().Count();
-            if (sim.Turn >= _maxTurns
-                || (_initialUnitOwners      > 1 && aliveOwners     <= 1)
-                || (_initialStructureOwners > 1 && structureOwners <= 1))
+            if (sim.Turn >= maxTurns
+                || (initialUnitOwners      > 1 && aliveOwners     <= 1)
+                || (initialStructureOwners > 1 && structureOwners <= 1))
             {
                 IsFinished = true;
             }
@@ -264,17 +264,17 @@ namespace StrategyGame
         public bool StepBack()
         {
             if (!CanStepBack) return false;
-            _currentIndex--;
-            CurrentBoard = _snapshots[_currentIndex].ToBoard();
+            currentIndex--;
+            CurrentBoard = snapshots[currentIndex].ToBoard();
             return true;
         }
 
         /// <summary>Jumps back to turn 0.</summary>
         public void Restart()
         {
-            _currentIndex = 0;
+            currentIndex = 0;
             IsFinished = false;
-            CurrentBoard = _snapshots[0].ToBoard();
+            CurrentBoard = snapshots[0].ToBoard();
         }
     }
 

@@ -731,12 +731,12 @@ namespace GameModel
 
             foreach (UnitType unitType in Enum.GetValues<UnitType>())
             {
-                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.PersonnelEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
+                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.Events.Where(y => y.Turn == turn && y.Reason == "Personnel change").Sum(z => (int)z.Value));
             }
 
             units.ForEach(x =>
             {
-                var losses = -x.PersonnelEvents.Where(y => y.Turn == turn).Sum(y => y.Quantity);
+                var losses = -(int)x.Events.Where(y => y.Turn == turn && y.Reason == "Personnel loss in battle").Sum(y => y.Value);
 
                 battleReport.CasualtyLog.Add(new CasualtyLogEntry
                 {

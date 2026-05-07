@@ -66,9 +66,8 @@ namespace GameModel
         public double Strength { get; set; }
         public double BattleStrength { get; set; }
         public double Size { get { return UnitTemplate.Size; } }
-        public List<PersonnelChangeEvent> PersonnelEvents { get; set; }
+        public List<UnitEvent> Events { get; set; }
         public double Morale { get; private set; }
-        public List<MoraleChangeEvent> MoraleEvents { get; set; }
         public double CombatInitiative { get; set; }
         public int Speed { get; set; }
         public bool IsAlive { get { return Personnel > 0; } }
@@ -138,13 +137,13 @@ namespace GameModel
             TransportableBy = template.TransportableBy ?? [];
             Transporting = [];
 
+            Quality = BaseQuality;
             CombatInitiative = template.CombatInitiative;
             TurnCreated = turnBuilt;
 
-            MoraleEvents = [];
+            Events = [];
             ChangeMorale(TurnCreated, UnitTemplate.Morale, "Initial morale");
             Personnel = InitialPersonnel;
-            PersonnelEvents = [];
 
             switch (MovementType)
             {
@@ -201,7 +200,7 @@ namespace GameModel
 
         public void ChangeQuantity(int turn, int quantity)
         {
-            PersonnelEvents.Add(new PersonnelChangeEvent { Turn = turn, Quantity = quantity });
+            Events.Add(new UnitEvent(turn, quantity, "Personnel change"));
             Personnel += quantity;
 
             if (Personnel <= 0)
@@ -216,7 +215,7 @@ namespace GameModel
         public void ChangeMorale(int turn, double moraleChange, string reason)
         {
             Morale += moraleChange;
-            MoraleEvents.Add(new MoraleChangeEvent(turn, moraleChange, reason));
+            Events.Add(new UnitEvent(turn, moraleChange, reason));
         }
 
 

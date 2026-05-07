@@ -25,17 +25,8 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(new UnitTemplate(), 0, 1, null, "1st Infantry")
-                {
-                    BaseQuality = 2,
-                    InitialQuantity = 300,
-                },
-
-                new(new UnitTemplate(), 1, 2, null, "1st Blue Infantry")
-                {
-                    BaseQuality = 2,
-                    InitialQuantity = 500,
-                },
+                new(new UnitTemplate { Quality = 2, Personnel = 300 }, 0, 1, null, "1st Infantry"),
+                new(new UnitTemplate { Quality = 2, Personnel = 500 }, 1, 2, null, "1st Blue Infantry"),
             };
 
             gameAnalysis.CalculateObjectiveFunction(players, structures, units);

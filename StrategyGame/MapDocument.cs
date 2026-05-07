@@ -193,7 +193,7 @@ namespace StrategyGame
                 RoadMovementBonus = unit.RoadMovementBonus,
                 UnitType = unit.UnitType,
                 BaseQuality = unit.BaseQuality,
-                InitialQuantity = unit.InitialQuantity,
+                InitialQuantity = unit.UnitTemplate.Personnel,
                 Size = unit.Size,
                 IsTransporter = unit.IsTransporter,
                 TransportableBy = unit.TransportableBy.ToList(),

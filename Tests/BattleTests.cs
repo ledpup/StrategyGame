@@ -14,66 +14,15 @@ namespace Tests
         {
             var units = new List<MilitaryUnit>
             {
-                new(new UnitTemplate())
-                {
-                    UnitType = UnitType.Melee,
-                    BaseQuality = 2,
-                    InitialQuantity = 347,
-                    InitialMorale = 3,
-                },
-                new(new UnitTemplate())
-                {
-                    UnitType = UnitType.Siege,
-                    BaseQuality = 2,
-                    InitialQuantity = 167,
-                    InitialMorale = 3,
-                    CombatInitiative = 5,
-                },
-                new(new UnitTemplate())
-                {
-                    UnitType = UnitType.Melee,
-                    BaseQuality = 1,
-                    InitialQuantity = 256,
-                    InitialMorale = 2,
-                },
+                new(new UnitTemplate { UnitType = UnitType.Melee, Quality = 2, Personnel = 347, Morale = 3 }),
+                new(new UnitTemplate { UnitType = UnitType.Siege, Quality = 2, Personnel = 167, Morale = 3, CombatInitiative = 5 }),
+                new(new UnitTemplate { UnitType = UnitType.Melee, Quality = 1, Personnel = 256, Morale = 2 }),
 
+                new(new UnitTemplate { UnitType = UnitType.Melee, Quality = 3, Personnel = 245, Morale = 2 }) { OwnerIndex = 1 },
+                new(new UnitTemplate { UnitType = UnitType.Cavalry, Quality = 3, Personnel = 345, CombatInitiative = 5 }) { OwnerIndex = 1, StructureBattleModifier = -1 },
 
-
-                new(new UnitTemplate())
-                {
-                    OwnerIndex = 1,
-                    UnitType = UnitType.Melee,
-                    BaseQuality = 3,
-                    InitialQuantity = 245,
-                    InitialMorale = 2,
-                },
-                new(new UnitTemplate())
-                {
-                    OwnerIndex = 1,
-                    UnitType = UnitType.Cavalry,
-                    BaseQuality = 3,
-                    InitialQuantity = 345,
-                    CombatInitiative = 5,
-                    StructureBattleModifier = -1,
-                },
-
-
-
-                new(new UnitTemplate())
-                {
-                    OwnerIndex = 2,
-                    UnitType = UnitType.Cavalry,
-                    BaseQuality = 3,
-                    InitialQuantity = 165,
-                    StructureBattleModifier = -1,
-                },
-                new(new UnitTemplate()) {
-                    OwnerIndex = 2,
-                    UnitType = UnitType.Ranged,
-                    BaseQuality = 3,
-                    InitialQuantity = 175,
-                    CombatInitiative = 5,
-                }
+                new(new UnitTemplate { UnitType = UnitType.Cavalry, Quality = 3, Personnel = 165 }) { OwnerIndex = 2, StructureBattleModifier = -1 },
+                new(new UnitTemplate { UnitType = UnitType.Ranged, Quality = 3, Personnel = 175, CombatInitiative = 5 }) { OwnerIndex = 2 },
             };
 
             units[0].TerrainTypeBattleModifier[TerrainType.Mountain] = 1;

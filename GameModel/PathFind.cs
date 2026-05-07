@@ -26,10 +26,11 @@ namespace GameModel
 
             var closed = new HashSet<Node>();
 
-            var loadedPathFindTiles = new HashSet<Node>();
-
-            loadedPathFindTiles.Add(origin);
-            loadedPathFindTiles.Add(destination);
+            var loadedPathFindTiles = new HashSet<Node>
+            {
+                origin,
+                destination
+            };
 
             var queue = new global::PathFind.PriorityQueue<double, Path<Node>>();
 

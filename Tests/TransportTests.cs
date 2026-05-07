@@ -26,11 +26,11 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true),
-                new(1, location: board[3, 10], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true),
-                new(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
-                new(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
-                new(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
+                new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
+                new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 3, IsTransporter = true }, 1, location: board[3, 10]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Water], RoadMovementBonus = 1 }, 2, location: board[24, 16]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Water] }, 3, location: board[1, 1]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Water] }, 4, location: board[1, 1]),
             };
 
             units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;
@@ -97,8 +97,8 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
+                new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, location: board[1, 1]),
+                new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[1, 1]),
             };
 
             board.Units = units;
@@ -132,8 +132,8 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(location: board[1, 1], name: "1st Dragoons", roadMovementBonus: 1),
-                new(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true),
+                new(new UnitTemplate { RoadMovementBonus = 1 }, location: board[1, 1], name: "1st Dragoons"),
+                new(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true }, location: board[1, 1]),
             };
 
             board.Units = units;
@@ -159,8 +159,8 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
+                new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, location: board[1, 1]),
+                new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[1, 1]),
             };
 
             board.Units = units;
@@ -181,10 +181,10 @@ namespace Tests
             Assert.AreEqual(units[0], units[1].Transporting.Single());
             Assert.AreEqual(units[1], units[0].TransportedBy);
 
-            unitOrders = new List<IUnitOrder>
-            {
+            unitOrders =
+            [
                 new UnloadOrder(units[0]),
-            };
+            ];
             board.ResolveOrders(unitOrders);
 
             Assert.AreEqual(0, units[1].Transporting.Count);
@@ -200,10 +200,10 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true),
-                new(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
-                new(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
+                new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 4, IsTransporter = true }, 0, location: board[24, 11]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Airborne], RoadMovementBonus = 1 }, 1, location: board[22, 15]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 2, location: board[1, 1]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 3, location: board[1, 1]),
             };
 
             units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;

@@ -70,7 +70,7 @@ namespace StrategyGame
     internal sealed class MapEditGroup
     {
         public string           Description { get; init; }
-        public List<MapDelta>   Deltas      { get; init; } = new();
+        public List<MapDelta>   Deltas      { get; init; } = [];
 
         public bool IsEmpty => Deltas.Count == 0;
 
@@ -241,7 +241,7 @@ namespace StrategyGame
                 var g = MapEditGroup.ParseFrom(editDescription, editLines);
                 if (topSection == "[UndoStack]") undoStack.Push(g);
                 else if (topSection == "[RedoStack]") redoStack.Push(g);
-                editLines = new List<string>();
+                editLines = [];
                 editDescription = null;
             }
 

@@ -49,7 +49,7 @@ namespace Hexagon
         static public List<Hex> HexLinedraw(Hex a, Hex b)
         {
             int N = Hex.Distance(a, b);
-            List<Hex> results = new() { };
+            List<Hex> results = [];
             double step = 1.0 / Math.Max(N, 1);
             for (int i = 0; i <= N; i++)
             {

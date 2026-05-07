@@ -51,31 +51,27 @@ namespace GameModel
         public int Index;
         public string Name { get; set; }
         public int OwnerIndex { get; set; }
-        public UnitType UnitType { get; set; }
-        public MovementType MovementType { get; private set; }
-        public int BaseMovementPoints { get; set; }
+
+        public UnitTemplate UnitTemplate { get; set; }
+        public UnitType UnitType { get { return UnitTemplate.UnitType; } }
+        public MovementType MovementType { get { return UnitTemplate.MovementType; } }
+        public int BaseMovementPoints { get { return UnitTemplate.MovementPoints; } }
         public double BaseQuality
         {
-            get { return _baseQuality; }
-            set
-            {
-                _baseQuality = value;
-                Quality = _baseQuality;
-            }
+            get { return UnitTemplate.Quality; }
         }
-        private double _baseQuality;
         public Dictionary<BattleQualityModifier, double> BattleQualityModifiers { get; set; }
         public double Quality { get; set; }
-        public int Quantity { get; private set; }
+        public int Personnel { get; private set; }
         public double Strength { get; set; }
         public double BattleStrength { get; set; }
-        public double Size { get; set; }
-        public List<QuantityChangeEvent> QuantityEvents { get; set; }
+        public double Size { get { return UnitTemplate.Size; } }
+        public List<PersonnelChangeEvent> PersonnelEvents { get; set; }
         public double Morale { get; private set; }
         public List<MoraleChangeEvent> MoraleEvents { get; set; }
         public double CombatInitiative { get; set; }
         public int Speed { get; set; }
-        public bool IsAlive { get; private set; }
+        public bool IsAlive { get { return Personnel > 0; } }
 
         public Dictionary<TerrainType, double> TerrainTypeBattleModifier { get; set; }
         public Dictionary<Weather, double> WeatherBattleModifier { get; set; }
@@ -86,7 +82,7 @@ namespace GameModel
         public Dictionary<TerrainType, int> TerrainMovementCosts { get; set; }
         public Dictionary<EdgeType, int> EdgeMovementCosts { get; set; }
 
-        public bool IsTransporter { get; set; }
+        public bool IsTransporter { get { return UnitTemplate.IsTransporter; } }
         public List<MilitaryUnit> Transporting { get; set; }
 
         public int TurnCreated { get; set; }
@@ -95,71 +91,60 @@ namespace GameModel
         {
             return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();
         }
-        public MilitaryUnit(int index = 0, string name = null, int ownerIndex = 0, Tile location = null, MovementType movementType = MovementType.Land, int baseMovementPoints = 2, int roadMovementBonus = 0, UnitType unitType = UnitType.Melee, double baseQuality = 1, int initialQuantity = 100, double size = 1, bool isTransporter = false, List<MovementType> transportableBy = null, int combatInitiative = 10, double initialMorale = 5, int turnBuilt = 0, float[] moraleMoveCost = null)
+        public MilitaryUnit(UnitTemplate template, int index = 0, int ownerIndex = 0, Tile location = null, string name = null, int turnBuilt = 0, float[] moraleMoveCost = null)
         {
-            IsAlive = true;
+            UnitTemplate = template;
 
-            BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>();
+            BattleQualityModifiers = [];
             foreach (BattleQualityModifier battleQualityModifier in Enum.GetValues<BattleQualityModifier>())
             {
                 BattleQualityModifiers.Add(battleQualityModifier, 0);
             }
 
-            TerrainTypeBattleModifier = new Dictionary<TerrainType, double>();
+            TerrainTypeBattleModifier = [];
             foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
             {
                 TerrainTypeBattleModifier.Add(terrainType, 0);
             }
 
-            WeatherBattleModifier = new Dictionary<Weather, double>();
+            WeatherBattleModifier = [];
             foreach (Weather weather in Enum.GetValues<Weather>())
             {
                 WeatherBattleModifier.Add(weather, 0);
             }
 
-            OpponentUnitTypeBattleModifier = new Dictionary<UnitType, double>();
+            OpponentUnitTypeBattleModifier = [];
             foreach (UnitType unitTypeEnum in Enum.GetValues<UnitType>())
             {
                 OpponentUnitTypeBattleModifier.Add(unitTypeEnum, 0);
             }
 
-            TerrainMovementCosts = new Dictionary<TerrainType, int>();
+            TerrainMovementCosts = [];
             foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
             {
                 TerrainMovementCosts.Add(terrainType, Terrain.Impassable);
             }
-            EdgeMovementCosts = new Dictionary<EdgeType, int>();
+            EdgeMovementCosts = [];
             foreach (EdgeType edgeType in Enum.GetValues<EdgeType>())
             {
                 EdgeMovementCosts.Add(edgeType, Terrain.Impassable);
             }
 
             Index = index;
-            if (name == null)
-            {
-                name = "Unit " + index + " (owned by " + ownerIndex + ")";
-            }
-            Name = name;
+            Name = name ?? template.Name ?? "Unit " + index + " (owned by " + ownerIndex + ")";
             OwnerIndex = ownerIndex;
             Location = location;
-            MovementType = movementType;
-            BaseMovementPoints = baseMovementPoints;
-            UnitType = unitType;
-            BaseQuality = baseQuality;
-            Size = size;
-            IsTransporter = isTransporter;
-            TransportableBy = transportableBy;
-            if (TransportableBy == null)
-            {
-                TransportableBy = new List<MovementType>();
-            }
-            Transporting = new List<MilitaryUnit>();
+            RoadMovementBonus = template.RoadMovementBonus;
+            TransportableBy = template.TransportableBy ?? [];
+            Transporting = [];
 
-            CombatInitiative = combatInitiative;
+            CombatInitiative = template.CombatInitiative;
             TurnCreated = turnBuilt;
 
-            InitialMorale = initialMorale;
-            InitialQuantity = initialQuantity;
+            MoraleEvents = [];
+            ChangeMorale(TurnCreated, UnitTemplate.Morale, "Initial morale");
+            Personnel = InitialPersonnel;
+            PersonnelEvents = [];
 
             switch (MovementType)
             {
@@ -174,7 +159,8 @@ namespace GameModel
                     break;
             }
 
-            if (moraleMoveCost == null)
+            var templateMoraleMoveCost = moraleMoveCost ?? template.MoraleMoveCost;
+            if (templateMoraleMoveCost == null)
             {
                 MoraleMoveCost = new float[BaseMovementPoints];
                 for (var i = 0; i < BaseMovementPoints; i++)
@@ -182,62 +168,44 @@ namespace GameModel
             }
             else
             {
-                MoraleMoveCost = moraleMoveCost;
+                MoraleMoveCost = templateMoraleMoveCost;
             }
-
-            RoadMovementBonus = roadMovementBonus;
-          
 
             CalculateStrength();
         }
 
-        
+
 
         public float[] MoraleMoveCost { get; set; }
 
-        public int InitialQuantity
+        public int InitialPersonnel
         {
-            get { return _initialQuantity; }
-            set
-            {
-                _initialQuantity = value;
-                Quantity = _initialQuantity;
-                QuantityEvents = new List<QuantityChangeEvent>();
-            }
+            get { return UnitTemplate.Personnel; }
         }
-        int _initialQuantity;
 
         public double InitialMorale
         {
-            get { return _initialMorale; }
-            set
-            {
-                MoraleEvents = new List<MoraleChangeEvent>();
-                _initialMorale = value;
-                ChangeMorale(TurnCreated, _initialMorale, "Initial morale");
-            }
+            get { return UnitTemplate.Morale; }
         }
-        double _initialMorale;
 
         public void CalculateStrength()
         {
-            Strength = Quality * Quantity;
+            Strength = Quality * Personnel;
 
             var battleQuality = Quality + BattleQualityModifiers.Values.Sum();
             if (battleQuality < .1)
                 battleQuality = .1;
 
-            BattleStrength = battleQuality * Quantity;
+            BattleStrength = battleQuality * Personnel;
         }
 
         public void ChangeQuantity(int turn, int quantity)
         {
-            QuantityEvents.Add(new QuantityChangeEvent { Turn = turn, Quantity = quantity });
-            Quantity += quantity;
+            PersonnelEvents.Add(new PersonnelChangeEvent { Turn = turn, Quantity = quantity });
+            Personnel += quantity;
 
-            if (Quantity <= 0)
+            if (Personnel <= 0)
             {
-                IsAlive = false;
                 Strength = BattleStrength = 0;
                 return;
             }
@@ -370,7 +338,7 @@ namespace GameModel
 
         public int TransportSize
         {
-            get { return (int)Math.Ceiling(Quantity * Size); }
+            get { return (int)Math.Ceiling(Personnel * Size); }
         }
 
         public int RoadMovementBonus { get; set; }

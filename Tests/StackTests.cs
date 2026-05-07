@@ -28,10 +28,10 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(location: board[6, 1], roadMovementBonus: 1),
-                new(location: board[6, 1]),
-                new(location: board[6, 1]),
-                new(location: board[6, 1]),
+                new(new UnitTemplate { RoadMovementBonus = 1 }, location: board[6, 1]),
+                new(new UnitTemplate(), location: board[6, 1]),
+                new(new UnitTemplate(), location: board[6, 1]),
+                new(new UnitTemplate(), location: board[6, 1]),
             };
             board.Units.AddRange(units);
 
@@ -46,8 +46,8 @@ namespace Tests
         [TestMethod]
         public void CanTransport()
         {
-            var inf = new MilitaryUnit(transportableBy: new List<MovementType> { MovementType.Airborne });
-            var air = new MilitaryUnit(movementType: MovementType.Airborne, isTransporter: true);
+            var inf = new MilitaryUnit(new UnitTemplate { TransportableBy = [MovementType.Airborne] });
+            var air = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true });
 
             
             Assert.IsTrue(air.CanTransport(inf));

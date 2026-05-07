@@ -105,7 +105,7 @@ namespace Tests
         [TestMethod]
         public void TestHexLinedraw()
         {
-            HexTests.EqualHexArray("hex_linedraw", new List<Hex> { new(0, 0, 0), new(0, -1, 1), new(0, -2, 2), new(1, -3, 2), new(1, -4, 3), new(1, -5, 4) }, FractionalHex.HexLinedraw(new Hex(0, 0, 0), new Hex(1, -5, 4)));
+            HexTests.EqualHexArray("hex_linedraw", [new(0, 0, 0), new(0, -1, 1), new(0, -2, 2), new(1, -3, 2), new(1, -4, 3), new(1, -5, 4)], FractionalHex.HexLinedraw(new Hex(0, 0, 0), new Hex(1, -5, 4)));
         }
 
 

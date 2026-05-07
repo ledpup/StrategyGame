@@ -731,18 +731,18 @@ namespace GameModel
 
             foreach (UnitType unitType in Enum.GetValues<UnitType>())
             {
-                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
+                units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.PersonnelEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
             }
 
             units.ForEach(x =>
             {
-                var losses = -x.QuantityEvents.Where(y => y.Turn == turn).Sum(y => y.Quantity);
+                var losses = -x.PersonnelEvents.Where(y => y.Turn == turn).Sum(y => y.Quantity);
 
                 battleReport.CasualtyLog.Add(new CasualtyLogEntry
                 {
                     OwnerIndex = x.OwnerIndex,
                     Text = x.IsAlive ? losses > 1
-                                        ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : "", x.Quantity)
+                                        ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : "", x.Personnel)
                                         : string.Format("{0} no losses", x.Name)
                                  : string.Format("{0} destroyed", x.Name)
                 });
@@ -773,7 +773,7 @@ namespace GameModel
                     if (strengthDamageToUnit > unit.Strength)
                     {
                         strengthDamageToUnit = unit.Strength;
-                        unit.ChangeQuantity(turn, -unit.Quantity);
+                        unit.ChangeQuantity(turn, -unit.Personnel);
                     }
                     else
                     {

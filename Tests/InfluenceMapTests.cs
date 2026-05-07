@@ -24,19 +24,19 @@ namespace Tests
 
             var numberOfPlayers = 2;
 
-            board.Units = new List<MilitaryUnit>
-            {
-                new(0, "1st Airborne", 0, board[114], MovementType.Airborne, 3),
-                new(1, "1st Infantry", 0, board[110], MovementType.Land, 3),
-                new(2, "2nd Infantry", 0, board[31], MovementType.Land),
-                new(3, "3rd Infantry", 0, board[56], MovementType.Land),
-                new(4, "4th Infantry", 0, board[65], MovementType.Land),
+            board.Units =
+            [
+                new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, 0, board[114], "1st Airborne"),
+                new(new UnitTemplate { MovementPoints = 3 }, 1, 0, board[110], "1st Infantry"),
+                new(new UnitTemplate(), 2, 0, board[31], "2nd Infantry"),
+                new(new UnitTemplate(), 3, 0, board[56], "3rd Infantry"),
+                new(new UnitTemplate(), 4, 0, board[65], "4th Infantry"),
 
-                new(5, "1st Infantry", 1, board[111]),
-                new(6, "2nd Infantry", 1, board[111]),
+                new(new UnitTemplate(), 5, 1, board[111], "1st Infantry"),
+                new(new UnitTemplate(), 6, 1, board[111], "2nd Infantry"),
 
-                new(7, "3rd Infantry", 1, board[168]),
-            };
+                new(new UnitTemplate(), 7, 1, board[168], "3rd Infantry"),
+            ];
 
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
@@ -71,18 +71,18 @@ namespace Tests
 
             var numberOfPlayers = 2;
 
-            board.Units = new List<MilitaryUnit>
-            {
-                new(0, ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
-                new(1, ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
-                new(2, ownerIndex: 0, location: board[31], movementType: MovementType.Land),
-                new(3, ownerIndex: 0, location: board[56], movementType: MovementType.Land),
-                new(4, ownerIndex: 0, location: board[65], movementType: MovementType.Land),
+            board.Units =
+            [
+                new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, 0, board[114]),
+                new(new UnitTemplate { MovementPoints = 3 }, 1, 0, board[110]),
+                new(new UnitTemplate(), 2, 0, board[31]),
+                new(new UnitTemplate(), 3, 0, board[56]),
+                new(new UnitTemplate(), 4, 0, board[65]),
 
-                new(5, ownerIndex: 1, location: board[111]),
-                new(6, ownerIndex: 1, location: board[111]),
-                new(7, ownerIndex: 1, location: board[168]),
-            };
+                new(new UnitTemplate(), 5, 1, board[111]),
+                new(new UnitTemplate(), 6, 1, board[111]),
+                new(new UnitTemplate(), 7, 1, board[168]),
+            ];
 
 
             var computerPlayer = new ComputerPlayer(board.Units);

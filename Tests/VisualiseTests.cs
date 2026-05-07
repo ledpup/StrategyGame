@@ -45,10 +45,10 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new() { Location = board[1, 1] },
-                new() { Location = board[1, 1] },
-                new() { Location = board[1, 1] },
-                new() { Location = board[1, 1], OwnerIndex = 2 }
+                new(new UnitTemplate()) { Location = board[1, 1] },
+                new(new UnitTemplate()) { Location = board[1, 1] },
+                new(new UnitTemplate()) { Location = board[1, 1] },
+                new(new UnitTemplate()) { Location = board[1, 1], OwnerIndex = 2 }
             };
 
             GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: units);

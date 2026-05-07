@@ -15,14 +15,14 @@ namespace GameModel
             CasualtiesByPlayerAndType = new Dictionary<UnitType, int>[numberOfCombatants];
             for (var i = 0; i < numberOfCombatants; i++)
             {
-                CasualtiesByPlayerAndType[i] = new Dictionary<UnitType, int>();
+                CasualtiesByPlayerAndType[i] = [];
                 foreach (UnitType unitType in Enum.GetValues<UnitType>())
                 {
                     CasualtiesByPlayerAndType[i].Add(unitType, 0);
                 }
             }
 
-            CasualtyLog = new List<CasualtyLogEntry>();
+            CasualtyLog = [];
         }
     }
 }

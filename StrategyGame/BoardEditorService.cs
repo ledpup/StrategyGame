@@ -174,7 +174,7 @@ namespace StrategyGame
 
         // Index 0 = initial board (turn 0, before any simulation).
         // Each subsequent entry is the board after that turn resolved.
-        private readonly List<MapDocument> snapshots = new();
+        private readonly List<MapDocument> snapshots = [];
 
         private int currentIndex = 0;
 

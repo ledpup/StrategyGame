@@ -16,12 +16,12 @@ namespace GameModel
         {
             Hex = hex;
             Edges = edges;
-            MoveCost = new Dictionary<Hex, double>();
+            MoveCost = [];
         }
 
         public void LoadNeighbours(HashSet<PathFindTile> loadedPathFindTiles, List<Edge> neighbourEdges, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
         {
-            Neighbours = new List<PathFindTile>();
+            Neighbours = [];
 
             foreach (var edge in neighbourEdges)
             {

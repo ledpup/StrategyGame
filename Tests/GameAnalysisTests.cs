@@ -25,13 +25,13 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(0, "1st Infantry", 1)
+                new(new UnitTemplate(), 0, 1, null, "1st Infantry")
                 {
                     BaseQuality = 2,
                     InitialQuantity = 300,
                 },
 
-                new(1, "1st Blue Infantry", 2)
+                new(new UnitTemplate(), 1, 2, null, "1st Blue Infantry")
                 {
                     BaseQuality = 2,
                     InitialQuantity = 500,

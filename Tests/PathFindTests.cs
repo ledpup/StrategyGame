@@ -20,7 +20,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges, Structures);
 
-            var unit = new MilitaryUnit(location: board[1, 1]);
+            var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
 
             var lines = new List<Centreline>();
 
@@ -41,7 +41,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[1, 1]);
+            var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
 
             var shortestPath = Board.FindShortestPath(board[1, 1], board[194], unit).ToArray();
 
@@ -70,7 +70,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[1, 1]);
+            var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
 
             var shortestPath = Board.FindShortestPath(unit.Location, board[247], unit);
 
@@ -82,7 +82,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true);
+            var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 5, IsTransporter = true }, location: board[20, 5]);
 
             var shortestPath = Board.FindShortestPath(unit.Location, board[291], unit).ToArray();
 
@@ -108,7 +108,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[24, 15], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
+            var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[24, 15]);
 
             var shortestPath = Board.FindShortestPath(unit.Location, board[365], unit).ToArray();
 
@@ -136,7 +136,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[19, 13], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true);
+            var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[19, 13]);
 
             var shortestPath = Board.FindShortestPath(unit.Location, board[365], unit).ToArray();
 
@@ -164,7 +164,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(location: board[119], movementType: MovementType.Airborne, baseMovementPoints: 5, isTransporter: true);
+            var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 5, IsTransporter = true }, location: board[119]);
 
             var shortestPath = Board.FindShortestPath(unit.Location, board[95], unit).ToArray();
 
@@ -174,8 +174,7 @@ namespace Tests
 
             var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
 
-            vectors = new List<Centreline>();
-            vectors.AddRange(Centreline.MoveOrderToCentrelines(moveOrder));
+            vectors = [.. Centreline.MoveOrderToCentrelines(moveOrder)];
 
             GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: vectors);
 

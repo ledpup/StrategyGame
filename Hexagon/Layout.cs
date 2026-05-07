@@ -51,7 +51,7 @@ namespace Hexagon
 
         static public List<PointD> PolygonCorners(Layout layout, Hex h)
         {
-            List<PointD> corners = new() { };
+            List<PointD> corners = [];
             PointD center = HexToPixel(layout, h);
             for (int i = 0; i < 6; i++)
             {

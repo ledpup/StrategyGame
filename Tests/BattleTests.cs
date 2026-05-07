@@ -14,14 +14,14 @@ namespace Tests
         {
             var units = new List<MilitaryUnit>
             {
-                new()
+                new(new UnitTemplate())
                 {
                     UnitType = UnitType.Melee,
                     BaseQuality = 2,
                     InitialQuantity = 347,
                     InitialMorale = 3,
                 },
-                new()
+                new(new UnitTemplate())
                 {
                     UnitType = UnitType.Siege,
                     BaseQuality = 2,
@@ -29,7 +29,7 @@ namespace Tests
                     InitialMorale = 3,
                     CombatInitiative = 5,
                 },
-                new()
+                new(new UnitTemplate())
                 {
                     UnitType = UnitType.Melee,
                     BaseQuality = 1,
@@ -39,7 +39,7 @@ namespace Tests
 
 
 
-                new()
+                new(new UnitTemplate())
                 {
                     OwnerIndex = 1,
                     UnitType = UnitType.Melee,
@@ -47,7 +47,7 @@ namespace Tests
                     InitialQuantity = 245,
                     InitialMorale = 2,
                 },
-                new()
+                new(new UnitTemplate())
                 {
                     OwnerIndex = 1,
                     UnitType = UnitType.Cavalry,
@@ -59,7 +59,7 @@ namespace Tests
 
 
 
-                new()
+                new(new UnitTemplate())
                 {
                     OwnerIndex = 2,
                     UnitType = UnitType.Cavalry,
@@ -67,7 +67,7 @@ namespace Tests
                     InitialQuantity = 165,
                     StructureBattleModifier = -1,
                 },
-                new() {
+                new(new UnitTemplate()) {
                     OwnerIndex = 2,
                     UnitType = UnitType.Ranged,
                     BaseQuality = 3,
@@ -112,11 +112,11 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            board.Units = new List<MilitaryUnit>
-            {
-                new(0, "1st Infantry", 0, board[1, 1], baseMovementPoints: 4),
-                new(1, "2nd Infantry", 1, board[2, 3]),
-            };
+            board.Units =
+            [
+                new(new UnitTemplate { MovementPoints = 4 }, 0, 0, board[1, 1], "1st Infantry"),
+                new(new UnitTemplate(), 1, 1, board[2, 3], "2nd Infantry"),
+            ];
 
             var moves1 = new Move[]
                     {

@@ -5,7 +5,7 @@ namespace PathFind
 {
     public class PriorityQueue<P, V>
     {
-        private readonly SortedDictionary<P, Queue<V>> list = new();
+        private readonly SortedDictionary<P, Queue<V>> list = [];
         
         public void Enqueue(P priority, V value)
         {

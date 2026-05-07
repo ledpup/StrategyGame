@@ -19,9 +19,9 @@ namespace StrategyGame
             return new MapDocument
             {
                 Tiles = Enumerable.Range(0, height).Select(_ => row).ToArray(),
-                Edges = new List<string>(),
-                Structures = new List<string>(),
-                Units = new List<UnitDocument>(),
+                Edges = [],
+                Structures = [],
+                Units = [],
             };
         }
 
@@ -98,7 +98,7 @@ namespace StrategyGame
                 {
                     currentSection = line;
                     if (!sections.ContainsKey(currentSection))
-                        sections[currentSection] = new List<string>();
+                        sections[currentSection] = [];
                     continue;
                 }
 
@@ -118,28 +118,30 @@ namespace StrategyGame
         private static List<string> GetSection(Dictionary<string, List<string>> sections, string name)
         {
             sections.TryGetValue(name, out var lines);
-            return lines ?? new List<string>();
+            return lines ?? [];
         }
 
         private static Func<UnitDocument, MilitaryUnit> ToMilitaryUnit(Board board)
         {
-            return x => new MilitaryUnit(
-                x.Index,
-                x.Name,
-                x.OwnerIndex,
-                board[x.TileIndex],
-                x.MovementType,
-                x.BaseMovementPoints,
-                x.RoadMovementBonus,
-                x.UnitType,
-                x.BaseQuality,
-                x.InitialQuantity,
-                x.Size,
-                x.IsTransporter,
-                x.TransportableBy,
-                x.CombatInitiative,
-                x.InitialMorale,
-                x.TurnBuilt);
+            return x =>
+            {
+                var template = new UnitTemplate
+                {
+                    Name = x.Name,
+                    MovementType = x.MovementType,
+                    MovementPoints = x.BaseMovementPoints,
+                    RoadMovementBonus = x.RoadMovementBonus,
+                    UnitType = x.UnitType,
+                    Quality = x.BaseQuality,
+                    Personnel = x.InitialQuantity,
+                    Size = x.Size,
+                    IsTransporter = x.IsTransporter,
+                    TransportableBy = x.TransportableBy,
+                    CombatInitiative = x.CombatInitiative,
+                    Morale = x.InitialMorale,
+                };
+                return new MilitaryUnit(template, x.Index, x.OwnerIndex, board[x.TileIndex], turnBuilt: x.TurnBuilt);
+            };
         }
 
         internal static char TerrainToChar(TerrainType terrainType)

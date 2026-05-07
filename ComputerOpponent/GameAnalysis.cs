@@ -42,9 +42,9 @@ namespace ComputerOpponent
 
             for (var i = 0; i < players.Length; i++)
             {
-                ObjectiveFunctionParameters[i] = new Dictionary<ObjFuncParameter, double>();
-                ObjectiveFunctionWeightedParameters[i] = new Dictionary<ObjFuncParameter, double>();
-                ObjectiveFunctionNormalisedParameters[i] = new Dictionary<ObjFuncParameter, double>();
+                ObjectiveFunctionParameters[i] = [];
+                ObjectiveFunctionWeightedParameters[i] = [];
+                ObjectiveFunctionNormalisedParameters[i] = [];
 
                 ObjectiveFunctionParameters[i].Add(ObjFuncParameter.StructureCount, structuresByPlayer[i].Count());
                 ObjectiveFunctionParameters[i].Add(ObjFuncParameter.StructureStrength, structuresByPlayer[i].Sum(x => 1 - Structure.StructureDefenceModifiers[x.StructureType]));

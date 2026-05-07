@@ -1,6 +1,6 @@
 ﻿namespace GameModel
 {
-    public class QuantityChangeEvent
+    public class PersonnelChangeEvent
     {
         public int Quantity { get; set; }
         public int Turn { get; set; }

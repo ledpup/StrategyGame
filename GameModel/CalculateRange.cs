@@ -26,11 +26,11 @@ namespace GameModel
             var visited = new List<Edge>();
 
             var fringes = new List<Tile>[movementPoints + 1];
-            fringes[0] = new List<Tile> { start };
+            fringes[0] = [start];
 
             for (var k = 1; k <= movementPoints; k++)
             {
-                fringes[k] = new List<Tile>();
+                fringes[k] = [];
                 foreach (var tile in fringes[k - 1])
                 {
                     foreach (var neighbour in start.Neighbours)

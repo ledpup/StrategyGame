@@ -56,7 +56,7 @@ namespace ComputerOpponent
             }
         }
         Dictionary<Role, double> _friendlyUnitInfluenceModifier;
-        Dictionary<Role, double> EnemyUnitInfluenceModifier
+        static Dictionary<Role, double> EnemyUnitInfluenceModifier
         {
             get
             {
@@ -669,7 +669,7 @@ namespace ComputerOpponent
             var roleMovementType = unitState.GetRoleMovementType(unit);
             var tilesOrderedInfluence = board.Tiles
                 .Where(x => results.Contains(x.Hex))
-                .OrderByDescending(x => AggregateInfluence[x.Index][roleMovementType][unit.OwnerIndex] - (1 * FriendlyUnitInfluenceModifier[unitState.Role]) / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
+                .OrderByDescending(x => AggregateInfluence[x.Index][roleMovementType][unit.OwnerIndex] - 1 * FriendlyUnitInfluenceModifier[unitState.Role] / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
                 .ToList();
 
             IEnumerable<PathFindTile> bestPossibleDestination = null;

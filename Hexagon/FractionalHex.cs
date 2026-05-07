@@ -17,9 +17,9 @@ namespace Hexagon
 
         static public Hex HexRound(FractionalHex h)
         {
-            int q = (int)(Math.Round(h.q));
-            int r = (int)(Math.Round(h.r));
-            int s = (int)(Math.Round(h.s));
+            int q = (int)Math.Round(h.q);
+            int r = (int)Math.Round(h.r);
+            int s = (int)Math.Round(h.s);
             double q_diff = Math.Abs(q - h.q);
             double r_diff = Math.Abs(r - h.r);
             double s_diff = Math.Abs(s - h.s);

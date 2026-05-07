@@ -216,7 +216,7 @@ namespace StrategyGame
                 transportableBy = columns[12]
                     .Split('|')
                     .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .Select(x => (MovementType)Enum.Parse(typeof(MovementType), x))
+                    .Select(x => Enum.Parse<MovementType>(x))
                     .ToList();
             }
 
@@ -226,10 +226,10 @@ namespace StrategyGame
                 Name = Unescape(columns[1]),
                 OwnerIndex = int.Parse(columns[2]),
                 TileIndex = int.Parse(columns[3]),
-                MovementType = (MovementType)Enum.Parse(typeof(MovementType), columns[4]),
+                MovementType = Enum.Parse<MovementType>(columns[4]),
                 BaseMovementPoints = int.Parse(columns[5]),
                 RoadMovementBonus = int.Parse(columns[6]),
-                UnitType = (UnitType)Enum.Parse(typeof(UnitType), columns[7]),
+                UnitType = Enum.Parse<UnitType>(columns[7]),
                 BaseQuality = double.Parse(columns[8]),
                 InitialQuantity = int.Parse(columns[9]),
                 Size = double.Parse(columns[10]),

@@ -24,7 +24,7 @@ namespace Tests
         }
 
 
-        public void EqualOffsetcoord(String name, OffsetCoord a, OffsetCoord b)
+        public static void EqualOffsetcoord(String name, OffsetCoord a, OffsetCoord b)
         {
             if (!(a.col == b.col && a.row == b.row))
             {

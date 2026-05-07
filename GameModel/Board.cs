@@ -23,7 +23,7 @@ namespace GameModel
 
         public Dictionary<int, List<MoveOrder>> MoveOrders;
 
-        public static Logger Logger;
+        private static Logger Logger;
 
         public List<Structure> Structures;
 
@@ -44,15 +44,12 @@ namespace GameModel
             CalculateContiguousRegions();
 
             Logger = logger;
-            if (Logger == null)
-            {
-                Logger = LogManager.GetCurrentClassLogger();
-            }
+            Logger ??= LogManager.GetCurrentClassLogger();
 
-            MoveOrders = new Dictionary<int, List<MoveOrder>>();
+            MoveOrders = [];
 
-            TerrainTemperatureModifiers = new Dictionary<TerrainType, double>();
-            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
+            TerrainTemperatureModifiers = [];
+            foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
             {
                 TerrainTemperatureModifiers.Add(terrainType, 0);
             }
@@ -61,7 +58,7 @@ namespace GameModel
 
             Turn = turn;
 
-            Units = new List<MilitaryUnit>();
+            Units = [];
 
             CalculateTemperature(Turn);
         }
@@ -102,7 +99,7 @@ namespace GameModel
             }
         }
 
-        private void AssignContiguousTilesToRegion(Tile start, int id, bool isMountainRange)
+        private static void AssignContiguousTilesToRegion(Tile start, int id, bool isMountainRange)
         {
             var stack = new Stack<Tile>();
             stack.Push(start);
@@ -113,8 +110,8 @@ namespace GameModel
                 {
                     if (x.Destination.ContiguousRegionId == 0
                         && x.Destination.BaseTerrainType == tile.BaseTerrainType
-                        && (x.HasRoad || ((tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain)
-                            || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain && isMountainRange))))
+                        && (x.HasRoad || (tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain)
+                            || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain && isMountainRange)))
                     {
                         x.Destination.ContiguousRegionId = id;
                         stack.Push(x.Destination);
@@ -230,7 +227,7 @@ namespace GameModel
             {
                 var structureProperties = point.Split(',');
                 var index = int.Parse(structureProperties[0]);
-                var structureType = (StructureType)Enum.Parse(typeof(StructureType), structureProperties[2]);
+                var structureType = Enum.Parse<StructureType>(structureProperties[2]);
                 var structure = new Structure(index, structureType, TileArray[index], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
 
                 
@@ -328,7 +325,7 @@ namespace GameModel
 
         private void IntitaliseEdges(string[] edges)
         {
-            Edges = new List<Edge>();
+            Edges = [];
 
             if (edges == null)
                 return;
@@ -618,7 +615,7 @@ namespace GameModel
             Tiles.ToList().ForEach(x =>
             {
                 var tileUnits = UnitsAt(x).ToList();
-                if (x.IsInConflict(tileUnits))
+                if (Tile.IsInConflict(tileUnits))
                 {
                     ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, 3, StructureType.Fortress, 2);
                     battleReports.Add(CreateBattleReport(x, Turn, tileUnits));
@@ -660,7 +657,7 @@ namespace GameModel
 
                 var opponentUnitsCount = (double)combatantInBattle.OpponentUnits.Count;
 
-                foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+                foreach (UnitType unitType in Enum.GetValues<UnitType>())
                 {
                     combatantInBattle.OpponentUnitTypes[unitType] = combatantInBattle.OpponentUnits.Count(x => x.UnitType == unitType);
                     var proportion = combatantInBattle.OpponentUnitTypes[unitType] / opponentUnitsCount;
@@ -696,7 +693,7 @@ namespace GameModel
                     opponents.ForEach(x => siegeUnitDamage += x.UnitStrengthByType[UnitType.Siege]);
 
                     combatant.StrengthDamage -= siegeUnitDamage;
-                    combatant.StrengthDamage *= (Structure.StructureDefenceModifiers[structure] + (.05 * siegeDuration));
+                    combatant.StrengthDamage *= Structure.StructureDefenceModifiers[structure] + (.05 * siegeDuration);
                     combatant.StrengthDamage += siegeUnitDamage;
                 }
             }
@@ -714,8 +711,8 @@ namespace GameModel
             var winnersToLosers = combatants.OrderByDescending(x => x.Outcome).ToArray();
             for (var i = 0; i < winnersToLosers.Length; i++)
             {
-                var positionProportion = ((i + 1) / (double)winnersToLosers.Length);
-                var losesPenalty = (1 - winnersToLosers[i].UnitSurvivalProportion);
+                var positionProportion = (i + 1) / (double)winnersToLosers.Length;
+                var losesPenalty = 1 - winnersToLosers[i].UnitSurvivalProportion;
 
                 winnersToLosers[i].Units.Where(x => x.IsAlive).ToList().ForEach(x => x.ChangeMorale(turn, -(positionProportion + losesPenalty), "Morale change due to combat"));
             }
@@ -732,7 +729,7 @@ namespace GameModel
                 Turn = turn,
             };
 
-            foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+            foreach (UnitType unitType in Enum.GetValues<UnitType>())
             {
                 units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.QuantityEvents.Where(y => y.Turn == turn).Sum(z => z.Quantity));
             }
@@ -812,7 +809,7 @@ namespace GameModel
 
         public static List<Move> MovesFromShortestPath(List<Move> possibleMoves, PathFindTile[] shortestPath)
         {
-            List<Move> moves = new List<Move>();
+            List<Move> moves = [];
             Move furthestMove = null;
             var origin = shortestPath[0].Hex;
             for (var i = 1; i < shortestPath.Length; i++)

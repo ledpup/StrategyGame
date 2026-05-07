@@ -31,7 +31,7 @@ namespace GameModel
             HasRoad = hasRoad;
         }
 
-        public Edge(string edgeType, Tile origin, Tile destination, bool hasRoad) : this ((EdgeType)Enum.Parse(typeof(EdgeType), edgeType), origin, destination, hasRoad)
+        public Edge(string edgeType, Tile origin, Tile destination, bool hasRoad) : this (Enum.Parse<EdgeType>(edgeType), origin, destination, hasRoad)
         {
         }
 

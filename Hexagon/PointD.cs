@@ -20,7 +20,7 @@ namespace Hexagon
         public static double Theta(PointD origin, PointD destination)
         {
             var dy = -(destination.Y - origin.Y);
-            var dx = (destination.X - origin.X);
+            var dx = destination.X - origin.X;
 
             var PRECISION = 10;
 

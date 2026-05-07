@@ -191,7 +191,7 @@ namespace GameModel
             return tileUnits.Count(x => x.IsAlive && x.OwnerIndex == playerIndex) - StackLimit;
         }
 
-        internal bool IsInConflict(IEnumerable<MilitaryUnit> tileUnits)
+        internal static bool IsInConflict(IEnumerable<MilitaryUnit> tileUnits)
         {
             return tileUnits.Where(x => x.IsAlive).GroupBy(x => x.OwnerIndex).Count() > 1;
         }

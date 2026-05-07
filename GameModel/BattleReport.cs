@@ -16,7 +16,7 @@ namespace GameModel
             for (var i = 0; i < numberOfCombatants; i++)
             {
                 CasualtiesByPlayerAndType[i] = new Dictionary<UnitType, int>();
-                foreach (UnitType unitType in Enum.GetValues(typeof(UnitType)))
+                foreach (UnitType unitType in Enum.GetValues<UnitType>())
                 {
                     CasualtiesByPlayerAndType[i].Add(unitType, 0);
                 }

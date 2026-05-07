@@ -9,7 +9,7 @@ namespace Hexagon
             double width = end - start;
             double offsetValue = value - start;
 
-            return (offsetValue - (Math.Floor(offsetValue / width) * width)) + start;
+            return offsetValue - (Math.Floor(offsetValue / width) * width) + start;
         }
 
         public static double DegreeToRadian(double angle)

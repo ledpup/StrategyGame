@@ -88,7 +88,7 @@ namespace StrategyGame
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 100,
                 Height = 28,
-                DataSource = Enum.GetValues(typeof(EditorTool)),
+                DataSource = Enum.GetValues<EditorTool>(),
             };
 
             // ── terrain palette panel ────────────────────────────────────

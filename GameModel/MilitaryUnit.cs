@@ -100,36 +100,36 @@ namespace GameModel
             IsAlive = true;
 
             BattleQualityModifiers = new Dictionary<BattleQualityModifier, double>();
-            foreach (BattleQualityModifier battleQualityModifier in Enum.GetValues(typeof(BattleQualityModifier)))
+            foreach (BattleQualityModifier battleQualityModifier in Enum.GetValues<BattleQualityModifier>())
             {
                 BattleQualityModifiers.Add(battleQualityModifier, 0);
             }
 
             TerrainTypeBattleModifier = new Dictionary<TerrainType, double>();
-            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
+            foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
             {
                 TerrainTypeBattleModifier.Add(terrainType, 0);
             }
 
             WeatherBattleModifier = new Dictionary<Weather, double>();
-            foreach (Weather weather in Enum.GetValues(typeof(Weather)))
+            foreach (Weather weather in Enum.GetValues<Weather>())
             {
                 WeatherBattleModifier.Add(weather, 0);
             }
 
             OpponentUnitTypeBattleModifier = new Dictionary<UnitType, double>();
-            foreach (UnitType unitTypeEnum in Enum.GetValues(typeof(UnitType)))
+            foreach (UnitType unitTypeEnum in Enum.GetValues<UnitType>())
             {
                 OpponentUnitTypeBattleModifier.Add(unitTypeEnum, 0);
             }
 
             TerrainMovementCosts = new Dictionary<TerrainType, int>();
-            foreach (TerrainType terrainType in Enum.GetValues(typeof(TerrainType)))
+            foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
             {
                 TerrainMovementCosts.Add(terrainType, Terrain.Impassable);
             }
             EdgeMovementCosts = new Dictionary<EdgeType, int>();
-            foreach (EdgeType edgeType in Enum.GetValues(typeof(EdgeType)))
+            foreach (EdgeType edgeType in Enum.GetValues<EdgeType>())
             {
                 EdgeMovementCosts.Add(edgeType, Terrain.Impassable);
             }

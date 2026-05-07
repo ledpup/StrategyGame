@@ -119,15 +119,15 @@ namespace Visualise
                             switch (unitsAtLocation[i].MovementType)
                             {
                                 case MovementType.Airborne:
-                                    gameBoardDrawing2D.DrawTriangle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    gameBoardDrawing2D.DrawTriangle(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Water:
-                                    gameBoardDrawing2D.DrawTrapezium(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    gameBoardDrawing2D.DrawTrapezium(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                     break;
 
                                 case MovementType.Land:
-                                    gameBoardDrawing2D.DrawCircle(group.Key.Hex, (float)(((i + 1) / (float)unitsAtLocation.Count) * Math.PI * 2), colour);
+                                    gameBoardDrawing2D.DrawCircle(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                     break;
                             }
                         }
@@ -173,45 +173,31 @@ namespace Visualise
         }
         private static ArgbColour EdgeToColour(EdgeType edgeType)
         {
-            switch (edgeType)
+            return edgeType switch
             {
-                case EdgeType.River:
-                    return Colours.DodgerBlue;
-                case EdgeType.Forest:
-                    return Colours.DarkGreen;
-                case EdgeType.Hill:
-                    return Colours.SandyBrown;
-                case EdgeType.Mountain:
-                    return Colours.Brown;
-                case EdgeType.Port:
-                    return Colours.DarkBlue;
-                default:
-                    return Colours.Black;
-            }
+                EdgeType.River => Colours.DodgerBlue,
+                EdgeType.Forest => Colours.DarkGreen,
+                EdgeType.Hill => Colours.SandyBrown,
+                EdgeType.Mountain => Colours.Brown,
+                EdgeType.Port => Colours.DarkBlue,
+                _ => Colours.Black,
+            };
         }
 
         private static ArgbColour GetColour(TerrainType terrainType)
         {
-            switch (terrainType)
+            return terrainType switch
             {
-                case TerrainType.Grassland:
-                    return Colours.GreenYellow;
-                case TerrainType.Desert:
-                    return Colours.Yellow;
-                case TerrainType.Forest:
-                    return Colours.DarkGreen;
-                case TerrainType.Hill:
-                    return Colours.SandyBrown;
-                case TerrainType.Mountain:
-                    return Colours.Brown;
-                case TerrainType.Water:
-                    return Colours.LightBlue;
-                case TerrainType.Wetland:
-                    return Colours.DarkGray;
-                case TerrainType.Reef:
-                    return Colours.DarkBlue;
-            }
-            return Colours.Black;
+                TerrainType.Grassland => Colours.GreenYellow,
+                TerrainType.Desert => Colours.Yellow,
+                TerrainType.Forest => Colours.DarkGreen,
+                TerrainType.Hill => Colours.SandyBrown,
+                TerrainType.Mountain => Colours.Brown,
+                TerrainType.Water => Colours.LightBlue,
+                TerrainType.Wetland => Colours.DarkGray,
+                TerrainType.Reef => Colours.DarkBlue,
+                _ => Colours.Black,
+            };
         }
     }
 }

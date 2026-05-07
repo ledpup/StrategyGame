@@ -50,14 +50,14 @@ namespace ComputerOpponent
                 ObjectiveFunctionParameters[i].Add(ObjFuncParameter.StructureStrength, structuresByPlayer[i].Sum(x => 1 - Structure.StructureDefenceModifiers[x.StructureType]));
                 ObjectiveFunctionParameters[i].Add(ObjFuncParameter.UnitStrength, unitsByPlayer[i].Sum(x => x.Strength));
 
-                foreach (ObjFuncParameter parameter in Enum.GetValues(typeof(ObjFuncParameter)))
+                foreach (ObjFuncParameter parameter in Enum.GetValues<ObjFuncParameter>())
                 {
                     ObjectiveFunctionWeightedParameters[i][parameter] = ObjectiveFunctionParameters[i][parameter] * ObjectiveFunctionParameterWeight[parameter];
                 }
 
                 MaxParameterValue[i] = ObjectiveFunctionWeightedParameters[i].Values.Max();
 
-                foreach (ObjFuncParameter parameter in Enum.GetValues(typeof(ObjFuncParameter)))
+                foreach (ObjFuncParameter parameter in Enum.GetValues<ObjFuncParameter>())
                 {
                     ObjectiveFunctionNormalisedParameters[i].Add(parameter, ObjectiveFunctionWeightedParameters[i][parameter] / MaxParameterValue[i]);
                     ObjectiveFunctionValue[i] += ObjectiveFunctionNormalisedParameters[i][parameter] ;

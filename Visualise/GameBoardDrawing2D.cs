@@ -54,11 +54,11 @@ namespace Visualise
             }
         }
 
-        private PointF PointDtoF(PointD point)
+        private static PointF PointDtoF(PointD point)
         {
             return new PointF((float)point.X, (float)point.Y);
         }
-        private PointF[] PointDtoF(List<PointD> points)
+        private static PointF[] PointDtoF(List<PointD> points)
         {
             return points
                 .Select(x => new PointF((float)x.X, (float)x.Y))

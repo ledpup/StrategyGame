@@ -17,7 +17,7 @@ namespace GameModel
     {
         Airborne,
         Land,
-        Water,
+        Waterbound,
     }
 
     public enum BattleQualityModifier
@@ -118,16 +118,10 @@ namespace GameModel
                 OpponentUnitTypeBattleModifier.Add(unitTypeEnum, 0);
             }
 
-            TerrainMovementCosts = [];
-            foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
-            {
-                TerrainMovementCosts.Add(terrainType, Terrain.Impassable);
-            }
-            EdgeMovementCosts = [];
-            foreach (EdgeType edgeType in Enum.GetValues<EdgeType>())
-            {
-                EdgeMovementCosts.Add(edgeType, Terrain.Impassable);
-            }
+            TerrainMovementCosts = new Dictionary<TerrainType, int>(template.TerrainMovementCosts);
+            EdgeMovementCosts = new Dictionary<EdgeType, int>(template.EdgeMovementCosts);
+            UsesRoads = template.UsesRoads;
+            CanStopOn = template.CanStopOn;
 
             Index = index;
             Name = name ?? template.Name ?? "Unit " + index + " (owned by " + ownerIndex + ")";
@@ -144,19 +138,6 @@ namespace GameModel
             Events = [];
             ChangeMorale(TurnCreated, UnitTemplate.Morale, "Initial morale");
             Personnel = InitialPersonnel;
-
-            switch (MovementType)
-            {
-                case MovementType.Land:
-                    LandUnit();
-                    break;
-                case MovementType.Airborne:
-                    AirborneUnit();
-                    break;
-                case MovementType.Water:
-                    WaterUnit();
-                    break;
-            }
 
             var templateMoraleMoveCost = moraleMoveCost ?? template.MoraleMoveCost;
             if (templateMoraleMoveCost == null)
@@ -198,7 +179,7 @@ namespace GameModel
             BattleStrength = battleQuality * Personnel;
         }
 
-        public void ChangeQuantity(int turn, int quantity)
+        public void ChangePersonnel(int turn, int quantity)
         {
             Events.Add(new UnitEvent(turn, quantity, "Personnel change"));
             Personnel += quantity;
@@ -220,77 +201,6 @@ namespace GameModel
 
 
         public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Location == o.Location && p.MovementType == o.MovementType;
-
-        void LandUnit()
-        {
-            TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Desert] = 2;
-            TerrainMovementCosts[TerrainType.Forest] = 2;
-            TerrainMovementCosts[TerrainType.Hill] = 2;
-            TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Water] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Wetland] = 2;
-            TerrainMovementCosts[TerrainType.Reef] = Terrain.Impassable;
-
-            EdgeMovementCosts[EdgeType.None] = 0;
-            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Forest] = 1;
-            EdgeMovementCosts[EdgeType.Hill] = 1;
-            EdgeMovementCosts[EdgeType.Mountain] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Reef] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Port] = 1;
-
-            UsesRoads = true;
-
-            CanStopOn = Terrain.Non_Mountainous_Land;
-        }
-
-        void AirborneUnit()
-        {
-            TerrainMovementCosts[TerrainType.Grassland] = 1;
-            TerrainMovementCosts[TerrainType.Desert] = 1;
-            TerrainMovementCosts[TerrainType.Forest] = 1;
-            TerrainMovementCosts[TerrainType.Hill] = 1;
-            TerrainMovementCosts[TerrainType.Mountain] = 1;
-            TerrainMovementCosts[TerrainType.Water] = 1;
-            TerrainMovementCosts[TerrainType.Wetland] = 1;            
-            TerrainMovementCosts[TerrainType.Reef] = 1;
-
-            EdgeMovementCosts[EdgeType.None] = 0;
-            EdgeMovementCosts[EdgeType.River] = 0;
-            EdgeMovementCosts[EdgeType.Forest] = 0;
-            EdgeMovementCosts[EdgeType.Hill] = 0;
-            EdgeMovementCosts[EdgeType.Mountain] = 0;
-            EdgeMovementCosts[EdgeType.Reef] = 0;
-            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Port] = 0;
-
-            CanStopOn = Terrain.Non_Mountainous_Land;
-        }
-
-        void WaterUnit()
-        {
-            TerrainMovementCosts[TerrainType.Grassland] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Desert] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Forest] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Hill] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Mountain] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Water] = 1;
-            TerrainMovementCosts[TerrainType.Wetland] = Terrain.Impassable;
-            TerrainMovementCosts[TerrainType.Reef] = 2;
-
-            EdgeMovementCosts[EdgeType.None] = 0;
-            EdgeMovementCosts[EdgeType.River] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Forest] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Hill] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Mountain] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Reef] = 1;
-            EdgeMovementCosts[EdgeType.Wall] = Terrain.Impassable;
-            EdgeMovementCosts[EdgeType.Port] = Terrain.Impassable;
-
-            CanStopOn = Terrain.All_Water;
-        }
 
         public Tile Location
         {
@@ -345,7 +255,7 @@ namespace GameModel
         public MilitaryUnit TransportedBy { get; set; }
         public List<MovementType> TransportableBy { get; private set; }
         public bool UsesRoads { get; private set; }
-        public bool IsBeingTransportedByWater { get { return TransportedBy != null && TransportedBy.MovementType == MovementType.Water; } }
+        public bool IsBeingTransportedByWater { get { return TransportedBy != null && TransportedBy.MovementType == MovementType.Waterbound; } }
 
         public IEnumerable<Move> PossibleMoves()
         {

@@ -89,7 +89,7 @@ namespace StrategyGame
             if (movementType == MovementType.Land)
             {
                 transportableBy.Add(MovementType.Airborne);
-                transportableBy.Add(MovementType.Water);
+                transportableBy.Add(MovementType.Waterbound);
             }
 
             document.Units.Add(new UnitDocument
@@ -99,7 +99,7 @@ namespace StrategyGame
                 OwnerIndex = ownerIndex,
                 TileIndex = tile.Index,
                 MovementType = movementType,
-                BaseMovementPoints = movementType == MovementType.Airborne ? 4 : movementType == MovementType.Water ? 5 : 2,
+                BaseMovementPoints = movementType == MovementType.Airborne ? 4 : movementType == MovementType.Waterbound ? 5 : 2,
                 RoadMovementBonus = movementType == MovementType.Land ? 1 : 0,
                 UnitType = unitType,
                 BaseQuality = 1,

@@ -26,11 +26,11 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
-                new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 3, IsTransporter = true }, 1, location: board[3, 10]),
-                new(new UnitTemplate { TransportableBy = [MovementType.Water], RoadMovementBonus = 1 }, 2, location: board[24, 16]),
-                new(new UnitTemplate { TransportableBy = [MovementType.Water] }, 3, location: board[1, 1]),
-                new(new UnitTemplate { TransportableBy = [MovementType.Water] }, 4, location: board[1, 1]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3, IsTransporter = true }, 1, location: board[3, 10]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound], RoadMovementBonus = 1 }, 2, location: board[24, 16]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 3, location: board[1, 1]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 4, location: board[1, 1]),
             };
 
             units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;

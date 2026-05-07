@@ -167,7 +167,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(new UnitTemplate { TransportableBy = [MovementType.Water] }, location: board[4, 3]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, location: board[4, 3]),
             };
 
             var moves = units[0].PossibleMoves();
@@ -506,7 +506,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 3 }, 0, 2, board[225], "1st Fleet") };
+            var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[225], "1st Fleet") };
 
             var moves = units[0].PossibleMoves();
 
@@ -534,8 +534,8 @@ namespace Tests
 
             board.Units =
             [
-                new(new UnitTemplate { MovementPoints = 3, TransportableBy = [MovementType.Water] }, 0, location: board[196]),
-                new(new UnitTemplate { MovementType = MovementType.Water, IsTransporter = true }, 1, location: board[224]),
+                new(new UnitTemplate { MovementPoints = 3, TransportableBy = [MovementType.Waterbound] }, 0, location: board[196]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, IsTransporter = true }, 1, location: board[224]),
             ];
 
             var computerPlayer = new ComputerPlayer(board.Units);

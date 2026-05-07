@@ -207,7 +207,7 @@ namespace ComputerOpponent
                             unitState.Value.StrategicAction = StrategicAction.Disembark;
                         }
                         break;
-                    case MovementType.Water:
+                    case MovementType.Waterbound:
                         // If there are any enemy units nearby, don't dock or transport to destination
                         if (board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId
                                             && x.OwnerIndex != unit.OwnerIndex
@@ -324,7 +324,7 @@ namespace ComputerOpponent
                             unitOrders.Add(new UnloadOrder(unit));
                         }
                     }
-                    if (unit.TransportedBy.MovementType == MovementType.Water)
+                    if (unit.TransportedBy.MovementType == MovementType.Waterbound)
                     {
                         var tileEdges = Edge.GetEdges(board.Edges, unit.Location);
                         if (board.Structures.Any(y => tileEdges.Any(z => 
@@ -586,7 +586,7 @@ namespace ComputerOpponent
                                     if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
                                     {
                                         FriendlyStructureInfluenceMap[index][MovementType.Land][i] += 1D / (distance + 1);
-                                        FriendlyStructureInfluenceMap[index][MovementType.Water][i] += 1D / (distance + 1);
+                                        FriendlyStructureInfluenceMap[index][MovementType.Waterbound][i] += 1D / (distance + 1);
                                     }
                                 }
                                 else
@@ -595,7 +595,7 @@ namespace ComputerOpponent
                                     if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
                                     {
                                         EnemyStructureInfluenceMap[index][MovementType.Land][i] += 1D / (distance + 1);
-                                        EnemyStructureInfluenceMap[index][MovementType.Water][i] += 1D / (distance + 1);
+                                        EnemyStructureInfluenceMap[index][MovementType.Waterbound][i] += 1D / (distance + 1);
                                     }
                                 }
                             }

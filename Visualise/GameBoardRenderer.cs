@@ -122,7 +122,7 @@ namespace Visualise
                                     gameBoardDrawing2D.DrawTriangle(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                     break;
 
-                                case MovementType.Water:
+                                case MovementType.Waterbound:
                                     gameBoardDrawing2D.DrawTrapezium(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                     break;
 

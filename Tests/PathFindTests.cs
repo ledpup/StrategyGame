@@ -82,7 +82,7 @@ namespace Tests
         {
             var board = new Board(GameBoard, TileEdges);
 
-            var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 5, IsTransporter = true }, location: board[20, 5]);
+            var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, location: board[20, 5]);
 
             var shortestPath = Board.FindShortestPath(unit.Location, board[291], unit).ToArray();
 

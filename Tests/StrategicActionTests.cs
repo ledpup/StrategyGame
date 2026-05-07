@@ -21,8 +21,8 @@ namespace Tests
 
             board.Units =
             [
-                new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
-                new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 3, IsTransporter = true }, 1, 1, board[18, 7]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3, IsTransporter = true }, 1, 1, board[18, 7]),
             ];
 
             var computerPlayer = new ComputerPlayer(board.Units);
@@ -39,7 +39,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new(new UnitTemplate { MovementType = MovementType.Water, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
             };
 
             board.Units = units;

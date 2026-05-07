@@ -1,13 +1,8 @@
 ﻿namespace GameModel
 {
-    public class TransportOrder : IUnitOrder
+    public class TransportOrder(MilitaryUnit transportUnit, MilitaryUnit unitToTransport) : IUnitOrder
     {
-        public TransportOrder(MilitaryUnit transportUnit, MilitaryUnit unitToTransport)
-        {
-            Unit = transportUnit;
-            UnitToTransport = unitToTransport;
-        }
-        public MilitaryUnit Unit { get; set; }
-        public MilitaryUnit UnitToTransport { get; set; }
+        public MilitaryUnit Unit { get; set; } = transportUnit;
+        public MilitaryUnit UnitToTransport { get; set; } = unitToTransport;
     }
 }

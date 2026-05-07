@@ -1,14 +1,9 @@
 ﻿namespace GameModel
 {
-    public class UnloadOrder : IUnitOrder
+    public class UnloadOrder(MilitaryUnit unit, Tile destination = null) : IUnitOrder
     {
-        public UnloadOrder(MilitaryUnit unit, Tile destination = null)
-        {
-            Unit = unit;
-            Destination = destination;
-        }
-        public MilitaryUnit Unit { get; set; }
+        public MilitaryUnit Unit { get; set; } = unit;
 
-        public Tile Destination { get; set; }
+        public Tile Destination { get; set; } = destination;
     }
 }

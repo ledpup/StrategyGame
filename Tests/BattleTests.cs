@@ -14,14 +14,14 @@ namespace Tests
         {
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit()
+                new()
                 {
                     UnitType = UnitType.Melee,
                     BaseQuality = 2,
                     InitialQuantity = 347,
                     InitialMorale = 3,
                 },
-                new MilitaryUnit()
+                new()
                 {
                     UnitType = UnitType.Siege,
                     BaseQuality = 2,
@@ -29,7 +29,7 @@ namespace Tests
                     InitialMorale = 3,
                     CombatInitiative = 5,
                 },
-                new MilitaryUnit()
+                new()
                 {
                     UnitType = UnitType.Melee,
                     BaseQuality = 1,
@@ -39,7 +39,7 @@ namespace Tests
 
 
 
-                new MilitaryUnit()
+                new()
                 {
                     OwnerIndex = 1,
                     UnitType = UnitType.Melee,
@@ -47,7 +47,7 @@ namespace Tests
                     InitialQuantity = 245,
                     InitialMorale = 2,
                 },
-                new MilitaryUnit()
+                new()
                 {
                     OwnerIndex = 1,
                     UnitType = UnitType.Cavalry,
@@ -59,7 +59,7 @@ namespace Tests
 
 
 
-                new MilitaryUnit()
+                new()
                 {
                     OwnerIndex = 2,
                     UnitType = UnitType.Cavalry,
@@ -67,7 +67,7 @@ namespace Tests
                     InitialQuantity = 165,
                     StructureBattleModifier = -1,
                 },
-                new MilitaryUnit() {
+                new() {
                     OwnerIndex = 2,
                     UnitType = UnitType.Ranged,
                     BaseQuality = 3,
@@ -114,20 +114,20 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, "1st Infantry", 0, board[1, 1], baseMovementPoints: 4),
-                new MilitaryUnit(1, "2nd Infantry", 1, board[2, 3]),
+                new(0, "1st Infantry", 0, board[1, 1], baseMovementPoints: 4),
+                new(1, "2nd Infantry", 1, board[2, 3]),
             };
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 2, 1),
-                        new Move(board[1, 2], board[2, 2], null, 1, 2),
-                        new Move(board[2, 2], board[3, 2], null, 0, 3),
+                        new(board[1, 1], board[1, 2], null, 2, 1),
+                        new(board[1, 2], board[2, 2], null, 1, 2),
+                        new(board[2, 2], board[3, 2], null, 0, 3),
                     };
             var moves2 = new Move[]
                     {
-                        new Move(board[2, 3], board[2, 2], null, 1, 1),
-                        new Move(board[2, 2], board[2, 1], null, 0, 2),
+                        new(board[2, 3], board[2, 2], null, 1, 1),
+                        new(board[2, 2], board[2, 1], null, 0, 2),
                     };
 
             var moveOrders = new List<IUnitOrder>

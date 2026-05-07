@@ -26,11 +26,11 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true),
-                new MilitaryUnit(1, location: board[3, 10], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true),
-                new MilitaryUnit(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
-                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
-                new MilitaryUnit(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
+                new(0, location: board[20, 5], movementType: MovementType.Water, baseMovementPoints: 5, isTransporter: true),
+                new(1, location: board[3, 10], movementType: MovementType.Water, baseMovementPoints: 3, isTransporter: true),
+                new(2, location: board[24, 16], transportableBy: new List<MovementType> { MovementType.Water }, roadMovementBonus: 1),
+                new(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
+                new(4, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Water }),
             };
 
             units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;
@@ -97,16 +97,16 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
+                new(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
+                new(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
             };
 
             board.Units = units;
 
             var moves = new Move[]
             {
-                new Move(board[1, 1], board[2, 2], null, 2, 1),
-                new Move(board[2, 2], board[3, 2], null, 1, 2),
+                new(board[1, 1], board[2, 2], null, 2, 1),
+                new(board[2, 2], board[3, 2], null, 1, 2),
             };
 
             var unitOrders = new List<IUnitOrder>
@@ -132,16 +132,16 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1], name: "1st Dragoons", roadMovementBonus: 1),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true),
+                new(location: board[1, 1], name: "1st Dragoons", roadMovementBonus: 1),
+                new(location: board[1, 1], movementType: MovementType.Airborne, isTransporter: true),
             };
 
             board.Units = units;
 
             var moves = new Move[]
             {
-                new Move(board[1, 1], board[2, 2], null, 2, 1),
-                new Move(board[2, 2], board[3, 2], null, 1, 2),
+                new(board[1, 1], board[2, 2], null, 2, 1),
+                new(board[2, 2], board[3, 2], null, 1, 2),
             };
 
             var unitOrders = new List<IUnitOrder>
@@ -159,16 +159,16 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new MilitaryUnit(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
+                new(location: board[1, 1], roadMovementBonus: 1, transportableBy: new List<MovementType> { MovementType.Airborne }),
+                new(location: board[1, 1], movementType: MovementType.Airborne, baseMovementPoints: 3, isTransporter: true),
             };
 
             board.Units = units;
 
             var moves = new Move[]
             {
-                new Move(board[1, 1], board[2, 2], null, 2, 1),
-                new Move(board[2, 2], board[3, 2], null, 1, 2),
+                new(board[1, 1], board[2, 2], null, 2, 1),
+                new(board[2, 2], board[3, 2], null, 1, 2),
             };
 
             var unitOrders = new List<IUnitOrder>
@@ -200,10 +200,10 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true),
-                new MilitaryUnit(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
-                new MilitaryUnit(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
-                new MilitaryUnit(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
+                new(0, location: board[24, 11], movementType: MovementType.Airborne, baseMovementPoints: 4, isTransporter: true),
+                new(1, location: board[22, 15], transportableBy: new List<MovementType> { MovementType.Airborne }, roadMovementBonus: 1),
+                new(2, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
+                new(3, location: board[1, 1], transportableBy: new List<MovementType> { MovementType.Airborne }),
             };
 
             units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;

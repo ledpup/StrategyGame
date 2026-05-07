@@ -25,7 +25,7 @@ namespace StrategyGame
             TerrainType.Reef,
         };
 
-        static readonly Dictionary<TerrainType, Color> TerrainColours = new Dictionary<TerrainType, Color>
+        static readonly Dictionary<TerrainType, Color> TerrainColours = new()
         {
             { TerrainType.Grassland, Color.FromArgb(173, 255, 47) },
             { TerrainType.Desert,    Color.FromArgb(255, 255, 0) },

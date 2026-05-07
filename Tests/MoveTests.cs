@@ -25,7 +25,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(location: board[335]) };
+            var units = new List<MilitaryUnit> { new(location: board[335]) };
 
             var moves = units[0].PossibleMoves();
 
@@ -105,7 +105,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(location: board[345], roadMovementBonus: 2) };
+            var units = new List<MilitaryUnit> { new(location: board[345], roadMovementBonus: 2) };
 
             var moves = units[0].PossibleMoves();
 
@@ -135,7 +135,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[85], MovementType.Land, 2, roadMovementBonus: 1) };
+            var units = new List<MilitaryUnit> { new(0, "1st Infantry", 1, board[85], MovementType.Land, 2, roadMovementBonus: 1) };
 
             var moves = units[0].PossibleMoves();
 
@@ -167,7 +167,7 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[4, 3], transportableBy: new List<MovementType> { MovementType.Water }),
+                new(location: board[4, 3], transportableBy: new List<MovementType> { MovementType.Water }),
             };
 
             var moves = units[0].PossibleMoves();
@@ -184,7 +184,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 1, board[85], MovementType.Airborne, 2) };
+            var units = new List<MilitaryUnit> { new(0, "1st Infantry", 1, board[85], MovementType.Airborne, 2) };
 
             var moves = units[0].PossibleMoves();
 
@@ -217,7 +217,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Airborne", 1, board[364], MovementType.Airborne, 3) };
+            var units = new List<MilitaryUnit> { new(0, "1st Airborne", 1, board[364], MovementType.Airborne, 3) };
 
             var moves = units[0].PossibleMoves();
 
@@ -432,7 +432,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 0, board[1, 1]) };
+            var units = new List<MilitaryUnit> { new(0, "1st Infantry", 0, board[1, 1]) };
 
             var moves = units[0].PossibleMoves();
 
@@ -455,7 +455,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Infantry", 0, board[141]) };
+            var units = new List<MilitaryUnit> { new(0, "1st Infantry", 0, board[141]) };
 
             var moves = units[0].PossibleMoves();
 
@@ -482,7 +482,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Amphibious", 1, board[1, 1], MovementType.Land) };
+            var units = new List<MilitaryUnit> { new(0, "1st Amphibious", 1, board[1, 1], MovementType.Land) };
             units[0].TerrainMovementCosts[TerrainType.Wetland] = 1;
             units[0].EdgeMovementCosts[EdgeType.River] = 0;
 
@@ -506,7 +506,7 @@ namespace Tests
         {
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
 
-            var units = new List<MilitaryUnit> { new MilitaryUnit(0, "1st Fleet", 2, board[225], MovementType.Water, 3) };
+            var units = new List<MilitaryUnit> { new(0, "1st Fleet", 2, board[225], MovementType.Water, 3) };
 
             var moves = units[0].PossibleMoves();
 
@@ -534,8 +534,8 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, location: board[196], baseMovementPoints: 3, transportableBy: new List<MovementType>{ MovementType.Water }),
-                new MilitaryUnit(1, location: board[224], movementType: MovementType.Water, isTransporter: true),
+                new(0, location: board[196], baseMovementPoints: 3, transportableBy: new List<MovementType>{ MovementType.Water }),
+                new(1, location: board[224], movementType: MovementType.Water, isTransporter: true),
             };
 
             var computerPlayer = new ComputerPlayer(board.Units);
@@ -559,21 +559,21 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             { 
-                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 5),
-                new MilitaryUnit(location: board[1, 1]),
+                new(location: board[1, 1], baseMovementPoints: 5),
+                new(location: board[1, 1]),
             };
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 5, 1),
-                        new Move(board[1, 2], board[2, 2], null, 4, 2),
-                        new Move(board[2, 2], board[3, 2], null, 3, 3),
+                        new(board[1, 1], board[1, 2], null, 5, 1),
+                        new(board[1, 2], board[2, 2], null, 4, 2),
+                        new(board[2, 2], board[3, 2], null, 3, 3),
                     };
 
             var moves2 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 2, 1),
-                        new Move(board[1, 2], board[2, 2], null, 1, 2),
+                        new(board[1, 1], board[1, 2], null, 2, 1),
+                        new(board[1, 2], board[2, 2], null, 1, 2),
                     };
 
             var moveOrders = new List<IUnitOrder>
@@ -595,18 +595,18 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1]),
-                new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
+                new(location: board[1, 1]),
+                new(ownerIndex: 1, location: board[2, 2]),
             };
 
             var moves1 = new Move[]
                                 {
-                                    new Move(board[1, 1], board[2, 2], null, 2, 1),
+                                    new(board[1, 1], board[2, 2], null, 2, 1),
                                 };
 
             var moves2 = new Move[]
                                 {
-                                    new Move(board[2, 2], board[1, 1], null, 2, 1),
+                                    new(board[2, 2], board[1, 1], null, 2, 1),
                                 };
 
             var moveOrders = new List<IUnitOrder>
@@ -628,19 +628,19 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1]),
-                new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
-                new MilitaryUnit(ownerIndex: 1, location: board[2, 2]),
+                new(location: board[1, 1]),
+                new(ownerIndex: 1, location: board[2, 2]),
+                new(ownerIndex: 1, location: board[2, 2]),
             };
 
             var moves1 = new Move[]
                                 {
-                                    new Move(board[1, 1], board[2, 2], null, 1, 1),
+                                    new(board[1, 1], board[2, 2], null, 1, 1),
                                 };
 
             var moves2 = new Move[]
                                 {
-                                    new Move(board[2, 2], board[1, 1], null, 1, 1),
+                                    new(board[2, 2], board[1, 1], null, 1, 1),
                                 };
 
             var moveOrders = new List<IUnitOrder>
@@ -663,34 +663,34 @@ namespace Tests
             var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, "1st Infantry", 1, board[1, 1], baseMovementPoints : 3),
-                new MilitaryUnit(1, "2nd Infantry", 2, board[4, 1], baseMovementPoints : 3),
+                new(0, "1st Infantry", 1, board[1, 1], baseMovementPoints : 3),
+                new(1, "2nd Infantry", 2, board[4, 1], baseMovementPoints : 3),
 
-                new MilitaryUnit(2, "1st Infantry", 1, board[10, 2], baseMovementPoints : 6),
-                new MilitaryUnit(3, "2nd Infantry", 2, board[10, 3]),
+                new(2, "1st Infantry", 1, board[10, 2], baseMovementPoints : 6),
+                new(3, "2nd Infantry", 2, board[10, 3]),
             };
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 3, 1),
-                        new Move(board[1, 2], board[2, 2], null, 2, 2),
-                        new Move(board[2, 2], board[3, 2], null, 1, 3),
+                        new(board[1, 1], board[1, 2], null, 3, 1),
+                        new(board[1, 2], board[2, 2], null, 2, 2),
+                        new(board[2, 2], board[3, 2], null, 1, 3),
                     };
             var moves2 = new Move[]
                     {
-                        new Move(board[4, 1], board[3, 1], null, 3, 1),
-                        new Move(board[3, 1], board[2, 2], null, 2, 2),
-                        new Move(board[2, 2], board[2, 1], null, 1, 3),
+                        new(board[4, 1], board[3, 1], null, 3, 1),
+                        new(board[3, 1], board[2, 2], null, 2, 2),
+                        new(board[2, 2], board[2, 1], null, 1, 3),
                     };
             var moves3 = new Move[]
                     {
-                        new Move(board[10, 2], board[11, 2], null, 6, 1),
-                        new Move(board[11, 2], board[12, 2], null, 5, 2),
+                        new(board[10, 2], board[11, 2], null, 6, 1),
+                        new(board[11, 2], board[12, 2], null, 5, 2),
                     };
             var moves4 = new Move[]
                     {
-                        new Move(board[10, 3], board[11, 2], null, 2, 1),
-                        new Move(board[11, 2], board[11, 1], null, 1, 2),
+                        new(board[10, 3], board[11, 2], null, 2, 1),
+                        new(board[11, 2], board[11, 1], null, 1, 2),
                     };
 
             var moveOrders = new List<IUnitOrder>
@@ -725,9 +725,9 @@ namespace Tests
 
             var units = new List<MilitaryUnit> 
             { 
-                            new MilitaryUnit() { Location = tile1, }, 
-                            new MilitaryUnit() { OwnerIndex = 2, Location = tile1, },
-                            new MilitaryUnit() { Location = tile2, },
+                            new() { Location = tile1, }, 
+                            new() { OwnerIndex = 2, Location = tile1, },
+                            new() { Location = tile2, },
             };
 
             var movingUnits = new List<MilitaryUnit> 
@@ -748,32 +748,32 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
-                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
-                new MilitaryUnit(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
+                new(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
+                new(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
+                new(location: board[1, 1], baseMovementPoints: 4, moraleMoveCost: new float[] {0, 0, .5F, .5F}),
             };
 
             var moves1 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 4, 1),
-                        new Move(board[1, 2], board[2, 2], null, 3, 2),
-                        new Move(board[2, 2], board[3, 2], null, 2, 3),
+                        new(board[1, 1], board[1, 2], null, 4, 1),
+                        new(board[1, 2], board[2, 2], null, 3, 2),
+                        new(board[2, 2], board[3, 2], null, 2, 3),
                     };
 
             var moves2 = new Move[]
                     {
-                        new Move(board[1, 1], board[1, 2], null, 4, 1),
-                        new Move(board[1, 2], board[2, 2], null, 3, 2),
-                        new Move(board[2, 2], board[3, 2], null, 2, 3),
-                        new Move(board[3, 2], board[4, 3], null, 1, 4),
+                        new(board[1, 1], board[1, 2], null, 4, 1),
+                        new(board[1, 2], board[2, 2], null, 3, 2),
+                        new(board[2, 2], board[3, 2], null, 2, 3),
+                        new(board[3, 2], board[4, 3], null, 1, 4),
                     };
 
             var moves3 = new Move[]
             {
-                        new Move(board[1, 1], board[1, 2], null, 4, 1, MoveType.Road),
-                        new Move(board[1, 2], board[2, 2], null, 3, 2, MoveType.Road),
-                        new Move(board[2, 2], board[3, 2], null, 2, 3, MoveType.Road),
-                        new Move(board[3, 2], board[4, 3], null, 1, 4, MoveType.Road),
+                        new(board[1, 1], board[1, 2], null, 4, 1, MoveType.Road),
+                        new(board[1, 2], board[2, 2], null, 3, 2, MoveType.Road),
+                        new(board[2, 2], board[3, 2], null, 2, 3, MoveType.Road),
+                        new(board[3, 2], board[4, 3], null, 1, 4, MoveType.Road),
             };
 
             var moveOrders = new List<IUnitOrder>

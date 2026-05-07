@@ -31,7 +31,7 @@ namespace Hexagon
             return new Hex(a.q * k, a.r * k, a.s * k);
         }
 
-        static public List<Hex> Directions = new List<Hex> { new Hex(-1, 0, 1), new Hex(0, -1, 1), new Hex(1, -1, 0), new Hex(1, 0, -1), new Hex(0, 1, -1), new Hex(-1, 1, 0), };
+        static public List<Hex> Directions = new() { new Hex(-1, 0, 1), new Hex(0, -1, 1), new Hex(1, -1, 0), new Hex(1, 0, -1), new Hex(0, 1, -1), new Hex(-1, 1, 0), };
 
         static public Hex Direction(int direction)
         {
@@ -73,7 +73,7 @@ namespace Hexagon
             return Add(hex, Direction(direction));
         }
 
-        static public List<Hex> Diagonals = new List<Hex> { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
+        static public List<Hex> Diagonals = new() { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
 
         static public Hex DiagonalNeighbor(Hex hex, int direction)
         {

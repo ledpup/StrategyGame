@@ -91,9 +91,9 @@ namespace Tests
         [TestMethod]
         public void TestHexRound()
         {
-            Hex a = new Hex(0, 0, 0);
-            Hex b = new Hex(1, -1, 0);
-            Hex c = new Hex(0, -1, 1);
+            Hex a = new(0, 0, 0);
+            Hex b = new(1, -1, 0);
+            Hex c = new(0, -1, 1);
             HexTests.EqualHex("hex_round 1", new Hex(5, -10, 5), FractionalHex.HexRound(FractionalHex.HexLerp(new Hex(0, 0, 0), new Hex(10, -20, 10), 0.5)));
             HexTests.EqualHex("hex_round 2", a, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.499)));
             HexTests.EqualHex("hex_round 3", b, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.501)));
@@ -105,17 +105,17 @@ namespace Tests
         [TestMethod]
         public void TestHexLinedraw()
         {
-            HexTests.EqualHexArray("hex_linedraw", new List<Hex> { new Hex(0, 0, 0), new Hex(0, -1, 1), new Hex(0, -2, 2), new Hex(1, -3, 2), new Hex(1, -4, 3), new Hex(1, -5, 4) }, FractionalHex.HexLinedraw(new Hex(0, 0, 0), new Hex(1, -5, 4)));
+            HexTests.EqualHexArray("hex_linedraw", new List<Hex> { new(0, 0, 0), new(0, -1, 1), new(0, -2, 2), new(1, -3, 2), new(1, -4, 3), new(1, -5, 4) }, FractionalHex.HexLinedraw(new Hex(0, 0, 0), new Hex(1, -5, 4)));
         }
 
 
         [TestMethod]
         public void TestLayout()
         {
-            Hex h = new Hex(3, 4, -7);
-            Layout flat = new Layout(Layout.flat, new PointD(10, 15), new PointD(35, 71));
+            Hex h = new(3, 4, -7);
+            Layout flat = new(Layout.flat, new PointD(10, 15), new PointD(35, 71));
             HexTests.EqualHex("layout", h, FractionalHex.HexRound(Layout.PixelToHex(flat, Layout.HexToPixel(flat, h))));
-            Layout pointy = new Layout(Layout.pointy, new PointD(10, 15), new PointD(35, 71));
+            Layout pointy = new(Layout.pointy, new PointD(10, 15), new PointD(35, 71));
             HexTests.EqualHex("layout", h, FractionalHex.HexRound(Layout.PixelToHex(pointy, Layout.HexToPixel(pointy, h))));
         }
 

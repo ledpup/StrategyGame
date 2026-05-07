@@ -28,10 +28,10 @@ namespace Tests
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(location: board[6, 1], roadMovementBonus: 1),
-                new MilitaryUnit(location: board[6, 1]),
-                new MilitaryUnit(location: board[6, 1]),
-                new MilitaryUnit(location: board[6, 1]),
+                new(location: board[6, 1], roadMovementBonus: 1),
+                new(location: board[6, 1]),
+                new(location: board[6, 1]),
+                new(location: board[6, 1]),
             };
             board.Units.AddRange(units);
 

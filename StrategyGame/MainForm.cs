@@ -185,7 +185,7 @@ namespace StrategyGame
         // ── helpers ──────────────────────────────────────────────────────
 
         static ComboBox CreateComboBox(Type enumType) =>
-            new ComboBox
+            new()
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 110,
@@ -193,7 +193,8 @@ namespace StrategyGame
             };
 
         static Label Label(string text, int leftPad = 4) =>
-            new Label { Text = text, AutoSize = true, Padding = new Padding(leftPad, 8, 0, 0) };
+            new()
+            { Text = text, AutoSize = true, Padding = new Padding(leftPad, 8, 0, 0) };
 
         static Panel MakePanel(params Control[] controls)
         {

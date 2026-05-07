@@ -154,12 +154,12 @@ namespace StrategyGame
         }
 
         public static SimulationSession StartSimulation(Board board, int maxTurns = 50) =>
-            new SimulationSession(board, maxTurns);
+            new(board, maxTurns);
     }
 
     internal static class EditorLayout
     {
-        public static readonly Layout Layout = new Layout(Layout.flat, new PointD(25, 25), new PointD(25, 21.650635094610966));
+        public static readonly Layout Layout = new(Layout.flat, new PointD(25, 25), new PointD(25, 21.650635094610966));
     }
 
     /// <summary>

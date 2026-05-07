@@ -14,8 +14,8 @@ namespace Hexagon
         public readonly Orientation orientation;
         public readonly PointD size;
         public readonly PointD origin;
-        static public Orientation pointy = new Orientation(Math.Sqrt(3.0), Math.Sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0, Math.Sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0, 0.5);
-        static public Orientation flat = new Orientation(3.0 / 2.0, 0.0, Math.Sqrt(3.0) / 2.0, Math.Sqrt(3.0), 2.0 / 3.0, 0.0, -1.0 / 3.0, Math.Sqrt(3.0) / 3.0, 0.0);
+        static public Orientation pointy = new(Math.Sqrt(3.0), Math.Sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0, Math.Sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0, 0.5);
+        static public Orientation flat = new(3.0 / 2.0, 0.0, Math.Sqrt(3.0) / 2.0, Math.Sqrt(3.0), 2.0 / 3.0, 0.0, -1.0 / 3.0, Math.Sqrt(3.0) / 3.0, 0.0);
 
         static public PointD HexToPixel(Layout layout, Hex h)
         {
@@ -33,7 +33,7 @@ namespace Hexagon
             Orientation M = layout.orientation;
             PointD size = layout.size;
             PointD origin = layout.origin;
-            PointD pt = new PointD((p.X - origin.X) / size.X, (p.Y - origin.Y) / size.Y);
+            PointD pt = new((p.X - origin.X) / size.X, (p.Y - origin.Y) / size.Y);
             double q = M.b0 * pt.X + M.b1 * pt.Y;
             double r = M.b2 * pt.X + M.b3 * pt.Y;
             return new FractionalHex(q, r, -q - r);
@@ -51,7 +51,7 @@ namespace Hexagon
 
         static public List<PointD> PolygonCorners(Layout layout, Hex h)
         {
-            List<PointD> corners = new List<PointD> { };
+            List<PointD> corners = new() { };
             PointD center = HexToPixel(layout, h);
             for (int i = 0; i < 6; i++)
             {

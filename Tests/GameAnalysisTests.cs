@@ -17,21 +17,21 @@ namespace Tests
 
             var structures = new List<Structure>
             {
-                new Structure(0, StructureType.Fortress, null, 1),
-                new Structure(0, StructureType.Outpost, null, 1),
+                new(0, StructureType.Fortress, null, 1),
+                new(0, StructureType.Outpost, null, 1),
 
-                new Structure(0, StructureType.City, null, 2),
+                new(0, StructureType.City, null, 2),
             };
 
             var units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, "1st Infantry", 1)
+                new(0, "1st Infantry", 1)
                 {
                     BaseQuality = 2,
                     InitialQuantity = 300,
                 },
 
-                new MilitaryUnit(1, "1st Blue Infantry", 2)
+                new(1, "1st Blue Infantry", 2)
                 {
                     BaseQuality = 2,
                     InitialQuantity = 500,

@@ -26,16 +26,16 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, "1st Airborne", 0, board[114], MovementType.Airborne, 3),
-                new MilitaryUnit(1, "1st Infantry", 0, board[110], MovementType.Land, 3),
-                new MilitaryUnit(2, "2nd Infantry", 0, board[31], MovementType.Land),
-                new MilitaryUnit(3, "3rd Infantry", 0, board[56], MovementType.Land),
-                new MilitaryUnit(4, "4th Infantry", 0, board[65], MovementType.Land),
+                new(0, "1st Airborne", 0, board[114], MovementType.Airborne, 3),
+                new(1, "1st Infantry", 0, board[110], MovementType.Land, 3),
+                new(2, "2nd Infantry", 0, board[31], MovementType.Land),
+                new(3, "3rd Infantry", 0, board[56], MovementType.Land),
+                new(4, "4th Infantry", 0, board[65], MovementType.Land),
 
-                new MilitaryUnit(5, "1st Infantry", 1, board[111]),
-                new MilitaryUnit(6, "2nd Infantry", 1, board[111]),
+                new(5, "1st Infantry", 1, board[111]),
+                new(6, "2nd Infantry", 1, board[111]),
 
-                new MilitaryUnit(7, "3rd Infantry", 1, board[168]),
+                new(7, "3rd Infantry", 1, board[168]),
             };
 
             board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
@@ -73,15 +73,15 @@ namespace Tests
 
             board.Units = new List<MilitaryUnit>
             {
-                new MilitaryUnit(0, ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
-                new MilitaryUnit(1, ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
-                new MilitaryUnit(2, ownerIndex: 0, location: board[31], movementType: MovementType.Land),
-                new MilitaryUnit(3, ownerIndex: 0, location: board[56], movementType: MovementType.Land),
-                new MilitaryUnit(4, ownerIndex: 0, location: board[65], movementType: MovementType.Land),
+                new(0, ownerIndex: 0, location: board[114], movementType: MovementType.Airborne, baseMovementPoints: 3),
+                new(1, ownerIndex: 0, location: board[110], movementType: MovementType.Land, baseMovementPoints: 3),
+                new(2, ownerIndex: 0, location: board[31], movementType: MovementType.Land),
+                new(3, ownerIndex: 0, location: board[56], movementType: MovementType.Land),
+                new(4, ownerIndex: 0, location: board[65], movementType: MovementType.Land),
 
-                new MilitaryUnit(5, ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(6, ownerIndex: 1, location: board[111]),
-                new MilitaryUnit(7, ownerIndex: 1, location: board[168]),
+                new(5, ownerIndex: 1, location: board[111]),
+                new(6, ownerIndex: 1, location: board[111]),
+                new(7, ownerIndex: 1, location: board[168]),
             };
 
 

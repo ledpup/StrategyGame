@@ -80,7 +80,7 @@ namespace Visualise
 
             if (isPort)
             {
-                using (StringFormat sf = new StringFormat())
+                using (StringFormat sf = new())
                 {
                     sf.Alignment = StringAlignment.Center;
                     sf.LineAlignment = StringAlignment.Center;
@@ -189,10 +189,10 @@ namespace Visualise
 
             PointF[] points =
             {
-                new PointF(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth * .8F, topLeftCorner.yTopLeft + _unitWidth * .65F),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth * .2F, topLeftCorner.yTopLeft + _unitWidth * .65F),
+                new(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
+                new(topLeftCorner.xTopLeft + _unitWidth, topLeftCorner.yTopLeft),
+                new(topLeftCorner.xTopLeft + _unitWidth * .8F, topLeftCorner.yTopLeft + _unitWidth * .65F),
+                new(topLeftCorner.xTopLeft + _unitWidth * .2F, topLeftCorner.yTopLeft + _unitWidth * .65F),
                 
             };
 
@@ -230,9 +230,9 @@ namespace Visualise
 
             PointF[] points = 
             {
-                new PointF(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth, topLeftCorner.yTopLeft),
-                new PointF(topLeftCorner.xTopLeft + _unitWidth / 2, topLeftCorner.yTopLeft + _unitWidth)
+                new(topLeftCorner.xTopLeft, topLeftCorner.yTopLeft),
+                new(topLeftCorner.xTopLeft + _unitWidth, topLeftCorner.yTopLeft),
+                new(topLeftCorner.xTopLeft + _unitWidth / 2, topLeftCorner.yTopLeft + _unitWidth)
             };
 
             _graphics.FillPolygon(brush, points);
@@ -261,7 +261,7 @@ namespace Visualise
             if (labels == null)
                 return;
 
-            using (StringFormat sf = new StringFormat())
+            using (StringFormat sf = new())
             {
                 sf.Alignment = StringAlignment.Center;
                 sf.LineAlignment = StringAlignment.Center;

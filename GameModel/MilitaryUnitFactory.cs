@@ -1,0 +1,49 @@
+using System.Collections.Generic;
+
+namespace GameModel;
+
+public class MilitaryUnitFactory
+{
+    private readonly UnitTemplateFactory templateFactory;
+    private readonly Dictionary<UnitTemplateName, int> sequenceCounters = [];
+
+    public MilitaryUnitFactory(UnitTemplateFactory templateFactory)
+    {
+        this.templateFactory = templateFactory;
+    }
+
+    public MilitaryUnit Create(UnitTemplateName templateName, string unitName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
+    {
+        var template = templateFactory.Get(templateName);
+        return new MilitaryUnit(template, ownerIndex: ownerIndex, location: location, name: unitName, turnBuilt: turnBuilt);
+    }
+
+    public MilitaryUnit CreateNext(UnitTemplateName templateName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
+    {
+        if (!sequenceCounters.TryGetValue(templateName, out var count))
+            count = 0;
+
+        count++;
+        sequenceCounters[templateName] = count;
+
+        var ordinal = ToOrdinal(count);
+        var unitName = $"{ordinal} {templateName.ToDisplayName()}";
+        return Create(templateName, unitName, ownerIndex, location, turnBuilt);
+    }
+
+    private static string ToOrdinal(int number)
+    {
+        var suffix = (number % 100) switch
+        {
+            11 or 12 or 13 => "th",
+            _ => (number % 10) switch
+            {
+                1 => "st",
+                2 => "nd",
+                3 => "rd",
+                _ => "th",
+            }
+        };
+        return $"{number}{suffix}";
+    }
+}

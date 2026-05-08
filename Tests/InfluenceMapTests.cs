@@ -1,5 +1,6 @@
 using ComputerOpponent;
 using GameModel;
+using GameModel.Commands;
 using Hexagon;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace Tests
 
             computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-            var moveOrders = new List<IUnitOrder>();
+            var moveOrders = new List<IUnitCommand>();
 
             board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
             {
@@ -55,7 +56,7 @@ namespace Tests
             });
 
             var vectors = new List<Centreline>();
-            moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
+            moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
             GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
 

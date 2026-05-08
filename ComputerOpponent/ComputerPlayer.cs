@@ -1,4 +1,5 @@
 using GameModel;
+using GameModel.Commands;
 using Hexagon;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 
 namespace ComputerOpponent
 {
-    public enum StrategicAction
+    public enum OperationalAction
     {
         None,
         Dock,
@@ -164,7 +165,7 @@ namespace ComputerOpponent
         {
             foreach (var unitState in UnitStates)
             {
-                unitState.Value.StrategicAction = StrategicAction.None;
+                unitState.Value.StrategicAction = OperationalAction.None;
 
                 var unit = board.Units.SingleOrDefault(x => x.Index == unitState.Key);
                 if (unit == null || !unit.IsAlive)
@@ -184,11 +185,11 @@ namespace ComputerOpponent
                         }
                         if (!unit.Transporting.Any())
                         {
-                            unitState.Value.StrategicAction = StrategicAction.Pickup;
+                            unitState.Value.StrategicAction = OperationalAction.Pickup;
                         }
                         else if (unit.Transporting.Any())
                         {
-                            unitState.Value.StrategicAction = StrategicAction.AirliftToDestination;
+                            unitState.Value.StrategicAction = OperationalAction.AirliftToDestination;
                         }
                         break;
                     case MovementType.Land:
@@ -200,11 +201,11 @@ namespace ComputerOpponent
                                     !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)
                                     )
                         {
-                            unitState.Value.StrategicAction = StrategicAction.Embark;
+                            unitState.Value.StrategicAction = OperationalAction.Embark;
                         }
                         else if (unit.TransportedBy != null)
                         {
-                            unitState.Value.StrategicAction = StrategicAction.Disembark;
+                            unitState.Value.StrategicAction = OperationalAction.Disembark;
                         }
                         break;
                     case MovementType.Waterbound:
@@ -217,24 +218,24 @@ namespace ComputerOpponent
                         }
                         if (!unit.Transporting.Any())
                         {
-                            unitState.Value.StrategicAction = StrategicAction.Dock;
+                            unitState.Value.StrategicAction = OperationalAction.Dock;
                         }
                         else if (unit.Transporting.Any())
                         {
-                            unitState.Value.StrategicAction = StrategicAction.TransportToDestination;
+                            unitState.Value.StrategicAction = OperationalAction.TransportToDestination;
                         }
                         break;
                 }
             }
         }
 
-        public List<IUnitOrder> CreateOrders(GameState board, List<MilitaryUnit> units)
+        public List<IUnitCommand> CreateOrders(GameState board, List<MilitaryUnit> units)
         {
             if (units.Any(x => !x.IsAlive))
                 throw new Exception("Cannot assign orders to units that have been destroyed");
 
             var aiControlledUnits = units.Where(IsTracked).ToList();
-            var unitOrders = new List<IUnitOrder>();
+            var unitOrders = new List<IUnitCommand>();
 
             var landAndWaterUnits = aiControlledUnits.Where(x => x.MovementType != MovementType.Airborne).ToList();
             landAndWaterUnits.ForEach(unit => unitOrders.AddRange(CreateOrdersForUnit(board, aiControlledUnits, null, unit)));
@@ -245,23 +246,23 @@ namespace ComputerOpponent
             return unitOrders;
         }
 
-        private List<IUnitOrder> CreateOrdersForUnit(GameState board, List<MilitaryUnit> units, List<IUnitOrder> existingOrders, MilitaryUnit unit)
+        private List<IUnitCommand> CreateOrdersForUnit(GameState board, List<MilitaryUnit> units, List<IUnitCommand> existingOrders, MilitaryUnit unit)
         {
-            var unitOrders = new List<IUnitOrder>();
+            var unitOrders = new List<IUnitCommand>();
 
             var unitState = GetUnitState(unit);
 
             switch (unitState.StrategicAction)
             {
-                case StrategicAction.None:
+                case OperationalAction.None:
                     {
                         var moveOrder = FindBestMoveOrderForUnit(unit, board);
                         if (moveOrder != null)
                             unitOrders.Add(moveOrder);
                         break;
                     }
-                case StrategicAction.Embark:
-                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && GetUnitState(x).StrategicAction == StrategicAction.Pickup;
+                case OperationalAction.Embark:
+                    Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && GetUnitState(x).StrategicAction == OperationalAction.Pickup;
                     var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule);
 
                     //Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;
@@ -287,7 +288,7 @@ namespace ComputerOpponent
                                     unitOrders.Add(moveOrder);
                                 }
                             }
-                            unitOrders.Add(new TransportOrder(transporter, unit));
+                            unitOrders.Add(new TransportCommand(transporter, unit));
                             break;
                         }
                     }
@@ -316,12 +317,12 @@ namespace ComputerOpponent
                     }
                     
                     break;
-                case StrategicAction.Disembark:
+                case OperationalAction.Disembark:
                     if (unit.TransportedBy.MovementType == MovementType.Airborne)
                     {
                         if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
                         {
-                            unitOrders.Add(new UnloadOrder(unit));
+                            unitOrders.Add(new UnloadCommand(unit));
                         }
                     }
                     if (unit.TransportedBy.MovementType == MovementType.Waterbound)
@@ -339,9 +340,9 @@ namespace ComputerOpponent
                     }
                     break;
 
-                case StrategicAction.Dock:
+                case OperationalAction.Dock:
                     {
-                        if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && GetUnitState(x).StrategicAction == StrategicAction.Embark))
+                        if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && GetUnitState(x).StrategicAction == OperationalAction.Embark))
                         {
                             closestPortPath = ClosestPortPath(board, unit);
 
@@ -355,7 +356,7 @@ namespace ComputerOpponent
                         }
                         break;
                     }
-                case StrategicAction.TransportToDestination:
+                case OperationalAction.TransportToDestination:
                     {
                         // Find the closest port that has a region with one or more enemy structures
                         closestPortPath = ClosestPortPath(board, unit);
@@ -370,7 +371,7 @@ namespace ComputerOpponent
 
                         break;
                     }
-                case StrategicAction.Pickup:
+                case OperationalAction.Pickup:
                     {
                         var closestUnit = ClosestEmbarkingUnitPath(board, units, unit.Location);
 
@@ -378,7 +379,7 @@ namespace ComputerOpponent
                         {
                             var destination = closestUnit.Location;
 
-                            var transporteeMoveOrder = existingOrders.OfType<MoveOrder>().SingleOrDefault(x => x.Unit == closestUnit);
+                            var transporteeMoveOrder = existingOrders.OfType<MoveCommand>().SingleOrDefault(x => x.Unit == closestUnit);
                             if (transporteeMoveOrder != null)
                             {
                                 destination = transporteeMoveOrder.Moves.Last().Edge.Destination;
@@ -396,7 +397,7 @@ namespace ComputerOpponent
                         }
                         break;
                     }
-                case StrategicAction.AirliftToDestination:
+                case OperationalAction.AirliftToDestination:
                     {
 
                         var closestEnemyStructure = ClosestEnemyStructurePath(board, unit);
@@ -408,7 +409,7 @@ namespace ComputerOpponent
 
                             if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
                             {
-                                unit.Transporting.ForEach(x => unitOrders.Add(new UnloadOrder(x, moveOrder.Moves.Last().Edge.Destination)));
+                                unit.Transporting.ForEach(x => unitOrders.Add(new UnloadCommand(x, moveOrder.Moves.Last().Edge.Destination)));
                             }
                         }
 
@@ -421,7 +422,7 @@ namespace ComputerOpponent
         private MilitaryUnit ClosestEmbarkingUnitPath(GameState board, List<MilitaryUnit> units, Tile origin)
         {
             var closestUnit = units
-                                    .Where(x => GetUnitState(x).StrategicAction == StrategicAction.Embark)
+                                    .Where(x => GetUnitState(x).StrategicAction == OperationalAction.Embark)
                                     .OrderBy(x => Hex.Distance(x.Location.Hex, origin.Hex))
                                     .FirstOrDefault();
 
@@ -496,12 +497,12 @@ namespace ComputerOpponent
                     {
                         switch (unitState.StrategicAction)
                         {
-                            case StrategicAction.Dock:
+                            case OperationalAction.Dock:
                                 // Only go to a port that has units that want to embark
-                                if (!board.Units.Any(y => IsTracked(y) && x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && GetUnitState(y).StrategicAction == StrategicAction.Embark))
+                                if (!board.Units.Any(y => IsTracked(y) && x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && GetUnitState(y).StrategicAction == OperationalAction.Embark))
                                     return;
                                 break;
-                            case StrategicAction.TransportToDestination:
+                            case OperationalAction.TransportToDestination:
                                 // Only go to a port that has enemy structure(s)
                                 if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
                                     return;
@@ -693,7 +694,7 @@ namespace ComputerOpponent
             }
         }
 
-        public MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit, GameState board)
+        public MoveCommand FindBestMoveOrderForUnit(MilitaryUnit unit, GameState board)
         {
             var unitState = GetUnitState(unit);
 

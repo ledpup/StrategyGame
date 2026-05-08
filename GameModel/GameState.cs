@@ -1,3 +1,4 @@
+using GameModel.Commands;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +9,7 @@ public class GameState
     public Board Board { get; }
     public List<MilitaryUnit> Units { get; set; }
     public int Turn { get; set; }
-    public Dictionary<int, List<MoveOrder>> MoveOrders { get; }
+    public Dictionary<int, List<MoveCommand>> MoveCommands { get; }
 
     // Board pass-throughs
     public int Width => Board.Width;
@@ -24,18 +25,16 @@ public class GameState
         Board = board;
         Units = units ?? [];
         Turn = turn;
-        MoveOrders = [];
+        MoveCommands = [];
         Board.CalculateTemperature(turn);
     }
 
     public void CalculateTemperature(int turn) => Board.CalculateTemperature(turn);
     public void InitialiseSupply() => Board.InitialiseSupply();
 
-    public IEnumerable<MilitaryUnit> UnitsAt(Tile tile) =>
-        Units.Where(x => x.Location == tile);
+    public IEnumerable<MilitaryUnit> UnitsAt(Tile tile) => Units.Where(x => x.Location == tile);
 
-    public bool OverStackLimit(Tile tile, int playerIndex) =>
-        tile.OverStackLimit(UnitsAt(tile), playerIndex);
+    public bool OverStackLimit(Tile tile, int playerIndex) => tile.OverStackLimit(UnitsAt(tile), playerIndex);
 
     public void ResolveStackLimits(int playerIndex)
     {
@@ -53,11 +52,7 @@ public class GameState
         });
     }
 
-    public void ResolveOrders(List<IUnitOrder> unitOrders) =>
-        new OrderResolver(this).ResolveOrders(unitOrders);
-
-    public static IEnumerable<MilitaryUnit> DetectConflictedUnits(List<MilitaryUnit> setOfUnits, IEnumerable<MilitaryUnit> allUnits) =>
-        OrderResolver.DetectConflictedUnits(setOfUnits, allUnits);
+    public void ResolveOrders(List<IUnitCommand> unitOrders) => new CommandResolver(this).ResolveCommands(unitOrders);
 
     public List<BattleReport> ConductBattles()
     {

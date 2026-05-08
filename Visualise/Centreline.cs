@@ -1,4 +1,5 @@
 ﻿using GameModel;
+using GameModel.Commands;
 using Hexagon;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Visualise
             Width = colour == Colours.Black ? 1 : isBridge ? 5 : 3;
         }
 
-        public static List<Centreline> MoveOrderToCentrelines(MoveOrder moveOrder)
+        public static List<Centreline> MoveOrderToCentrelines(MoveCommand moveOrder)
         {
             var colour = moveOrder.Unit == null ? Colours.Black : GameBoardRenderer.UnitColour(moveOrder.Unit);
             return moveOrder.Moves.Select(x => new Centreline(x.Origin.Hex, x.Edge.Destination.Hex, colour)).ToList();

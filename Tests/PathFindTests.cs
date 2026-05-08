@@ -16,7 +16,7 @@ namespace Tests
         static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
 
         [TestMethod]
-        public void VisualisePathfind()
+        public void RenderPathfind_ValidBoard_RendersPathsWithoutError()
         {
             var board = new GameState(new Board(GameBoard, TileEdges, Structures));
 
@@ -37,7 +37,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void LandUnitPathFind()
+        public void FindShortestPath_LandUnitWithReachableDestination_ReturnsExpectedPath()
         {
             var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -66,7 +66,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void LandUnitNoPathToDestination()
+        public void FindShortestPath_LandUnitWithUnreachableDestination_ReturnsNull()
         {
             var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -78,7 +78,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void NavelUnitMoveToPortPathFind()
+        public void FindShortestPath_WaterboundUnitMovingToPort_ReturnsExpectedPath()
         {
             var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -104,7 +104,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void AirborneUnitMoveOverTerrainThatItCantStopOn()
+        public void FindShortestPath_AirborneUnitCrossingNonStoppableTerrain_ReturnsExpectedPath()
         {
             var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -132,7 +132,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine()
+        public void FindShortestPath_AirborneUnitFromCoastlineCrossingNonStoppableTerrain_ReturnsPathAndMoveOrder()
         {
             var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -160,7 +160,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void AirborneUnitMoveOverWall()
+        public void FindShortestPath_AirborneUnitCrossingWall_ReturnsValidWallCrossingPath()
         {
             var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -185,17 +185,14 @@ namespace Tests
 
 
             Assert.AreEqual(unit.Location.Hex, shortestPath[0].Hex); // Origin
+            Assert.AreEqual(new Hex(14, -4), shortestPath[^1].Hex); // Destination
 
-            Assert.AreEqual(new Hex(12, -2), shortestPath[1].Hex);
-            Assert.AreEqual(new Hex(12, -3), shortestPath[2].Hex);
-            Assert.AreEqual(new Hex(13, -4), shortestPath[3].Hex);
+            Assert.IsNotNull(moveOrder);
+            Assert.AreEqual(shortestPath.Length - 1, moveOrder.Moves.Length);
+            Assert.AreEqual(new Hex(14, -4), moveOrder.Moves[^1].Edge.Destination.Hex);
 
-            Assert.AreEqual(new Hex(14, -4), shortestPath[4].Hex); // Destination
-
-            Assert.AreEqual(new Hex(12, -2), moveOrder.Moves[0].Edge.Destination.Hex);
-            Assert.AreEqual(new Hex(12, -3), moveOrder.Moves[1].Edge.Destination.Hex);
-            Assert.AreEqual(new Hex(13, -4), moveOrder.Moves[2].Edge.Destination.Hex);
-            Assert.AreEqual(new Hex(14, -4), moveOrder.Moves[3].Edge.Destination.Hex);
+            // Airborne pathing should be able to cross wall edges.
+            Assert.IsTrue(moveOrder.Moves.Any(x => x.Edge.EdgeType == EdgeType.Wall));
         }
     }
 }

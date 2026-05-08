@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
 using ComputerOpponent;
 using Visualise;
+using GameModel.Commands;
 
 namespace Tests
 {
@@ -576,10 +577,10 @@ namespace Tests
                         new(board[1, 2], board[2, 2], null, 1, 2),
                     };
 
-            var moveOrders = new List<IUnitOrder>
+            var moveOrders = new List<IUnitCommand>
             {
-                new MoveOrder(moves1, board.Units[0]),
-                new MoveOrder(moves2, board.Units[1]),
+                new MoveCommand(moves1, board.Units[0]),
+                new MoveCommand(moves2, board.Units[1]),
             };
 
             board.ResolveOrders(moveOrders);
@@ -609,10 +610,10 @@ namespace Tests
                                     new(board[2, 2], board[1, 1], null, 2, 1),
                                 };
 
-            var moveOrders = new List<IUnitOrder>
+            var moveOrders = new List<IUnitCommand>
             {
-                new MoveOrder(moves1, board.Units[0]),
-                new MoveOrder(moves2, board.Units[1]),
+                new MoveCommand(moves1, board.Units[0]),
+                new MoveCommand(moves2, board.Units[1]),
             };
 
             board.ResolveOrders(moveOrders);
@@ -643,11 +644,11 @@ namespace Tests
                                     new(board[2, 2], board[1, 1], null, 1, 1),
                                 };
 
-            var moveOrders = new List<IUnitOrder>
+            var moveOrders = new List<IUnitCommand>
             {
-                new MoveOrder(moves1, board.Units[0]),
-                new MoveOrder(moves2, board.Units[1]),
-                new MoveOrder(moves2, board.Units[2]),
+                new MoveCommand(moves1, board.Units[0]),
+                new MoveCommand(moves2, board.Units[1]),
+                new MoveCommand(moves2, board.Units[2]),
             };
 
             board.ResolveOrders(moveOrders);
@@ -693,16 +694,16 @@ namespace Tests
                         new(board[11, 2], board[11, 1], null, 1, 2),
                     };
 
-            var moveOrders = new List<IUnitOrder>
+            var moveOrders = new List<IUnitCommand>
             {
-                new MoveOrder(moves1, board.Units[0]),               
-                new MoveOrder(moves2, board.Units[1]),
-                new MoveOrder(moves3, board.Units[2]),
-                new MoveOrder(moves4, board.Units[3]),
+                new MoveCommand(moves1, board.Units[0]),               
+                new MoveCommand(moves2, board.Units[1]),
+                new MoveCommand(moves3, board.Units[2]),
+                new MoveCommand(moves4, board.Units[3]),
             };
 
             var lines = new List<Centreline>();
-            moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
+            moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
             GameBoardRenderer.RenderAndSave("UnitsPreMove.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
 
@@ -736,62 +737,9 @@ namespace Tests
                 units[2],
             };
 
-            var conflictedUnits = GameState.DetectConflictedUnits(movingUnits, units);
+            var conflictedUnits = CommandResolver.DetectConflictedUnits(movingUnits, units);
 
             Assert.AreEqual(1, conflictedUnits.Count());
-        }
-
-        [TestMethod]
-        public void ForcedMarch()
-        {
-            var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
-
-            board.Units =
-            [
-                new(new UnitTemplate { MovementPoints = 4 }, location: board[1, 1], moraleMoveCost: new float[] {0, 0, .5F, .5F}),
-                new(new UnitTemplate { MovementPoints = 4 }, location: board[1, 1], moraleMoveCost: new float[] {0, 0, .5F, .5F}),
-                new(new UnitTemplate { MovementPoints = 4 }, location: board[1, 1], moraleMoveCost: new float[] {0, 0, .5F, .5F}),
-            ];
-
-            var moves1 = new Move[]
-                    {
-                        new(board[1, 1], board[1, 2], null, 4, 1),
-                        new(board[1, 2], board[2, 2], null, 3, 2),
-                        new(board[2, 2], board[3, 2], null, 2, 3),
-                    };
-
-            var moves2 = new Move[]
-                    {
-                        new(board[1, 1], board[1, 2], null, 4, 1),
-                        new(board[1, 2], board[2, 2], null, 3, 2),
-                        new(board[2, 2], board[3, 2], null, 2, 3),
-                        new(board[3, 2], board[4, 3], null, 1, 4),
-                    };
-
-            var moves3 = new Move[]
-            {
-                        new(board[1, 1], board[1, 2], null, 4, 1, MoveType.Road),
-                        new(board[1, 2], board[2, 2], null, 3, 2, MoveType.Road),
-                        new(board[2, 2], board[3, 2], null, 2, 3, MoveType.Road),
-                        new(board[3, 2], board[4, 3], null, 1, 4, MoveType.Road),
-            };
-
-            var moveOrders = new List<IUnitOrder>
-            {
-                new MoveOrder(moves1, board.Units[0]),
-                new MoveOrder(moves2, board.Units[1]),
-                new MoveOrder(moves3, board.Units[2]),
-            };
-
-            board.ResolveOrders(moveOrders);
-
-            Assert.AreEqual(board[3, 2], board.Units[0].Location);
-            Assert.AreEqual(board[4, 3], board.Units[1].Location);
-            Assert.AreEqual(board[4, 3], board.Units[2].Location);
-
-            Assert.AreEqual(4.5, board.Units[0].Morale);
-            Assert.AreEqual(4, board.Units[1].Morale);
-            Assert.AreEqual(5, board.Units[2].Morale);
         }
     }
 }

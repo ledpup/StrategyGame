@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameModel.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,7 +31,6 @@ namespace GameModel
 
     public class MilitaryUnit
     {
-
         public static List<MovementType> MovementTypes
         {
             get
@@ -139,24 +139,8 @@ namespace GameModel
             ChangeMorale(TurnCreated, UnitTemplate.Morale, "Initial morale");
             Personnel = InitialPersonnel;
 
-            var templateMoraleMoveCost = moraleMoveCost ?? template.MoraleMoveCost;
-            if (templateMoraleMoveCost == null)
-            {
-                MoraleMoveCost = new float[BaseMovementPoints];
-                for (var i = 0; i < BaseMovementPoints; i++)
-                    MoraleMoveCost[i] = 0;
-            }
-            else
-            {
-                MoraleMoveCost = templateMoraleMoveCost;
-            }
-
             CalculateStrength();
         }
-
-
-
-        public float[] MoraleMoveCost { get; set; }
 
         public int InitialPersonnel
         {
@@ -386,21 +370,21 @@ namespace GameModel
             return moves;
         }
 
-        public MoveOrder GetMoveOrderToDestination(Tile destination)
+        public MoveCommand GetMoveOrderToDestination(Tile destination)
         {
             var shortestPath = PathFinder.FindShortestPath(Location, destination, this).ToArray();
 
             return ShortestPathToMoveOrder(shortestPath);
         }
 
-        public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
+        public MoveCommand ShortestPathToMoveOrder(PathFindTile[] shortestPath)
         {
             var moves = PathFinder.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
 
             if (moves.Count == 0)
                 return null;
 
-            var moveOrders = new MoveOrder(moves.ToArray(), this);
+            var moveOrders = new MoveCommand(moves.ToArray(), this);
             return moveOrders;
         }
     }

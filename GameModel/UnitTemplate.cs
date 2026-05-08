@@ -16,7 +16,6 @@ public record UnitTemplate
     public List<MovementType> TransportableBy { get; set; }
     public int CombatInitiative { get; set; } = 10;
     public double Morale { get; set; } = 5;
-    public float[] MoraleMoveCost { get; set; }
 
     public Dictionary<TerrainType, int> TerrainMovementCosts => MovementType switch
     {
@@ -77,7 +76,7 @@ public record UnitTemplate
             { EdgeType.Hill,     0 },
             { EdgeType.Mountain, 0 },
             { EdgeType.Reef,     0 },
-            { EdgeType.Wall,     Terrain.Impassable },
+            { EdgeType.Wall,     0 },
             { EdgeType.Port,     0 },
         },
         MovementType.Waterbound => new Dictionary<EdgeType, int>

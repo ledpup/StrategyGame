@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GameModel.Commands;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GameModel
@@ -29,7 +30,7 @@ namespace GameModel
             return "From: " + Origin + " To: " + Edge.Destination;
         }
 
-        public MoveOrder GetMoveOrder(MilitaryUnit unit)
+        public MoveCommand GetMoveOrder(MilitaryUnit unit)
         {
             var moveList = new List<Move>();
             var currentMove = this;
@@ -41,7 +42,7 @@ namespace GameModel
 
             moveList.Reverse();
 
-            return new MoveOrder(moveList.ToArray(), unit);
+            return new MoveCommand(moveList.ToArray(), unit);
         }
     }
 }

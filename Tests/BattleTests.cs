@@ -1,4 +1,5 @@
 using GameModel;
+using GameModel.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Tests
                 unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 1, location: board[2, 3]),
             ];
 
-            var moveOrders = new List<IUnitOrder>
+            var moveOrders = new List<IUnitCommand>
             {
                 board.Units[0].GetMoveOrderToDestination(board[2, 2]),
                 board.Units[1].GetMoveOrderToDestination(board[2, 2]),

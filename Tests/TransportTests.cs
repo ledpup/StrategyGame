@@ -1,5 +1,6 @@
 using ComputerOpponent;
 using GameModel;
+using GameModel.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -59,7 +60,7 @@ namespace Tests
                 var moveOrders = computerPlayer.CreateOrders(gameState, aliveUnits);
 
                 var lines = new List<Centreline>();
-                moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
+                moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
                 GameBoardRenderer.RenderAndSave($"PortsTurn{gameState.Turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Structures, null, lines, gameState.Units);
 
@@ -109,10 +110,10 @@ namespace Tests
                 new(board[2, 2], board[3, 2], null, 1, 2),
             };
 
-            var unitOrders = new List<IUnitOrder>
+            var unitOrders = new List<IUnitCommand>
             {
-                new MoveOrder(moves, units[1]),
-                new TransportOrder(units[1], units[0]),
+                new MoveCommand(moves, units[1]),
+                new TransportCommand(units[1], units[0]),
 
             };
             board.ResolveOrders(unitOrders);
@@ -144,10 +145,10 @@ namespace Tests
                 new(board[2, 2], board[3, 2], null, 1, 2),
             };
 
-            var unitOrders = new List<IUnitOrder>
+            var unitOrders = new List<IUnitCommand>
             {
-                new TransportOrder(units[1], units[0]),
-                new MoveOrder(moves, units[0]),
+                new TransportCommand(units[1], units[0]),
+                new MoveCommand(moves, units[0]),
             };
             board.ResolveOrders(unitOrders);
         }
@@ -171,10 +172,10 @@ namespace Tests
                 new(board[2, 2], board[3, 2], null, 1, 2),
             };
 
-            var unitOrders = new List<IUnitOrder>
+            var unitOrders = new List<IUnitCommand>
             {
-                new MoveOrder(moves, units[1]),
-                new TransportOrder(units[1], units[0]),
+                new MoveCommand(moves, units[1]),
+                new TransportCommand(units[1], units[0]),
             };
             board.ResolveOrders(unitOrders);
             
@@ -183,7 +184,7 @@ namespace Tests
 
             unitOrders =
             [
-                new UnloadOrder(units[0]),
+                new UnloadCommand(units[0]),
             ];
             board.ResolveOrders(unitOrders);
 
@@ -231,7 +232,7 @@ namespace Tests
                 var unitOrders = computerPlayer.CreateOrders(board, units);
 
                 var lines = new List<Centreline>();
-                unitOrders.OfType<MoveOrder>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
+                unitOrders.OfType<MoveCommand>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
                 GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
 

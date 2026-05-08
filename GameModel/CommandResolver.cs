@@ -1,47 +1,43 @@
+using GameModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace GameModel
 {
-    public class OrderResolver
+    public class CommandResolver(GameState gameState)
     {
-        private readonly GameState _board;
+        private readonly GameState gameState = gameState;
 
-        public OrderResolver(GameState gameState)
+        public void ResolveCommands(List<IUnitCommand> unitCommands)
         {
-            _board = gameState;
+            ResolveTransportCommands(unitCommands);
+            UnloadCommands(unitCommands);
+            ResolveMoves(unitCommands);
+            UnloadCommands(unitCommands);
+
+            ResolveTransportCommands(unitCommands);
         }
 
-        public void ResolveOrders(List<IUnitOrder> unitOrders)
+        private static void UnloadCommands(List<IUnitCommand> unitCommands)
         {
-            ResolveTransportOrders(unitOrders);
-            UnloadOrders(unitOrders);
-            ResolveMoves(unitOrders);
-            UnloadOrders(unitOrders);
-
-            ResolveTransportOrders(unitOrders);
-        }
-
-        private static void UnloadOrders(List<IUnitOrder> unitOrders)
-        {
-            var unloadOrders = unitOrders
-                .OfType<UnloadOrder>()
+            var unloadCommands = unitCommands
+                .OfType<UnloadCommand>()
                 .Where(x => x.Unit.TransportedBy != null && (x.Destination == null || x.Destination == x.Unit.Location))
                 .ToList();
 
-            unloadOrders.ForEach(x =>
+            unloadCommands.ForEach(x =>
             {
                 x.Unit.TransportedBy.Transporting.Remove(x.Unit);
                 x.Unit.TransportedBy = null;
             });
         }
 
-        private static void ResolveTransportOrders(List<IUnitOrder> unitOrders)
+        private static void ResolveTransportCommands(List<IUnitCommand> unitCommands)
         {
-            var transportOrders = unitOrders.OfType<TransportOrder>().ToList();
+            var transportCommands = unitCommands.OfType<TransportCommand>().ToList();
 
-            transportOrders.ForEach(x =>
+            transportCommands.ForEach(x =>
             {
                 if (x.Unit.Location == x.UnitToTransport.Location && x.Unit.CanTransport(x.UnitToTransport))
                 {
@@ -51,33 +47,32 @@ namespace GameModel
             });
         }
 
-        private void ResolveMoves(List<IUnitOrder> unitOrders)
+        private void ResolveMoves(List<IUnitCommand> unitOrders)
         {
-            var moveOrders = unitOrders.OfType<MoveOrder>().ToList();
+            var moveCommands = unitOrders.OfType<MoveCommand>().ToList();
 
-            if (moveOrders == null || moveOrders.Count == 0)
+            if (moveCommands == null || moveCommands.Count == 0)
                 return;
 
-            _board.MoveOrders[_board.Turn] = moveOrders;
+            gameState.MoveCommands[gameState.Turn] = moveCommands;
 
             float maxMovementPoints = 12;
 
-            var transportedUnitMoveOrder = moveOrders.FirstOrDefault(x => x.Unit.TransportedBy != null);
+            var transportedUnitMoveOrder = moveCommands.FirstOrDefault(x => x.Unit.TransportedBy != null);
             if (transportedUnitMoveOrder != null)
             {
                 throw new Exception($"Unit {transportedUnitMoveOrder.Unit.Name} is being transported and therefore may not submit move orders");
             }
 
-            var invalidMoveOrders = moveOrders.Where(x => x.Moves[0].Origin != x.Unit.Location);
-            if (invalidMoveOrders.Count() > 0)
+            var invalidMoveCommands = moveCommands.Where(x => x.Moves[0].Origin != x.Unit.Location);
+            if (invalidMoveCommands.Count() > 0)
             {
-                throw new Exception("The following units received orders to move from a location where they don't currently reside: " + string.Join(", ", invalidMoveOrders.Select(x => x.Unit + ". Ordered " + x.Moves[0])));
+                throw new Exception("The following units received commands to move from a location where they don't currently reside: " + string.Join(", ", invalidMoveCommands.Select(x => x.Unit + ". Ordered " + x.Moves[0])));
             }
 
-            if (moveOrders.Max(x => x.Moves.Length) > maxMovementPoints)
-                throw new Exception(string.Format("The max number of moves is capped at {0}. A move order has exceeded this limit.", maxMovementPoints));
-
-            moveOrders.ForEach(x =>
+            if (moveCommands.Max(x => x.Moves.Length) > maxMovementPoints)
+                throw new Exception(string.Format("The max number of moves is capped at {0}. A move command has exceeded this limit.", maxMovementPoints));
+            moveCommands.ForEach(x =>
                 {
                     if (x.Moves.Length > x.Unit.MovementPoints + x.Unit.RoadMovementBonus)
                         throw new Exception($"Number of moves for {x.Unit} = {x.Moves.Length} exceeds the max number of moves permitted for the unit of {x.Unit.MovementPoints} moves with a road move bonus of {x.Unit.RoadMovementBonus}");
@@ -85,19 +80,18 @@ namespace GameModel
             );
 
             var unitStepRate = new Dictionary<MilitaryUnit, int>();
-            moveOrders.ForEach(x => unitStepRate.Add(x.Unit, (int)Math.Round(maxMovementPoints / (x.Moves.Length > x.Unit.MovementPoints ? (x.Unit.MovementPoints + x.Unit.RoadMovementBonus) : x.Unit.MovementPoints))));
+            moveCommands.ForEach(x => unitStepRate.Add(x.Unit, (int)Math.Round(maxMovementPoints / (x.Moves.Length > x.Unit.MovementPoints ? (x.Unit.MovementPoints + x.Unit.RoadMovementBonus) : x.Unit.MovementPoints))));
 
             for (var step = 1; step <= maxMovementPoints; step++)
             {
-                var unitStepMoves = MoveUnitsOneStep(moveOrders, unitStepRate, step);
-
+                var unitStepMoves = MoveUnitsOneStep(moveCommands, unitStepRate, step);
                 var removeUnitMoves = new Dictionary<MilitaryUnit, Move>();
                 foreach (var stepMove in unitStepMoves)
                 {
                     if (unitStepMoves.Any(x => x.Value.Edge.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
                     {
-                        var originStrength = _board.UnitsAt(stepMove.Value.Origin).Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
-                        var destinationStrength = _board.UnitsAt(stepMove.Value.Edge.Destination).Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var originStrength = gameState.UnitsAt(stepMove.Value.Origin).Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                        var destinationStrength = gameState.UnitsAt(stepMove.Value.Edge.Destination).Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
 
                         if (originStrength <= destinationStrength)
                         {
@@ -111,7 +105,7 @@ namespace GameModel
                     .ForEach((KeyValuePair<MilitaryUnit, Move> x) =>
                     {
                         var transportedUnit = x.Key;
-                        var transports = _board.Units.Where(y => y.MovementType == MovementType.Waterbound && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                        var transports = gameState.Units.Where(y => y.MovementType == MovementType.Waterbound && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
                         var transport = transports.FirstOrDefault();
                         if (transport != null)
                         {
@@ -133,18 +127,10 @@ namespace GameModel
                     unit.Location = unitStepMove.Value.Edge.Destination;
 
                     unit.Transporting.ForEach(x => x.Location = unitStepMove.Key.Location);
-
-                    if (unitStepMove.Value.MoveType != MoveType.Road)
-                    {
-                        if (unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining] > 0)
-                        {
-                            unit.ChangeMorale(_board.Turn, -unit.MoraleMoveCost[unit.BaseMovementPoints - unitStepMove.Value.MovesRemaining], "Morale reduced during forced march");
-                        }
-                    }
                 }
 
-                var conflictedUnits = DetectConflictedUnits(moveOrders.Select(x => x.Unit).ToList(), _board.Units.Where(x => x.IsAlive));
-                moveOrders.RemoveAll(x => conflictedUnits.Contains(x.Unit));
+                var conflictedUnits = DetectConflictedUnits(moveCommands.Select(x => x.Unit).ToList(), gameState.Units.Where(x => x.IsAlive));
+                moveCommands.RemoveAll(x => conflictedUnits.Contains(x.Unit));
             }
         }
 
@@ -165,16 +151,16 @@ namespace GameModel
             return conflictedUnits;
         }
 
-        private static Dictionary<MilitaryUnit, Move> MoveUnitsOneStep(List<MoveOrder> moveOrders, Dictionary<MilitaryUnit, int> unitStepRate, int step)
+        private static Dictionary<MilitaryUnit, Move> MoveUnitsOneStep(List<MoveCommand> moveCommands, Dictionary<MilitaryUnit, int> unitStepRate, int step)
         {
             var unitStepMoves = new Dictionary<MilitaryUnit, Move>();
-            foreach (var moveOrder in moveOrders)
+            foreach (var moveCommand in moveCommands)
             {
-                if (step % unitStepRate[moveOrder.Unit] == 0)
+                if (step % unitStepRate[moveCommand.Unit] == 0)
                 {
-                    var moveIndex = step / unitStepRate[moveOrder.Unit] - 1;
-                    if (moveOrder.Moves.Length > moveIndex)
-                        unitStepMoves.Add(moveOrder.Unit, moveOrder.Moves[moveIndex]);
+                    var moveIndex = step / unitStepRate[moveCommand.Unit] - 1;
+                    if (moveCommand.Moves.Length > moveIndex)
+                        unitStepMoves.Add(moveCommand.Unit, moveCommand.Moves[moveIndex]);
                 }
             }
             return unitStepMoves;

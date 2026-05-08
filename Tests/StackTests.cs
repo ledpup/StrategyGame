@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
 using System.IO;
@@ -14,7 +14,7 @@ namespace Tests
         [TestMethod]
         public void StackLimits()
         {
-            var board = new Board(GameBoard, structures: Structures);
+            var board = new GameState(new Board(GameBoard, structures: Structures));
 
             Assert.AreEqual(4, board[1, 2].StackLimit);
             Assert.AreEqual(5, board[1, 3].StackLimit);
@@ -24,7 +24,7 @@ namespace Tests
         [TestMethod]
         public void OverStackLimit()
         {
-            var board = new Board(GameBoard, structures: Structures);
+            var board = new GameState(new Board(GameBoard, structures: Structures));
 
             var units = new List<MilitaryUnit>
             {

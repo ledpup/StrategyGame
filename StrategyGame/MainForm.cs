@@ -29,7 +29,7 @@ namespace StrategyGame
         readonly Panel structurePanel;
         readonly Panel ownerPanel;
 
-        Board board;
+        GameState board;
         string currentFilePath;
         Tile selectedTile;
         bool isPaintingTerrain;
@@ -238,8 +238,8 @@ namespace StrategyGame
         void PerformUndo()
         {
             if (!history.CanUndo) return;
-            var doc = history.Undo(MapDocument.FromBoard(board));
-            board = doc.ToBoard();
+            var doc = history.Undo(MapDocument.FromGameState(board));
+            board = doc.ToGameState(board.Turn);
             selectedTile = null;
             UpdateUndoRedoButtons();
             RenderBoard();
@@ -249,8 +249,8 @@ namespace StrategyGame
         void PerformRedo()
         {
             if (!history.CanRedo) return;
-            var doc = history.Redo(MapDocument.FromBoard(board));
-            board = doc.ToBoard();
+            var doc = history.Redo(MapDocument.FromGameState(board));
+            board = doc.ToGameState(board.Turn);
             selectedTile = null;
             UpdateUndoRedoButtons();
             RenderBoard();
@@ -261,13 +261,13 @@ namespace StrategyGame
         MapDocument editBefore;
 
         /// <summary>Snapshot the current state before a mutation begins.</summary>
-        void BeginEdit() => editBefore = MapDocument.FromBoard(board);
+        void BeginEdit() => editBefore = MapDocument.FromGameState(board);
 
         /// <summary>Diff before→after and push to undo stack; call after the mutation is applied.</summary>
         void CommitEdit(string description)
         {
             if (editBefore == null) return;
-            history.Commit(editBefore, MapDocument.FromBoard(board), description);
+            history.Commit(editBefore, MapDocument.FromGameState(board), description);
             editBefore = null;
             UpdateUndoRedoButtons();
         }
@@ -283,10 +283,11 @@ namespace StrategyGame
         void LoadDefaultMap()
         {
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            board = new Board(
-                File.ReadAllLines(Path.Combine(basePath, "BasicBoard.txt")),
-                File.ReadAllLines(Path.Combine(basePath, "BasicBoardEdges.txt")),
-                File.ReadAllLines(Path.Combine(basePath, "BasicBoardStructures.txt")));
+            board = new GameState(
+                new Board(
+                    File.ReadAllLines(Path.Combine(basePath, "BasicBoard.txt")),
+                    File.ReadAllLines(Path.Combine(basePath, "BasicBoardEdges.txt")),
+                    File.ReadAllLines(Path.Combine(basePath, "BasicBoardStructures.txt"))));
             currentFilePath = null;
             selectedTile = null;
             RenderBoard();
@@ -316,7 +317,7 @@ namespace StrategyGame
                 if (dialog.ShowDialog(this) != DialogResult.OK)
                     return;
 
-                board = MapDocument.Load(dialog.FileName).ToBoard();
+                board = MapDocument.Load(dialog.FileName).ToGameState();
                 currentFilePath = dialog.FileName;
                 selectedTile = null;
                 history.Clear();
@@ -341,7 +342,7 @@ namespace StrategyGame
                 }
             }
 
-            MapDocument.FromBoard(board).Save(path);
+            MapDocument.FromGameState(board).Save(path);
             history.Save(path);
             currentFilePath = path;
             SetStatus($"Saved {Path.GetFileName(path)}");

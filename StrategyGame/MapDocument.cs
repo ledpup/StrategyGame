@@ -25,15 +25,21 @@ namespace StrategyGame
             };
         }
 
-        public Board ToBoard()
+        public Board ToBoard() =>
+            new Board(Tiles, Edges.ToArray(), Structures.ToArray());
+
+        public GameState ToGameState(int turn = 0)
         {
-            var board = new Board(Tiles, Edges.ToArray(), Structures.ToArray());
-            board.Units = Units.Select(ToMilitaryUnit(board)).ToList();
-            return board;
+            var board = ToBoard();
+            var units = Units.Select(ToMilitaryUnit(board)).ToList();
+            return new GameState(board, units, turn);
         }
 
-        public static MapDocument FromBoard(Board board)
+        public static MapDocument FromBoard(Board board) => FromGameState(new GameState(board));
+
+        public static MapDocument FromGameState(GameState gameState)
         {
+            var board = gameState.Board;
             var tiles = new string[board.Height];
             for (var y = 0; y < board.Height; y++)
             {
@@ -56,7 +62,7 @@ namespace StrategyGame
                     .Select(x => $"{x.Index},{x.StructureType},{x.OwnerIndex},{(int)x.Supply}")
                     .OrderBy(x => x)
                     .ToList(),
-                Units = board.Units
+                Units = gameState.Units
                     .Select(UnitDocument.FromMilitaryUnit)
                     .OrderBy(x => x.Index)
                     .ToList(),

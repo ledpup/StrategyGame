@@ -1,4 +1,4 @@
-﻿// Code from http://www.redblobgames.com/grids/hexagons/
+// Code from http://www.redblobgames.com/grids/hexagons/
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -125,7 +125,7 @@ namespace Tests
             var hex = new Hex(5, 0);
             var results = Hex.HexRing(hex, 1, 20, 20);
 
-            var board = new Board(GameBoard);
+            var board = new GameState(new Board(GameBoard));
 
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(5, -1, -4))));
             Assert.IsTrue(results.Any(x => x.Equals(new Hex(6, -1, -5))));
@@ -160,7 +160,7 @@ namespace Tests
         [TestMethod]
         public void HexesWithinArea()
         {
-            var board = new Board(GameBoard);
+            var board = new GameState(new Board(GameBoard));
 
             var hex = new Hex(14, -4);
             var results = Hex.HexesWithinArea(hex, 2, board.Width, board.Height);

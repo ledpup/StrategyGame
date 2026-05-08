@@ -9,24 +9,24 @@ namespace StrategyGame
 {
     internal static class BoardEditorService
     {
-        public static Board CreateDefaultBoard(int width, int height)
+        public static GameState CreateDefaultBoard(int width, int height)
         {
-            return MapDocument.CreateDefault(width, height).ToBoard();
+            return MapDocument.CreateDefault(width, height).ToGameState();
         }
 
-        public static Board RebuildBoard(Board board)
+        public static GameState RebuildBoard(GameState gameState)
         {
-            return MapDocument.FromBoard(board).ToBoard();
+            return MapDocument.FromGameState(gameState).ToGameState(gameState.Turn);
         }
 
-        public static Tile HitTest(Board board, int x, int y)
+        public static Tile HitTest(GameState gameState, int x, int y)
         {
             var point = new PointD(x, y);
             var hex = FractionalHex.HexRound(Layout.PixelToHex(EditorLayout.Layout, point));
             try
             {
-                var index = Hex.HexToIndex(hex, board.Width, board.Height);
-                return board[index];
+                var index = Hex.HexToIndex(hex, gameState.Width, gameState.Height);
+                return gameState[index];
             }
             catch
             {
@@ -50,39 +50,39 @@ namespace StrategyGame
                 : BaseTerrainType.Land;
         }
 
-        public static Board SetTerrain(Board board, Tile tile, TerrainType terrainType)
+        public static GameState SetTerrain(GameState gameState, Tile tile, TerrainType terrainType)
         {
             if (tile == null)
-                return board;
+                return gameState;
 
-            var document = MapDocument.FromBoard(board);
+            var document = MapDocument.FromGameState(gameState);
             var row = document.Tiles[tile.Y].ToCharArray();
             row[tile.X] = MapDocument.TerrainToChar(terrainType);
             document.Tiles[tile.Y] = new string(row);
-            return document.ToBoard();
+            return document.ToGameState(gameState.Turn);
         }
 
-        public static Board SetStructure(Board board, Tile tile, StructureType structureType, int ownerIndex = 0, int supply = 4)
+        public static GameState SetStructure(GameState gameState, Tile tile, StructureType structureType, int ownerIndex = 0, int supply = 4)
         {
             if (tile == null)
-                return board;
+                return gameState;
 
-            var document = MapDocument.FromBoard(board);
+            var document = MapDocument.FromGameState(gameState);
             document.Structures.RemoveAll(x => x.StartsWith(tile.Index + ",", StringComparison.Ordinal));
             if (structureType != StructureType.None)
             {
                 document.Structures.Add($"{tile.Index},{structureType},{ownerIndex},{supply}");
                 document.Structures = document.Structures.OrderBy(x => x).ToList();
             }
-            return document.ToBoard();
+            return document.ToGameState(gameState.Turn);
         }
 
-        public static Board AddUnit(Board board, Tile tile, UnitType unitType, MovementType movementType, int ownerIndex = 0)
+        public static GameState AddUnit(GameState gameState, Tile tile, UnitType unitType, MovementType movementType, int ownerIndex = 0)
         {
             if (tile == null)
-                return board;
+                return gameState;
 
-            var document = MapDocument.FromBoard(board);
+            var document = MapDocument.FromGameState(gameState);
             var nextIndex = document.Units.Any() ? document.Units.Max(x => x.Index) + 1 : 0;
             var isTransporter = movementType != MovementType.Land;
             var transportableBy = new List<MovementType>();
@@ -112,36 +112,36 @@ namespace StrategyGame
                 TurnBuilt = 0,
             });
             document.Units = document.Units.OrderBy(x => x.Index).ToList();
-            return document.ToBoard();
+            return document.ToGameState(gameState.Turn);
         }
 
-        public static Board RemoveUnits(Board board, Tile tile)
+        public static GameState RemoveUnits(GameState gameState, Tile tile)
         {
             if (tile == null)
-                return board;
+                return gameState;
 
-            var document = MapDocument.FromBoard(board);
+            var document = MapDocument.FromGameState(gameState);
             document.Units.RemoveAll(x => x.TileIndex == tile.Index);
-            return document.ToBoard();
+            return document.ToGameState(gameState.Turn);
         }
 
-        public static Board EraseTileContent(Board board, Tile tile)
+        public static GameState EraseTileContent(GameState gameState, Tile tile)
         {
             if (tile == null)
-                return board;
+                return gameState;
 
-            var document = MapDocument.FromBoard(board);
+            var document = MapDocument.FromGameState(gameState);
             document.Structures.RemoveAll(x => x.StartsWith(tile.Index + ",", StringComparison.Ordinal));
             document.Units.RemoveAll(x => x.TileIndex == tile.Index);
-            return document.ToBoard();
+            return document.ToGameState(gameState.Turn);
         }
 
-        public static Board SetEdge(Board board, Tile first, Tile second, EdgeType edgeType, bool hasRoad)
+        public static GameState SetEdge(GameState gameState, Tile first, Tile second, EdgeType edgeType, bool hasRoad)
         {
             if (!AreAdjacent(first, second))
-                return board;
+                return gameState;
 
-            var document = MapDocument.FromBoard(board);
+            var document = MapDocument.FromGameState(gameState);
             var low = Math.Min(first.Index, second.Index);
             var high = Math.Max(first.Index, second.Index);
             document.Edges.RemoveAll(x => x.StartsWith($"{low},{high},", StringComparison.Ordinal));
@@ -150,11 +150,11 @@ namespace StrategyGame
                 document.Edges.Add($"{low},{high},{edgeType},{hasRoad.ToString().ToLowerInvariant()}");
                 document.Edges = document.Edges.OrderBy(x => x).ToList();
             }
-            return document.ToBoard();
+            return document.ToGameState(gameState.Turn);
         }
 
-        public static SimulationSession StartSimulation(Board board, int maxTurns = 50) =>
-            new(board, maxTurns);
+        public static SimulationSession StartSimulation(GameState gameState, int maxTurns = 50) =>
+            new(gameState, maxTurns);
     }
 
     internal static class EditorLayout
@@ -186,18 +186,18 @@ namespace StrategyGame
 
         public bool CanStepBack => currentIndex > 0;
 
-        public Board CurrentBoard { get; private set; }
+        public GameState CurrentBoard { get; private set; }
 
         private readonly int initialUnitOwners;
         private readonly int initialStructureOwners;
 
-        internal SimulationSession(Board board, int maxTurns)
+        internal SimulationSession(GameState gameState, int maxTurns)
         {
             this.maxTurns = maxTurns;
 
             // Take a clean copy as turn-0 snapshot
-            CurrentBoard = MapDocument.FromBoard(board).ToBoard();
-            snapshots.Add(MapDocument.FromBoard(CurrentBoard));
+            CurrentBoard = MapDocument.FromGameState(gameState).ToGameState(gameState.Turn);
+            snapshots.Add(MapDocument.FromGameState(CurrentBoard));
 
             var ownerCount = CurrentBoard.Units.Select(x => x.OwnerIndex).DefaultIfEmpty(0).Distinct().Count();
             numberOfPlayers = Math.Max(2, ownerCount);
@@ -225,14 +225,14 @@ namespace StrategyGame
             if (currentIndex < snapshots.Count - 1)
             {
                 currentIndex++;
-                CurrentBoard = snapshots[currentIndex].ToBoard();
+                CurrentBoard = snapshots[currentIndex].ToGameState();
                 return true;
             }
 
             if (IsFinished) return false;
 
             // Compute and cache the next turn.
-            var sim = snapshots[currentIndex].ToBoard();
+            var sim = snapshots[currentIndex].ToGameState(currentIndex);
             computerPlayer.GenerateInfluenceMaps(sim, numberOfPlayers);
             computerPlayer.SetStrategicAction(sim);
             var orders = computerPlayer.CreateOrders(sim, sim.Units.Where(x => x.IsAlive).ToList());
@@ -243,7 +243,7 @@ namespace StrategyGame
             sim.ChangeStructureOwners();
             sim.Turn++;
 
-            snapshots.Add(MapDocument.FromBoard(sim));
+            snapshots.Add(MapDocument.FromGameState(sim));
             currentIndex++;
             CurrentBoard = sim;
 
@@ -265,7 +265,7 @@ namespace StrategyGame
         {
             if (!CanStepBack) return false;
             currentIndex--;
-            CurrentBoard = snapshots[currentIndex].ToBoard();
+            CurrentBoard = snapshots[currentIndex].ToGameState();
             return true;
         }
 
@@ -274,7 +274,7 @@ namespace StrategyGame
         {
             currentIndex = 0;
             IsFinished = false;
-            CurrentBoard = snapshots[0].ToBoard();
+            CurrentBoard = snapshots[0].ToGameState();
         }
     }
 

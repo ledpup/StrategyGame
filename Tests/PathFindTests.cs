@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
 using System.Collections.Generic;
 using System.IO;
@@ -18,14 +18,14 @@ namespace Tests
         [TestMethod]
         public void VisualisePathfind()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
 
             var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
 
             var lines = new List<Centreline>();
 
-            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(board[28], board[196], unit)));
-            lines.AddRange(Centreline.PathFindTilesToCentrelines(Board.FindShortestPath(board[91], board[175], unit)));
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(PathFinder.FindShortestPath(board[28], board[196], unit)));
+            lines.AddRange(Centreline.PathFindTilesToCentrelines(PathFinder.FindShortestPath(board[91], board[175], unit)));
 
             var labels = new string[board.Width * board.Height];
             for (var i = 0; i < board.TileArray.Length; i++)
@@ -39,11 +39,11 @@ namespace Tests
         [TestMethod]
         public void LandUnitPathFind()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
 
-            var shortestPath = Board.FindShortestPath(board[1, 1], board[194], unit).ToArray();
+            var shortestPath = PathFinder.FindShortestPath(board[1, 1], board[194], unit).ToArray();
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -68,11 +68,11 @@ namespace Tests
         [TestMethod]
         public void LandUnitNoPathToDestination()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
 
-            var shortestPath = Board.FindShortestPath(unit.Location, board[247], unit);
+            var shortestPath = PathFinder.FindShortestPath(unit.Location, board[247], unit);
 
             Assert.IsNull(shortestPath);
         }
@@ -80,11 +80,11 @@ namespace Tests
         [TestMethod]
         public void NavelUnitMoveToPortPathFind()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, location: board[20, 5]);
 
-            var shortestPath = Board.FindShortestPath(unit.Location, board[291], unit).ToArray();
+            var shortestPath = PathFinder.FindShortestPath(unit.Location, board[291], unit).ToArray();
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -106,11 +106,11 @@ namespace Tests
         [TestMethod]
         public void AirborneUnitMoveOverTerrainThatItCantStopOn()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[24, 15]);
 
-            var shortestPath = Board.FindShortestPath(unit.Location, board[365], unit).ToArray();
+            var shortestPath = PathFinder.FindShortestPath(unit.Location, board[365], unit).ToArray();
 
             var lines = new List<Centreline>();
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -134,11 +134,11 @@ namespace Tests
         [TestMethod]
         public void AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[19, 13]);
 
-            var shortestPath = Board.FindShortestPath(unit.Location, board[365], unit).ToArray();
+            var shortestPath = PathFinder.FindShortestPath(unit.Location, board[365], unit).ToArray();
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
@@ -162,11 +162,11 @@ namespace Tests
         [TestMethod]
         public void AirborneUnitMoveOverWall()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 5, IsTransporter = true }, location: board[119]);
 
-            var shortestPath = Board.FindShortestPath(unit.Location, board[95], unit).ToArray();
+            var shortestPath = PathFinder.FindShortestPath(unit.Location, board[95], unit).ToArray();
 
             var vectors = new List<Centreline>();
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));

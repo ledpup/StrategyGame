@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
@@ -17,7 +17,7 @@ namespace Tests
         [TestMethod]
         public void LoadBoard_AdjacentTilesAndCoastal_NoNullTilesAndCoasts()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             var tiles = board.Tiles.ToList();
 
@@ -36,7 +36,7 @@ namespace Tests
         [TestMethod]
         public void NeighboursTest()
         {
-            var board = new Board(GameBoard);
+            var board = new GameState(new Board(GameBoard));
 
             Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 2 && x.Destination.Hex.r == -1));
             Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 3 && x.Destination.Hex.r == -1));
@@ -56,7 +56,7 @@ namespace Tests
         [TestMethod]
         public void IsSeaTest()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             Assert.IsTrue(board[9, 9].IsSea);
         }
@@ -64,7 +64,7 @@ namespace Tests
         [TestMethod]
         public void IsLakeTest()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             Assert.IsTrue(board[14, 4].IsLake);
         }
@@ -112,7 +112,7 @@ namespace Tests
             string[] gameBoard = File.ReadAllLines("ContiguousRegionTestBoard.txt");
             string[] tileEdges = File.ReadAllLines("ContiguousRegionTestEdges.txt");
 
-            var board = new Board(gameBoard, tileEdges);
+            var board = new GameState(new Board(gameBoard, tileEdges));
 
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());

@@ -386,16 +386,16 @@ namespace GameModel
             return moves;
         }
 
-        public MoveOrder GetMoveOrderToDestination(Tile destination, Board board)
+        public MoveOrder GetMoveOrderToDestination(Tile destination)
         {
-            var shortestPath = Board.FindShortestPath(Location, destination, this).ToArray();
+            var shortestPath = PathFinder.FindShortestPath(Location, destination, this).ToArray();
 
             return ShortestPathToMoveOrder(shortestPath);
         }
 
         public MoveOrder ShortestPathToMoveOrder(PathFindTile[] shortestPath)
         {
-            var moves = Board.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
+            var moves = PathFinder.MovesFromShortestPath(PossibleMoves().ToList(), shortestPath);
 
             if (moves.Count == 0)
                 return null;

@@ -1,4 +1,4 @@
-﻿using GameModel;
+using GameModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace Tests
         [TestMethod]
         public void CorrectTempTest()
         {
-            var board = new Board(GameBoard, TileEdges);
+            var board = new GameState(new Board(GameBoard, TileEdges));
 
             for (var i = 0; i < 30; i++)
             {

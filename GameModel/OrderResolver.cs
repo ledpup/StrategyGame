@@ -6,11 +6,11 @@ namespace GameModel
 {
     public class OrderResolver
     {
-        private readonly Board _board;
+        private readonly GameState _board;
 
-        public OrderResolver(Board board)
+        public OrderResolver(GameState gameState)
         {
-            _board = board;
+            _board = gameState;
         }
 
         public void ResolveOrders(List<IUnitOrder> unitOrders)

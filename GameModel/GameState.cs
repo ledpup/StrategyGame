@@ -1,0 +1,93 @@
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GameModel;
+
+public class GameState
+{
+    public Board Board { get; }
+    public List<MilitaryUnit> Units { get; set; }
+    public int Turn { get; set; }
+    public Dictionary<int, List<MoveOrder>> MoveOrders { get; }
+
+    // Board pass-throughs
+    public int Width => Board.Width;
+    public int Height => Board.Height;
+    public IEnumerable<Tile> Tiles => Board.Tiles;
+    public Tile[] TileArray => Board.TileArray;
+    public List<Edge> Edges => Board.Edges;
+    public List<Structure> Structures => Board.Structures;
+    public Tile this[int index] => Board[index];
+    public Tile this[int x, int y] => Board[x, y];
+
+    public GameState(Board board, List<MilitaryUnit> units = null, int turn = 0)
+    {
+        Board = board;
+        Units = units ?? [];
+        Turn = turn;
+        MoveOrders = [];
+        Board.CalculateTemperature(turn);
+    }
+
+    public void CalculateTemperature(int turn) => Board.CalculateTemperature(turn);
+    public void InitialiseSupply() => Board.InitialiseSupply();
+
+    public IEnumerable<MilitaryUnit> UnitsAt(Tile tile) =>
+        Units.Where(x => x.Location == tile);
+
+    public bool OverStackLimit(Tile tile, int playerIndex) =>
+        tile.OverStackLimit(UnitsAt(tile), playerIndex);
+
+    public void ResolveStackLimits(int playerIndex)
+    {
+        Tiles.ToList().ForEach(x =>
+        {
+            var tileUnits = UnitsAt(x).ToList();
+            if (x.OverStackLimit(tileUnits, playerIndex))
+            {
+                var overStackLimitCount = x.OverStackLimitCount(tileUnits, playerIndex);
+                tileUnits
+                    .Where(y => y.IsAlive && y.OwnerIndex == playerIndex)
+                    .ToList()
+                    .ForEach(y => y.ChangeMorale(Turn, -.5 * overStackLimitCount, $"Units are over the stack limit of {x.StackLimit} by {overStackLimitCount} units"));
+            }
+        });
+    }
+
+    public void ResolveOrders(List<IUnitOrder> unitOrders) =>
+        new OrderResolver(this).ResolveOrders(unitOrders);
+
+    public static IEnumerable<MilitaryUnit> DetectConflictedUnits(List<MilitaryUnit> setOfUnits, IEnumerable<MilitaryUnit> allUnits) =>
+        OrderResolver.DetectConflictedUnits(setOfUnits, allUnits);
+
+    public List<BattleReport> ConductBattles()
+    {
+        var battleReports = new List<BattleReport>();
+        Tiles.ToList().ForEach(x =>
+        {
+            var tileUnits = UnitsAt(x).ToList();
+            if (Tile.IsInConflict(tileUnits))
+            {
+                battleReports.Add(BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, 3, StructureType.Fortress, 2));
+            }
+        });
+        return battleReports;
+    }
+
+    public void ChangeStructureOwners()
+    {
+        Structures.ForEach(x =>
+        {
+            var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
+            if (unitsAtStructureByOwner.Count() == 1)
+            {
+                if (x.OwnerIndex == unitsAtStructureByOwner.First().Key)
+                    return;
+                x.OwnerIndex = unitsAtStructureByOwner.First().Key;
+                var units = unitsAtStructureByOwner.First().ToList();
+                var numberOfUnits = units.Count;
+                units.ForEach(y => y.ChangeMorale(Turn, 2D / numberOfUnits, $"Morale increase from pillaging {x.StructureType}"));
+            }
+        });
+    }
+}

@@ -5,7 +5,7 @@ namespace GameModel;
 public class MilitaryUnitFactory
 {
     private readonly UnitTemplateFactory templateFactory;
-    private readonly Dictionary<UnitTemplateName, int> sequenceCounters = [];
+    private readonly Dictionary<(UnitTemplateName, int ownerIndex), int> sequenceCounters = [];
 
     public MilitaryUnitFactory(UnitTemplateFactory templateFactory)
     {
@@ -20,11 +20,11 @@ public class MilitaryUnitFactory
 
     public MilitaryUnit CreateNext(UnitTemplateName templateName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
     {
-        if (!sequenceCounters.TryGetValue(templateName, out var count))
+        if (!sequenceCounters.TryGetValue((templateName, ownerIndex), out var count))
             count = 0;
 
         count++;
-        sequenceCounters[templateName] = count;
+        sequenceCounters[(templateName, ownerIndex)] = count;
 
         var ordinal = ToOrdinal(count);
         var unitName = $"{ordinal} {templateName.ToDisplayName()}";

@@ -1,4 +1,4 @@
-﻿using Hexagon;
+using Hexagon;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -19,17 +19,12 @@ namespace GameModel
 
         public int Width;
         public int Height;
-        public List<MilitaryUnit> Units { get; set; }
-
-        public Dictionary<int, List<MoveOrder>> MoveOrders;
 
         private static Logger Logger;
 
         public List<Structure> Structures;
 
-        public int Turn;
-
-        public Board(string[] tiles, string[] edges = null, string[] structures = null, int turn = 0, Logger logger = null)
+        public Board(string[] tiles, string[] edges = null, string[] structures = null, Logger logger = null)
         {
             Width = tiles[0].Length;
             Height = tiles.Length;
@@ -46,8 +41,6 @@ namespace GameModel
             Logger = logger;
             Logger ??= LogManager.GetCurrentClassLogger();
 
-            MoveOrders = [];
-
             TerrainTemperatureModifiers = [];
             foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
             {
@@ -55,34 +48,6 @@ namespace GameModel
             }
             TerrainTemperatureModifiers[TerrainType.Mountain] = -10;
             TerrainTemperatureModifiers[TerrainType.Hill] = -5;
-
-            Turn = turn;
-
-            Units = [];
-
-            CalculateTemperature(Turn);
-        }
-
-        public IEnumerable<MilitaryUnit> UnitsAt(Tile tile) =>
-            Units.Where(x => x.Location == tile);
-
-        public bool OverStackLimit(Tile tile, int playerIndex) =>
-            tile.OverStackLimit(UnitsAt(tile), playerIndex);
-
-        public void ResolveStackLimits(int playerIndex)
-        {
-            Tiles.ToList().ForEach(x =>
-                {
-                    var tileUnits = UnitsAt(x).ToList();
-                    if (x.OverStackLimit(tileUnits, playerIndex))
-                    {
-                        var overStackLimitCount = x.OverStackLimitCount(tileUnits, playerIndex);
-                        tileUnits
-                            .Where(y => y.IsAlive && y.OwnerIndex == playerIndex)
-                            .ToList()
-                            .ForEach(y => y.ChangeMorale(Turn, - .5 * overStackLimitCount, $"Units are over the stack limit of {x.StackLimit} by {overStackLimitCount} units"));
-                    }
-                });
         }
 
         private void CalculateContiguousRegions()
@@ -195,28 +160,6 @@ namespace GameModel
             }
         }
 
-        public void ChangeStructureOwners()
-        {
-            Structures.ForEach(x => 
-            {
-                var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
-                if (unitsAtStructureByOwner.Count() == 1)
-                {
-                    if (x.OwnerIndex == unitsAtStructureByOwner.First().Key)
-                    {
-                        return;
-                    }
-                    x.OwnerIndex = unitsAtStructureByOwner.First().Key;
-
-                    var units = unitsAtStructureByOwner.First().ToList();
-
-                    var numberOfUnits = units.Count;
-
-                    units.ForEach(y => y.ChangeMorale(Turn, 2D / numberOfUnits, $"Morale increase from pillaging {x.StructureType}"));
-                }
-            });
-        }
-
         private List<Structure> IntitaliseStructures(string[] tilePoints)
         {
             var structures = new List<Structure>();
@@ -270,12 +213,8 @@ namespace GameModel
             }
         }
 
-        public void CalculateTemperature(int? turnParameter = null)
+        public void CalculateTemperature(int turn)
         {
-            var turn = Turn;
-            if (turnParameter != null)
-                turn = (int)turnParameter;
-
             for (var x = 0; x < Width; x++)
             {
                 for (var y = 0; y < Height; y++)
@@ -433,44 +372,5 @@ namespace GameModel
             _edgeLookup.TryGetValue(key, out var edge);
             return edge;
         }
-
-        public void ResolveOrders(List<IUnitOrder> unitOrders) =>
-            new OrderResolver(this).ResolveOrders(unitOrders);
-
-        public static IEnumerable<MilitaryUnit> DetectConflictedUnits(List<MilitaryUnit> setOfUnits, IEnumerable<MilitaryUnit> allUnits) =>
-            OrderResolver.DetectConflictedUnits(setOfUnits, allUnits);
-
-        public List<BattleReport> ConductBattles()
-        {
-            var battleReports = new List<BattleReport>();
-            Tiles.ToList().ForEach(x =>
-            {
-                var tileUnits = UnitsAt(x).ToList();
-                if (Tile.IsInConflict(tileUnits))
-                {
-                    BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, 3, StructureType.Fortress, 2);
-                    battleReports.Add(BattleResolver.CreateBattleReport(x, Turn, tileUnits));
-                }
-            });
-
-            return battleReports;
-        }
-
-        public static void ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None, int siegeDuration = 1) =>
-            BattleResolver.ResolveBattle(locationText, turn, terrainType, weather, units, residentId, structure, siegeDuration);
-
-        public static BattleReport CreateBattleReport(Tile tile, int turn, List<MilitaryUnit> units) =>
-            BattleResolver.CreateBattleReport(tile, turn, units);
-
-        public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Tile destination, MilitaryUnit unit) =>
-            PathFinder.FindShortestPath(origin, destination, unit);
-
-        public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Tile destination, int maxCumulativeCost, bool usesRoads,
-                                                                    bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts,
-                                                                    Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn) =>
-            PathFinder.FindShortestPath(origin, destination, maxCumulativeCost, usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts, canStopOn);
-
-        public static List<Move> MovesFromShortestPath(List<Move> possibleMoves, PathFindTile[] shortestPath) =>
-            PathFinder.MovesFromShortestPath(possibleMoves, shortestPath);
     }
 }

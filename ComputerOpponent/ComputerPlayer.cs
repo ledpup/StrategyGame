@@ -1,4 +1,4 @@
-﻿using GameModel;
+using GameModel;
 using Hexagon;
 using System;
 using System.Collections.Generic;
@@ -160,7 +160,7 @@ namespace ComputerOpponent
             UnitStates.TryGetValue(unit.Index, out var state);
             return state;
         }
-        public void SetStrategicAction(Board board)
+        public void SetStrategicAction(GameState board)
         {
             foreach (var unitState in UnitStates)
             {
@@ -228,7 +228,7 @@ namespace ComputerOpponent
             }
         }
 
-        public List<IUnitOrder> CreateOrders(Board board, List<MilitaryUnit> units)
+        public List<IUnitOrder> CreateOrders(GameState board, List<MilitaryUnit> units)
         {
             if (units.Any(x => !x.IsAlive))
                 throw new Exception("Cannot assign orders to units that have been destroyed");
@@ -245,7 +245,7 @@ namespace ComputerOpponent
             return unitOrders;
         }
 
-        private List<IUnitOrder> CreateOrdersForUnit(Board board, List<MilitaryUnit> units, List<IUnitOrder> existingOrders, MilitaryUnit unit)
+        private List<IUnitOrder> CreateOrdersForUnit(GameState board, List<MilitaryUnit> units, List<IUnitOrder> existingOrders, MilitaryUnit unit)
         {
             var unitOrders = new List<IUnitOrder>();
 
@@ -278,7 +278,7 @@ namespace ComputerOpponent
 
                             if (closestAvailableAirborneUnitPath.Path != null)
                             {
-                                var pathToAirbornUnit = Board.FindShortestPath(unit.Location, transporter.Location, unit);
+                                var pathToAirbornUnit = PathFinder.FindShortestPath(unit.Location, transporter.Location, unit);
                                 Tile transporteeMoveOrderDesintation = null;
                                 if (pathToAirbornUnit != null)
                                 {
@@ -310,7 +310,7 @@ namespace ComputerOpponent
                     else
                     {
                         var dest = board[Hex.HexToIndex(closestPortPath.Last().Hex, board.Width, board.Height)];
-                        var moveOrder = unit.GetMoveOrderToDestination(dest, board);
+                        var moveOrder = unit.GetMoveOrderToDestination(dest);
                         if (moveOrder != null)
                             unitOrders.Add(moveOrder);
                     }
@@ -348,7 +348,7 @@ namespace ComputerOpponent
                             if (closestPortPath != null)
                             {
                                 var dest = board[Hex.HexToIndex(closestPortPath.Last().Hex, board.Width, board.Height)];
-                                var moveOrder = unit.GetMoveOrderToDestination(dest, board);
+                                var moveOrder = unit.GetMoveOrderToDestination(dest);
                                 if (moveOrder != null)
                                     unitOrders.Add(moveOrder);
                             }
@@ -363,7 +363,7 @@ namespace ComputerOpponent
                         if (closestPortPath != null)
                         {
                             var dest = board[Hex.HexToIndex(closestPortPath.Last().Hex, board.Width, board.Height)];
-                            var moveOrder = unit.GetMoveOrderToDestination(dest, board);
+                            var moveOrder = unit.GetMoveOrderToDestination(dest);
                             if (moveOrder != null)
                                 unitOrders.Add(moveOrder);
                         }
@@ -389,7 +389,7 @@ namespace ComputerOpponent
                                 break;
 
                             // Move transport unit to the destination of the transportee's move order or just to the transportee's location
-                            var pathToTransporteesDestination = Board.FindShortestPath(unit.Location, destination, unit);
+                            var pathToTransporteesDestination = PathFinder.FindShortestPath(unit.Location, destination, unit);
                             if (pathToTransporteesDestination != null)
                                 unitOrders.Add(unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
 
@@ -418,7 +418,7 @@ namespace ComputerOpponent
             return unitOrders;
         }
 
-        private MilitaryUnit ClosestEmbarkingUnitPath(Board board, List<MilitaryUnit> units, Tile origin)
+        private MilitaryUnit ClosestEmbarkingUnitPath(GameState board, List<MilitaryUnit> units, Tile origin)
         {
             var closestUnit = units
                                     .Where(x => GetUnitState(x).StrategicAction == StrategicAction.Embark)
@@ -442,7 +442,7 @@ namespace ComputerOpponent
 
             //return null;
         }
-        private static UnitAndPath ClosestAvailableTransportPath(Board board, MilitaryUnit unit, List<MilitaryUnit> units, Func<MilitaryUnit, bool> rule)
+        private static UnitAndPath ClosestAvailableTransportPath(GameState board, MilitaryUnit unit, List<MilitaryUnit> units, Func<MilitaryUnit, bool> rule)
         {
             var potentialPickupUnits = units
                                     .Where(x => rule(x) && x.CanTransport(unit))
@@ -456,7 +456,7 @@ namespace ComputerOpponent
                     return new UnitAndPath { Unit = potentialPickupUnit };
                 }
 
-                var shortestPath = Board.FindShortestPath(unit.Location, potentialPickupUnit.Location, potentialPickupUnit);
+                var shortestPath = PathFinder.FindShortestPath(unit.Location, potentialPickupUnit.Location, potentialPickupUnit);
                 if (shortestPath != null)
                 {
                     return new UnitAndPath { Unit = potentialPickupUnit, Path = shortestPath };
@@ -468,7 +468,7 @@ namespace ComputerOpponent
 
         static Dictionary<Role, double> _enemyStructureInfluence;
 
-        public static IEnumerable<PathFindTile> ClosestEnemyStructurePath(Board board, MilitaryUnit unit)
+        public static IEnumerable<PathFindTile> ClosestEnemyStructurePath(GameState board, MilitaryUnit unit)
         {
             var structures = board.Structures
                 .Where(x => x.OwnerIndex != unit.OwnerIndex)
@@ -477,7 +477,7 @@ namespace ComputerOpponent
 
             foreach (var enemyStructure in structures)
             { 
-                var shortestPath = Board.FindShortestPath(unit.Location, enemyStructure.Location, unit);
+                var shortestPath = PathFinder.FindShortestPath(unit.Location, enemyStructure.Location, unit);
                 if (shortestPath != null)
                 {
                     return shortestPath;
@@ -485,7 +485,7 @@ namespace ComputerOpponent
             }
             return null;
         }
-        public IEnumerable<PathFindTile> ClosestPortPath(Board board, MilitaryUnit unit)
+        public IEnumerable<PathFindTile> ClosestPortPath(GameState board, MilitaryUnit unit)
         {
             var unitState = GetUnitState(unit);
             var closestPortDistance = int.MaxValue;
@@ -511,7 +511,7 @@ namespace ComputerOpponent
                         if (unit.Location == x)
                             return;
 
-                        var shortestPath = Board.FindShortestPath(unit.Location, x, unit);
+                        var shortestPath = PathFinder.FindShortestPath(unit.Location, x, unit);
                         if (shortestPath != null)
                         {
                             var distance = shortestPath.Count();
@@ -533,7 +533,7 @@ namespace ComputerOpponent
 
 
 
-        public void GenerateInfluenceMaps(Board board, int numberOfPlayers)
+        public void GenerateInfluenceMaps(GameState board, int numberOfPlayers)
         {
             var aliveUnits = board.Units.Where(x => x.IsAlive).ToList();
 
@@ -615,7 +615,7 @@ namespace ComputerOpponent
             }
         }
 
-        private void CalculateUnitInfluence(Board board, int numberOfPlayers, MilitaryUnit unit, int playerIndex)
+        private void CalculateUnitInfluence(GameState board, int numberOfPlayers, MilitaryUnit unit, int playerIndex)
         {
             for (var i = 0; i < 4; i++)
             {
@@ -653,7 +653,7 @@ namespace ComputerOpponent
                 + (EnemyStructureInfluenceMap[tile.Index][movementType][playerIndex] * EnemyStructureInfluence[role]);
         }
 
-        public MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit, Board board)
+        public MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit, GameState board)
         {
             var unitState = GetUnitState(unit);
 
@@ -684,7 +684,7 @@ namespace ComputerOpponent
                 if (!unit.CanStopOn.HasFlag(tile.TerrainType))
                     continue;
 
-                bestPossibleDestination = Board.FindShortestPath(unit.Location, tile, unit);
+                bestPossibleDestination = PathFinder.FindShortestPath(unit.Location, tile, unit);
 
                 if (bestPossibleDestination != null)
                     break;  
@@ -701,7 +701,7 @@ namespace ComputerOpponent
 
         public static int ShortestPathDistance(Tile origin, Tile destination, MilitaryUnit unit)
         {
-            var path = Board.FindShortestPath(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
+            var path = PathFinder.FindShortestPath(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
             if (path == null)
                 return int.MaxValue;
             return path.Count();

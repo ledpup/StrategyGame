@@ -1,4 +1,4 @@
-﻿using ComputerOpponent;
+using ComputerOpponent;
 using GameModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -20,7 +20,7 @@ namespace Tests
         [TestMethod]
         public void Ports()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
             var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
@@ -93,7 +93,7 @@ namespace Tests
         [TestMethod]
         public void TransportByAir()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
 
             var units = new List<MilitaryUnit>
             {
@@ -128,7 +128,7 @@ namespace Tests
         [ExpectedException(typeof(Exception))]
         public void MoveTransportedUnit()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
 
             var units = new List<MilitaryUnit>
             {
@@ -155,7 +155,7 @@ namespace Tests
         [TestMethod]
         public void UnloadUnit()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
 
             var units = new List<MilitaryUnit>
             {
@@ -194,7 +194,7 @@ namespace Tests
         [TestMethod]
         public void AirborneUnitAirlift()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
             var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 

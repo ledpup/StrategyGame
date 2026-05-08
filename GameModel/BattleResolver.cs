@@ -6,7 +6,7 @@ namespace GameModel
 {
     public static class BattleResolver
     {
-        public static void ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None, int siegeDuration = 1)
+        public static BattleReport ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None, int siegeDuration = 1)
         {
             var groupedUnits = units.GroupBy(x => x.OwnerIndex);
             if (groupedUnits.Count() == 1)
@@ -86,15 +86,16 @@ namespace GameModel
 
                 winnersToLosers[i].Units.Where(x => x.IsAlive).ToList().ForEach(x => x.ChangeMorale(turn, -(positionProportion + losesPenalty), "Morale change due to combat"));
             }
+
+            return CreateBattleReport(turn, units);
         }
 
-        public static BattleReport CreateBattleReport(Tile tile, int turn, List<MilitaryUnit> units)
+        private static BattleReport CreateBattleReport(int turn, List<MilitaryUnit> units)
         {
             var numberOfPlayers = units.GroupBy(x => x.OwnerIndex).Select(x => x.Key).Count();
 
             var battleReport = new BattleReport(numberOfPlayers)
             {
-                Tile = tile,
                 Turn = turn,
             };
 

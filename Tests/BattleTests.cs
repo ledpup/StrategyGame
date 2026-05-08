@@ -1,6 +1,5 @@
-﻿using GameModel;
+using GameModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,79 +9,41 @@ namespace Tests
     public class BattleTests
     {
         [TestMethod]
-        public void BasicBattleTest()
+        public void TwoEnemies_ResolveBattle_200Casualties()
         {
+            var templateFactory = new UnitTemplateFactory();
+            var unitFactory = new MilitaryUnitFactory(templateFactory);
+
             var units = new List<MilitaryUnit>
             {
-                new(new UnitTemplate { UnitType = UnitType.Melee, Quality = 2, Personnel = 347, Morale = 3 }),
-                new(new UnitTemplate { UnitType = UnitType.Siege, Quality = 2, Personnel = 167, Morale = 3, CombatInitiative = 5 }),
-                new(new UnitTemplate { UnitType = UnitType.Melee, Quality = 1, Personnel = 256, Morale = 2 }),
-
-                new(new UnitTemplate { UnitType = UnitType.Melee, Quality = 3, Personnel = 245, Morale = 2 }) { OwnerIndex = 1 },
-                new(new UnitTemplate { UnitType = UnitType.Cavalry, Quality = 3, Personnel = 345, CombatInitiative = 5 }) { OwnerIndex = 1, StructureBattleModifier = -1 },
-
-                new(new UnitTemplate { UnitType = UnitType.Cavalry, Quality = 3, Personnel = 165 }) { OwnerIndex = 2, StructureBattleModifier = -1 },
-                new(new UnitTemplate { UnitType = UnitType.Ranged, Quality = 3, Personnel = 175, CombatInitiative = 5 }) { OwnerIndex = 2 },
+                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry),
+                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 1),
             };
 
-            units[0].TerrainTypeBattleModifier[TerrainType.Mountain] = 1;
-            units[0].TerrainTypeBattleModifier[TerrainType.Hill] = 1;
-            units[0].TerrainTypeBattleModifier[TerrainType.Desert] = -1;
-
-            units[1].WeatherBattleModifier[Weather.Cold] = -1;
-
-            units[4].WeatherBattleModifier[Weather.Wet] = -2;
-            units[4].OpponentUnitTypeBattleModifier[UnitType.Melee] = 2;
-
-            units[5].WeatherBattleModifier[Weather.Wet] = -2;
-            units[5].OpponentUnitTypeBattleModifier[UnitType.Melee] = 2;
-
-            units[6].OpponentUnitTypeBattleModifier[UnitType.Cavalry] = 1;
-            units[6].OpponentUnitTypeBattleModifier[UnitType.Melee] = 1;
-
-
-            var location = "Tzarian Castle";
             var turn = 1;
 
-            //Board.Logger = LogManager.GetCurrentClassLogger();
+            var battleReport = BattleResolver.ResolveBattle("BasicBattle", turn, TerrainType.Grassland, Weather.Fine, units, 1, StructureType.None, 0);
 
-            var board = new Board(new[] { "S", "S" });
-
-            Board.ResolveBattle(location, turn, TerrainType.Mountain, Weather.Cold, units, 3, StructureType.Fortress, 2);
-            var battleReport = Board.CreateBattleReport(new Tile(0, 1, 1), turn, units);
-
-
-
-            Assert.IsTrue(battleReport.CasualtiesByPlayerAndType[0][UnitType.Melee] > 50);
+            Assert.AreEqual(200, battleReport.CasualtiesByPlayerAndType[0][UnitType.Melee]);
+            Assert.AreEqual(200, battleReport.CasualtiesByPlayerAndType[1][UnitType.Melee]);
         }
 
         [TestMethod]
-        public void BattleTest()
+        public void TwoEnemies_MoveToSameDestination_BattleOccurs()
         {
-            var board = new Board(BoardTests.GameBoard, BoardTests.TileEdges);
+            var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
+            var unitFactory = new MilitaryUnitFactory(new UnitTemplateFactory());
 
             board.Units =
             [
-                new(new UnitTemplate { MovementPoints = 4 }, 0, 0, board[1, 1], "1st Infantry"),
-                new(new UnitTemplate(), 1, 1, board[2, 3], "2nd Infantry"),
+                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 0, location: board[1, 1]),
+                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 1, location: board[2, 3]),
             ];
-
-            var moves1 = new Move[]
-                    {
-                        new(board[1, 1], board[1, 2], null, 2, 1),
-                        new(board[1, 2], board[2, 2], null, 1, 2),
-                        new(board[2, 2], board[3, 2], null, 0, 3),
-                    };
-            var moves2 = new Move[]
-                    {
-                        new(board[2, 3], board[2, 2], null, 1, 1),
-                        new(board[2, 2], board[2, 1], null, 0, 2),
-                    };
 
             var moveOrders = new List<IUnitOrder>
             {
-                new MoveOrder(moves1, board.Units[0]),
-                new MoveOrder(moves2, board.Units[1]),
+                board.Units[0].GetMoveOrderToDestination(board[2, 2]),
+                board.Units[1].GetMoveOrderToDestination(board[2, 2]),
             };
 
             board.ResolveOrders(moveOrders);

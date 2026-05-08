@@ -1,4 +1,4 @@
-﻿using ComputerOpponent;
+using ComputerOpponent;
 using GameModel;
 using Hexagon;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,7 +20,7 @@ namespace Tests
         [TestMethod]
         public void DisplayInfluenceMap()
         {
-            var board = new Board(GameBoard, Edges, Structures);
+            var board = new GameState(new Board(GameBoard, Edges, Structures));
 
             var numberOfPlayers = 2;
 
@@ -67,7 +67,7 @@ namespace Tests
         [TestMethod]
         public void SelectBestMoveFromInfluenceMap()
         {
-            var board = new Board(GameBoard, Edges, Structures);
+            var board = new GameState(new Board(GameBoard, Edges, Structures));
 
             var numberOfPlayers = 2;
 
@@ -102,7 +102,7 @@ namespace Tests
             IEnumerable<PathFindTile> bestPossibleDestination = null;
             foreach (var tile in tilesOrderedInfluence)
             {
-                bestPossibleDestination = Board.FindShortestPath(board.Units[1].Location, tile, board.Units[1]);
+                bestPossibleDestination = PathFinder.FindShortestPath(board.Units[1].Location, tile, board.Units[1]);
                 if (bestPossibleDestination != null)
                     break;
             }

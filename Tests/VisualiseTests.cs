@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace Tests
         [TestMethod]
         public void VisualiseBoardTest()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
 
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Index.ToString());
@@ -41,7 +41,7 @@ namespace Tests
         [TestMethod]
         public void VisualiseUnitOnBoardTest()
         {
-            var board = new Board(GameBoard, TileEdges, Structures);
+            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
 
             var units = new List<MilitaryUnit>
             {

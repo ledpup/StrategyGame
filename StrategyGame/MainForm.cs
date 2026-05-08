@@ -20,6 +20,7 @@ namespace StrategyGame
         readonly ComboBox structureTypeComboBox;
         readonly NumericUpDown ownerNumeric;
         readonly TextBox statusTextBox;
+        readonly CheckBox showCoordinatesCheckBox;
 
         // Per-tool panels – shown/hidden when the active tool changes
         readonly Panel terrainPanel;
@@ -123,6 +124,9 @@ namespace StrategyGame
             ownerNumeric = new NumericUpDown { Minimum = 0, Maximum = 7, Width = 55 };
             ownerPanel = MakePanel(Label("Owner"), ownerNumeric);
 
+            // ── coordinates toggle ───────────────────────────────────────
+            showCoordinatesCheckBox = new CheckBox { Text = "Coordinates", AutoSize = true, Margin = new Padding(4, 8, 0, 0) };
+
             // ── status ───────────────────────────────────────────────────
             statusTextBox = new TextBox { Width = 380, ReadOnly = true, Margin = new Padding(8, 8, 0, 0) };
 
@@ -141,6 +145,7 @@ namespace StrategyGame
             toolPanel.Controls.Add(unitPanel);
             toolPanel.Controls.Add(structurePanel);
             toolPanel.Controls.Add(ownerPanel);
+            toolPanel.Controls.Add(showCoordinatesCheckBox);
             toolPanel.Controls.Add(statusTextBox);
 
             // ── canvas ───────────────────────────────────────────────────
@@ -177,6 +182,7 @@ namespace StrategyGame
             canvas.MouseUp      += CanvasMouseUp;
             toolComboBox.SelectedIndexChanged += (_, __) => UpdateToolPanels();
             terrainPalette.SelectionChanged += (_, t) => lastPaintedTerrainType = t;
+            showCoordinatesCheckBox.CheckedChanged += (_, __) => RenderBoard();
 
             UpdateToolPanels();
             LoadDefaultMap();
@@ -540,7 +546,16 @@ namespace StrategyGame
             foreach (var tile in board.Tiles)
                 tile.IsSelected = showSelectedTile && tile.Index == selectedTile.Index;
 
-            var drawing = GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            string[] labels = null;
+            if (showCoordinatesCheckBox.Checked)
+            {
+                labels = new string[board.Width * board.Height];
+                foreach (var tile in board.Tiles)
+                    labels[tile.Index] = $"{tile.X},{tile.Y}";
+            }
+
+            var renderUntil = showCoordinatesCheckBox.Checked ? RenderPipeline.Labels : RenderPipeline.Units;
+            var drawing = GameBoardRenderer.Render(RenderPipeline.Board, renderUntil, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
             var previous = canvas.Image;
             canvas.Image = new Bitmap(drawing.ToBitmap());
             previous?.Dispose();

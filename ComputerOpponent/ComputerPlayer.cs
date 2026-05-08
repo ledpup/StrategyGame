@@ -37,7 +37,7 @@ namespace ComputerOpponent
                 TrackUnit(unitRole.Key, unitRole.Value);
             }
         }
-        Dictionary<Role, double> FriendlyUnitInfluenceModifier
+        Dictionary<Role, float> FriendlyUnitInfluenceModifier
         {
             get
             {
@@ -46,17 +46,17 @@ namespace ComputerOpponent
                     _friendlyUnitInfluenceModifier = [];
                     foreach (var role in Enum.GetValues<Role>())
                     {
-                        _friendlyUnitInfluenceModifier.Add(role, 0.5);
+                        _friendlyUnitInfluenceModifier.Add(role, 0.5f);
                     }
-                    _friendlyUnitInfluenceModifier[Role.Defensive] = 1;
-                    _friendlyUnitInfluenceModifier[Role.Scout] = -0.5;
-                    _friendlyUnitInfluenceModifier[Role.Besieger] = -0.25;
+                    _friendlyUnitInfluenceModifier[Role.Defensive] = 1f;
+                    _friendlyUnitInfluenceModifier[Role.Scout] = -0.5f;
+                    _friendlyUnitInfluenceModifier[Role.Besieger] = -0.25f;
                 }
                 return _friendlyUnitInfluenceModifier;
             }
         }
-        Dictionary<Role, double> _friendlyUnitInfluenceModifier;
-        static Dictionary<Role, double> EnemyUnitInfluenceModifier
+        Dictionary<Role, float> _friendlyUnitInfluenceModifier;
+        static Dictionary<Role, float> EnemyUnitInfluenceModifier
         {
             get
             {
@@ -65,17 +65,17 @@ namespace ComputerOpponent
                     _enemyUnitInfluenceModifier = [];
                     foreach (var role in Enum.GetValues<Role>())
                     {
-                        _enemyUnitInfluenceModifier.Add(role, 1);
+                        _enemyUnitInfluenceModifier.Add(role, 1f);
                     }
-                    _enemyUnitInfluenceModifier[Role.Defensive] = -0.5;
-                    _enemyUnitInfluenceModifier[Role.Offensive] = 1.5;
-                    _enemyUnitInfluenceModifier[Role.Scout] = -0.5;
+                    _enemyUnitInfluenceModifier[Role.Defensive] = -0.5f;
+                    _enemyUnitInfluenceModifier[Role.Offensive] = 1.5f;
+                    _enemyUnitInfluenceModifier[Role.Scout] = -0.5f;
                 }
                 return _enemyUnitInfluenceModifier;
             }
         }
 
-        Dictionary<Role, double> FriendlyStructureInfluence
+        Dictionary<Role, float> FriendlyStructureInfluenceModifier
         {
             get
             {
@@ -84,18 +84,18 @@ namespace ComputerOpponent
                     _friendlyStructureInfluence = [];
                     foreach (var role in Enum.GetValues<Role>())
                     {
-                        _friendlyStructureInfluence.Add(role, -1);
+                        _friendlyStructureInfluence.Add(role, -1f);
                     }
-                    _friendlyStructureInfluence[Role.Defensive] = 2;
-                    _friendlyStructureInfluence[Role.Scout] = -2;
-                    _friendlyStructureInfluence[Role.Besieger] = -2;
+                    _friendlyStructureInfluence[Role.Defensive] = 2f;
+                    _friendlyStructureInfluence[Role.Scout] = -2f;
+                    _friendlyStructureInfluence[Role.Besieger] = -2f;
                 }
                 return _friendlyStructureInfluence;
             }
         }
-        Dictionary<Role, double> _friendlyStructureInfluence;
+        Dictionary<Role, float> _friendlyStructureInfluence;
 
-        static Dictionary<Role, double> EnemyStructureInfluence
+        static Dictionary<Role, float> EnemyStructureInfluenceModifier
         {
             get
             {
@@ -104,11 +104,11 @@ namespace ComputerOpponent
                     _enemyStructureInfluence = [];
                     foreach (var role in Enum.GetValues<Role>())
                     {
-                        _enemyStructureInfluence.Add(role, 1);
+                        _enemyStructureInfluence.Add(role, 1f);
                     }
-                    _enemyStructureInfluence[Role.Besieger] = 2;
-                    _enemyStructureInfluence[Role.Defensive] = -2;
-                    _enemyStructureInfluence[Role.Scout] = 0.5;
+                    _enemyStructureInfluence[Role.Besieger] = 2f;
+                    _enemyStructureInfluence[Role.Defensive] = -2f;
+                    _enemyStructureInfluence[Role.Scout] = 0.5f;
                 }
                 return _enemyStructureInfluence;
             }
@@ -116,11 +116,11 @@ namespace ComputerOpponent
 
         public Dictionary<int, UnitAiState> UnitStates { get; set; }
 
-        public Dictionary<int, Dictionary<RoleMovementType, double[]>> AggregateInfluence { get; private set; }
-        public Dictionary<int, double[]> FriendlyUnitInfluence { get; private set; }
-        public Dictionary<int, double[]> EnemyUnitInfluence { get; private set; }
-        public Dictionary<int, Dictionary<MovementType, double[]>> FriendlyStructureInfluenceMap { get; private set; }
-        public Dictionary<int, Dictionary<MovementType, double[]>> EnemyStructureInfluenceMap { get; private set; }
+        public Dictionary<int, Dictionary<RoleMovementType, float[]>> AggregateInfluence { get; private set; }
+        public Dictionary<int, float[]> FriendlyUnitInfluence { get; private set; }
+        public Dictionary<int, float[]> EnemyUnitInfluence { get; private set; }
+        public Dictionary<int, Dictionary<MovementType, float[]>> FriendlyStructureInfluenceMap { get; private set; }
+        public Dictionary<int, Dictionary<MovementType, float[]>> EnemyStructureInfluenceMap { get; private set; }
 
         public static List<Role> Roles
         {
@@ -466,7 +466,7 @@ namespace ComputerOpponent
             return null;
         }
 
-        static Dictionary<Role, double> _enemyStructureInfluence;
+        static Dictionary<Role, float> _enemyStructureInfluence;
 
         public static IEnumerable<PathFindTile> ClosestEnemyStructurePath(GameState board, MilitaryUnit unit)
         {
@@ -529,7 +529,7 @@ namespace ComputerOpponent
 
 
 
-        static Dictionary<Role, double> _enemyUnitInfluenceModifier;
+        static Dictionary<Role, float> _enemyUnitInfluenceModifier;
 
 
 
@@ -545,18 +545,18 @@ namespace ComputerOpponent
 
             board.Tiles.ToList().ForEach(x =>
             {
-                FriendlyUnitInfluence[x.Index] = new double[numberOfPlayers];
-                EnemyUnitInfluence[x.Index] = new double[numberOfPlayers];
+                FriendlyUnitInfluence[x.Index] = new float[numberOfPlayers];
+                EnemyUnitInfluence[x.Index] = new float[numberOfPlayers];
                 FriendlyStructureInfluenceMap[x.Index] = [];
                 EnemyStructureInfluenceMap[x.Index] = [];
 
                 MilitaryUnit.MovementTypes.ForEach(y => {
-                    FriendlyStructureInfluenceMap[x.Index].Add(y, new double[numberOfPlayers]);
-                    EnemyStructureInfluenceMap[x.Index].Add(y, new double[numberOfPlayers]);
+                    FriendlyStructureInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
+                    EnemyStructureInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
                 });
 
-                var tileInfluence = new Dictionary<RoleMovementType, double[]>();
-                Roles.ForEach(y => MilitaryUnit.MovementTypes.ForEach(z => tileInfluence.Add(new RoleMovementType(z, y), new double[numberOfPlayers])));
+                var tileInfluence = new Dictionary<RoleMovementType, float[]>();
+                Roles.ForEach(y => MilitaryUnit.MovementTypes.ForEach(z => tileInfluence.Add(new RoleMovementType(z, y), new float[numberOfPlayers])));
                 AggregateInfluence[x.Index] = tileInfluence;
             });
 
@@ -681,10 +681,10 @@ namespace ComputerOpponent
             // Combine the reusable influence layers with role-specific weights into one decision field.
             var combinedMap = BoardInfluenceMap.Combine(board.Width, board.Height,
             [
-                (friendlyUnitMap, (float)FriendlyUnitInfluenceModifier[role]),
-                (enemyUnitMap, (float)EnemyUnitInfluenceModifier[role]),
-                (friendlyStructureMap, (float)FriendlyStructureInfluence[role]),
-                (enemyStructureMap, (float)EnemyStructureInfluence[role])
+                (friendlyUnitMap, FriendlyUnitInfluenceModifier[role]),
+                (enemyUnitMap, EnemyUnitInfluenceModifier[role]),
+                (friendlyStructureMap, FriendlyStructureInfluenceModifier[role]),
+                (enemyStructureMap, EnemyStructureInfluenceModifier[role])
             ]);
 
             foreach (var tile in board.Tiles)

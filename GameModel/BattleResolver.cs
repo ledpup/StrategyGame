@@ -6,7 +6,7 @@ namespace GameModel
 {
     public static class BattleResolver
     {
-        public static BattleReport ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, StructureType structure = StructureType.None, int siegeDuration = 1)
+        public static BattleReport ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, SettlementType settlement = SettlementType.None, int siegeDuration = 1)
         {
             var groupedUnits = units.GroupBy(x => x.OwnerIndex);
             if (groupedUnits.Count() == 1)
@@ -18,7 +18,7 @@ namespace GameModel
             {
                 x.BattleQualityModifiers[BattleQualityModifier.Terrain] = x.TerrainTypeBattleModifier[terrainType];
                 x.BattleQualityModifiers[BattleQualityModifier.Weather] = x.WeatherBattleModifier[weather];
-                x.BattleQualityModifiers[BattleQualityModifier.Structure] = structure != StructureType.None ? x.StructureBattleModifier : 0;
+                x.BattleQualityModifiers[BattleQualityModifier.Settlement] = settlement != SettlementType.None ? x.SettlementBattleModifier : 0;
             });
 
             var combatants = new List<CombatantInBattle>();
@@ -62,13 +62,13 @@ namespace GameModel
 
                 combatant.StrengthDamage = opponents.Sum(x => x.UnitStrength) / (numberOfSides - 1) * .8;
 
-                if (residentId == combatant.OwnerId && structure != StructureType.None)
+                if (residentId == combatant.OwnerId && settlement != SettlementType.None)
                 {
                     var siegeUnitDamage = 0D;
                     opponents.ForEach(x => siegeUnitDamage += x.UnitStrengthByType[UnitType.Siege]);
 
                     combatant.StrengthDamage -= siegeUnitDamage;
-                    combatant.StrengthDamage *= Structure.StructureDefenceModifiers[structure] + (.05 * siegeDuration);
+                    combatant.StrengthDamage *= (1 - Settlement.SettlementDefenceModifier(settlement)) + (.05 * siegeDuration);
                     combatant.StrengthDamage += siegeUnitDamage;
                 }
             }

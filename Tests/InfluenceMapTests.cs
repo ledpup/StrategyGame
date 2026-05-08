@@ -16,12 +16,12 @@ namespace Tests
       
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
         static string[] Edges = File.ReadAllLines("BasicBoardEdges.txt");
-        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
+        static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
         [TestMethod]
         public void DisplayInfluenceMap()
         {
-            var board = new GameState(new Board(GameBoard, Edges, Structures));
+            var board = new GameState(new Board(GameBoard, Edges, Settlements));
 
             var numberOfPlayers = 2;
 
@@ -58,17 +58,17 @@ namespace Tests
             var vectors = new List<Centreline>();
             moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
-            GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, vectors, board.Units);
+            GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, vectors, board.Units);
 
             board.ResolveOrders(moveOrders);
 
-            GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, board.Units);
         }
 
         [TestMethod]
         public void SelectBestMoveFromInfluenceMap()
         {
-            var board = new GameState(new Board(GameBoard, Edges, Structures));
+            var board = new GameState(new Board(GameBoard, Edges, Settlements));
 
             var numberOfPlayers = 2;
 
@@ -92,7 +92,7 @@ namespace Tests
             var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4, board.Width, board.Height);
             results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-            GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+            GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, board.Units);
 
             var roleMovementType = computerPlayer.GetUnitState(board.Units[1]).GetRoleMovementType(board.Units[1]);
             var tilesOrderedInfluence = board.Tiles

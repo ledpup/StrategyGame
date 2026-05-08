@@ -33,7 +33,7 @@
     <None Update="BasicBoardEdges.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="BasicBoardStructures.txt">
+    <None Update="BasicBoardSettlements.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ContiguousRegionTestEdges.txt">

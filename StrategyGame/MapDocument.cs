@@ -10,7 +10,7 @@ namespace StrategyGame
     {
         public string[] Tiles { get; set; }
         public List<string> Edges { get; set; }
-        public List<string> Structures { get; set; }
+        public List<string> Settlements { get; set; }
         public List<UnitDocument> Units { get; set; }
 
         public static MapDocument CreateDefault(int width, int height)
@@ -20,13 +20,13 @@ namespace StrategyGame
             {
                 Tiles = Enumerable.Range(0, height).Select(_ => row).ToArray(),
                 Edges = [],
-                Structures = [],
+                Settlements = [],
                 Units = [],
             };
         }
 
         public Board ToBoard() =>
-            new Board(Tiles, Edges.ToArray(), Structures.ToArray());
+            new Board(Tiles, Edges.ToArray(), Settlements.ToArray());
 
         public GameState ToGameState(int turn = 0)
         {
@@ -58,8 +58,8 @@ namespace StrategyGame
                     .Select(x => $"{Math.Min(x.Origin.Index, x.Destination.Index)},{Math.Max(x.Origin.Index, x.Destination.Index)},{x.EdgeType},{x.HasRoad.ToString().ToLowerInvariant()}")
                     .OrderBy(x => x)
                     .ToList(),
-                Structures = board.Structures
-                    .Select(x => $"{x.Index},{x.StructureType},{x.OwnerIndex},{(int)x.Supply}")
+                Settlements = board.Settlements
+                    .Select(x => $"{x.Index},{x.SettlementType},{x.OwnerIndex},{(int)x.Supply}")
                     .OrderBy(x => x)
                     .ToList(),
                 Units = gameState.Units
@@ -81,8 +81,8 @@ namespace StrategyGame
             foreach (var t in Tiles) writer.WriteLine(t);
             writer.WriteLine("[Edges]");
             foreach (var e in Edges) writer.WriteLine(e);
-            writer.WriteLine("[Structures]");
-            foreach (var s in Structures) writer.WriteLine(s);
+            writer.WriteLine("[Settlements]");
+            foreach (var s in Settlements) writer.WriteLine(s);
             writer.WriteLine("[Units]");
             foreach (var u in Units) writer.WriteLine(u.ToLine());
         }
@@ -116,7 +116,7 @@ namespace StrategyGame
             {
                 Tiles = GetSection(sections, "[Tiles]").ToArray(),
                 Edges = GetSection(sections, "[Edges]"),
-                Structures = GetSection(sections, "[Structures]"),
+                Settlements = GetSection(sections, "[Settlements]"),
                 Units = GetSection(sections, "[Units]").Select(UnitDocument.Parse).ToList(),
             };
         }

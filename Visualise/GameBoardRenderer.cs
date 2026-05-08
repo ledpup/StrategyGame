@@ -9,13 +9,13 @@ namespace Visualise
     {
         Board,
         Edges,
-        Structures,
+        Settlements,
         Units,
         Labels
     }
     public class GameBoardRenderer
     {
-        public static GameBoardDrawing2D Render(RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static GameBoardDrawing2D Render(RenderPipeline renderBegin, RenderPipeline renderUntil, int boardWidth, int boardHeight, IEnumerable<Tile> tiles = null, IEnumerable<GameModel.Edge> edges = null, List<Settlement> settlements = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
             var gameBoardDrawing2D = new GameBoardDrawing2D(boardWidth, boardHeight);
 
@@ -89,18 +89,18 @@ namespace Visualise
 
 
 
-            if (renderBegin <= RenderPipeline.Structures)
+            if (renderBegin <= RenderPipeline.Settlements)
             {
-                if (structures != null)
+                if (settlements != null)
                 {
-                    structures.ForEach(x =>
+                    settlements.ForEach(x =>
                     {
-                        var colour = GameBoardRenderer.StructureColour(x);
+                        var colour = GameBoardRenderer.SettlementColour(x);
                         gameBoardDrawing2D.DrawRectangle(x.Location.Hex, colour);
                     });
                 }
             }
-            if (renderUntil == RenderPipeline.Structures)
+            if (renderUntil == RenderPipeline.Settlements)
                 return gameBoardDrawing2D;
 
             if (renderBegin <= RenderPipeline.Units)
@@ -155,14 +155,14 @@ namespace Visualise
             return unit.IsAlive ? PlayerColour(unit.OwnerIndex) : Colours.Black;
         }
 
-        public static ArgbColour StructureColour(Structure structure)
+        public static ArgbColour SettlementColour(Settlement settlement)
         {
-            return PlayerColour(structure.OwnerIndex);
+            return PlayerColour(settlement.OwnerIndex);
         }
 
-        public static void RenderAndSave(string fileName, int boardWidth, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Structure> structures = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
+        public static void RenderAndSave(string fileName, int boardWidth, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Settlement> settlements = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)
         {
-            var gameBoardDrawing2D = Render(RenderPipeline.Board, RenderPipeline.Labels, boardWidth, boardHeight, tiles, edges, structures, labels, lines, units, circles);
+            var gameBoardDrawing2D = Render(RenderPipeline.Board, RenderPipeline.Labels, boardWidth, boardHeight, tiles, edges, settlements, labels, lines, units, circles);
             gameBoardDrawing2D.Save(fileName);
         }
 

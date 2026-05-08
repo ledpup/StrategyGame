@@ -16,7 +16,7 @@ public class GameState
     public int Height => Board.Height;
     public Tile[] Tiles => Board.TileArray;
     public List<Edge> Edges => Board.Edges;
-    public List<Structure> Structures => Board.Structures;
+    public List<Settlement> Settlements => Board.Settlements;
     public Tile this[int index] => Board[index];
     public Tile this[int x, int y] => Board[x, y];
 
@@ -62,25 +62,25 @@ public class GameState
             var tileUnits = UnitsAt(x).ToList();
             if (Tile.IsInConflict(tileUnits))
             {
-                battleReports.Add(BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, 3, StructureType.Fortress, 2));
+                battleReports.Add(BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, 3, SettlementType.Fortress, 2));
             }
         });
         return battleReports;
     }
 
-    public void ChangeStructureOwners()
+    public void ChangeSettlementOwners()
     {
-        Structures.ForEach(x =>
+        Settlements.ForEach(x =>
         {
-            var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
-            if (unitsAtStructureByOwner.Count == 1)
+            var unitsAtSettlementByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
+            if (unitsAtSettlementByOwner.Count == 1)
             {
-                if (x.OwnerIndex == unitsAtStructureByOwner.First().Key)
+                if (x.OwnerIndex == unitsAtSettlementByOwner.First().Key)
                     return;
-                x.OwnerIndex = unitsAtStructureByOwner.First().Key;
-                var units = unitsAtStructureByOwner.First().ToList();
+                x.OwnerIndex = unitsAtSettlementByOwner.First().Key;
+                var units = unitsAtSettlementByOwner.First().ToList();
                 var numberOfUnits = units.Count;
-                units.ForEach(y => y.ChangeMorale(Turn, 2D / numberOfUnits, $"Morale increase from pillaging {x.StructureType}"));
+                units.ForEach(y => y.ChangeMorale(Turn, 2D / numberOfUnits, $"Morale increase from pillaging {x.SettlementType}"));
             }
         });
     }

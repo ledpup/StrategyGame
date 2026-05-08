@@ -62,17 +62,17 @@ namespace StrategyGame
             return document.ToGameState(gameState.Turn);
         }
 
-        public static GameState SetStructure(GameState gameState, Tile tile, StructureType structureType, int ownerIndex = 0, int supply = 4)
+        public static GameState SetSettlement(GameState gameState, Tile tile, SettlementType settlementType, int ownerIndex = 0, int supply = 4)
         {
             if (tile == null)
                 return gameState;
 
             var document = MapDocument.FromGameState(gameState);
-            document.Structures.RemoveAll(x => x.StartsWith(tile.Index + ",", StringComparison.Ordinal));
-            if (structureType != StructureType.None)
+            document.Settlements.RemoveAll(x => x.StartsWith(tile.Index + ",", StringComparison.Ordinal));
+            if (settlementType != SettlementType.None)
             {
-                document.Structures.Add($"{tile.Index},{structureType},{ownerIndex},{supply}");
-                document.Structures = document.Structures.OrderBy(x => x).ToList();
+                document.Settlements.Add($"{tile.Index},{settlementType},{ownerIndex},{supply}");
+                document.Settlements = document.Settlements.OrderBy(x => x).ToList();
             }
             return document.ToGameState(gameState.Turn);
         }
@@ -131,7 +131,7 @@ namespace StrategyGame
                 return gameState;
 
             var document = MapDocument.FromGameState(gameState);
-            document.Structures.RemoveAll(x => x.StartsWith(tile.Index + ",", StringComparison.Ordinal));
+            document.Settlements.RemoveAll(x => x.StartsWith(tile.Index + ",", StringComparison.Ordinal));
             document.Units.RemoveAll(x => x.TileIndex == tile.Index);
             return document.ToGameState(gameState.Turn);
         }
@@ -189,7 +189,7 @@ namespace StrategyGame
         public GameState CurrentBoard { get; private set; }
 
         private readonly int initialUnitOwners;
-        private readonly int initialStructureOwners;
+        private readonly int initialSettlementOwners;
 
         internal SimulationSession(GameState gameState, int maxTurns)
         {
@@ -204,18 +204,18 @@ namespace StrategyGame
             computerPlayer = new ComputerPlayer(CurrentBoard.Units);
 
             initialUnitOwners      = CurrentBoard.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
-            initialStructureOwners = CurrentBoard.Structures.Select(x => x.OwnerIndex).Distinct().Count();
+            initialSettlementOwners = CurrentBoard.Settlements.Select(x => x.OwnerIndex).Distinct().Count();
         }
 
         public string StatusLine()
         {
             var alive  = CurrentBoard.Units.Count(u => u.IsAlive);
             var owners = string.Join(", ",
-                CurrentBoard.Structures
+                CurrentBoard.Settlements
                     .GroupBy(s => s.OwnerIndex)
                     .OrderBy(g => g.Key)
                     .Select(g => $"P{g.Key}:{g.Count()}"));
-            return $"Turn {CurrentTurn}  |  Units alive: {alive}  |  Structures: {owners}";
+            return $"Turn {CurrentTurn}  |  Units alive: {alive}  |  Settlements: {owners}";
         }
 
         /// <summary>Advances one turn. Returns false if already at the end.</summary>
@@ -240,7 +240,7 @@ namespace StrategyGame
             for (var i = 0; i < numberOfPlayers; i++)
                 sim.ResolveStackLimits(i);
             sim.ConductBattles();
-            sim.ChangeStructureOwners();
+            sim.ChangeSettlementOwners();
             sim.Turn++;
 
             snapshots.Add(MapDocument.FromGameState(sim));
@@ -249,10 +249,10 @@ namespace StrategyGame
 
             // Check end conditions — only stop early if sides have actually been eliminated
             var aliveOwners     = sim.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
-            var structureOwners = sim.Structures.Select(x => x.OwnerIndex).Distinct().Count();
+            var settlementOwners = sim.Settlements.Select(x => x.OwnerIndex).Distinct().Count();
             if (sim.Turn >= maxTurns
                 || (initialUnitOwners      > 1 && aliveOwners     <= 1)
-                || (initialStructureOwners > 1 && structureOwners <= 1))
+                || (initialSettlementOwners > 1 && settlementOwners <= 1))
             {
                 IsFinished = true;
             }
@@ -283,6 +283,6 @@ namespace StrategyGame
         public Board Board { get; set; }
         public int TurnsCompleted { get; set; }
         public int RemainingUnits { get; set; }
-        public Dictionary<int, int> StructuresByOwner { get; set; }
+        public Dictionary<int, int> SettlementsByOwner { get; set; }
     }
 }

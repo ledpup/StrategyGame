@@ -15,13 +15,13 @@ namespace Tests
     {
         public static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
         public static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
-        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
+        static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
 
         [TestMethod]
         public void Ports()
         {
-            var gameState = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var gameState = new GameState(new Board(GameBoard, TileEdges, Settlements));
             var numberOfPlayers = 2;
             var labels = new string[gameState.Width, gameState.Height];
 
@@ -52,7 +52,7 @@ namespace Tests
             {
                 computerPlayer.GenerateInfluenceMaps(gameState, numberOfPlayers);
 
-                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Structures, null, null, gameState.Units);
+                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 var aliveUnits = gameState.Units.Where(x => x.IsAlive).ToList();
@@ -62,10 +62,10 @@ namespace Tests
                 var lines = new List<Centreline>();
                 moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
-                GameBoardRenderer.RenderAndSave($"PortsTurn{gameState.Turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Structures, null, lines, gameState.Units);
+                GameBoardRenderer.RenderAndSave($"PortsTurn{gameState.Turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, lines, gameState.Units);
 
                 gameState.ResolveOrders(moveOrders);
-                gameState.ChangeStructureOwners();
+                gameState.ChangeSettlementOwners();
 
                 switch (gameState.Turn)
                 {
@@ -94,7 +94,7 @@ namespace Tests
         [TestMethod]
         public void TransportByAir()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
             var units = new List<MilitaryUnit>
             {
@@ -129,7 +129,7 @@ namespace Tests
         [ExpectedException(typeof(Exception))]
         public void MoveTransportedUnit()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
             var units = new List<MilitaryUnit>
             {
@@ -156,7 +156,7 @@ namespace Tests
         [TestMethod]
         public void UnloadUnit()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
             var units = new List<MilitaryUnit>
             {
@@ -195,7 +195,7 @@ namespace Tests
         [TestMethod]
         public void AirborneUnitAirlift()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
             var numberOfPlayers = 2;
             var labels = new string[board.Width, board.Height];
 
@@ -224,7 +224,7 @@ namespace Tests
             {
                 computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
 
-                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, board.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
                 units = units.Where(x => x.IsAlive).ToList();
@@ -234,10 +234,10 @@ namespace Tests
                 var lines = new List<Centreline>();
                 unitOrders.OfType<MoveCommand>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, units: board.Units, lines: lines);
+                GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, units: board.Units, lines: lines);
 
                 board.ResolveOrders(unitOrders);
-                board.ChangeStructureOwners();
+                board.ChangeSettlementOwners();
 
                 board.Turn++;
 

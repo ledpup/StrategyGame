@@ -116,7 +116,7 @@ namespace Tests
 
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
-            GameBoardRenderer.RenderAndSave("ContiguousRegionsTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels);
+            GameBoardRenderer.RenderAndSave("ContiguousRegionsTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
 
             Assert.AreEqual(2, board[12].ContiguousRegionId);
             Assert.AreEqual(7, board[32].ContiguousRegionId);

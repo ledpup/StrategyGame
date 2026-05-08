@@ -5,7 +5,7 @@ namespace StrategyGame
         Terrain,
         Edge,
         Unit,
-        Structure,
+        Settlement,
         Erase,
     }
 }

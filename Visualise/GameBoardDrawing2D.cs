@@ -16,7 +16,7 @@ namespace Visualise
         float _hexWidth;
         float _hexHeight;
         const float EdgeLength = 25;
-        float _structureWidth;
+        float _settlementWidth;
         float _unitWidth;
         Layout _layout;
 
@@ -35,8 +35,8 @@ namespace Visualise
 
 
             
-            _structureWidth = _hexHeight / 4;
-            _unitWidth = _structureWidth * .8f;
+            _settlementWidth = _hexHeight / 4;
+            _unitWidth = _settlementWidth * .8f;
             _layout = new Layout(Layout.flat, new PointD(EdgeLength, EdgeLength), new PointD(EdgeLength, _hexHeight/2));
         }
 
@@ -243,10 +243,10 @@ namespace Visualise
             var brush = new SolidBrush(Color.FromArgb(colour.Alpha, colour.Red, colour.Green, colour.Blue));
             var hexCentre = Layout.HexToPixel(_layout, location);
 
-            var x = (float)hexCentre.X - (_structureWidth / 2);
-            var y = (float)hexCentre.Y - (_structureWidth / 2);
+            var x = (float)hexCentre.X - (_settlementWidth / 2);
+            var y = (float)hexCentre.Y - (_settlementWidth / 2);
 
-            _graphics.FillRectangle(brush, x, y, _structureWidth, _structureWidth);
+            _graphics.FillRectangle(brush, x, y, _settlementWidth, _settlementWidth);
         }
 
         public void LabelHexes(ArgbColour colour, float xMin, float yMin, string[] labels, int boardWidth)

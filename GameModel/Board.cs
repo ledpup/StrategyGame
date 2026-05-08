@@ -22,9 +22,9 @@ namespace GameModel
 
         private static Logger Logger;
 
-        public List<Structure> Structures;
+        public List<Settlement> Settlements;
 
-        public Board(string[] tiles, string[] edges = null, string[] structures = null, Logger logger = null)
+        public Board(string[] tiles, string[] edges = null, string[] settlements = null, Logger logger = null)
         {
             Width = tiles[0].Length;
             Height = tiles.Length;
@@ -34,7 +34,7 @@ namespace GameModel
             BuildEdgeLookup();
             InitialiseNeighbours(Edges);
             CalculateTileDistanceFromTheSea();
-            Structures = IntitaliseStructures(structures);
+            Settlements = IntitaliseSettlements(settlements);
             InitialiseSupply();
             CalculateContiguousRegions();
 
@@ -89,9 +89,9 @@ namespace GameModel
         {
             Tiles.ToList().ForEach(x => x.Supply = null);
             var supplyCalculated = new HashSet<Tile>();
-            foreach (var structure in Structures)
+            foreach (var settlement in Settlements)
             {
-                CalculateSupply(this[structure.Index], structure.OwnerIndex, structure.Supply, supplyCalculated);
+                CalculateSupply(this[settlement.Index], settlement.OwnerIndex, settlement.Supply, supplyCalculated);
             }
         }
 
@@ -160,23 +160,23 @@ namespace GameModel
             }
         }
 
-        private List<Structure> IntitaliseStructures(string[] tilePoints)
+        private List<Settlement> IntitaliseSettlements(string[] tilePoints)
         {
-            var structures = new List<Structure>();
+            var settlements = new List<Settlement>();
 
             if (tilePoints == null)
-                return structures;
+                return settlements;
             foreach (var point in tilePoints)
             {
-                var structureProperties = point.Split(',');
-                var index = int.Parse(structureProperties[0]);
-                var structureType = Enum.Parse<StructureType>(structureProperties[2]);
-                var structure = new Structure(index, structureType, TileArray[index], int.Parse(structureProperties[2]), int.Parse(structureProperties[3]));
+                var settlementProperties = point.Split(',');
+                var index = int.Parse(settlementProperties[0]);
+                var settlementType = Enum.Parse<SettlementType>(settlementProperties[2]);
+                var settlement = new Settlement(index, settlementType, TileArray[index], int.Parse(settlementProperties[2]), int.Parse(settlementProperties[3]));
 
                 
-                structures.Add(structure);
+                settlements.Add(settlement);
             }
-            return structures;
+            return settlements;
         }
 
         private void CalculateTileDistanceFromTheSea()

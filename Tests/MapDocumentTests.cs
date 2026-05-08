@@ -34,7 +34,7 @@ namespace Tests
             Assert.AreEqual(4, doc.Tiles.Length);
             Assert.IsTrue(doc.Tiles.All(r => r == "GGGGG"));
             Assert.AreEqual(0, doc.Edges.Count);
-            Assert.AreEqual(0, doc.Structures.Count);
+            Assert.AreEqual(0, doc.Settlements.Count);
             Assert.AreEqual(0, doc.Units.Count);
         }
 
@@ -61,12 +61,12 @@ namespace Tests
         }
 
         [TestMethod]
-        public void Roundtrip_StructuresPreserved()
+        public void Roundtrip_SettlementsPreserved()
         {
             var doc = Grassland();
-            doc.Structures.Add("5,City,1,100");
+            doc.Settlements.Add("5,City,1,100");
             var rt = Roundtrip(doc);
-            CollectionAssert.AreEquivalent(doc.Structures, rt.Structures);
+            CollectionAssert.AreEquivalent(doc.Settlements, rt.Settlements);
         }
 
         [TestMethod]
@@ -102,7 +102,7 @@ namespace Tests
             var board = new Board(
                 File.ReadAllLines("BasicBoard.txt"),
                 File.ReadAllLines("BasicBoardEdges.txt"),
-                File.ReadAllLines("BasicBoardStructures.txt"));
+                File.ReadAllLines("BasicBoardSettlements.txt"));
             var doc = MapDocument.FromBoard(board);
             Assert.AreEqual(board.Height, doc.Tiles.Length);
             Assert.IsTrue(doc.Tiles.All(r => r.Length == board.Width));
@@ -138,7 +138,7 @@ namespace Tests
             var lines = new[]
             {
                 "", "[Tiles]", "", "GGG", "", "GGG", "",
-                "[Edges]", "", "[Structures]", "", "[Units]", ""
+                "[Edges]", "", "[Settlements]", "", "[Units]", ""
             };
             var doc = MapDocument.ParseFromLines(lines);
             Assert.AreEqual(2, doc.Tiles.Length);
@@ -199,11 +199,11 @@ namespace Tests
         }
 
         [TestMethod]
-        public void StructureAdd_Inverse_IsStructureRemove()
+        public void SettlementAdd_Inverse_IsSettlementRemove()
         {
-            var d = new MapDelta { Kind = DeltaKind.StructureAdd, NewValue = "5,City,1,100" };
+            var d = new MapDelta { Kind = DeltaKind.SettlementAdd, NewValue = "5,City,1,100" };
             var inv = d.Inverse();
-            Assert.AreEqual(DeltaKind.StructureRemove, inv.Kind);
+            Assert.AreEqual(DeltaKind.SettlementRemove, inv.Kind);
             Assert.AreEqual("5,City,1,100", inv.OldValue);
         }
 
@@ -397,19 +397,19 @@ namespace Tests
             Assert.AreEqual("0,1,River,false", redone.Edges[0]);
         }
 
-        // ── Structure deltas ──────────────────────────────────────────────
+        // ── Settlement deltas ──────────────────────────────────────────────
 
         [TestMethod]
-        public void Undo_StructureAdd_RemovesStructure()
+        public void Undo_SettlementAdd_RemovesSettlement()
         {
             var h = new MapHistory();
             var before = Grassland();
             var after  = Clone(before);
-            after.Structures.Add("5,City,1,100");
-            h.Commit(before, after, "structure");
+            after.Settlements.Add("5,City,1,100");
+            h.Commit(before, after, "settlement");
 
             var restored = h.Undo(after);
-            Assert.AreEqual(0, restored.Structures.Count);
+            Assert.AreEqual(0, restored.Settlements.Count);
         }
 
         // ── Diff ──────────────────────────────────────────────────────────

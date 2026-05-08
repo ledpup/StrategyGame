@@ -6,15 +6,15 @@ namespace Tests
 {
 
     [TestClass]
-    public class StructureTests
+    public class SettlementTests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
-        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
+        static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
         [TestMethod]
-        public void ReadStructuresTest()
+        public void ReadSettlementsTest()
         {
-            var board = new Board(GameBoard, null, Structures) ;
+            var board = new Board(GameBoard, null, Settlements) ;
         }
     }
 }

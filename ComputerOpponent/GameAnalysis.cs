@@ -16,12 +16,12 @@ namespace ComputerOpponent
         public double[] MaxParameterValue;
         public enum ObjFuncParameter
         {
-            StructureCount,
-            StructureStrength,
+            SettlementCount,
+            SettlementStrength,
             UnitStrength
         }
 
-        public double[] CalculateObjectiveFunction(Player[] players, List<Structure> structures, List<MilitaryUnit> units)
+        public double[] CalculateObjectiveFunction(Player[] players, List<Settlement> settlements, List<MilitaryUnit> units)
         {
             ObjectiveFunctionValue = new double[players.Length];
 
@@ -30,13 +30,13 @@ namespace ComputerOpponent
             ObjectiveFunctionNormalisedParameters = new Dictionary<ObjFuncParameter, double>[players.Length];
             MaxParameterValue = new double[players.Length];
 
-            var structuresByPlayer = structures.GroupBy(x => x.OwnerIndex).ToList();
+            var settlementsByPlayer = settlements.GroupBy(x => x.OwnerIndex).ToList();
             var unitsByPlayer = units.GroupBy(x => x.OwnerIndex).ToList();
 
             ObjectiveFunctionParameterWeight = new Dictionary<ObjFuncParameter, double>
             {
-                { ObjFuncParameter.StructureCount, 2 },
-                { ObjFuncParameter.StructureStrength, 1 },
+                { ObjFuncParameter.SettlementCount, 2 },
+                { ObjFuncParameter.SettlementStrength, 1 },
                 { ObjFuncParameter.UnitStrength, .001 },
             };
 
@@ -46,8 +46,8 @@ namespace ComputerOpponent
                 ObjectiveFunctionWeightedParameters[i] = [];
                 ObjectiveFunctionNormalisedParameters[i] = [];
 
-                ObjectiveFunctionParameters[i].Add(ObjFuncParameter.StructureCount, structuresByPlayer[i].Count());
-                ObjectiveFunctionParameters[i].Add(ObjFuncParameter.StructureStrength, structuresByPlayer[i].Sum(x => 1 - Structure.StructureDefenceModifiers[x.StructureType]));
+                ObjectiveFunctionParameters[i].Add(ObjFuncParameter.SettlementCount, settlementsByPlayer[i].Count());
+                ObjectiveFunctionParameters[i].Add(ObjFuncParameter.SettlementStrength, settlementsByPlayer[i].Sum(x => Settlement.SettlementDefenceModifier(x.SettlementType)));
                 ObjectiveFunctionParameters[i].Add(ObjFuncParameter.UnitStrength, unitsByPlayer[i].Sum(x => x.Strength));
 
                 foreach (ObjFuncParameter parameter in Enum.GetValues<ObjFuncParameter>())

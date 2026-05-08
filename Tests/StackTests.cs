@@ -9,12 +9,12 @@ namespace Tests
     public class StackTests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
-        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
+        static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
         [TestMethod]
         public void StackLimits()
         {
-            var board = new GameState(new Board(GameBoard, structures: Structures));
+            var board = new GameState(new Board(GameBoard, settlements: Settlements));
 
             Assert.AreEqual(4, board[1, 2].StackLimit);
             Assert.AreEqual(5, board[1, 3].StackLimit);
@@ -24,7 +24,7 @@ namespace Tests
         [TestMethod]
         public void OverStackLimit()
         {
-            var board = new GameState(new Board(GameBoard, structures: Structures));
+            var board = new GameState(new Board(GameBoard, settlements: Settlements));
 
             var units = new List<MilitaryUnit>
             {

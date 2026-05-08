@@ -17,7 +17,7 @@ namespace StrategyGame
         readonly CheckBox roadCheckBox;
         readonly ComboBox unitTypeComboBox;
         readonly ComboBox movementTypeComboBox;
-        readonly ComboBox structureTypeComboBox;
+        readonly ComboBox settlementTypeComboBox;
         readonly NumericUpDown ownerNumeric;
         readonly TextBox statusTextBox;
         readonly CheckBox showCoordinatesCheckBox;
@@ -26,7 +26,7 @@ namespace StrategyGame
         readonly Panel terrainPanel;
         readonly Panel edgePanel;
         readonly Panel unitPanel;
-        readonly Panel structurePanel;
+        readonly Panel settlementPanel;
         readonly Panel ownerPanel;
 
         GameState board;
@@ -114,13 +114,13 @@ namespace StrategyGame
                 Label("Move"),
                 movementTypeComboBox);
 
-            // ── structure panel ──────────────────────────────────────────
-            structureTypeComboBox = CreateComboBox(typeof(StructureType));
-            structurePanel = MakePanel(
-                Label("Structure"),
-                structureTypeComboBox);
+            // ── settlement panel ──────────────────────────────────────────
+            settlementTypeComboBox = CreateComboBox(typeof(SettlementType));
+            settlementPanel = MakePanel(
+                Label("Settlement"),
+                settlementTypeComboBox);
 
-            // ── owner panel (unit + structure) ───────────────────────────
+            // ── owner panel (unit + settlement) ───────────────────────────
             ownerNumeric = new NumericUpDown { Minimum = 0, Maximum = 7, Width = 55 };
             ownerPanel = MakePanel(Label("Owner"), ownerNumeric);
 
@@ -143,7 +143,7 @@ namespace StrategyGame
             toolPanel.Controls.Add(terrainPanel);
             toolPanel.Controls.Add(edgePanel);
             toolPanel.Controls.Add(unitPanel);
-            toolPanel.Controls.Add(structurePanel);
+            toolPanel.Controls.Add(settlementPanel);
             toolPanel.Controls.Add(ownerPanel);
             toolPanel.Controls.Add(showCoordinatesCheckBox);
             toolPanel.Controls.Add(statusTextBox);
@@ -217,8 +217,8 @@ namespace StrategyGame
             terrainPanel.Visible   = tool == EditorTool.Terrain;
             edgePanel.Visible      = tool == EditorTool.Edge;
             unitPanel.Visible      = tool == EditorTool.Unit;
-            structurePanel.Visible = tool == EditorTool.Structure;
-            ownerPanel.Visible     = tool == EditorTool.Unit || tool == EditorTool.Structure;
+            settlementPanel.Visible = tool == EditorTool.Settlement;
+            ownerPanel.Visible     = tool == EditorTool.Unit || tool == EditorTool.Settlement;
         }
 
         void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -287,7 +287,7 @@ namespace StrategyGame
                 new Board(
                     File.ReadAllLines(Path.Combine(basePath, "BasicBoard.txt")),
                     File.ReadAllLines(Path.Combine(basePath, "BasicBoardEdges.txt")),
-                    File.ReadAllLines(Path.Combine(basePath, "BasicBoardStructures.txt"))));
+                    File.ReadAllLines(Path.Combine(basePath, "BasicBoardSettlements.txt"))));
             currentFilePath = null;
             selectedTile = null;
             RenderBoard();
@@ -479,12 +479,12 @@ namespace StrategyGame
             {
                 case EditorTool.Terrain:
                     return;
-                case EditorTool.Structure:
+                case EditorTool.Settlement:
                     BeginEdit();
-                    board = BoardEditorService.SetStructure(board, tile, (StructureType)structureTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
-                    CommitEdit($"Set structure at {tile.Index}");
+                    board = BoardEditorService.SetSettlement(board, tile, (SettlementType)settlementTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
+                    CommitEdit($"Set settlement at {tile.Index}");
                     selectedTile = null;
-                    SetStatus($"Structure updated at tile {tile.Index}");
+                    SetStatus($"Settlement updated at tile {tile.Index}");
                     break;
                 case EditorTool.Unit:
                     BeginEdit();
@@ -556,7 +556,7 @@ namespace StrategyGame
             }
 
             var renderUntil = showCoordinatesCheckBox.Checked ? RenderPipeline.Labels : RenderPipeline.Units;
-            var drawing = GameBoardRenderer.Render(RenderPipeline.Board, renderUntil, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
+            var drawing = GameBoardRenderer.Render(RenderPipeline.Board, renderUntil, board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels, null, board.Units);
             var previous = canvas.Image;
             canvas.Image = new Bitmap(drawing.ToBitmap());
             previous?.Dispose();

@@ -26,7 +26,7 @@ namespace GameModel
         Terrain,
         Weather,
         UnitType,
-        Structure,
+        Settlement,
     }
 
     public class MilitaryUnit
@@ -235,7 +235,7 @@ namespace GameModel
         }
 
         public int RoadMovementBonus { get; set; }
-        public double StructureBattleModifier { get; set; }
+        public double SettlementBattleModifier { get; set; }
         public MilitaryUnit TransportedBy { get; set; }
         public List<MovementType> TransportableBy { get; private set; }
         public bool UsesRoads { get; private set; }

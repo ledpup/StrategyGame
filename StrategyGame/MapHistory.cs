@@ -10,12 +10,12 @@ namespace StrategyGame
     // A single field-level change within one map document.
     // ─────────────────────────────────────────────────────────────────────────
 
-    internal enum DeltaKind { TileRow, EdgeAdd, EdgeRemove, StructureAdd, StructureRemove, UnitAdd, UnitRemove }
+    internal enum DeltaKind { TileRow, EdgeAdd, EdgeRemove, SettlementAdd, SettlementRemove, UnitAdd, UnitRemove }
 
     /// <summary>
     /// One atomic change: the kind of change, an optional row/key, the old value, and the new value.
     /// For TileRow: Key = row index (string), OldValue/NewValue = full row strings.
-    /// For Edge/Structure/Unit Add/Remove: OldValue (for Remove) or NewValue (for Add) is the line;
+    /// For Edge/Settlement/Unit Add/Remove: OldValue (for Remove) or NewValue (for Add) is the line;
     /// for a replacement both OldValue and NewValue are set and Kind is the Remove variant.
     /// </summary>
     internal sealed class MapDelta
@@ -55,8 +55,8 @@ namespace StrategyGame
             DeltaKind.TileRow         => new MapDelta { Kind = DeltaKind.TileRow,         Key = Key, OldValue = NewValue, NewValue = OldValue },
             DeltaKind.EdgeAdd         => new MapDelta { Kind = DeltaKind.EdgeRemove,       OldValue = NewValue },
             DeltaKind.EdgeRemove      => new MapDelta { Kind = DeltaKind.EdgeAdd,          NewValue = OldValue },
-            DeltaKind.StructureAdd    => new MapDelta { Kind = DeltaKind.StructureRemove,  OldValue = NewValue },
-            DeltaKind.StructureRemove => new MapDelta { Kind = DeltaKind.StructureAdd,     NewValue = OldValue },
+            DeltaKind.SettlementAdd    => new MapDelta { Kind = DeltaKind.SettlementRemove,  OldValue = NewValue },
+            DeltaKind.SettlementRemove => new MapDelta { Kind = DeltaKind.SettlementAdd,     NewValue = OldValue },
             DeltaKind.UnitAdd         => new MapDelta { Kind = DeltaKind.UnitRemove,       OldValue = NewValue },
             DeltaKind.UnitRemove      => new MapDelta { Kind = DeltaKind.UnitAdd,          NewValue = OldValue },
             _ => throw new InvalidOperationException($"Unknown delta kind {Kind}")
@@ -102,13 +102,13 @@ namespace StrategyGame
                         doc.Edges.Remove(d.OldValue);
                         break;
 
-                    case DeltaKind.StructureAdd:
-                        if (!doc.Structures.Contains(d.NewValue))
-                            doc.Structures.Add(d.NewValue);
+                    case DeltaKind.SettlementAdd:
+                        if (!doc.Settlements.Contains(d.NewValue))
+                            doc.Settlements.Add(d.NewValue);
                         break;
 
-                    case DeltaKind.StructureRemove:
-                        doc.Structures.Remove(d.OldValue);
+                    case DeltaKind.SettlementRemove:
+                        doc.Settlements.Remove(d.OldValue);
                         break;
 
                     case DeltaKind.UnitAdd:
@@ -286,7 +286,7 @@ namespace StrategyGame
 
             // Edges – sets of lines
             DiffLines(before.Edges, after.Edges, DeltaKind.EdgeAdd, DeltaKind.EdgeRemove, g.Deltas);
-            DiffLines(before.Structures, after.Structures, DeltaKind.StructureAdd, DeltaKind.StructureRemove, g.Deltas);
+            DiffLines(before.Settlements, after.Settlements, DeltaKind.SettlementAdd, DeltaKind.SettlementRemove, g.Deltas);
 
             var beforeUnitLines = before.Units.Select(u => u.ToLine()).ToList();
             var afterUnitLines  = after.Units.Select(u => u.ToLine()).ToList();

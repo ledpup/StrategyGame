@@ -76,42 +76,42 @@ namespace ComputerOpponent
             }
         }
 
-        Dictionary<Role, float> FriendlyStructureInfluenceModifier
+        Dictionary<Role, float> FriendlySettlementInfluenceModifier
         {
             get
             {
-                if (_friendlyStructureInfluence == null)
+                if (_friendlySettlementInfluence == null)
                 {
-                    _friendlyStructureInfluence = [];
+                    _friendlySettlementInfluence = [];
                     foreach (var role in Enum.GetValues<Role>())
                     {
-                        _friendlyStructureInfluence.Add(role, -1f);
+                        _friendlySettlementInfluence.Add(role, -1f);
                     }
-                    _friendlyStructureInfluence[Role.Defensive] = 2f;
-                    _friendlyStructureInfluence[Role.Scout] = -2f;
-                    _friendlyStructureInfluence[Role.Besieger] = -2f;
+                    _friendlySettlementInfluence[Role.Defensive] = 2f;
+                    _friendlySettlementInfluence[Role.Scout] = -2f;
+                    _friendlySettlementInfluence[Role.Besieger] = -2f;
                 }
-                return _friendlyStructureInfluence;
+                return _friendlySettlementInfluence;
             }
         }
-        Dictionary<Role, float> _friendlyStructureInfluence;
+        Dictionary<Role, float> _friendlySettlementInfluence;
 
-        static Dictionary<Role, float> EnemyStructureInfluenceModifier
+        static Dictionary<Role, float> EnemySettlementInfluenceModifier
         {
             get
             {
-                if (_enemyStructureInfluence == null)
+                if (_enemySettlementInfluence == null)
                 {
-                    _enemyStructureInfluence = [];
+                    _enemySettlementInfluence = [];
                     foreach (var role in Enum.GetValues<Role>())
                     {
-                        _enemyStructureInfluence.Add(role, 1f);
+                        _enemySettlementInfluence.Add(role, 1f);
                     }
-                    _enemyStructureInfluence[Role.Besieger] = 2f;
-                    _enemyStructureInfluence[Role.Defensive] = -2f;
-                    _enemyStructureInfluence[Role.Scout] = 0.5f;
+                    _enemySettlementInfluence[Role.Besieger] = 2f;
+                    _enemySettlementInfluence[Role.Defensive] = -2f;
+                    _enemySettlementInfluence[Role.Scout] = 0.5f;
                 }
-                return _enemyStructureInfluence;
+                return _enemySettlementInfluence;
             }
         }
 
@@ -120,8 +120,8 @@ namespace ComputerOpponent
         public Dictionary<int, Dictionary<RoleMovementType, float[]>> AggregateInfluence { get; private set; }
         public Dictionary<int, float[]> FriendlyUnitInfluence { get; private set; }
         public Dictionary<int, float[]> EnemyUnitInfluence { get; private set; }
-        public Dictionary<int, Dictionary<MovementType, float[]>> FriendlyStructureInfluenceMap { get; private set; }
-        public Dictionary<int, Dictionary<MovementType, float[]>> EnemyStructureInfluenceMap { get; private set; }
+        public Dictionary<int, Dictionary<MovementType, float[]>> FriendlySettlementInfluenceMap { get; private set; }
+        public Dictionary<int, Dictionary<MovementType, float[]>> EnemySettlementInfluenceMap { get; private set; }
 
         public static List<Role> Roles
         {
@@ -194,10 +194,10 @@ namespace ComputerOpponent
                         break;
                     case MovementType.Land:
                         // Only embark if not already being transported, not in a defensive role, 
-                        // and there are no enemy structures or units nearby
+                        // and there are no enemy settlements or units nearby
                         if (unit.TransportedBy == null &&
                                     unitState.Value.Role != Role.Defensive &&
-                                    !board.Structures.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex) &&
+                                    !board.Settlements.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex) &&
                                     !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)
                                     )
                         {
@@ -320,7 +320,7 @@ namespace ComputerOpponent
                 case OperationalAction.Disembark:
                     if (unit.TransportedBy.MovementType == MovementType.Airborne)
                     {
-                        if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
+                        if (board.Settlements.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
                         {
                             unitOrders.Add(new UnloadCommand(unit));
                         }
@@ -328,7 +328,7 @@ namespace ComputerOpponent
                     if (unit.TransportedBy.MovementType == MovementType.Waterbound)
                     {
                         var tileEdges = Edge.GetEdges(board.Edges, unit.Location);
-                        if (board.Structures.Any(y => tileEdges.Any(z => 
+                        if (board.Settlements.Any(y => tileEdges.Any(z => 
                                                                         z.EdgeType == EdgeType.Port 
                                                                         && (z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) || (z.Origin.ContiguousRegionId == y.Location.ContiguousRegionId))
                                                                         && y.OwnerIndex != unit.OwnerIndex))
@@ -358,7 +358,7 @@ namespace ComputerOpponent
                     }
                 case OperationalAction.TransportToDestination:
                     {
-                        // Find the closest port that has a region with one or more enemy structures
+                        // Find the closest port that has a region with one or more enemy settlements
                         closestPortPath = ClosestPortPath(board, unit);
 
                         if (closestPortPath != null)
@@ -400,14 +400,14 @@ namespace ComputerOpponent
                 case OperationalAction.AirliftToDestination:
                     {
 
-                        var closestEnemyStructure = ClosestEnemyStructurePath(board, unit);
-                        if (closestEnemyStructure != null)
+                        var closestEnemySettlement = ClosestEnemySettlementPath(board, unit);
+                        if (closestEnemySettlement != null)
                         {
-                            var moveOrder = unit.ShortestPathToMoveOrder(closestEnemyStructure.ToArray());
+                            var moveOrder = unit.ShortestPathToMoveOrder(closestEnemySettlement.ToArray());
                             if (moveOrder != null)
                                 unitOrders.Add(moveOrder);
 
-                            if (board.Structures.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
+                            if (board.Settlements.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
                             {
                                 unit.Transporting.ForEach(x => unitOrders.Add(new UnloadCommand(x, moveOrder.Moves.Last().Edge.Destination)));
                             }
@@ -467,18 +467,18 @@ namespace ComputerOpponent
             return null;
         }
 
-        static Dictionary<Role, float> _enemyStructureInfluence;
+        static Dictionary<Role, float> _enemySettlementInfluence;
 
-        public static IEnumerable<PathFindTile> ClosestEnemyStructurePath(GameState board, MilitaryUnit unit)
+        public static IEnumerable<PathFindTile> ClosestEnemySettlementPath(GameState board, MilitaryUnit unit)
         {
-            var structures = board.Structures
+            var settlements = board.Settlements
                 .Where(x => x.OwnerIndex != unit.OwnerIndex)
                 .OrderBy(x => Hex.Distance(unit.Location.Hex, x.Location.Hex))
                 .ToList();
 
-            foreach (var enemyStructure in structures)
+            foreach (var enemySettlement in settlements)
             { 
-                var shortestPath = PathFinder.FindShortestPath(unit.Location, enemyStructure.Location, unit);
+                var shortestPath = PathFinder.FindShortestPath(unit.Location, enemySettlement.Location, unit);
                 if (shortestPath != null)
                 {
                     return shortestPath;
@@ -503,8 +503,8 @@ namespace ComputerOpponent
                                     return;
                                 break;
                             case OperationalAction.TransportToDestination:
-                                // Only go to a port that has enemy structure(s)
-                                if (!board.Structures.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                                // Only go to a port that has enemy settlement(s)
+                                if (!board.Settlements.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
                                     return;
                                 break;
                         }
@@ -541,19 +541,19 @@ namespace ComputerOpponent
             AggregateInfluence = [];
             FriendlyUnitInfluence = [];
             EnemyUnitInfluence = [];
-            FriendlyStructureInfluenceMap = [];
-            EnemyStructureInfluenceMap = [];
+            FriendlySettlementInfluenceMap = [];
+            EnemySettlementInfluenceMap = [];
 
             board.Tiles.ToList().ForEach(x =>
             {
                 FriendlyUnitInfluence[x.Index] = new float[numberOfPlayers];
                 EnemyUnitInfluence[x.Index] = new float[numberOfPlayers];
-                FriendlyStructureInfluenceMap[x.Index] = [];
-                EnemyStructureInfluenceMap[x.Index] = [];
+                FriendlySettlementInfluenceMap[x.Index] = [];
+                EnemySettlementInfluenceMap[x.Index] = [];
 
                 MilitaryUnit.MovementTypes.ForEach(y => {
-                    FriendlyStructureInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
-                    EnemyStructureInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
+                    FriendlySettlementInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
+                    EnemySettlementInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
                 });
 
                 var tileInfluence = new Dictionary<RoleMovementType, float[]>();
@@ -564,20 +564,20 @@ namespace ComputerOpponent
             // Build reusable influence maps first, then copy values into the legacy dictionaries used by the AI decision code.
             var friendlyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
             var enemyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
-            var friendlyStructureMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
-            var enemyStructureMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
+            var friendlySettlementMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
+            var enemySettlementMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
 
             for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
             {
                 friendlyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(board.Width, board.Height);
                 enemyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(board.Width, board.Height);
-                friendlyStructureMapsByPlayer[playerIndex] = [];
-                enemyStructureMapsByPlayer[playerIndex] = [];
+                friendlySettlementMapsByPlayer[playerIndex] = [];
+                enemySettlementMapsByPlayer[playerIndex] = [];
 
                 MilitaryUnit.MovementTypes.ForEach(movementType =>
                 {
-                    friendlyStructureMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
-                    enemyStructureMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
+                    friendlySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
+                    enemySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
                 });
             }
 
@@ -607,26 +607,26 @@ namespace ComputerOpponent
                 }
             }
 
-            foreach (var structure in board.Structures)
+            foreach (var settlement in board.Settlements)
             {
-                var structureMap = new BoardInfluenceMap(board.Width, board.Height);
-                structureMap.AddRadialInfluence(structure.Location.Hex, 1f, 5);
+                var settlementMap = new BoardInfluenceMap(board.Width, board.Height);
+                settlementMap.AddRadialInfluence(settlement.Location.Hex, 1f, 5);
 
                 for (var index = 0; index < board.Tiles.Length; index++)
                 {
-                    var influence = structureMap.GetValue(index);
+                    var influence = settlementMap.GetValue(index);
                     if (influence == 0f)
                         continue;
 
                     for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
                     {
-                        var isFriendlyForPlayer = structure.OwnerIndex == playerIndex;
-                        var movementMapSet = isFriendlyForPlayer ? friendlyStructureMapsByPlayer[playerIndex] : enemyStructureMapsByPlayer[playerIndex];
+                        var isFriendlyForPlayer = settlement.OwnerIndex == playerIndex;
+                        var movementMapSet = isFriendlyForPlayer ? friendlySettlementMapsByPlayer[playerIndex] : enemySettlementMapsByPlayer[playerIndex];
 
                         // Air influence is always relevant, while land and water require same contiguous region.
                         movementMapSet[MovementType.Airborne].AddValue(index, influence);
 
-                        if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
+                        if (settlement.Location.ContiguousRegionId == board[index].ContiguousRegionId)
                         {
                             movementMapSet[MovementType.Land].AddValue(index, influence);
                             movementMapSet[MovementType.Waterbound].AddValue(index, influence);
@@ -644,8 +644,8 @@ namespace ComputerOpponent
 
                     MilitaryUnit.MovementTypes.ForEach(movementType =>
                     {
-                        FriendlyStructureInfluenceMap[tile.Index][movementType][playerIndex] = friendlyStructureMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
-                        EnemyStructureInfluenceMap[tile.Index][movementType][playerIndex] = enemyStructureMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
+                        FriendlySettlementInfluenceMap[tile.Index][movementType][playerIndex] = friendlySettlementMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
+                        EnemySettlementInfluenceMap[tile.Index][movementType][playerIndex] = enemySettlementMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
                     });
                 }
 
@@ -660,8 +660,8 @@ namespace ComputerOpponent
                             movementType,
                             friendlyUnitMapsByPlayer[playerIndex],
                             enemyUnitMapsByPlayer[playerIndex],
-                            friendlyStructureMapsByPlayer[playerIndex][movementType],
-                            enemyStructureMapsByPlayer[playerIndex][movementType]);
+                            friendlySettlementMapsByPlayer[playerIndex][movementType],
+                            enemySettlementMapsByPlayer[playerIndex][movementType]);
                     });
                 });
             }
@@ -674,8 +674,8 @@ namespace ComputerOpponent
             MovementType movementType,
             IInfluenceMap friendlyUnitMap,
             IInfluenceMap enemyUnitMap,
-            IInfluenceMap friendlyStructureMap,
-            IInfluenceMap enemyStructureMap)
+            IInfluenceMap friendlySettlementMap,
+            IInfluenceMap enemySettlementMap)
         {
             var rmt = new RoleMovementType(movementType, role);
 
@@ -684,8 +684,8 @@ namespace ComputerOpponent
             [
                 (friendlyUnitMap, FriendlyUnitInfluenceModifier[role]),
                 (enemyUnitMap, EnemyUnitInfluenceModifier[role]),
-                (friendlyStructureMap, FriendlyStructureInfluenceModifier[role]),
-                (enemyStructureMap, EnemyStructureInfluenceModifier[role])
+                (friendlySettlementMap, FriendlySettlementInfluenceModifier[role]),
+                (enemySettlementMap, EnemySettlementInfluenceModifier[role])
             ]);
 
             foreach (var tile in board.Tiles)

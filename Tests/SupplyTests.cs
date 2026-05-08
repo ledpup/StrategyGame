@@ -11,12 +11,12 @@ namespace Tests
     {
         static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
         static string[] Edges = File.ReadAllLines("BasicBoardEdges.txt");
-        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
+        static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
         [TestMethod]
         public void SupplyTest()
         {
-            var board = new GameState(new Board(GameBoard, Edges, Structures));
+            var board = new GameState(new Board(GameBoard, Edges, Settlements));
 
             board[3, 4].OwnerId = 2;
             board.Units = [new(new UnitTemplate(), 0, 2, board[3, 4], "1st Enemy")];
@@ -25,7 +25,7 @@ namespace Tests
             var labels = new string[board.Width * board.Height];
             board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Supply.ToString());
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithStructuresAndSupply.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, labels, null, board.Units);
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithSettlementsAndSupply.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels, null, board.Units);
         }
     }
 }

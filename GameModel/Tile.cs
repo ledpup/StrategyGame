@@ -170,7 +170,7 @@ namespace GameModel
                 if (stackLimit == 0)
                 {
                     stackLimit = Terrain.TerrainStackLimit[TerrainType];
-                    if (Structure != null)
+                    if (Settlement != null)
                     {
                         stackLimit++;
                     }
@@ -202,7 +202,7 @@ namespace GameModel
         public TerrainType TemperatureAdjustedTerrainType { get; set; }
         public int? OwnerId { get; set; }
         public bool IsSelected { get; set; }
-        public Structure Structure { get; set; }
+        public Settlement Settlement { get; set; }
         public Tile PortDestination
         {
             get

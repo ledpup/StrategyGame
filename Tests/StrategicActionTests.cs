@@ -11,12 +11,12 @@ namespace Tests
     {
         public static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
         public static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
-        static string[] Structures = File.ReadAllLines("BasicBoardStructures.txt");
+        static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
         [TestMethod]
         public void EnemyNearNavelUnitSoDontDock()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
             var labels = new string[board.Width, board.Height];
 
             board.Units =
@@ -34,7 +34,7 @@ namespace Tests
         [TestMethod]
         public void NoEnemyNearNavelUnitSoDock()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
             var labels = new string[board.Width, board.Height];
 
             var units = new List<MilitaryUnit>
@@ -54,7 +54,7 @@ namespace Tests
         [TestMethod]
         public void EnemyNearAirborneUnitSoDontPickup()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
             var labels = new string[board.Width, board.Height];
 
             var units = new List<MilitaryUnit>
@@ -76,7 +76,7 @@ namespace Tests
         [TestMethod]
         public void EnemyNearAirborneUnitSoPickup()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
             var labels = new string[board.Width, board.Height];
 
             var units = new List<MilitaryUnit>

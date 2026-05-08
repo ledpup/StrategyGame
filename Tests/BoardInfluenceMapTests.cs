@@ -15,7 +15,7 @@ namespace Tests
             var map = new BoardInfluenceMap(5, 5);
             var origin = new Hex(2, 1);
 
-            map.AddThreatInfluence(origin, 12f, 2);
+            map.AddRadialInfluence(origin, 12f, 2);
 
             var centerValue = map.GetValue(origin);
             var firstRingHex = Hex.Neighbor(origin, 0);

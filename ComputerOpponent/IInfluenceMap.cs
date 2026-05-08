@@ -26,7 +26,7 @@ namespace ComputerOpponent
         /// <summary>
         /// Writes a radial influence gradient around an origin using strength at the centre and radius falloff.
         /// </summary>
-        void AddThreatInfluence(Hex origin, float strength, int radius);
+        void AddRadialInfluence(Hex origin, float strength, int radius);
 
         float[] CopyValues();
     }

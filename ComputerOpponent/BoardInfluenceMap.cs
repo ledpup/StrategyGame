@@ -88,7 +88,7 @@ namespace ComputerOpponent
             }
         }
 
-        public void AddThreatInfluence(Hex origin, float strength, int radius)
+        public void AddRadialInfluence(Hex origin, float strength, int radius)
         {
             if (radius < 0)
                 throw new ArgumentOutOfRangeException(nameof(radius));

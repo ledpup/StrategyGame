@@ -583,7 +583,7 @@ namespace ComputerOpponent
             foreach (var unit in aliveUnits)
             {
                 var unitMap = new BoardInfluenceMap(board.Width, board.Height);
-                unitMap.AddThreatInfluence(unit.Location.Hex, 1f, 3);
+                unitMap.AddRadialInfluence(unit.Location.Hex, 1f, 3);
 
                 for (var index = 0; index < board.Tiles.Length; index++)
                 {
@@ -609,7 +609,7 @@ namespace ComputerOpponent
             foreach (var structure in board.Structures)
             {
                 var structureMap = new BoardInfluenceMap(board.Width, board.Height);
-                structureMap.AddThreatInfluence(structure.Location.Hex, 1f, 5);
+                structureMap.AddRadialInfluence(structure.Location.Hex, 1f, 5);
 
                 for (var index = 0; index < board.Tiles.Length; index++)
                 {
@@ -646,24 +646,51 @@ namespace ComputerOpponent
                         FriendlyStructureInfluenceMap[tile.Index][movementType][playerIndex] = friendlyStructureMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
                         EnemyStructureInfluenceMap[tile.Index][movementType][playerIndex] = enemyStructureMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
                     });
-
-                    Roles.ForEach(role =>
-                    {
-                        MilitaryUnit.MovementTypes.ForEach(movementType => CalculateAggregateInfluence(tile, playerIndex, role, movementType));
-                    });
                 }
+
+                Roles.ForEach(role =>
+                {
+                    MilitaryUnit.MovementTypes.ForEach(movementType =>
+                    {
+                        CalculateAggregateInfluence(
+                            board,
+                            playerIndex,
+                            role,
+                            movementType,
+                            friendlyUnitMapsByPlayer[playerIndex],
+                            enemyUnitMapsByPlayer[playerIndex],
+                            friendlyStructureMapsByPlayer[playerIndex][movementType],
+                            enemyStructureMapsByPlayer[playerIndex][movementType]);
+                    });
+                });
             }
         }
 
-        private void CalculateAggregateInfluence(Tile tile, int playerIndex, Role role, MovementType movementType)
+        private void CalculateAggregateInfluence(
+            GameState board,
+            int playerIndex,
+            Role role,
+            MovementType movementType,
+            IInfluenceMap friendlyUnitMap,
+            IInfluenceMap enemyUnitMap,
+            IInfluenceMap friendlyStructureMap,
+            IInfluenceMap enemyStructureMap)
         {
             var rmt = new RoleMovementType(movementType, role);
 
-            AggregateInfluence[tile.Index][rmt][playerIndex] = 
-                  (FriendlyUnitInfluence[tile.Index][playerIndex] * FriendlyUnitInfluenceModifier[role])
-                + (EnemyUnitInfluence[tile.Index][playerIndex] * EnemyUnitInfluenceModifier[role])
-                + (FriendlyStructureInfluenceMap[tile.Index][movementType][playerIndex] * FriendlyStructureInfluence[role])
-                + (EnemyStructureInfluenceMap[tile.Index][movementType][playerIndex] * EnemyStructureInfluence[role]);
+            // Combine the reusable influence layers with role-specific weights into one decision field.
+            var combinedMap = BoardInfluenceMap.Combine(board.Width, board.Height,
+            [
+                (friendlyUnitMap, (float)FriendlyUnitInfluenceModifier[role]),
+                (enemyUnitMap, (float)EnemyUnitInfluenceModifier[role]),
+                (friendlyStructureMap, (float)FriendlyStructureInfluence[role]),
+                (enemyStructureMap, (float)EnemyStructureInfluence[role])
+            ]);
+
+            foreach (var tile in board.Tiles)
+            {
+                AggregateInfluence[tile.Index][rmt][playerIndex] = combinedMap.GetValue(tile.Index);
+            }
         }
 
         public MoveOrder FindBestMoveOrderForUnit(MilitaryUnit unit, GameState board)

@@ -578,7 +578,7 @@ namespace ComputerOpponent
                         hexesInRing.ForEach(y =>
                         {
                             var index = Hex.HexToIndex(y, board.Width, board.Height);
-                            if (index >= 0 && index < board.TileArray.Length)
+                            if (index >= 0 && index < board.Tiles.Length)
                             {
                                 if (structure.OwnerIndex == i)
                                 {
@@ -624,7 +624,7 @@ namespace ComputerOpponent
                 hexesInRing.ForEach(x =>
                 {
                     var index = Hex.HexToIndex(x, board.Width, board.Height);
-                    if (index >= 0 && index < board.TileArray.Length)
+                    if (index >= 0 && index < board.Tiles.Length)
                     {
                         if (unit.CanStopOn.HasFlag(board[index].TerrainType))
                         {

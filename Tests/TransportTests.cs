@@ -20,23 +20,23 @@ namespace Tests
         [TestMethod]
         public void Ports()
         {
-            var board = new GameState(new Board(GameBoard, TileEdges, Structures));
+            var gameState = new GameState(new Board(GameBoard, TileEdges, Structures));
             var numberOfPlayers = 2;
-            var labels = new string[board.Width, board.Height];
+            var labels = new string[gameState.Width, gameState.Height];
 
             var units = new List<MilitaryUnit>
             {
-                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 0, location: board[20, 5]),
-                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3, IsTransporter = true }, 1, location: board[3, 10]),
-                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound], RoadMovementBonus = 1 }, 2, location: board[24, 16]),
-                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 3, location: board[1, 1]),
-                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 4, location: board[1, 1]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 0, location: gameState[20, 5]),
+                new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3, IsTransporter = true }, 1, location: gameState[3, 10]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound], RoadMovementBonus = 1 }, 2, location: gameState[24, 16]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 3, location: gameState[1, 1]),
+                new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 4, location: gameState[1, 1]),
             };
 
             units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;
             units[3].EdgeMovementCosts[EdgeType.River] = 0;
 
-            board.Units = units;
+            gameState.Units = units;
 
             var computerPlayer = new ComputerPlayer(new Dictionary<MilitaryUnit, Role>
             {
@@ -47,44 +47,44 @@ namespace Tests
                 [units[4]] = Role.Besieger,
             });
 
-            for (board.Turn = 0; board.Turn < 30; board.Turn++)
+            for (gameState.Turn = 0; gameState.Turn < 30; gameState.Turn++)
             {
-                computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+                computerPlayer.GenerateInfluenceMaps(gameState, numberOfPlayers);
 
-                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, null, board.Units);
+                GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Structures, null, null, gameState.Units);
 
                 // Remove any units that have been destroyed for the purposes of unit orders
-                var aliveUnits = board.Units.Where(x => x.IsAlive).ToList();
-                computerPlayer.SetStrategicAction(board);
-                var moveOrders = computerPlayer.CreateOrders(board, aliveUnits);
+                var aliveUnits = gameState.Units.Where(x => x.IsAlive).ToList();
+                computerPlayer.SetStrategicAction(gameState);
+                var moveOrders = computerPlayer.CreateOrders(gameState, aliveUnits);
 
                 var lines = new List<Centreline>();
                 moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
 
-                GameBoardRenderer.RenderAndSave($"PortsTurn{board.Turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Structures, null, lines, board.Units);
+                GameBoardRenderer.RenderAndSave($"PortsTurn{gameState.Turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Structures, null, lines, gameState.Units);
 
-                board.ResolveOrders(moveOrders);
-                board.ChangeStructureOwners();
+                gameState.ResolveOrders(moveOrders);
+                gameState.ChangeStructureOwners();
 
-                switch (board.Turn)
+                switch (gameState.Turn)
                 {
                     case 0:
-                        Assert.AreEqual(board[23, 13], units[2].Location);
+                        Assert.AreEqual(gameState[23, 13], units[2].Location);
                         break;
                     case 1:
-                        Assert.AreEqual(board[21, 11], units[2].Location);
+                        Assert.AreEqual(gameState[21, 11], units[2].Location);
                         break;
                     case 2:
-                        Assert.AreEqual(board[21, 10], units[0].Location);
-                        Assert.AreEqual(board[21, 10], units[2].Location);
+                        Assert.AreEqual(gameState[21, 10], units[0].Location);
+                        Assert.AreEqual(gameState[21, 10], units[2].Location);
                         break;
                     case 3:
-                        Assert.AreEqual(board[18, 7], units[0].Location);
-                        Assert.AreEqual(board[18, 7], units[2].Location);
+                        Assert.AreEqual(gameState[18, 7], units[0].Location);
+                        Assert.AreEqual(gameState[18, 7], units[2].Location);
                         break;
                     case 5:
-                        Assert.AreEqual(board[17, 2], units[0].Location);
-                        Assert.AreEqual(board[21, 4], units[2].Location);
+                        Assert.AreEqual(gameState[17, 2], units[0].Location);
+                        Assert.AreEqual(gameState[21, 4], units[2].Location);
                         break;
                 }
             }

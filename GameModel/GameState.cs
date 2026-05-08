@@ -13,8 +13,7 @@ public class GameState
     // Board pass-throughs
     public int Width => Board.Width;
     public int Height => Board.Height;
-    public IEnumerable<Tile> Tiles => Board.Tiles;
-    public Tile[] TileArray => Board.TileArray;
+    public Tile[] Tiles => Board.TileArray;
     public List<Edge> Edges => Board.Edges;
     public List<Structure> Structures => Board.Structures;
     public Tile this[int index] => Board[index];
@@ -79,7 +78,7 @@ public class GameState
         Structures.ForEach(x =>
         {
             var unitsAtStructureByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
-            if (unitsAtStructureByOwner.Count() == 1)
+            if (unitsAtStructureByOwner.Count == 1)
             {
                 if (x.OwnerIndex == unitsAtStructureByOwner.First().Key)
                     return;

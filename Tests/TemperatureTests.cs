@@ -26,7 +26,7 @@ namespace Tests
                 board.Tiles.ToList().ForEach(x => tiles.Add(new Tile(x.Index, x.X, x.Y, x.GetTerrainTypeByTemperature(x.Temperature))));
 
                 var labels = new string[board.Width * board.Height];
-                for (var j = 0; j < board.TileArray.Length; j++)
+                for (var j = 0; j < board.Tiles.Length; j++)
                 {
                     labels[j] = Math.Round(board[j].Temperature, 1).ToString();
                 }

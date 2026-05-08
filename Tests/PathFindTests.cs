@@ -28,7 +28,7 @@ namespace Tests
             lines.AddRange(Centreline.PathFindTilesToCentrelines(PathFinder.FindShortestPath(board[91], board[175], unit)));
 
             var labels = new string[board.Width * board.Height];
-            for (var i = 0; i < board.TileArray.Length; i++)
+            for (var i = 0; i < board.Tiles.Length; i++)
             {
                 labels[i] = i.ToString();
             }

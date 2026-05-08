@@ -558,87 +558,100 @@ namespace ComputerOpponent
                 var tileInfluence = new Dictionary<RoleMovementType, double[]>();
                 Roles.ForEach(y => MilitaryUnit.MovementTypes.ForEach(z => tileInfluence.Add(new RoleMovementType(z, y), new double[numberOfPlayers])));
                 AggregateInfluence[x.Index] = tileInfluence;
-
             });
+
+            // Build reusable influence maps first, then copy values into the legacy dictionaries used by the AI decision code.
+            var friendlyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
+            var enemyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
+            var friendlyStructureMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
+            var enemyStructureMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
+
+            for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+            {
+                friendlyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(board.Width, board.Height);
+                enemyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(board.Width, board.Height);
+                friendlyStructureMapsByPlayer[playerIndex] = [];
+                enemyStructureMapsByPlayer[playerIndex] = [];
+
+                MilitaryUnit.MovementTypes.ForEach(movementType =>
+                {
+                    friendlyStructureMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
+                    enemyStructureMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
+                });
+            }
 
             foreach (var unit in aliveUnits)
             {
-                var playerIndex = unit.OwnerIndex;
-                CalculateUnitInfluence(board, numberOfPlayers, unit, playerIndex);
-            }
+                var unitMap = new BoardInfluenceMap(board.Width, board.Height);
+                unitMap.AddThreatInfluence(unit.Location.Hex, 1f, 3);
 
-            for (var i = 0; i < numberOfPlayers; i++)
-            {
-                foreach (var structure in board.Structures)
+                for (var index = 0; index < board.Tiles.Length; index++)
                 {
-                    for (var distance = 0; distance < 6; distance++)
-                    {
-                        var hexesInRing = Hex.HexRing(structure.Location.Hex, distance, board.Width, board.Height);
+                    if (!unit.CanStopOn.HasFlag(board[index].TerrainType))
+                        continue;
 
-                        hexesInRing.ForEach(y =>
-                        {
-                            var index = Hex.HexToIndex(y, board.Width, board.Height);
-                            if (index >= 0 && index < board.Tiles.Length)
-                            {
-                                if (structure.OwnerIndex == i)
-                                {
-                                    FriendlyStructureInfluenceMap[index][MovementType.Airborne][i] += 1D / (distance + 1);
-                                    if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
-                                    {
-                                        FriendlyStructureInfluenceMap[index][MovementType.Land][i] += 1D / (distance + 1);
-                                        FriendlyStructureInfluenceMap[index][MovementType.Waterbound][i] += 1D / (distance + 1);
-                                    }
-                                }
-                                else
-                                {
-                                    EnemyStructureInfluenceMap[index][MovementType.Airborne][i] += 1D / (distance + 1);
-                                    if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
-                                    {
-                                        EnemyStructureInfluenceMap[index][MovementType.Land][i] += 1D / (distance + 1);
-                                        EnemyStructureInfluenceMap[index][MovementType.Waterbound][i] += 1D / (distance + 1);
-                                    }
-                                }
-                            }
-                        });
-                    }  
+                    var influence = unitMap.GetValue(index);
+                    if (influence == 0f)
+                        continue;
+
+                    friendlyUnitMapsByPlayer[unit.OwnerIndex].AddValue(index, influence);
+
+                    for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+                    {
+                        if (playerIndex == unit.OwnerIndex)
+                            continue;
+
+                        enemyUnitMapsByPlayer[playerIndex].AddValue(index, influence);
+                    }
                 }
-
-
-                board.Tiles.ToList().ForEach(x =>
-                {
-                    Roles
-                        .ForEach(y => 
-                        {
-                            MilitaryUnit.MovementTypes.ForEach(z => CalculateAggregateInfluence(x, i, y, z));
-                        });
-                });
             }
-        }
 
-        private void CalculateUnitInfluence(GameState board, int numberOfPlayers, MilitaryUnit unit, int playerIndex)
-        {
-            for (var i = 0; i < 4; i++)
+            foreach (var structure in board.Structures)
             {
-                var hexesInRing = Hex.HexRing(unit.Location.Hex, i, board.Width, board.Height);
+                var structureMap = new BoardInfluenceMap(board.Width, board.Height);
+                structureMap.AddThreatInfluence(structure.Location.Hex, 1f, 5);
 
-                hexesInRing.ForEach(x =>
+                for (var index = 0; index < board.Tiles.Length; index++)
                 {
-                    var index = Hex.HexToIndex(x, board.Width, board.Height);
-                    if (index >= 0 && index < board.Tiles.Length)
-                    {
-                        if (unit.CanStopOn.HasFlag(board[index].TerrainType))
-                        {
-                            FriendlyUnitInfluence[index][playerIndex] += 1D / (i + 1);
-                            for (var j = 0; j < numberOfPlayers; j++)
-                            {
-                                if (playerIndex == j)
-                                    continue;
+                    var influence = structureMap.GetValue(index);
+                    if (influence == 0f)
+                        continue;
 
-                                EnemyUnitInfluence[index][j] += 1D / (i + 1);
-                            }
+                    for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+                    {
+                        var isFriendlyForPlayer = structure.OwnerIndex == playerIndex;
+                        var movementMapSet = isFriendlyForPlayer ? friendlyStructureMapsByPlayer[playerIndex] : enemyStructureMapsByPlayer[playerIndex];
+
+                        // Air influence is always relevant, while land and water require same contiguous region.
+                        movementMapSet[MovementType.Airborne].AddValue(index, influence);
+
+                        if (structure.Location.ContiguousRegionId == board[index].ContiguousRegionId)
+                        {
+                            movementMapSet[MovementType.Land].AddValue(index, influence);
+                            movementMapSet[MovementType.Waterbound].AddValue(index, influence);
                         }
                     }
-                });
+                }
+            }
+
+            for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+            {
+                foreach (var tile in board.Tiles)
+                {
+                    FriendlyUnitInfluence[tile.Index][playerIndex] = friendlyUnitMapsByPlayer[playerIndex].GetValue(tile.Index);
+                    EnemyUnitInfluence[tile.Index][playerIndex] = enemyUnitMapsByPlayer[playerIndex].GetValue(tile.Index);
+
+                    MilitaryUnit.MovementTypes.ForEach(movementType =>
+                    {
+                        FriendlyStructureInfluenceMap[tile.Index][movementType][playerIndex] = friendlyStructureMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
+                        EnemyStructureInfluenceMap[tile.Index][movementType][playerIndex] = enemyStructureMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
+                    });
+
+                    Roles.ForEach(role =>
+                    {
+                        MilitaryUnit.MovementTypes.ForEach(movementType => CalculateAggregateInfluence(tile, playerIndex, role, movementType));
+                    });
+                }
             }
         }
 

@@ -34,7 +34,7 @@ namespace Tests
                 new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 4, location: gameState[1, 1]),
             };
 
-            units[3].TerrainMovementCosts[TerrainType.Wetland] = 1;
+            units[3].TerrainMovementCosts[TerrainType.Swamp] = 1;
             units[3].EdgeMovementCosts[EdgeType.River] = 0;
 
             gameState.Units = units;
@@ -207,7 +207,7 @@ namespace Tests
                 new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 3, location: board[1, 1]),
             };
 
-            units[2].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            units[2].TerrainTypeBattleModifier[TerrainType.Swamp] = 1;
             units[2].EdgeMovementCosts[EdgeType.River] = 0;
 
             board.Units = units;

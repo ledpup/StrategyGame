@@ -21,7 +21,7 @@ namespace StrategyGame
             TerrainType.Hill,
             TerrainType.Mountain,
             TerrainType.Water,
-            TerrainType.Wetland,
+            TerrainType.Swamp,
             TerrainType.Reef,
         };
 
@@ -33,7 +33,7 @@ namespace StrategyGame
             { TerrainType.Hill,      Color.FromArgb(244, 164, 96) },
             { TerrainType.Mountain,  Color.FromArgb(165, 42,  42) },
             { TerrainType.Water,     Color.FromArgb(173, 216, 230) },
-            { TerrainType.Wetland,   Color.FromArgb(169, 169, 169) },
+            { TerrainType.Swamp,   Color.FromArgb(169, 169, 169) },
             { TerrainType.Reef,      Color.FromArgb(0,   0,   139) },
         };
 

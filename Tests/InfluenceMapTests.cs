@@ -39,7 +39,7 @@ namespace Tests
                 new(new UnitTemplate(), 7, 1, board[168], "3rd Infantry"),
             ];
 
-            board.Units[0].TerrainTypeBattleModifier[TerrainType.Wetland] = 1;
+            board.Units[0].TerrainTypeBattleModifier[TerrainType.Swamp] = 1;
             board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
 
             var computerPlayer = new ComputerPlayer(board.Units);

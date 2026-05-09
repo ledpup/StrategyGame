@@ -132,7 +132,7 @@ namespace GameModel
                 case TerrainType.Grassland:
                     if (temperature < 10)
                     {
-                        return TerrainType.Wetland;
+                        return TerrainType.Swamp;
                     }
                     if (temperature > 30)
                     {
@@ -144,7 +144,7 @@ namespace GameModel
                     if (IsLake)
                     {
                         if (temperature > 30)
-                            return TerrainType.Wetland;
+                            return TerrainType.Swamp;
                     }
                     return TerrainType.Water;
 
@@ -153,12 +153,12 @@ namespace GameModel
                         return TerrainType.Grassland;
                     return TerrainType.Desert;
 
-                case TerrainType.Wetland:
+                case TerrainType.Swamp:
                     if (temperature < 10)
                         return TerrainType.Water;
                     if (temperature > 30)
                         return TerrainType.Grassland;
-                    return TerrainType.Wetland;
+                    return TerrainType.Swamp;
             }
             throw new Exception("Can got resolve terrain type based on temperature given base type of " + TerrainType);
         }

@@ -88,7 +88,7 @@ namespace Tests
                 (TerrainType.Grassland, 'G'), (TerrainType.Desert, 'D'),
                 (TerrainType.Forest, 'F'),    (TerrainType.Hill, 'H'),
                 (TerrainType.Mountain, 'M'),  (TerrainType.Water, 'L'),
-                (TerrainType.Wetland, 'W'),   (TerrainType.Reef, 'R'),
+                (TerrainType.Swamp, 'W'),   (TerrainType.Reef, 'R'),
             };
             foreach (var (terrain, expected) in types)
                 Assert.AreEqual(expected, MapDocument.TerrainToChar(terrain), terrain.ToString());

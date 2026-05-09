@@ -484,7 +484,7 @@ namespace Tests
             var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
             var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Land }, 0, 1, board[1, 1], "1st Amphibious") };
-            units[0].TerrainMovementCosts[TerrainType.Wetland] = 1;
+            units[0].TerrainMovementCosts[TerrainType.Swamp] = 1;
             units[0].EdgeMovementCosts[EdgeType.River] = 0;
 
             var moves = units[0].PossibleMoves();

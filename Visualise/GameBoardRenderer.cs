@@ -194,7 +194,7 @@ namespace Visualise
                 TerrainType.Hill => Colours.SandyBrown,
                 TerrainType.Mountain => Colours.Brown,
                 TerrainType.Water => Colours.LightBlue,
-                TerrainType.Wetland => Colours.DarkGray,
+                TerrainType.Swamp => Colours.DarkGray,
                 TerrainType.Reef => Colours.DarkBlue,
                 _ => Colours.Black,
             };

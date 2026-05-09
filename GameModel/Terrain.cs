@@ -18,7 +18,7 @@ namespace GameModel
         Hill = 1 << 3,
         Mountain = 1 << 4,
         Water = 1 << 5,
-        Wetland = 1 << 6,
+        Swamp = 1 << 6,
         Reef = 1 << 7,
     }
 
@@ -36,7 +36,7 @@ namespace GameModel
     {
         public const int Impassable = 100;
 
-        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Desert | TerrainType.Hill | TerrainType.Mountain | TerrainType.Wetland;
+        public static TerrainType All_Land = TerrainType.Grassland | TerrainType.Forest | TerrainType.Desert | TerrainType.Hill | TerrainType.Mountain | TerrainType.Swamp;
         public static TerrainType All_Water = TerrainType.Water | TerrainType.Reef;
         public static TerrainType Non_Mountainous_Land = All_Land ^ TerrainType.Mountain;
         public static TerrainType Rough_Land = All_Land ^ TerrainType.Grassland;
@@ -51,7 +51,7 @@ namespace GameModel
                 'D' => TerrainType.Desert,
                 'M' => TerrainType.Mountain,
                 'H' => TerrainType.Hill,
-                'W' => TerrainType.Wetland,
+                'W' => TerrainType.Swamp,
                 'L' => TerrainType.Water,
                 'S' => TerrainType.Water,
                 'R' => TerrainType.Reef,
@@ -73,7 +73,7 @@ namespace GameModel
                     { TerrainType.Hill, 3 },
                     { TerrainType.Mountain, 2 },
                     { TerrainType.Desert, 2 },
-                    { TerrainType.Wetland, 2 },
+                    { TerrainType.Swamp, 2 },
 
                     { TerrainType.Reef, 2 },
                     { TerrainType.Water, 4 }

@@ -27,7 +27,7 @@ public record UnitTemplate
             { TerrainType.Hill,      2 },
             { TerrainType.Mountain,  Terrain.Impassable },
             { TerrainType.Water,     Terrain.Impassable },
-            { TerrainType.Wetland,   2 },
+            { TerrainType.Swamp,   2 },
             { TerrainType.Reef,      Terrain.Impassable },
         },
         MovementType.Airborne => new Dictionary<TerrainType, int>
@@ -38,7 +38,7 @@ public record UnitTemplate
             { TerrainType.Hill,      1 },
             { TerrainType.Mountain,  1 },
             { TerrainType.Water,     1 },
-            { TerrainType.Wetland,   1 },
+            { TerrainType.Swamp,   1 },
             { TerrainType.Reef,      1 },
         },
         MovementType.Waterbound => new Dictionary<TerrainType, int>
@@ -49,7 +49,7 @@ public record UnitTemplate
             { TerrainType.Hill,      Terrain.Impassable },
             { TerrainType.Mountain,  Terrain.Impassable },
             { TerrainType.Water,     1 },
-            { TerrainType.Wetland,   Terrain.Impassable },
+            { TerrainType.Swamp,   Terrain.Impassable },
             { TerrainType.Reef,      2 },
         },
         _ => [],

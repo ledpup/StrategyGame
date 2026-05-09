@@ -1,18 +1,22 @@
-## Game rules
+## Game description
 1. The game is turn-based, with players taking turns to perform actions.
 1. A turn is resolved simultaneously for all players.
 1. The play area is a hex-based board, with land and water hex tiles.
+1. The objective of the game is to capture settlements on the board.
 
 ## Game board
 1. The game board is a grid of hexagon tiles.
-1. Each hex has a terrain type: grassland, forest, hills, etc.
+1. Each hex has a terrain type: grassland, forest, hill, mountain, swamp, desert, sea or reef.
 1. Hex edges may have a river, forest, hill, mountain, reef, wall or port.
 1. Two adjacent hex tiles may be linked by a road.
 1. If a road crosses a river edge, it's a bridge.
-1. Roads may not cross edges that have a reef, wall or port.
+1. Roads cannot exist on edges that have a reef, wall or port.
+1. Hex tiles may contain a settlement, which is a city, fortress or outpost.
+1. Settlements may be owned by a player or neutral.
 
 ## Player rules
 1. Players have a number of orders for each turn, defaulting to 10.
+1. Players control units on the board, which can be moved and used to capture settlements.
 1. Players issue move commands, each step of which is resolved before the next step is executed.
 1. Each move command for a unit costs one order.
 1. When all orders are used, the player may not issue any more move commands.

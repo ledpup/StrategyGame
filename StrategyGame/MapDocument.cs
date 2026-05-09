@@ -160,7 +160,7 @@ namespace StrategyGame
                 TerrainType.Hill => 'H',
                 TerrainType.Mountain => 'M',
                 TerrainType.Water => 'L',
-                TerrainType.Wetland => 'W',
+                TerrainType.Swamp => 'W',
                 TerrainType.Reef => 'R',
                 _ => throw new InvalidOperationException($"Unsupported terrain type {terrainType}"),
             };

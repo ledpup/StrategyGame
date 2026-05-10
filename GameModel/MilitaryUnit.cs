@@ -226,12 +226,27 @@ namespace GameModel
             if (!transportee.TransportableBy.Contains(MovementType))
                 throw new Exception($"{transportee.Name} may not be transported by {MovementType} movement type");
 
-            return TransportSize >= transportee.TransportSize + Transporting.Sum(x => x.TransportSize);
+            return TransportCapacity >= transportee.TransportSize + Transporting.Sum(x => x.TransportSize);
+        }
+
+        public int TransportCapacity
+        {
+            get 
+            { 
+                if (!IsTransporter)
+                {
+                    return 0;
+                }
+                return (int)Math.Ceiling(Personnel * Size); 
+            }
         }
 
         public int TransportSize
         {
-            get { return (int)Math.Ceiling(Personnel * Size); }
+            get
+            {
+                return (int)Math.Ceiling(Personnel * Size);
+            }
         }
 
         public int RoadMovementBonus { get; set; }

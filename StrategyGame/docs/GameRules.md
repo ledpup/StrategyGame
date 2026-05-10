@@ -13,6 +13,8 @@
 1. Roads cannot exist on edges that have a reef, wall or port.
 1. Hex tiles may contain a settlement, which is a city, fortress or outpost.
 1. Settlements may be owned by a player or neutral.
+1. Hexes have a stack limit, it is determined by the terrain type and the presence of a settlement. A hex cannot contain more units than its stack limit.
+1. The total number of units in a hex (i.e., the count of all player's units) during a conflict may exceed the stack limit, but after the conflict is resolved, the number of units in the hex must be reduced to the stack limit.
 
 ## Player rules
 1. Players have a number of orders for each turn, defaulting to 10.
@@ -30,6 +32,20 @@
 (M6) A unit may have multiple move commands each turn.
 (M7) If a unit enters a conflict during a move command, all subsequent commands for that unit are cancelled.
 (M8) The first move command for a unit does not affect morale, but subsequent move commands reduce morale, starting at 1 and increasing exponentially with each additional move command.
+
+### Naval movement rules
+(NM1) A waterbound unit may only move on water and reef hexes.
+(NM2) Exception to (NM1): a waterbound unit may stop on a coastal settlement tile if there is a port edge between the water and the settlement tile.
+(NM3) A land unit may embark on a waterbound unit if they are in a coastal settlement and there is a port edge between the land and water hexes.
+(NM4) A land unit may embark on a waterbound unit if they are adjacent to a water hex and there is a port edge between the land and water hexes.
+(NM5) A waterbound unit may only ferry land units if their transport capacity is sufficient to carry land units.
+(NM6) A waterbound unit may transport multiple land units.
+(NM7) If an airborne unit is lost due to a conflict, all land units it was transporting are also lost.
+
+### Airborne movement rules
+(AM1) An airborne unit may move over any terrain type, but must end its turn on a land tile.
+(AM2) An airborne unit may airlift land units if they are in the same hex and the airborne unit has sufficient transport capacity.
+(AM3) If an airborne unit is lost due to a conflict, all land units it was transporting are also lost.
 
 ## Definitions
 - Orders: The number of actions a player may take in a turn.

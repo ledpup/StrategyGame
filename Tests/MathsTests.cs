@@ -41,7 +41,7 @@ namespace Tests
         public void EdgeToCentrePoint()
         {
             var layout = new Layout(Layout.flat, new PointD(10, 10), new PointD(0, 0));
-            var points = Layout.PolygonCorners(layout, new Hex(1, 1, -2)).ToArray();
+            var points = Layout.PolygonCorners(layout, new Hex(1, 1)).ToArray();
 
             var point = PointD.EdgeToCentrePoint(points, 10, 0);
 

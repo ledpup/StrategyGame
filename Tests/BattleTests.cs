@@ -32,26 +32,26 @@ namespace Tests
         [TestMethod]
         public void TwoEnemies_MoveToSameDestination_BattleOccurs()
         {
-            var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
+            var gameState = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
             var unitFactory = new MilitaryUnitFactory(new UnitTemplateFactory());
 
-            board.Units =
+            gameState.Units =
             [
-                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 0, location: board[1, 1]),
-                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 1, location: board[2, 3]),
+                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 0, location: gameState[1, 1]),
+                unitFactory.CreateNext(UnitTemplateName.DwarvenInfantry, ownerIndex: 1, location: gameState[2, 3]),
             ];
 
             var moveOrders = new List<IUnitCommand>
             {
-                board.Units[0].GetMoveOrderToDestination(board[2, 2]),
-                board.Units[1].GetMoveOrderToDestination(board[2, 2]),
+                gameState.Units[0].GetMoveOrderToDestination(gameState[2, 2]),
+                gameState.Units[1].GetMoveOrderToDestination(gameState[2, 2]),
             };
 
-            board.ResolveOrders(moveOrders);
+            gameState.ResolveOrders(moveOrders);
 
-            var battles = board.ConductBattles();
+            var battles = gameState.ConductBattles();
 
-            Assert.AreEqual(1, battles.Count());
+            Assert.HasCount(1, battles);
         }
     }
 }

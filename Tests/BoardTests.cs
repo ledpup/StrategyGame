@@ -21,10 +21,10 @@ namespace Tests
 
             var tiles = board.Tiles.ToList();
 
-            tiles.ForEach(t => Assert.AreEqual(1, tiles.Count(x => x.Index == t.Index)));
+            tiles.ForEach(t => Assert.ContainsSingle(x => x.Index == t.Index, tiles));
 
             // Ensure that adjacent tiles have been populated correctly
-            tiles.ForEach(t => Assert.IsFalse(t.Neighbours.Any(at => at == null)));
+            tiles.ForEach(t => Assert.DoesNotContain(at => at == null, t.Neighbours));
             
             // Ensure that some tiles are coastal.
             var coastal = tiles.Count(t => t.IsCoast);
@@ -38,19 +38,19 @@ namespace Tests
         {
             var board = new GameState(new Board(GameBoard));
 
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 2 && x.Destination.Hex.r == -1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 3 && x.Destination.Hex.r == -1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 3 && x.Destination.Hex.r == 0));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 2 && x.Destination.Hex.r == 1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 1 && x.Destination.Hex.r == 1));
-            Assert.IsTrue(board[2, 1].Neighbours.Any(x => x.Destination.Hex.q == 1 && x.Destination.Hex.r == 0));
+            Assert.Contains(x => x.Destination.Hex.q == 2 && x.Destination.Hex.r == -1, board[2, 1].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 3 && x.Destination.Hex.r == -1, board[2, 1].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 3 && x.Destination.Hex.r == 0, board[2, 1].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 2 && x.Destination.Hex.r == 1, board[2, 1].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 1 && x.Destination.Hex.r == 1, board[2, 1].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 1 && x.Destination.Hex.r == 0, board[2, 1].Neighbours);
 
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 1));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 1));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 2));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 3));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 3));
-            Assert.IsTrue(board[5, 4].Neighbours.Any(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 2));
+            Assert.Contains(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 1, board[5, 4].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 1, board[5, 4].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 6 && x.Destination.Hex.r == 2, board[5, 4].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 5 && x.Destination.Hex.r == 3, board[5, 4].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 3, board[5, 4].Neighbours);
+            Assert.Contains(x => x.Destination.Hex.q == 4 && x.Destination.Hex.r == 2, board[5, 4].Neighbours);
         }
 
         [TestMethod]
@@ -98,12 +98,12 @@ namespace Tests
             Assert.AreEqual(32, index);
 
 
-            Assert.AreEqual(32, Hex.HexToIndex(new Hex(5, -1, -4), boardWidth, boardHeight));
-            Assert.AreEqual(60, Hex.HexToIndex(new Hex(6, -1, -5), boardWidth, boardHeight));
-            Assert.AreEqual(87, Hex.HexToIndex(new Hex(6, 0, -6), boardWidth, boardHeight));
-            Assert.AreEqual(86, Hex.HexToIndex(new Hex(5, 1, -6), boardWidth, boardHeight));
-            Assert.AreEqual(85, Hex.HexToIndex(new Hex(4, 1, -5), boardWidth, boardHeight));
-            Assert.AreEqual(58, Hex.HexToIndex(new Hex(4, 0, -4), boardWidth, boardHeight));
+            Assert.AreEqual(32, Hex.HexToIndex(new Hex(5, -1), boardWidth, boardHeight));
+            Assert.AreEqual(60, Hex.HexToIndex(new Hex(6, -1), boardWidth, boardHeight));
+            Assert.AreEqual(87, Hex.HexToIndex(new Hex(6, 0), boardWidth, boardHeight));
+            Assert.AreEqual(86, Hex.HexToIndex(new Hex(5, 1), boardWidth, boardHeight));
+            Assert.AreEqual(85, Hex.HexToIndex(new Hex(4, 1), boardWidth, boardHeight));
+            Assert.AreEqual(58, Hex.HexToIndex(new Hex(4, 0), boardWidth, boardHeight));
         }
 
         [TestMethod]

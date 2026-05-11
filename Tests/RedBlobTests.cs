@@ -55,46 +55,46 @@ namespace Tests
         [TestMethod]
         public void TestHexArithmetic()
         {
-            HexTests.EqualHex("hex_add", new Hex(4, -10, 6), Hex.Add(new Hex(1, -3, 2), new Hex(3, -7, 4)));
-            HexTests.EqualHex("hex_subtract", new Hex(-2, 4, -2), Hex.Subtract(new Hex(1, -3, 2), new Hex(3, -7, 4)));
+            HexTests.EqualHex("hex_add", new Hex(4, -10), Hex.Add(new Hex(1, -3), new Hex(3, -7)));
+            HexTests.EqualHex("hex_subtract", new Hex(-2, 4), Hex.Subtract(new Hex(1, -3), new Hex(3, -7)));
         }
 
 
         [TestMethod]
         public void TestHexDirection()
         {
-            HexTests.EqualHex("hex_direction", new Hex(0, -1, 1), Hex.Direction(2));
+            HexTests.EqualHex("hex_direction", new Hex(0, -1), Hex.Direction(2));
         }
 
 
         [TestMethod]
         public void TestHexNeighbor()
         {
-            HexTests.EqualHex("hex_neighbor", new Hex(1, -3, 2), Hex.Neighbor(new Hex(1, -2, 1), 2));
+            HexTests.EqualHex("hex_neighbor", new Hex(1, -3), Hex.Neighbor(new Hex(1, -2), 2));
         }
 
 
         [TestMethod]
         public void TestHexDiagonal()
         {
-            HexTests.EqualHex("hex_diagonal", new Hex(-1, -1, 2), Hex.DiagonalNeighbor(new Hex(1, -2, 1), 3));
+            HexTests.EqualHex("hex_diagonal", new Hex(-1, -1), Hex.DiagonalNeighbor(new Hex(1, -2), 3));
         }
 
 
         [TestMethod]
         public void TestHexDistance()
         {
-            HexTests.EqualInt("hex_distance", 7, Hex.Distance(new Hex(3, -7, 4), new Hex(0, 0, 0)));
+            HexTests.EqualInt("hex_distance", 7, Hex.Distance(new Hex(3, -7), new Hex(0, 0)));
         }
 
 
         [TestMethod]
         public void TestHexRound()
         {
-            Hex a = new(0, 0, 0);
-            Hex b = new(1, -1, 0);
-            Hex c = new(0, -1, 1);
-            HexTests.EqualHex("hex_round 1", new Hex(5, -10, 5), FractionalHex.HexRound(FractionalHex.HexLerp(new Hex(0, 0, 0), new Hex(10, -20, 10), 0.5)));
+            Hex a = new(0, 0);
+            Hex b = new(1, -1);
+            Hex c = new(0, -1);
+            HexTests.EqualHex("hex_round 1", new Hex(5, -10), FractionalHex.HexRound(FractionalHex.HexLerp(new Hex(0, 0), new Hex(10, -20), 0.5)));
             HexTests.EqualHex("hex_round 2", a, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.499)));
             HexTests.EqualHex("hex_round 3", b, FractionalHex.HexRound(FractionalHex.HexLerp(a, b, 0.501)));
             HexTests.EqualHex("hex_round 4", a, FractionalHex.HexRound(new FractionalHex(a.q * 0.4 + b.q * 0.3 + c.q * 0.3, a.r * 0.4 + b.r * 0.3 + c.r * 0.3, a.s * 0.4 + b.s * 0.3 + c.s * 0.3)));
@@ -105,14 +105,14 @@ namespace Tests
         [TestMethod]
         public void TestHexLinedraw()
         {
-            HexTests.EqualHexArray("hex_linedraw", [new(0, 0, 0), new(0, -1, 1), new(0, -2, 2), new(1, -3, 2), new(1, -4, 3), new(1, -5, 4)], FractionalHex.HexLinedraw(new Hex(0, 0, 0), new Hex(1, -5, 4)));
+            HexTests.EqualHexArray("hex_linedraw", [new(0, 0), new(0, -1), new(0, -2), new(1, -3), new(1, -4), new(1, -5)], FractionalHex.HexLinedraw(new Hex(0, 0), new Hex(1, -5)));
         }
 
 
         [TestMethod]
         public void TestLayout()
         {
-            Hex h = new(3, 4, -7);
+            Hex h = new(3, 4);
             Layout flat = new(Layout.flat, new PointD(10, 15), new PointD(35, 71));
             HexTests.EqualHex("layout", h, FractionalHex.HexRound(Layout.PixelToHex(flat, Layout.HexToPixel(flat, h))));
             Layout pointy = new(Layout.pointy, new PointD(10, 15), new PointD(35, 71));
@@ -127,12 +127,12 @@ namespace Tests
 
             var board = new GameState(new Board(GameBoard));
 
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(5, -1, -4))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(6, -1, -5))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(6,  0, -6))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(5,  1, -6))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(4,  1, -5))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(4,  0, -4))));
+            Assert.Contains(x => x.Equals(new Hex(5, -1)), results);
+            Assert.Contains(x => x.Equals(new Hex(6, -1)), results);
+            Assert.Contains(x => x.Equals(new Hex(6,  0)), results);
+            Assert.Contains(x => x.Equals(new Hex(5,  1)), results);
+            Assert.Contains(x => x.Equals(new Hex(4,  1)), results);
+            Assert.Contains(x => x.Equals(new Hex(4,  0)), results);
 
             // top-left corner
             hex = new Hex(0, 0);
@@ -169,29 +169,29 @@ namespace Tests
             Visualise.GameBoardRenderer.RenderAndSave("HexesInArea.png", board.Width, board.Height, board.Tiles);
             board.Tiles.ToList().ForEach(x => x.IsSelected = false);
 
-            Assert.AreEqual(19, results.Count);
+            Assert.HasCount(19, results);
 
-            Assert.IsTrue(results.Any(x => x.Equals(hex)));
+            Assert.Contains(x => x.Equals(hex), results);
 
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -5))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -4))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -3))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -3))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -4))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -5))));
+            Assert.Contains(x => x.Equals(new Hex(14, -5)), results);
+            Assert.Contains(x => x.Equals(new Hex(13, -4)), results);
+            Assert.Contains(x => x.Equals(new Hex(13, -3)), results);
+            Assert.Contains(x => x.Equals(new Hex(14, -3)), results);
+            Assert.Contains(x => x.Equals(new Hex(14, -4)), results);
+            Assert.Contains(x => x.Equals(new Hex(15, -5)), results);
 
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -6))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -5))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(12, -4))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(12, -3))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(13, -3))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -3))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(14, -2))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -3))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(16, -4))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(16, -5))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(16, -6))));
-            Assert.IsTrue(results.Any(x => x.Equals(new Hex(15, -6))));
+            Assert.Contains(x => x.Equals(new Hex(15, -6)), results);
+            Assert.Contains(x => x.Equals(new Hex(13, -5)), results);
+            Assert.Contains(x => x.Equals(new Hex(12, -4)), results);
+            Assert.Contains(x => x.Equals(new Hex(12, -3)), results);
+            Assert.Contains(x => x.Equals(new Hex(13, -3)), results);
+            Assert.Contains(x => x.Equals(new Hex(14, -3)), results);
+            Assert.Contains(x => x.Equals(new Hex(14, -2)), results);
+            Assert.Contains(x => x.Equals(new Hex(15, -3)), results);
+            Assert.Contains(x => x.Equals(new Hex(16, -4)), results);
+            Assert.Contains(x => x.Equals(new Hex(16, -5)), results);
+            Assert.Contains(x => x.Equals(new Hex(16, -6)), results);
+            Assert.Contains(x => x.Equals(new Hex(15, -6)), results);
 
 
             hex = new Hex(14, -7);

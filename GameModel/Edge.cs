@@ -51,6 +51,7 @@ namespace GameModel
         {
             return CrossesEdge(this, tile1, tile2);
         }
+
         public static Edge GetEdge(List<Edge> edges, Tile tile1, Tile tile2)
         {
             if (edges == null)
@@ -64,7 +65,7 @@ namespace GameModel
             return edges.Where(x => x.Origin == location || x.Destination == location).ToList();
         }
 
-        public int MoveCost(bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts)
+        public int MoveCost(bool usesRoads, bool transportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts)
         {
             // Movement by road or bridge always costs 1 regardless of terrain type
             if (usesRoads && HasRoad)
@@ -73,29 +74,12 @@ namespace GameModel
             }
 
             // If a unit is transported by water, you can only get out at a port
-            if (isBeingTransportedByWater && EdgeType != EdgeType.Port)
+            if (transportedByWater && EdgeType != EdgeType.Port)
             {
                 return Terrain.Impassable;
             }
 
             return edgeMovementCosts[EdgeType] + terrainMovementCosts[Destination.TerrainType];
-        }
-
-        public int MoveCost(bool usesRoads, bool isBeingTransportedByWater, int edgeMovementCost, int terrainMovementCost)
-        {
-            // Movement by road or bridge always costs 1 regardless of terrain type
-            if (usesRoads && HasRoad)
-            {
-                return 1;
-            }
-
-            // If a unit is transported by water, you can only get out at a port
-            if (isBeingTransportedByWater && EdgeType != EdgeType.Port)
-            {
-                return Terrain.Impassable;
-            }
-
-            return edgeMovementCost + terrainMovementCost;
         }
     }
 }

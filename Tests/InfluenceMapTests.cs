@@ -110,7 +110,7 @@ namespace Tests
 
             if (bestPossibleDestination != null)
             {
-                var moveOrder = board.Units[1].ShortestPathToMoveOrder(bestPossibleDestination.ToArray());
+                var moveOrder = board.Units[1].ShortestPathToMoveCommand(bestPossibleDestination.ToArray());
             }
         }
     }

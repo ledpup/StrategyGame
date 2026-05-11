@@ -5,9 +5,8 @@ public enum SettlementType
     None,
     Outpost,
     Fortress,
-    City
+    City,
 }
-
 
 public class Settlement
 {
@@ -36,7 +35,7 @@ public class Settlement
         OwnerIndex = ownerIndex;
         Supply = supply;
 
-        Location?.Settlement = this;            
+        Location?.Settlement = this;
     }
 
     public SettlementType SettlementType { get; set;}

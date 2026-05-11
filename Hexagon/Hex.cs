@@ -3,35 +3,29 @@ using System.Collections.Generic;
 
 namespace Hexagon
 {
-    public struct Hex
+    public struct Hex(int q, int r)
     {
-        public Hex(int q, int r, int s = 0)
-        {
-            this.q = q;
-            this.r = r;
-            this.s = -q - r;
-        }
-        public readonly int q;
-        public readonly int r;
-        public readonly int s;
+        public readonly int q = q;
+        public readonly int r = r;
+        public readonly int s = -q - r;
 
         static public Hex Add(Hex a, Hex b)
         {
-            return new Hex(a.q + b.q, a.r + b.r, a.s + b.s);
+            return new Hex(a.q + b.q, a.r + b.r);
         }
 
         static public Hex Subtract(Hex a, Hex b)
         {
-            return new Hex(a.q - b.q, a.r - b.r, a.s - b.s);
+            return new Hex(a.q - b.q, a.r - b.r);
         }
 
 
         static public Hex Scale(Hex a, int k)
         {
-            return new Hex(a.q * k, a.r * k, a.s * k);
+            return new Hex(a.q * k, a.r * k);
         }
 
-        static public List<Hex> Directions = [new Hex(-1, 0, 1), new Hex(0, -1, 1), new Hex(1, -1, 0), new Hex(1, 0, -1), new Hex(0, 1, -1), new Hex(-1, 1, 0),];
+        static public List<Hex> Directions = [new Hex(-1, 0), new Hex(0, -1), new Hex(1, -1), new Hex(1, 0), new Hex(0, 1), new Hex(-1, 1),];
 
         static public Hex Direction(int direction)
         {
@@ -73,7 +67,7 @@ namespace Hexagon
             return Add(hex, Direction(direction));
         }
 
-        static public List<Hex> Diagonals = [new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2)];
+        static public List<Hex> Diagonals = [new Hex(2, -1), new Hex(1, -2), new Hex(-1, -1), new Hex(-2, 1), new Hex(-1, 2), new Hex(1, 1)];
 
         static public Hex DiagonalNeighbor(Hex hex, int direction)
         {
@@ -171,6 +165,11 @@ namespace Hexagon
         {
             var offsetCoords = new OffsetCoord(index % width, index / width);
             return offsetCoords.QoffsetToCube();
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(q, r);
         }
     }
 }

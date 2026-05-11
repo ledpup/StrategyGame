@@ -126,7 +126,6 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
         public void MoveTransportedUnit()
         {
             var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
@@ -150,7 +149,10 @@ namespace Tests
                 new TransportCommand(units[1], units[0]),
                 new MoveCommand(moves, units[0]),
             };
-            board.ResolveOrders(unitOrders);
+            bool exceptionThrown = false;
+            try { board.ResolveOrders(unitOrders); }
+            catch (Exception) { exceptionThrown = true; }
+            Assert.IsTrue(exceptionThrown, "Expected an Exception to be thrown.");
         }
 
         [TestMethod]
@@ -188,7 +190,7 @@ namespace Tests
             ];
             board.ResolveOrders(unitOrders);
 
-            Assert.AreEqual(0, units[1].Transporting.Count);
+            Assert.IsEmpty(units[1].Transporting);
             Assert.IsNull(units[0].TransportedBy);
         }
 
@@ -265,12 +267,12 @@ namespace Tests
                     case 5:
                         Assert.AreEqual(340, units[0].Location.Index);
                         Assert.AreEqual(340, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.IsNull(units[1].TransportedBy);
                         break;
                     case 6:
                         Assert.AreEqual(311, units[0].Location.Index);
                         Assert.AreEqual(365, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.IsNull(units[1].TransportedBy);
                         break;
                     case 7:
                         Assert.AreEqual(338, units[0].Location.Index);
@@ -280,17 +282,17 @@ namespace Tests
                     case 8:
                         Assert.AreEqual(257, units[0].Location.Index);
                         Assert.AreEqual(257, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.IsNull(units[1].TransportedBy);
                         break;
                     case 9:
                         Assert.AreEqual(199, units[0].Location.Index);
                         Assert.AreEqual(203, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.IsNull(units[1].TransportedBy);
                         break;
                     case 10:
                         Assert.AreEqual(196, units[0].Location.Index);
                         Assert.AreEqual(150, units[1].Location.Index);
-                        Assert.AreEqual(null, units[1].TransportedBy);
+                        Assert.IsNull(units[1].TransportedBy);
                         Assert.AreEqual(units[0], units[3].TransportedBy);
                         break;
                     //case 11:

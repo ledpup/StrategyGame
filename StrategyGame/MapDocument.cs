@@ -133,7 +133,7 @@ namespace StrategyGame
             {
                 var template = new UnitTemplate
                 {
-                    Name = x.Name,
+                    UnitTemplateName = x.UnitTemplateName,
                     MovementType = x.MovementType,
                     MovementPoints = x.BaseMovementPoints,
                     RoadMovementBonus = x.RoadMovementBonus,
@@ -170,6 +170,8 @@ namespace StrategyGame
     internal class UnitDocument
     {
         public int Index { get; set; }
+        public UnitTemplateName UnitTemplateName { get; set; }
+
         public string Name { get; set; }
         public int OwnerIndex { get; set; }
         public int TileIndex { get; set; }
@@ -191,7 +193,7 @@ namespace StrategyGame
             return new UnitDocument
             {
                 Index = unit.Index,
-                Name = unit.Name,
+                UnitTemplateName = unit.UnitTemplate.UnitTemplateName,
                 OwnerIndex = unit.OwnerIndex,
                 TileIndex = unit.Location.Index,
                 MovementType = unit.MovementType,
@@ -212,7 +214,7 @@ namespace StrategyGame
         public string ToLine()
         {
             var transportableBy = string.Join('|', TransportableBy);
-            return $"{Index},{Escape(Name)},{OwnerIndex},{TileIndex},{MovementType},{BaseMovementPoints},{RoadMovementBonus},{UnitType},{BaseQuality},{InitialQuantity},{Size},{IsTransporter},{transportableBy},{CombatInitiative},{InitialMorale},{TurnBuilt}";
+            return $"{Index},{UnitTemplateName},{OwnerIndex},{TileIndex},{MovementType},{BaseMovementPoints},{RoadMovementBonus},{UnitType},{BaseQuality},{InitialQuantity},{Size},{IsTransporter},{transportableBy},{CombatInitiative},{InitialMorale},{TurnBuilt}";
         }
 
         public static UnitDocument Parse(string line)
@@ -231,7 +233,7 @@ namespace StrategyGame
             return new UnitDocument
             {
                 Index = int.Parse(columns[0]),
-                Name = Unescape(columns[1]),
+                UnitTemplateName = Enum.Parse<UnitTemplateName>(columns[1]),
                 OwnerIndex = int.Parse(columns[2]),
                 TileIndex = int.Parse(columns[3]),
                 MovementType = Enum.Parse<MovementType>(columns[4]),

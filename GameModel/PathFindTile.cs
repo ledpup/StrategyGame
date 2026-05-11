@@ -36,7 +36,7 @@ namespace GameModel
                         neighbourPathFindTile = new PathFindTile(edge.Destination.Hex, edge.Destination.Neighbours);
                         loadedPathFindTiles.Add(neighbourPathFindTile);
                     }
-                    
+
                     Neighbours.Add(neighbourPathFindTile);
 
                     MoveCost[neighbourPathFindTile.Hex] = moveCost;
@@ -44,10 +44,8 @@ namespace GameModel
                     // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
                     neighbourPathFindTile.HasCumulativeCost = !canStopOn.HasFlag(edge.Destination.TerrainType);
                 }
-            };
+            }
         }
-
-       
 
         public override string ToString()
         {

@@ -42,7 +42,7 @@
             int q = o.col;
             int r = o.row - ((o.col + offset * (o.col & 1)) / 2);
             int s = -q - r;
-            return new Hex(q, r, s);
+            return new Hex(q, r);
         }
 
         public static int OffsetCoordsToIndex(int x, int y, int width)

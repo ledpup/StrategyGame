@@ -283,7 +283,7 @@ namespace ComputerOpponent
                                 Tile transporteeMoveOrderDesintation = null;
                                 if (pathToAirbornUnit != null)
                                 {
-                                    var moveOrder = unit.ShortestPathToMoveOrder(pathToAirbornUnit.ToArray());
+                                    var moveOrder = unit.ShortestPathToMoveCommand(pathToAirbornUnit.ToArray());
                                     transporteeMoveOrderDesintation = moveOrder.Moves.Last().Edge.Destination;
                                     unitOrders.Add(moveOrder);
                                 }
@@ -392,7 +392,7 @@ namespace ComputerOpponent
                             // Move transport unit to the destination of the transportee's move order or just to the transportee's location
                             var pathToTransporteesDestination = PathFinder.FindShortestPath(unit.Location, destination, unit);
                             if (pathToTransporteesDestination != null)
-                                unitOrders.Add(unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray()));
+                                unitOrders.Add(unit.ShortestPathToMoveCommand(pathToTransporteesDestination.ToArray()));
 
                         }
                         break;
@@ -403,7 +403,7 @@ namespace ComputerOpponent
                         var closestEnemySettlement = ClosestEnemySettlementPath(board, unit);
                         if (closestEnemySettlement != null)
                         {
-                            var moveOrder = unit.ShortestPathToMoveOrder(closestEnemySettlement.ToArray());
+                            var moveOrder = unit.ShortestPathToMoveCommand(closestEnemySettlement.ToArray());
                             if (moveOrder != null)
                                 unitOrders.Add(moveOrder);
 
@@ -733,7 +733,7 @@ namespace ComputerOpponent
 
             if (bestPossibleDestination != null)
             {
-                var moveOrder = unit.ShortestPathToMoveOrder(bestPossibleDestination.ToArray());
+                var moveOrder = unit.ShortestPathToMoveCommand(bestPossibleDestination.ToArray());
                 return moveOrder;
             }
             return null;

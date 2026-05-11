@@ -31,11 +31,11 @@ namespace Tests
         public void CreateDefault_DimensionsCorrect()
         {
             var doc = Grassland(5, 4);
-            Assert.AreEqual(4, doc.Tiles.Length);
+            Assert.HasCount(4, doc.Tiles);
             Assert.IsTrue(doc.Tiles.All(r => r == "GGGGG"));
-            Assert.AreEqual(0, doc.Edges.Count);
-            Assert.AreEqual(0, doc.Settlements.Count);
-            Assert.AreEqual(0, doc.Units.Count);
+            Assert.IsEmpty(doc.Edges);
+            Assert.IsEmpty(doc.Settlements);
+            Assert.IsEmpty(doc.Units);
         }
 
         // ── WriteTo / ParseFromLines roundtrip ────────────────────────────
@@ -74,8 +74,8 @@ namespace Tests
         {
             var doc = Grassland(2, 2);
             var rt = Roundtrip(doc);
-            Assert.AreEqual(2, rt.Tiles.Length);
-            Assert.AreEqual(0, rt.Edges.Count);
+            Assert.HasCount(2, rt.Tiles);
+            Assert.IsEmpty(rt.Edges);
         }
 
         // ── TerrainToChar ─────────────────────────────────────────────────
@@ -104,7 +104,7 @@ namespace Tests
                 File.ReadAllLines("BasicBoardEdges.txt"),
                 File.ReadAllLines("BasicBoardSettlements.txt"));
             var doc = MapDocument.FromBoard(board);
-            Assert.AreEqual(board.Height, doc.Tiles.Length);
+            Assert.HasCount(board.Height, doc.Tiles);
             Assert.IsTrue(doc.Tiles.All(r => r.Length == board.Width));
         }
 
@@ -126,8 +126,8 @@ namespace Tests
             doc.Edges.Add("0,1,River,false");
             var board = doc.ToBoard();
             var doc2 = MapDocument.FromBoard(board);
-            Assert.AreEqual(1, doc2.Edges.Count);
-            Assert.IsTrue(doc2.Edges[0].Contains("River"));
+            Assert.HasCount(1, doc2.Edges);
+            Assert.Contains("River", doc2.Edges[0]);
         }
 
         // ── ParseFromLines ignores blank lines ────────────────────────────
@@ -141,7 +141,7 @@ namespace Tests
                 "[Edges]", "", "[Settlements]", "", "[Units]", ""
             };
             var doc = MapDocument.ParseFromLines(lines);
-            Assert.AreEqual(2, doc.Tiles.Length);
+            Assert.HasCount(2, doc.Tiles);
         }
     }
 
@@ -379,7 +379,7 @@ namespace Tests
             h.Commit(before, after, "edge");
 
             var restored = h.Undo(after);
-            Assert.AreEqual(0, restored.Edges.Count);
+            Assert.IsEmpty(restored.Edges);
         }
 
         [TestMethod]
@@ -393,7 +393,7 @@ namespace Tests
 
             var undone = h.Undo(after);
             var redone = h.Redo(undone);
-            Assert.AreEqual(1, redone.Edges.Count);
+            Assert.HasCount(1, redone.Edges);
             Assert.AreEqual("0,1,River,false", redone.Edges[0]);
         }
 
@@ -409,7 +409,7 @@ namespace Tests
             h.Commit(before, after, "settlement");
 
             var restored = h.Undo(after);
-            Assert.AreEqual(0, restored.Settlements.Count);
+            Assert.IsEmpty(restored.Settlements);
         }
 
         // ── Diff ──────────────────────────────────────────────────────────
@@ -429,7 +429,7 @@ namespace Tests
             var after  = Clone(before);
             after.Tiles[1] = "GMG";
             var g = MapHistory.Diff(before, after, "test");
-            Assert.AreEqual(1, g.Deltas.Count);
+            Assert.HasCount(1, g.Deltas);
             Assert.AreEqual(DeltaKind.TileRow, g.Deltas[0].Kind);
             Assert.AreEqual("1", g.Deltas[0].Key);
             Assert.AreEqual("GMG", g.Deltas[0].NewValue);
@@ -442,7 +442,7 @@ namespace Tests
             var after  = Clone(before);
             after.Edges.Add("0,1,River,false");
             var g = MapHistory.Diff(before, after, "test");
-            Assert.AreEqual(1, g.Deltas.Count);
+            Assert.HasCount(1, g.Deltas);
             Assert.AreEqual(DeltaKind.EdgeAdd, g.Deltas[0].Kind);
         }
 
@@ -454,7 +454,7 @@ namespace Tests
             var after = Clone(before);
             after.Edges.Clear();
             var g = MapHistory.Diff(before, after, "test");
-            Assert.AreEqual(1, g.Deltas.Count);
+            Assert.HasCount(1, g.Deltas);
             Assert.AreEqual(DeltaKind.EdgeRemove, g.Deltas[0].Kind);
         }
 

@@ -25,9 +25,9 @@ public class UnitTemplateFactory
 
     public UnitTemplateFactory()
     {
-        Register(new UnitTemplate { Name = UnitTemplateName.DwarvenInfantry.ToDisplayName(), UnitType = UnitType.Melee, Personnel = 250 });
-        Register(new UnitTemplate { Name = UnitTemplateName.DwarvenDragoons.ToDisplayName(), UnitType = UnitType.Melee, Personnel = 100, MovementPoints = 3 });
-        Register(new UnitTemplate { Name = UnitTemplateName.DwarvenCrossbowmen.ToDisplayName(), UnitType = UnitType.Ranged,  Personnel = 150 });
+        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenInfantry, UnitType = UnitType.Melee, Personnel = 250, TransportableBy = [MovementType.Waterbound, MovementType.Airborne] });
+        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenDragoons, UnitType = UnitType.Melee, Personnel = 100, MovementPoints = 3, TransportableBy = [MovementType.Waterbound] });
+        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenCrossbowmen, UnitType = UnitType.Ranged,  Personnel = 150, TransportableBy = [MovementType.Waterbound, MovementType.Airborne] });
     }
 
     public UnitTemplate Register(UnitTemplate template)

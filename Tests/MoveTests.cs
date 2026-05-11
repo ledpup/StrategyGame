@@ -34,29 +34,29 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("LandUnitMoves.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.AreEqual(11, moves.Count());
+            Assert.HasCount(11, moves);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 334));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 361));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 336));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 309));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 310));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 308));
+            Assert.Contains(x => x.Edge.Destination.Index == 334, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 361, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 336, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 309, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 310, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 308, moves);
 
             // Can't go into the ocean
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 281));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 306));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 333));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 360));
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 281, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 306, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 333, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 360, moves);
 
             // Can't go over mountains
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 337));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 363));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 362));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 388));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 364));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 390));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 389));
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 337, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 363, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 362, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 388, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 364, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 390, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 389, moves);
         }
 
         [TestMethod]
@@ -114,21 +114,21 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoad.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 316));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 317));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 343));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 344));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 318));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 373));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 347));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 374));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 402));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 429));
+            Assert.Contains(x => x.Edge.Destination.Index == 316, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 317, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 343, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 344, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 318, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 373, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 347, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 374, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 402, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 429, moves);
 
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 346));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 371));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 372));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 400));
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 346, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 371, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 372, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 400, moves);
         }
 
         [TestMethod]
@@ -144,21 +144,21 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("LandUnitMovesOverRoadOverMountain.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 30));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 56));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 57));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 59));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 86));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 87));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 114));
+            Assert.Contains(x => x.Edge.Destination.Index == 30, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 56, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 57, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 59, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 86, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 87, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 114, moves);
 
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 58));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 32));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 60));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 83));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 84));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 112));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 113));
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 58, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 32, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 60, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 83, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 84, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 112, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 113, moves);
         }
 
         [TestMethod]
@@ -177,7 +177,7 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("InfantryMoveOverMountainWithRoad.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 86));
+            Assert.Contains(x => x.Edge.Destination.Index == 86, moves);
         }
 
         [TestMethod]
@@ -193,24 +193,24 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("AirborneUnitMovesWithRoadAndMountain.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 30));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 31));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 32));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 56));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 57));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 59));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 60));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 87));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 110));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 111));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 114));
+            Assert.Contains(x => x.Edge.Destination.Index == 30, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 31, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 32, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 56, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 57, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 59, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 60, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 87, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 110, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 111, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 114, moves);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 58 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 83));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 84 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 86 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 112 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 113));
+            Assert.Contains(x => x.Edge.Destination.Index == 58 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 83, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 84 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 86 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 112 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 113, moves);
         }
 
         [TestMethod]
@@ -228,40 +228,40 @@ namespace Tests
 
             //Assert.AreEqual(12, moves.Count());
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 334));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 308));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 309));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 361));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 335));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 336));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 310));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 311));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 338));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 312));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 389));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 390));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 365));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 339));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 340));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 417));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 366));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 367));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 418));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 419));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 393));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 394));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 445));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 446));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 420));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 421));
+            Assert.Contains(x => x.Edge.Destination.Index == 334, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 308, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 309, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 361, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 335, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 336, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 310, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 311, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 338, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 312, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 389, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 390, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 365, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 339, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 340, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 417, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 366, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 367, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 418, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 419, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 393, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 394, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 445, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 446, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 420, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 421, moves);
 
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 388));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 362 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 337 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 391 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 392 && x.MoveType == MoveType.OnlyPassingThrough));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 416));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 444));
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 388, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 362 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 337 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 391 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 392 && x.MoveType == MoveType.OnlyPassingThrough, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 416, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 444, moves);
         }
 
 
@@ -285,12 +285,12 @@ namespace Tests
             var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne }, location: board[1, 1]);
             var moveList = unit.PossibleMoves();
 
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[1, 2]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[1, 3]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[2, 2]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[2, 1]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[3, 1]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[3, 2]));
+            Assert.Contains(x => x.Edge.Destination == board[1, 2], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[1, 3], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[2, 2], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[2, 1], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[3, 1], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[3, 2], moveList);
         }
 
         [TestMethod]
@@ -306,22 +306,22 @@ namespace Tests
             GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, [unit]);
 
 
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[3, 9] && x.MoveType == MoveType.OnlyPassingThrough)); // Mountain
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[5, 9]));
+            Assert.Contains(x => x.Edge.Destination == board[3, 9] && x.MoveType == MoveType.OnlyPassingThrough, moveList); // Mountain
+            Assert.Contains(x => x.Edge.Destination == board[5, 9], moveList);
 
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[3, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[4, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[5, 8] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
+            Assert.Contains(x => x.Edge.Destination == board[3, 8] && x.MoveType == MoveType.OnlyPassingThrough, moveList); // Water
+            Assert.Contains(x => x.Edge.Destination == board[4, 8] && x.MoveType == MoveType.OnlyPassingThrough, moveList); // Water
+            Assert.Contains(x => x.Edge.Destination == board[5, 8] && x.MoveType == MoveType.OnlyPassingThrough, moveList); // Water
 
-            Assert.IsFalse(moveList.Any(x => x.Edge.Destination == board[3, 7])); // Reef
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[4, 7]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[5, 7]));
+            Assert.DoesNotContain(x => x.Edge.Destination == board[3, 7], moveList); // Reef
+            Assert.Contains(x => x.Edge.Destination == board[4, 7], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[5, 7], moveList);
 
-            Assert.IsFalse(moveList.Any(x => x.Edge.Destination == board[3, 10])); // Water
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[4, 10] && x.MoveType == MoveType.OnlyPassingThrough)); // Water
-            Assert.IsFalse(moveList.Any(x => x.Edge.Destination == board[5, 10])); // Water
+            Assert.DoesNotContain(x => x.Edge.Destination == board[3, 10], moveList); // Water
+            Assert.Contains(x => x.Edge.Destination == board[4, 10] && x.MoveType == MoveType.OnlyPassingThrough, moveList); // Water
+            Assert.DoesNotContain(x => x.Edge.Destination == board[5, 10], moveList); // Water
 
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[4, 11]));
+            Assert.Contains(x => x.Edge.Destination == board[4, 11], moveList);
         }
 
         [TestMethod]
@@ -334,12 +334,12 @@ namespace Tests
 
             var pathToTransporteesDestination = PathFinder.FindShortestPath(unit.Location, board[196], unit);
             
-            var moveOrder = unit.ShortestPathToMoveOrder(pathToTransporteesDestination.ToArray());
+            var moveOrder = unit.ShortestPathToMoveCommand(pathToTransporteesDestination.ToArray());
 
             moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
             GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, [unit]);
 
-            Assert.IsFalse(moveOrder.Moves.Last().MoveType == MoveType.OnlyPassingThrough);
+            Assert.AreNotEqual(MoveType.OnlyPassingThrough, moveOrder.Moves.Last().MoveType);
         }
 
         [TestMethod]
@@ -406,7 +406,7 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverContinent.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, [unit]);
 
-            Assert.AreEqual(154, moveList.Count());
+            Assert.HasCount(154, moveList);
 
             //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 9])); // Mountain
             //Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[5, 9]));
@@ -416,10 +416,10 @@ namespace Tests
             //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[5, 8])); // Water
 
             //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 7])); // Reef
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[16, 12]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[16, 13]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[16, 14]));
-            Assert.IsTrue(moveList.Any(x => x.Edge.Destination == board[16, 15]));
+            Assert.Contains(x => x.Edge.Destination == board[16, 12], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[16, 13], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[16, 14], moveList);
+            Assert.Contains(x => x.Edge.Destination == board[16, 15], moveList);
 
             //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 10])); // Water
             //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[4, 10])); // Water
@@ -441,14 +441,14 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[1, 2]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[2, 2]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[2, 1]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[3, 1]));
+            Assert.Contains(x => x.Edge.Destination == board[1, 2], moves);
+            Assert.Contains(x => x.Edge.Destination == board[2, 2], moves);
+            Assert.Contains(x => x.Edge.Destination == board[2, 1], moves);
+            Assert.Contains(x => x.Edge.Destination == board[3, 1], moves);
 
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination == board[1, 3])); // Can't cross river
+            Assert.DoesNotContain(x => x.Edge.Destination == board[1, 3], moves); // Can't cross river
 
-            Assert.AreEqual(7, moves.Count());
+            Assert.HasCount(7, moves);
         }
 
         [TestMethod]
@@ -464,18 +464,18 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.AreEqual(15, moves.Count());
+            Assert.HasCount(15, moves);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[87]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[88]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[114]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[115]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[140]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[142]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[168]));
+            Assert.Contains(x => x.Edge.Destination == board[87], moves);
+            Assert.Contains(x => x.Edge.Destination == board[88], moves);
+            Assert.Contains(x => x.Edge.Destination == board[114], moves);
+            Assert.Contains(x => x.Edge.Destination == board[115], moves);
+            Assert.Contains(x => x.Edge.Destination == board[140], moves);
+            Assert.Contains(x => x.Edge.Destination == board[142], moves);
+            Assert.Contains(x => x.Edge.Destination == board[168], moves);
 
             // Blocked by mountain hexside and hill/wetland terrain            
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination == board[169]));
+            Assert.DoesNotContain(x => x.Edge.Destination == board[169], moves);
         }
 
         [TestMethod]
@@ -493,13 +493,13 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("AmphibiousUnitNearRiverAndRoad.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.AreEqual(8, moves.Count());
+            Assert.HasCount(8, moves);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[1, 2]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[2, 2]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[2, 1]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[3, 1]));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination == board[1, 3]));
+            Assert.Contains(x => x.Edge.Destination == board[1, 2], moves);
+            Assert.Contains(x => x.Edge.Destination == board[2, 2], moves);
+            Assert.Contains(x => x.Edge.Destination == board[2, 1], moves);
+            Assert.Contains(x => x.Edge.Destination == board[3, 1], moves);
+            Assert.Contains(x => x.Edge.Destination == board[1, 3], moves);
         }
 
         [TestMethod]
@@ -515,17 +515,17 @@ namespace Tests
 
             GameBoardRenderer.RenderAndSave("AquaticUnitMoves.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
 
-            Assert.AreEqual(138, moves.Count());
+            Assert.HasCount(138, moves);
 
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 198));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 226));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 253));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 252));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 251));
-            Assert.IsTrue(moves.Any(x => x.Edge.Destination.Index == 224));
+            Assert.Contains(x => x.Edge.Destination.Index == 198, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 226, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 253, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 252, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 251, moves);
+            Assert.Contains(x => x.Edge.Destination.Index == 224, moves);
 
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 196));
-            Assert.IsFalse(moves.Any(x => x.Edge.Destination.Index == 199));
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 196, moves);
+            Assert.DoesNotContain(x => x.Edge.Destination.Index == 199, moves);
         }
 
         [TestMethod]
@@ -739,7 +739,7 @@ namespace Tests
 
             var conflictedUnits = CommandResolver.DetectConflictedUnits(movingUnits, units);
 
-            Assert.AreEqual(1, conflictedUnits.Count());
+            Assert.HasCount(1, conflictedUnits);
         }
     }
 }

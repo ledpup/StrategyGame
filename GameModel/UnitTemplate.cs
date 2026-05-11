@@ -4,11 +4,40 @@ namespace GameModel;
 
 public record UnitTemplate
 {
-    public string Name { get; set; }
+
+    public UnitTemplateName UnitTemplateName { get; set; }
+
+    public string Name
+    {
+        get { return UnitTemplateName.ToDisplayName(); }
+    }
+
     public UnitType UnitType { get; set; }
+
     public MovementType MovementType { get; set; } = MovementType.Land;
+
     public int MovementPoints { get; set; } = 2;
-    public int RoadMovementBonus { get; set; } = 0;
+
+    public int RoadMovementBonus
+    {
+        get
+        {
+            return field;
+        }
+
+        set
+        {
+            if (MovementType == MovementType.Land)
+            {
+                field = value;
+            }
+            else
+            {
+                field = 0;
+            }
+        }
+    }
+
     public double Quality { get; set; } = 1;
     public int Personnel { get; set; } = 100;
     public double Size { get; set; } = 1;
@@ -27,7 +56,7 @@ public record UnitTemplate
             { TerrainType.Hill,      2 },
             { TerrainType.Mountain,  Terrain.Impassable },
             { TerrainType.Water,     Terrain.Impassable },
-            { TerrainType.Swamp,   2 },
+            { TerrainType.Swamp,     2 },
             { TerrainType.Reef,      Terrain.Impassable },
         },
         MovementType.Airborne => new Dictionary<TerrainType, int>
@@ -38,7 +67,7 @@ public record UnitTemplate
             { TerrainType.Hill,      1 },
             { TerrainType.Mountain,  1 },
             { TerrainType.Water,     1 },
-            { TerrainType.Swamp,   1 },
+            { TerrainType.Swamp,     1 },
             { TerrainType.Reef,      1 },
         },
         MovementType.Waterbound => new Dictionary<TerrainType, int>
@@ -49,7 +78,7 @@ public record UnitTemplate
             { TerrainType.Hill,      Terrain.Impassable },
             { TerrainType.Mountain,  Terrain.Impassable },
             { TerrainType.Water,     1 },
-            { TerrainType.Swamp,   Terrain.Impassable },
+            { TerrainType.Swamp,     Terrain.Impassable },
             { TerrainType.Reef,      2 },
         },
         _ => [],
@@ -97,7 +126,7 @@ public record UnitTemplate
 
     public TerrainType CanStopOn => MovementType switch
     {
-        MovementType.Land     => Terrain.Non_Mountainous_Land,
+        MovementType.Land => Terrain.Non_Mountainous_Land,
         MovementType.Airborne => Terrain.Non_Mountainous_Land,
         MovementType.Waterbound => Terrain.All_Water,
         _ => default,

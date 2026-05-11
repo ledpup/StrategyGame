@@ -36,7 +36,7 @@ namespace Hexagon
             {
                 s = -q - r;
             }
-            return new Hex(q, r, s);
+            return new Hex(q, r);
         }
 
 

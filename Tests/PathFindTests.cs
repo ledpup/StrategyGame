@@ -49,7 +49,7 @@ namespace Tests
             lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
             GameBoardRenderer.RenderAndSave("LandUnitPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, lines);
 
-            Assert.AreEqual(10, shortestPath.Length);
+            Assert.HasCount(10, shortestPath);
 
             Assert.AreEqual(new Hex(1, 1), shortestPath[0].Hex); // Origin
 
@@ -154,7 +154,7 @@ namespace Tests
 
             Assert.AreEqual(new Hex(14, 6), shortestPath[5].Hex); // Destination
 
-            var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
+            var moveOrder = unit.ShortestPathToMoveCommand(shortestPath);
 
             Assert.IsNotNull(moveOrder);
         }
@@ -172,7 +172,7 @@ namespace Tests
             vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
             GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, vectors);
 
-            var moveOrder = unit.ShortestPathToMoveOrder(shortestPath);
+            var moveOrder = unit.ShortestPathToMoveCommand(shortestPath);
 
             vectors = [.. Centreline.MoveOrderToCentrelines(moveOrder)];
 
@@ -188,11 +188,11 @@ namespace Tests
             Assert.AreEqual(new Hex(14, -4), shortestPath[^1].Hex); // Destination
 
             Assert.IsNotNull(moveOrder);
-            Assert.AreEqual(shortestPath.Length - 1, moveOrder.Moves.Length);
+            Assert.HasCount(shortestPath.Length - 1, moveOrder.Moves);
             Assert.AreEqual(new Hex(14, -4), moveOrder.Moves[^1].Edge.Destination.Hex);
 
             // Airborne pathing should be able to cross wall edges.
-            Assert.IsTrue(moveOrder.Moves.Any(x => x.Edge.EdgeType == EdgeType.Wall));
+            Assert.Contains(x => x.Edge.EdgeType == EdgeType.Wall, moveOrder.Moves);
         }
     }
 }

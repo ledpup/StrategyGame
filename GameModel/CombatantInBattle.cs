@@ -1,41 +1,45 @@
-﻿using System;
+﻿namespace GameModel;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GameModel
+public class CombatantInBattle
 {
-    public class CombatantInBattle
+    public int OwnerId { get; set; }
+
+    public double UnitStrength { get; set; }
+
+    public double StrengthDamage { get; set; }
+
+    public Dictionary<UnitType, double> UnitStrengthByType { get; set; }
+
+    public List<MilitaryUnit> Units { get; set; }
+
+    public double UnitSurvivalProportion { get; set; }
+
+    public List<MilitaryUnit> OpponentUnits { get; set; }
+
+    public Dictionary<UnitType, int> OpponentUnitTypes { get; set; }
+
+    public CombatantInBattle()
     {
-        public int OwnerId { get; set; }
-        public double UnitStrength { get; set; }
-        public double StrengthDamage { get; set; }
-
-        public Dictionary<UnitType, double> UnitStrengthByType { get; set; }
-        public List<MilitaryUnit> Units { get; set; }
-        public double UnitSurvivalProportion { get; set; }
-        public List<MilitaryUnit> OpponentUnits { get; set; }
-
-        public Dictionary<UnitType, int> OpponentUnitTypes { get; set; }
-
-        public CombatantInBattle()
+        UnitStrengthByType = [];
+        OpponentUnitTypes = [];
+        foreach (UnitType unitType in Enum.GetValues<UnitType>())
         {
-            UnitStrengthByType = [];
-            OpponentUnitTypes = [];
-            foreach (UnitType unitType in Enum.GetValues<UnitType>())
-            {
-                UnitStrengthByType.Add(unitType, 0);
-                OpponentUnitTypes.Add(unitType, 0);
-            }
+            UnitStrengthByType.Add(unitType, 0);
+            OpponentUnitTypes.Add(unitType, 0);
         }
+    }
 
-        public double Outcome
+    public double Outcome
+    {
+        get
         {
-            get
-            {
-                UnitSurvivalProportion = Units.Count(x => x.IsAlive) / (double)Units.Count;
+            UnitSurvivalProportion = Units.Count(x => x.IsAlive) / (double)Units.Count;
 
-                return (UnitStrength - StrengthDamage) * UnitSurvivalProportion;
-            }
+            return (UnitStrength - StrengthDamage) * UnitSurvivalProportion;
         }
     }
 }

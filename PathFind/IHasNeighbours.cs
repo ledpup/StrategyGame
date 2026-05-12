@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace PathFind
+namespace PathFind;
+
+public interface IHasNeighbours<N>
 {
-    public interface IHasNeighbours<N>
-    {
-        List<N> Neighbours { get; }
-        bool HasCumulativeCost { get; set; }
-    }
+    List<N> Neighbours { get; }
+    bool HasCumulativeCost { get; set; }
 }

@@ -38,5 +38,5 @@ public class Settlement
         Location?.Settlement = this;
     }
 
-    public SettlementType SettlementType { get; set;}
+    public SettlementType SettlementType { get; set; }
 }

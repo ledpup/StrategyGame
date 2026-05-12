@@ -1,16 +1,11 @@
-using System.Collections.Generic;
-
 namespace GameModel;
 
-public class MilitaryUnitFactory
-{
-    private readonly UnitTemplateFactory templateFactory;
-    private readonly Dictionary<(UnitTemplateName, int ownerIndex), int> sequenceCounters = [];
+using System.Collections.Generic;
 
-    public MilitaryUnitFactory(UnitTemplateFactory templateFactory)
-    {
-        this.templateFactory = templateFactory;
-    }
+public class MilitaryUnitFactory(UnitTemplateFactory templateFactory)
+{
+    private readonly UnitTemplateFactory templateFactory = templateFactory;
+    private readonly Dictionary<(UnitTemplateName, int ownerIndex), int> sequenceCounters = [];
 
     public MilitaryUnit Create(UnitTemplateName templateName, string unitName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
     {
@@ -21,7 +16,9 @@ public class MilitaryUnitFactory
     public MilitaryUnit CreateNext(UnitTemplateName templateName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
     {
         if (!sequenceCounters.TryGetValue((templateName, ownerIndex), out var count))
+        {
             count = 0;
+        }
 
         count++;
         sequenceCounters[(templateName, ownerIndex)] = count;
@@ -42,7 +39,7 @@ public class MilitaryUnitFactory
                 2 => "nd",
                 3 => "rd",
                 _ => "th",
-            }
+            },
         };
         return $"{number}{suffix}";
     }

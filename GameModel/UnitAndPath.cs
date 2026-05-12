@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿namespace GameModel;
 
-namespace GameModel
+using System.Collections.Generic;
+
+public class UnitAndPath
 {
-    public class UnitAndPath
-    {
-        public MilitaryUnit Unit;
-        public IEnumerable<PathFindTile> Path;
-    }
+    public MilitaryUnit Unit;
+    public IEnumerable<PathFindTile> Path;
 }

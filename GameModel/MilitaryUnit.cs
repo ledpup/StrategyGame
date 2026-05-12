@@ -53,45 +53,82 @@ public class MilitaryUnit
 
     public int OwnerIndex { get; set; }
 
-
     public UnitTemplate UnitTemplate { get; set; }
-    public UnitType UnitType { get { return UnitTemplate.UnitType; } }
-    public MovementType MovementType { get { return UnitTemplate.MovementType; } }
-    public int BaseMovementPoints { get { return UnitTemplate.MovementPoints; } }
+
+    public UnitType UnitType
+    {
+        get { return UnitTemplate.UnitType; }
+    }
+
+    public MovementType MovementType
+    {
+        get { return UnitTemplate.MovementType; }
+    }
+
+    public int BaseMovementPoints
+    {
+        get { return UnitTemplate.MovementPoints; }
+    }
+
     public double BaseQuality
     {
         get { return UnitTemplate.Quality; }
     }
+
     public Dictionary<BattleQualityModifier, double> BattleQualityModifiers { get; set; }
+
     public double Quality { get; set; }
+
     public int Personnel { get; private set; }
+
     public double Strength { get; set; }
+
     public double BattleStrength { get; set; }
-    public double Size { get { return UnitTemplate.Size; } }
+
+    public double Size
+    {
+        get { return UnitTemplate.Size; }
+    }
+
     public List<UnitEvent> Events { get; set; }
+
     public double Morale { get; private set; }
+
     public double CombatInitiative { get; set; }
+
     public int Speed { get; set; }
-    public bool IsAlive { get { return Personnel > 0; } }
+
+    public bool IsAlive
+    {
+        get { return Personnel > 0; }
+    }
 
     public Dictionary<TerrainType, double> TerrainTypeBattleModifier { get; set; }
+
     public Dictionary<Weather, double> WeatherBattleModifier { get; set; }
+
     public Dictionary<UnitType, double> OpponentUnitTypeBattleModifier { get; set; }
 
     public TerrainType CanStopOn;
 
     public Dictionary<TerrainType, int> TerrainMovementCosts { get; set; }
+
     public Dictionary<EdgeType, int> EdgeMovementCosts { get; set; }
 
-    public bool IsTransporter { get { return UnitTemplate.IsTransporter; } }
+    public bool IsTransporter
+    {
+        get { return UnitTemplate.IsTransporter; }
+    }
+
     public List<MilitaryUnit> Transporting { get; set; }
 
     public int TurnCreated { get; set; }
 
     public override string ToString()
     {
-        return MovementType.ToString() + " " +  Name + " (" + Strength + ") at " + Location.ToString();
+        return MovementType.ToString() + " " + Name + " (" + Strength + ") at " + Location.ToString();
     }
+
     public MilitaryUnit(UnitTemplate template, int index = 0, int ownerIndex = 0, Tile location = null, string name = null, int turnBuilt = 0, float[] moraleMoveCost = null)
     {
         UnitTemplate = template;
@@ -160,7 +197,9 @@ public class MilitaryUnit
 
         var battleQuality = Quality + BattleQualityModifiers.Values.Sum();
         if (battleQuality < .1)
+        {
             battleQuality = .1;
+        }
 
         BattleStrength = battleQuality * Personnel;
     }
@@ -185,15 +224,15 @@ public class MilitaryUnit
         Events.Add(new UnitEvent(turn, moraleChange, reason));
     }
 
-
     public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Location == o.Location && p.MovementType == o.MovementType;
 
     public Tile Location
     {
-        get { return _location; }
-        set { _location = value; }
+        get { return location; }
+        set { location = value; }
     }
-    Tile _location;
+
+    Tile location;
 
     public override int GetHashCode()
     {
@@ -210,6 +249,7 @@ public class MilitaryUnit
             {
                 return movementPoints -= 1;
             }
+
             if (Morale / InitialMorale < .5)
             {
                 return movementPoints -= 1;
@@ -219,14 +259,17 @@ public class MilitaryUnit
         }
     }
 
-
     public bool CanTransport(MilitaryUnit transportee)
     {
         if (!IsTransporter)
+        {
             return false;
+        }
 
         if (!transportee.TransportableBy.Contains(MovementType))
+        {
             throw new Exception($"{transportee.Name} may not be transported by {MovementType} movement type");
+        }
 
         return TransportCapacity >= transportee.TransportSize;
     }
@@ -262,7 +305,10 @@ public class MilitaryUnit
 
     public bool UsesRoads { get; private set; }
 
-    public bool TransportedByWater { get { return TransportedBy != null && TransportedBy.MovementType == MovementType.Waterbound; } }
+    public bool TransportedByWater
+    {
+        get { return TransportedBy != null && TransportedBy.MovementType == MovementType.Waterbound; }
+    }
 
     public IEnumerable<Move> PossibleMoves()
     {
@@ -288,7 +334,7 @@ public class MilitaryUnit
 
             searchForOnlyPassingThroughDestinations = removeOnlyPassingThroughDestinations.Any();
             removeOnlyPassingThroughDestinations.ToList().ForEach(x => possibleMoves.Remove(x));
-        } 
+        }
 
         return possibleMoves;
     }
@@ -314,7 +360,7 @@ public class MilitaryUnit
 
         foreach (var move in potentialMoves)
         {
-            var moveCost = move.Edge.MoveCost(unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts);
+            var moveCost = move.Edge.MoveCost(unit.UsesRoads, unit.TransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts);
             var remainingMovementPoints = movementPoints - moveCost;
             if (remainingMovementPoints > 0)
             {
@@ -337,15 +383,18 @@ public class MilitaryUnit
                 return MoveType.Embark;
             }
         }
+
         if (!unit.CanStopOn.HasFlag(destination.TerrainType))
+        {
             return MoveType.OnlyPassingThrough;
+        }
 
         return MoveType.Standard;
     }
 
     private static bool ValidMove(MilitaryUnit unit, Move x)
     {
-        var validMove = x.MoveType == MoveType.OnlyPassingThrough || 
+        var validMove = x.MoveType == MoveType.OnlyPassingThrough ||
                                     x.MoveType == MoveType.Embark ||
                                     unit.CanStopOn.HasFlag(x.Edge.Destination.TerrainType);
         return validMove;
@@ -353,16 +402,20 @@ public class MilitaryUnit
 
     private static bool PotentialMove(MilitaryUnit unit, Tile origin, List<Move> movesConsidered, int movementPoints, Edge edge)
     {
-        var potentialMove = edge.Destination != unit.Location 
+        var potentialMove = edge.Destination != unit.Location
                                     && !movesConsidered.Any(x => x.Origin == origin && x.MovesRemaining > movementPoints);
 
         if (!potentialMove)
+        {
             return false;
+        }
 
         potentialMove = unit.EdgeMovementCosts[edge.EdgeType] < Terrain.Impassable || (unit.UsesRoads && edge.HasRoad);
 
         if (!potentialMove)
+        {
             return false;
+        }
 
         potentialMove = unit.TransportedBy == null || edge.EdgeType == EdgeType.Port;
 
@@ -385,7 +438,9 @@ public class MilitaryUnit
         {
             var cost = movementPoints - 1;
             if (cost > 0)
+            {
                 neighbourMoves.AddRange(GenerateRoadMoves(unit, move.Edge.Destination, move, movesConsidered, cost, distance + 1));
+            }
         }
 
         moves.AddRange(neighbourMoves);

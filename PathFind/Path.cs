@@ -1,37 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace PathFind
+namespace PathFind;
+
+public class Path<Node> : IEnumerable<Node>
 {
-    public class Path<Node> : IEnumerable<Node>
+    public Node LastStep { get; private set; }
+    public Path<Node> PreviousSteps { get; private set; }
+    public double TotalCost { get; private set; }
+
+    private Path(Node lastStep, Path<Node> previousSteps, double totalCost)
     {
-        public Node LastStep { get; private set; }
-        public Path<Node> PreviousSteps { get; private set; }
-        public double TotalCost { get; private set; }
+        LastStep = lastStep;
+        PreviousSteps = previousSteps;
+        TotalCost = totalCost;
+    }
 
-        private Path(Node lastStep, Path<Node> previousSteps, double totalCost)
-        {
-            LastStep = lastStep;
-            PreviousSteps = previousSteps;
-            TotalCost = totalCost;
-        }
+    public Path(Node start) : this(start, null, 0) { }
 
-        public Path(Node start) : this(start, null, 0) { }
+    public Path<Node> AddStep(Node step, double stepCost)
+    {
+        return new Path<Node>(step, this, TotalCost + stepCost);
+    }
 
-        public Path<Node> AddStep(Node step, double stepCost)
-        {
-            return new Path<Node>(step, this, TotalCost + stepCost);
-        }
+    public IEnumerator<Node> GetEnumerator()
+    {
+        for (var p = this; p != null; p = p.PreviousSteps)
+            yield return p.LastStep;
+    }
 
-        public IEnumerator<Node> GetEnumerator()
-        {
-            for (var p = this; p != null; p = p.PreviousSteps)
-                yield return p.LastStep;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

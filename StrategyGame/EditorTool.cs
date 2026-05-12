@@ -1,11 +1,10 @@
-namespace StrategyGame
+namespace StrategyGame;
+
+internal enum EditorTool
 {
-    internal enum EditorTool
-    {
-        Terrain,
-        Edge,
-        Unit,
-        Settlement,
-        Erase,
-    }
+    Terrain,
+    Edge,
+    Unit,
+    Settlement,
+    Erase,
 }

@@ -1,8 +1,8 @@
-﻿namespace GameModel
+﻿namespace GameModel;
+
+public class CasualtyLogEntry
 {
-    public class CasualtyLogEntry
-    {
-        public int OwnerIndex { get; set; }
-        public string Text { get; set; }
-    }
+    public int OwnerIndex { get; set; }
+
+    public string Text { get; set; }
 }

@@ -5,34 +5,33 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Tests
+namespace Tests;
+
+[TestClass]
+public class TemperatureTests
 {
-    [TestClass]
-    public class TemperatureTests
+    static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
+    static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
+
+    [TestMethod]
+    public void CorrectTempTest()
     {
-        static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
-        static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
+        var board = new GameState(new Board(GameBoard, TileEdges));
 
-        [TestMethod]
-        public void CorrectTempTest()
+        for (var i = 0; i < 30; i++)
         {
-            var board = new GameState(new Board(GameBoard, TileEdges));
 
-            for (var i = 0; i < 30; i++)
+            board.CalculateTemperature(i);
+            var tiles = new List<Tile>();
+            board.Tiles.ToList().ForEach(x => tiles.Add(new Tile(x.Index, x.X, x.Y, x.GetTerrainTypeByTemperature(x.Temperature))));
+
+            var labels = new string[board.Width * board.Height];
+            for (var j = 0; j < board.Tiles.Length; j++)
             {
-
-                board.CalculateTemperature(i);
-                var tiles = new List<Tile>();
-                board.Tiles.ToList().ForEach(x => tiles.Add(new Tile(x.Index, x.X, x.Y, x.GetTerrainTypeByTemperature(x.Temperature))));
-
-                var labels = new string[board.Width * board.Height];
-                for (var j = 0; j < board.Tiles.Length; j++)
-                {
-                    labels[j] = Math.Round(board[j].Temperature, 1).ToString();
-                }
-
-                Visualise.GameBoardRenderer.RenderAndSave("BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
+                labels[j] = Math.Round(board[j].Temperature, 1).ToString();
             }
+
+            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
         }
     }
 }

@@ -1,8 +1,8 @@
+namespace GameModel;
+
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-
-namespace GameModel;
 
 public enum UnitTemplateName
 {
@@ -27,7 +27,7 @@ public class UnitTemplateFactory
     {
         Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenInfantry, UnitType = UnitType.Melee, Personnel = 250, TransportableBy = [MovementType.Waterbound, MovementType.Airborne] });
         Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenDragoons, UnitType = UnitType.Melee, Personnel = 100, MovementPoints = 3, TransportableBy = [MovementType.Waterbound] });
-        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenCrossbowmen, UnitType = UnitType.Ranged,  Personnel = 150, TransportableBy = [MovementType.Waterbound, MovementType.Airborne] });
+        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenCrossbowmen, UnitType = UnitType.Ranged, Personnel = 150, TransportableBy = [MovementType.Waterbound, MovementType.Airborne] });
     }
 
     public UnitTemplate Register(UnitTemplate template)

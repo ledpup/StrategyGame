@@ -1,23 +1,32 @@
-using GameModel.Commands;
+namespace GameModel;
+
 using System.Collections.Generic;
 using System.Linq;
-
-namespace GameModel;
+using GameModel.Commands;
 
 public class GameState
 {
     public Board Board { get; }
+
     public List<MilitaryUnit> Units { get; set; }
+
     public int Turn { get; set; }
+
     public Dictionary<int, List<MoveCommand>> MoveCommands { get; }
 
     // Board pass-throughs
     public int Width => Board.Width;
+
     public int Height => Board.Height;
+
     public Tile[] Tiles => Board.TileArray;
+
     public List<Edge> Edges => Board.Edges;
+
     public List<Settlement> Settlements => Board.Settlements;
+
     public Tile this[int index] => Board[index];
+
     public Tile this[int x, int y] => Board[x, y];
 
     public GameState(Board board, List<MilitaryUnit> units = null, int turn = 0)
@@ -30,6 +39,7 @@ public class GameState
     }
 
     public void CalculateTemperature(int turn) => Board.CalculateTemperature(turn);
+
     public void InitialiseSupply() => Board.InitialiseSupply();
 
     public IEnumerable<MilitaryUnit> UnitsAt(Tile tile) => Units.Where(x => x.Location == tile);
@@ -76,7 +86,10 @@ public class GameState
             if (unitsAtSettlementByOwner.Count == 1)
             {
                 if (x.OwnerIndex == unitsAtSettlementByOwner.First().Key)
+                {
                     return;
+                }
+
                 x.OwnerIndex = unitsAtSettlementByOwner.First().Key;
                 var units = unitsAtSettlementByOwner.First().ToList();
                 var numberOfUnits = units.Count;

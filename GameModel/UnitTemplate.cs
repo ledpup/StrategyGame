@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-
 namespace GameModel;
+
+using System.Collections.Generic;
 
 public record UnitTemplate
 {
@@ -39,11 +39,17 @@ public record UnitTemplate
     }
 
     public double Quality { get; set; } = 1;
+
     public int Personnel { get; set; } = 100;
+
     public double Size { get; set; } = 1;
+
     public bool IsTransporter { get; set; } = false;
+
     public List<MovementType> TransportableBy { get; set; }
+
     public int CombatInitiative { get; set; } = 10;
+
     public double Morale { get; set; } = 5;
 
     public Dictionary<TerrainType, int> TerrainMovementCosts => MovementType switch
@@ -126,9 +132,9 @@ public record UnitTemplate
 
     public TerrainType CanStopOn => MovementType switch
     {
-        MovementType.Land => Terrain.Non_Mountainous_Land,
-        MovementType.Airborne => Terrain.Non_Mountainous_Land,
-        MovementType.Waterbound => Terrain.All_Water,
+        MovementType.Land => Terrain.NonMountainousLand,
+        MovementType.Airborne => Terrain.NonMountainousLand,
+        MovementType.Waterbound => Terrain.AllWater,
         _ => default,
     };
 }

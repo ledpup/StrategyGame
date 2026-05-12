@@ -1,55 +1,51 @@
-﻿using Hexagon;
+﻿namespace GameModel;
+
 using System.Collections.Generic;
 using System.Linq;
+using Hexagon;
 
-namespace GameModel
+public class PathFindTile(Hex hex, List<Edge> edges) : IHasNeighbours<PathFindTile>
 {
-    public class PathFindTile : IHasNeighbours<PathFindTile>
+    public Hex Hex { get; set; } = hex;
+
+    public List<Edge> Edges { get; set; } = edges;
+
+    public List<PathFindTile> Neighbours { get; set; }
+
+    public Dictionary<Hex, double> MoveCost { get; set; } = [];
+
+    public bool HasCumulativeCost { get; set; }
+
+    public void LoadNeighbours(HashSet<PathFindTile> loadedPathFindTiles, List<Edge> neighbourEdges, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
     {
-        public Hex Hex { get; set; }
-        public List<Edge> Edges { get; set; }
-        public List<PathFindTile> Neighbours { get; set; }
-        public Dictionary<Hex, double> MoveCost { get; set; }
-        public bool HasCumulativeCost { get; set; }
+        Neighbours = [];
 
-        public PathFindTile(Hex hex, List<Edge> edges)
+        foreach (var edge in neighbourEdges)
         {
-            Hex = hex;
-            Edges = edges;
-            MoveCost = [];
-        }
+            var moveCost = edge.MoveCost(usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts);
 
-        public void LoadNeighbours(HashSet<PathFindTile> loadedPathFindTiles, List<Edge> neighbourEdges, bool usesRoads, bool isBeingTransportedByWater, Dictionary<EdgeType, int> edgeMovementCosts, Dictionary<TerrainType, int> terrainMovementCosts, TerrainType canStopOn)
-        {
-            Neighbours = [];
-
-            foreach (var edge in neighbourEdges)
+            if (moveCost < Terrain.Impassable)
             {
-                var moveCost = edge.MoveCost(usesRoads, isBeingTransportedByWater, edgeMovementCosts, terrainMovementCosts);
+                var neighbourPathFindTile = loadedPathFindTiles.SingleOrDefault(x => x.Hex.Equals(edge.Destination.Hex));
 
-                if (moveCost < Terrain.Impassable)
+                if (neighbourPathFindTile == null)
                 {
-                    var neighbourPathFindTile = loadedPathFindTiles.SingleOrDefault(x => x.Hex.Equals(edge.Destination.Hex));
-
-                    if (neighbourPathFindTile == null)
-                    {
-                        neighbourPathFindTile = new PathFindTile(edge.Destination.Hex, edge.Destination.Neighbours);
-                        loadedPathFindTiles.Add(neighbourPathFindTile);
-                    }
-
-                    Neighbours.Add(neighbourPathFindTile);
-
-                    MoveCost[neighbourPathFindTile.Hex] = moveCost;
-
-                    // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
-                    neighbourPathFindTile.HasCumulativeCost = !canStopOn.HasFlag(edge.Destination.TerrainType);
+                    neighbourPathFindTile = new PathFindTile(edge.Destination.Hex, edge.Destination.Neighbours);
+                    loadedPathFindTiles.Add(neighbourPathFindTile);
                 }
+
+                Neighbours.Add(neighbourPathFindTile);
+
+                MoveCost[neighbourPathFindTile.Hex] = moveCost;
+
+                // This is to allow the path find to allow units to move over mountains and water even though they can't end their turn there
+                neighbourPathFindTile.HasCumulativeCost = !canStopOn.HasFlag(edge.Destination.TerrainType);
             }
         }
+    }
 
-        public override string ToString()
-        {
-            return $"{Hex.q}, {Hex.r}";
-        }
+    public override string ToString()
+    {
+        return $"{Hex.q}, {Hex.r}";
     }
 }

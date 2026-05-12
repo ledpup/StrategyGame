@@ -1,175 +1,174 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Hexagon
+namespace Hexagon;
+
+public struct Hex(int q, int r)
 {
-    public struct Hex(int q, int r)
+    public readonly int q = q;
+    public readonly int r = r;
+    public readonly int s = -q - r;
+
+    static public Hex Add(Hex a, Hex b)
     {
-        public readonly int q = q;
-        public readonly int r = r;
-        public readonly int s = -q - r;
+        return new Hex(a.q + b.q, a.r + b.r);
+    }
 
-        static public Hex Add(Hex a, Hex b)
+    static public Hex Subtract(Hex a, Hex b)
+    {
+        return new Hex(a.q - b.q, a.r - b.r);
+    }
+
+
+    static public Hex Scale(Hex a, int k)
+    {
+        return new Hex(a.q * k, a.r * k);
+    }
+
+    static public List<Hex> Directions = [new Hex(-1, 0), new Hex(0, -1), new Hex(1, -1), new Hex(1, 0), new Hex(0, 1), new Hex(-1, 1),];
+
+    static public Hex Direction(int direction)
+    {
+        return Directions[direction];
+    }
+
+    public static int HexToIndex(Hex hex, int boardWidth, int boardHeight)
+    {
+        return HexToIndex(hex, OffsetCoord.ODD, boardWidth, boardHeight);
+    }
+
+    static int HexToIndex(Hex hex, int offset, int boardWidth, int boardHeight)
+    {
+        var hexOffset = hex.q / 2;
+
+        if (hex.q < 0 || hex.q >= boardWidth || hex.r < -hexOffset || hex.r >= boardHeight - hexOffset)
+            throw new Exception("Hex is outside the border of the board");
+
+        int col = hex.q;
+        int row = hex.r + ((hex.q + offset * (hex.q & 1)) / 2);
+
+        var index = row * boardWidth + col;
+
+        return index;
+    }
+
+    public static List<Hex> Neighbours(Hex hex)
+    {
+        var neighbours = new List<Hex>();
+        for (var i = 0; i < 6; i++)
         {
-            return new Hex(a.q + b.q, a.r + b.r);
+            neighbours.Add(Add(hex, Direction(i)));
         }
+        return neighbours;
+    }
 
-        static public Hex Subtract(Hex a, Hex b)
+    static public Hex Neighbor(Hex hex, int direction)
+    {
+        return Add(hex, Direction(direction));
+    }
+
+    static public List<Hex> Diagonals = [new Hex(2, -1), new Hex(1, -2), new Hex(-1, -1), new Hex(-2, 1), new Hex(-1, 2), new Hex(1, 1)];
+
+    static public Hex DiagonalNeighbor(Hex hex, int direction)
+    {
+        return Hex.Add(hex, Hex.Diagonals[direction]);
+    }
+
+    static public int Length(Hex hex)
+    {
+        return (Math.Abs(hex.q) + Math.Abs(hex.r) + Math.Abs(hex.s)) / 2;
+    }
+
+
+    static public int Distance(Hex a, Hex b)
+    {
+        return Hex.Length(Hex.Subtract(a, b));
+    }
+
+    public override string ToString()
+    {
+        return q + ", " + r;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (!(obj is Hex))
+            return false;
+
+        Hex hex = (Hex)obj;
+
+        return (q == hex.q) && (r == hex.r) && (s == hex.s);
+    }
+
+    public static bool operator ==(Hex a, Hex b)
+    {
+        return a.Equals(b);
+    }
+
+    public static bool operator !=(Hex a, Hex b)
+    {
+        return !a.Equals(b);
+    }
+
+    public static List<Hex> HexesWithinArea(Hex centreHex, int distance, int boardWidth, int boardHeight)
+    {
+        var results = new List<Hex>();
+        for (var q = -distance; q <= distance; q++)
         {
-            return new Hex(a.q - b.q, a.r - b.r);
-        }
+            var adjustedQ = centreHex.q + q;
+            if (adjustedQ < 0 || adjustedQ >= boardWidth)
+                continue;
 
+            var offset = adjustedQ / 2;
 
-        static public Hex Scale(Hex a, int k)
-        {
-            return new Hex(a.q * k, a.r * k);
-        }
-
-        static public List<Hex> Directions = [new Hex(-1, 0), new Hex(0, -1), new Hex(1, -1), new Hex(1, 0), new Hex(0, 1), new Hex(-1, 1),];
-
-        static public Hex Direction(int direction)
-        {
-            return Directions[direction];
-        }
-
-        public static int HexToIndex(Hex hex, int boardWidth, int boardHeight)
-        {
-            return HexToIndex(hex, OffsetCoord.ODD, boardWidth, boardHeight);
-        }
-
-        static int HexToIndex(Hex hex, int offset, int boardWidth, int boardHeight)
-        {
-            var hexOffset = hex.q / 2;
-
-            if (hex.q < 0 || hex.q >= boardWidth || hex.r < -hexOffset || hex.r >= boardHeight - hexOffset)
-                throw new Exception("Hex is outside the border of the board");
-
-            int col = hex.q;
-            int row = hex.r + ((hex.q + offset * (hex.q & 1)) / 2);
-
-            var index = row * boardWidth + col;
-
-            return index;
-        }
-
-        public static List<Hex> Neighbours(Hex hex)
-        {
-            var neighbours = new List<Hex>();
-            for (var i = 0; i < 6; i++)
+            for (var r = Math.Max(-distance, -q - distance); r <= Math.Min(distance, -q + distance); r++)
             {
-                neighbours.Add(Add(hex, Direction(i)));
-            }
-            return neighbours;
-        }
+                var adjustedR = centreHex.r + r;
 
-        static public Hex Neighbor(Hex hex, int direction)
-        {
-            return Add(hex, Direction(direction));
-        }
-
-        static public List<Hex> Diagonals = [new Hex(2, -1), new Hex(1, -2), new Hex(-1, -1), new Hex(-2, 1), new Hex(-1, 2), new Hex(1, 1)];
-
-        static public Hex DiagonalNeighbor(Hex hex, int direction)
-        {
-            return Hex.Add(hex, Hex.Diagonals[direction]);
-        }
-
-        static public int Length(Hex hex)
-        {
-            return (Math.Abs(hex.q) + Math.Abs(hex.r) + Math.Abs(hex.s)) / 2;
-        }
-
-
-        static public int Distance(Hex a, Hex b)
-        {
-            return Hex.Length(Hex.Subtract(a, b));
-        }
-
-        public override string ToString()
-        {
-            return q + ", " + r;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is Hex))
-                return false;
-
-            Hex hex = (Hex)obj;
-
-            return (q == hex.q) && (r == hex.r) && (s == hex.s);
-        }
-
-        public static bool operator ==(Hex a, Hex b)
-        {
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(Hex a, Hex b)
-        {
-            return !a.Equals(b);
-        }
-
-        public static List<Hex> HexesWithinArea(Hex centreHex, int distance, int boardWidth, int boardHeight)
-        {
-            var results = new List<Hex>();
-            for (var q = -distance; q <= distance; q++)
-            {
-                var adjustedQ = centreHex.q + q;
-                if (adjustedQ < 0 || adjustedQ >= boardWidth)
+                if (adjustedR < -offset || adjustedR >= boardHeight - offset)
                     continue;
 
-                var offset = adjustedQ / 2;
-
-                for (var r = Math.Max(-distance, -q - distance); r <= Math.Min(distance, -q + distance); r++)
-                {
-                    var adjustedR = centreHex.r + r;
-
-                    if (adjustedR < -offset || adjustedR >= boardHeight - offset)
-                        continue;
-
-                    results.Add(Add(centreHex, new Hex(q, r)));
-                }
+                results.Add(Add(centreHex, new Hex(q, r)));
             }
-            return results;
         }
+        return results;
+    }
 
-        public static List<Hex> HexRing(Hex centreHex, int radius, int boardWidth, int boardHeight)
+    public static List<Hex> HexRing(Hex centreHex, int radius, int boardWidth, int boardHeight)
+    {
+        if (radius < 1)
+            return [centreHex];
+
+        var results = new List<Hex>();
+
+        var hex = Add(centreHex, Scale(Direction(4), radius));
+
+        for (var i = 0; i < 6; i++)
         {
-            if (radius < 1)
-                return [centreHex];
-
-            var results = new List<Hex>();
-
-            var hex = Add(centreHex, Scale(Direction(4), radius));
-
-            for (var i = 0; i < 6; i++)
+            for (var j = 0; j < radius; j++)
             {
-                for (var j = 0; j < radius; j++)
-                {
-                    // Check borders
-                    // I think you can set offset = q / 2 and then compare -offset <= r <= height - offset.
-                    // In column q = 0, offset = 0. It'd be 0 <= r <= 18 - 0; in column q = 26, offset = 13 so it'd be -13 <= r <= 18 - 13.
-                    var offset = hex.q / 2;
+                // Check borders
+                // I think you can set offset = q / 2 and then compare -offset <= r <= height - offset.
+                // In column q = 0, offset = 0. It'd be 0 <= r <= 18 - 0; in column q = 26, offset = 13 so it'd be -13 <= r <= 18 - 13.
+                var offset = hex.q / 2;
 
-                    if (!(hex.q < 0 || hex.q >= boardWidth || hex.r < -offset || hex.r >= boardHeight - offset))
-                        results.Add(hex);
+                if (!(hex.q < 0 || hex.q >= boardWidth || hex.r < -offset || hex.r >= boardHeight - offset))
+                    results.Add(hex);
 
-                    hex = Neighbor(hex, i);
-                }
+                hex = Neighbor(hex, i);
             }
-            return results;
         }
+        return results;
+    }
 
-        public static Hex IndexToHex(int index, int width)
-        {
-            var offsetCoords = new OffsetCoord(index % width, index / width);
-            return offsetCoords.QoffsetToCube();
-        }
+    public static Hex IndexToHex(int index, int width)
+    {
+        var offsetCoords = new OffsetCoord(index % width, index / width);
+        return offsetCoords.QoffsetToCube();
+    }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(q, r);
-        }
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(q, r);
     }
 }

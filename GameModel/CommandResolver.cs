@@ -1,9 +1,9 @@
-using GameModel.Commands;
+namespace GameModel;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-namespace GameModel;
+using GameModel.Commands;
 
 public class CommandResolver(GameState gameState)
 {
@@ -73,11 +73,16 @@ public class CommandResolver(GameState gameState)
         }
 
         if (moveCommands.Max(x => x.Moves.Length) > maxMovementPoints)
+        {
             throw new Exception(string.Format("The max number of moves is capped at {0}. A move command has exceeded this limit.", maxMovementPoints));
+        }
+
         moveCommands.ForEach(x =>
             {
                 if (x.Moves.Length > x.Unit.MovementPoints + x.Unit.RoadMovementBonus)
+                {
                     throw new Exception($"Number of moves for {x.Unit} = {x.Moves.Length} exceeds the max number of moves permitted for the unit of {x.Unit.MovementPoints} moves with a road move bonus of {x.Unit.RoadMovementBonus}");
+                }
             }
         );
 
@@ -142,7 +147,9 @@ public class CommandResolver(GameState gameState)
         setOfUnits.ForEach(x =>
         {
             if (conflictedUnits.Contains(x))
+            {
                 return;
+            }
 
             if (allUnits.Any(u => MilitaryUnit.IsInConflictDuringMovement(u, x)))
             {
@@ -160,11 +167,14 @@ public class CommandResolver(GameState gameState)
         {
             if (step % unitStepRate[moveCommand.Unit] == 0)
             {
-                var moveIndex = step / unitStepRate[moveCommand.Unit] - 1;
+                var moveIndex = (step / unitStepRate[moveCommand.Unit]) - 1;
                 if (moveCommand.Moves.Length > moveIndex)
+                {
                     unitStepMoves.Add(moveCommand.Unit, moveCommand.Moves[moveIndex]);
+                }
             }
         }
+
         return unitStepMoves;
     }
 }

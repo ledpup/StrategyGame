@@ -55,8 +55,8 @@
 ## Settlement rules
 (S1) A settlement can be built on any land hex tile.
 (S2) Settlements may be owned by a player or neutral.
-(S3) A settlement can be captured by moving an opposing unit into the settlement's hex tile.
-(S4) Most units may move into and occupy a settlement tile, but only one player may own the settlement at a time.
+(S3) A settlement can be captured by moving a unit into the settlement's hex tile.
+(S4) Most units may move into and occupy a settlement tile.
 (S5) Further clarification to (S4): a waterbound unit may occupy a coastal settlement tile if there is a port edge between the water and the settlement tile (NM2).
 (S6) Settlements have a garrison: a stationary unit used solely for defense.
 (S7) Additional friendly units may garrison a settlement, adding to the settlement's defense.
@@ -74,5 +74,5 @@
 - Movement Points (MP): The maximum number of hexes a unit may move in a single move command.
 - Move Command: A sequence of steps over hexes, resolved step-by-step.
 - Conflict: A situation where two opposing units of the same domain occupy the same hex.
-- Siege: A conflict that occurs when an unit is on a tile of a neutral or enemy settlement.
+- Siege: A conflict that occurs when a unit is on a tile of a neutral or enemy settlement.
 - Domain: The movement type of a unit (airborne, land, waterbound).

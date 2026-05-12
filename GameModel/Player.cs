@@ -1,12 +1,11 @@
-﻿namespace GameModel
-{
-    public class Player
-    {
-        public int Id;
+﻿namespace GameModel;
 
-        public override int GetHashCode()
-        {
-            return Id;
-        }
+public class Player
+{
+    public int Id;
+
+    public override int GetHashCode()
+    {
+        return Id;
     }
 }

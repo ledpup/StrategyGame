@@ -1,15 +1,15 @@
-using Hexagon;
+namespace GameModel;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-namespace GameModel;
+using Hexagon;
 
 public static class PathFinder
 {
     public static IEnumerable<PathFindTile> FindShortestPath(Tile origin, Tile destination, MilitaryUnit unit)
     {
-        return FindShortestPath(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.IsBeingTransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
+        return FindShortestPath(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.TransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
     }
 
     public static IEnumerable<PathFindTile> FindShortestPath(
@@ -49,6 +49,7 @@ public static class PathFinder
                     moves.Remove(furthestMove);
                     furthestMove = furthestMove.PreviousMove;
                 }
+
                 return moves;
             }
 

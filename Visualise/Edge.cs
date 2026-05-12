@@ -1,19 +1,11 @@
 ﻿using Hexagon;
 
-namespace Visualise
+namespace Visualise;
+
+public class Edge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
 {
-    public class Edge
-    {
-        public Hex Origin;
-        public Hex Destination;
-        public ArgbColour Colour;
-        public bool IsPort;
-        public Edge(Hex origin, Hex destination, ArgbColour colour, bool isPort)
-        {
-            Origin = origin;
-            Destination = destination;
-            Colour = colour;
-            IsPort = isPort;
-        }
-    }
+    public Hex Origin = origin;
+    public Hex Destination = destination;
+    public ArgbColour Colour = colour;
+    public bool IsPort = isPort;
 }

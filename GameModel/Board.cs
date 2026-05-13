@@ -16,8 +16,6 @@ public enum Weather
 
 public class Board
 {
-    private Tile[] tiles;
-
     public int Width;
     public int Height;
 
@@ -55,7 +53,7 @@ public class Board
     private void CalculateContiguousRegions()
     {
         var id = 0;
-        foreach (var tile in tiles)
+        foreach (var tile in TileArray)
         {
             if (tile.ContiguousRegionId == 0)
             {
@@ -190,7 +188,7 @@ public class Board
         // Multi-source BFS from all sea tiles simultaneously - O(tiles) instead of O(tiles²).
         var queue = new Queue<Tile>();
 
-        foreach (var tile in tiles)
+        foreach (var tile in TileArray)
         {
             if (tile.IsSea)
             {
@@ -318,7 +316,7 @@ public class Board
 
     private void InitialiseTiles(int width, int height, string[] tileData)
     {
-        tiles = new Tile[width * height];
+        TileArray = new Tile[width * height];
 
         for (ushort x = 0; x < width; x++)
         {
@@ -328,7 +326,7 @@ public class Board
                 var isEdgeOfMap = x == 0 || y == 0 || x == width || y == height ? true : false;
 
                 var tile = new Tile(x, y, width, terrainType, isEdgeOfMap);
-                tiles[(y * width) + x] = tile;
+                TileArray[(y * width) + x] = tile;
             }
         }
     }
@@ -337,7 +335,7 @@ public class Board
     {
         get
         {
-            return tiles[index];
+            return TileArray[index];
         }
     }
 
@@ -347,23 +345,17 @@ public class Board
         get
         {
             var index = OffsetCoord.OffsetCoordsToIndex(x, y, Width);
-            return tiles[index];
+            return TileArray[index];
         }
     }
 
-    public Tile[] TileArray
-    {
-        get
-        {
-            return tiles;
-        }
-    }
+    public Tile[] TileArray { get; private set; }
 
     public IEnumerable<Tile> Tiles
     {
         get
         {
-            return tiles;
+            return TileArray;
         }
     }
 

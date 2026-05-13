@@ -1,8 +1,8 @@
 ﻿namespace GameModel.Commands;
 
-public class MoveCommand(Move[] moves, MilitaryUnit unit) : IUnitCommand
+public record MoveCommand(Move[] Moves, MilitaryUnit Unit) : IUnitCommand
 {
-    public MilitaryUnit Unit { get; set; } = unit;
+    public MilitaryUnit Unit { get; set; } = Unit;
 
-    public Move[] Moves = moves;
+    public Move[] Moves { get; set; } = Moves;
 }

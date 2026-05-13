@@ -4,5 +4,5 @@ using System.Collections.Generic;
 
 public class Stack(List<MilitaryUnit> units)
 {
-    readonly List<MilitaryUnit> Units = units;
+    private readonly List<MilitaryUnit> Units = units;
 }

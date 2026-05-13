@@ -226,13 +226,7 @@ public class MilitaryUnit
 
     public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Location == o.Location && p.MovementType == o.MovementType;
 
-    public Tile Location
-    {
-        get { return location; }
-        set { location = value; }
-    }
-
-    Tile location;
+    public Tile Location { get; set; }
 
     public override int GetHashCode()
     {
@@ -318,13 +312,7 @@ public class MilitaryUnit
 
         possibleMoves = GenerateStandardMoves(this, Location, null, movesConsidered, MovementPoints, 1);
 
-        if (MovementType == MovementType.Land && TransportedBy == null)
-        {
-            var roadMovesAlreadyConsidered = new List<Move>();
-            var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus, 1);
-            var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Edge.Destination == y.Edge.Destination));
-            possibleMoves.AddRange(notAlreadySeenRoadMoves);
-        }
+        AddRoadMoves(possibleMoves);
 
         var searchForOnlyPassingThroughDestinations = true;
         while (searchForOnlyPassingThroughDestinations)
@@ -337,6 +325,17 @@ public class MilitaryUnit
         }
 
         return possibleMoves;
+    }
+
+    private void AddRoadMoves(List<Move> possibleMoves)
+    {
+        if (MovementType == MovementType.Land && TransportedBy == null)
+        {
+            var roadMovesAlreadyConsidered = new List<Move>();
+            var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus, 1);
+            var notAlreadySeenRoadMoves = roadMoves.Where(x => !possibleMoves.Any(y => x.Origin == y.Origin && x.Edge.Destination == y.Edge.Destination));
+            possibleMoves.AddRange(notAlreadySeenRoadMoves);
+        }
     }
 
     private static List<Move> GenerateStandardMoves(MilitaryUnit unit, Tile origin, Move previousMove, List<Move> movesConsidered, int movementPoints, int distance)
@@ -371,7 +370,6 @@ public class MilitaryUnit
         potentialMoves.AddRange(neighbourMoves);
 
         return potentialMoves.Where(x => ValidMove(unit, x)).ToList();
-
     }
 
     private static MoveType GetMoveType(Tile origin, Tile destination, MilitaryUnit unit)
@@ -386,17 +384,29 @@ public class MilitaryUnit
 
         if (!unit.CanStopOn.HasFlag(destination.TerrainType))
         {
+            if (IsWaterboundMovingToCoastalSettlement(unit, origin.Neighbours.Single(x => x.Destination == destination)))
+            {
+                return MoveType.Standard;
+            }
+
             return MoveType.OnlyPassingThrough;
         }
 
         return MoveType.Standard;
     }
 
+    // NM2: a waterbound unit may stop on a coastal settlement land tile if there is a port edge between the water tile and the settlement tile
+    private static bool IsWaterboundMovingToCoastalSettlement(MilitaryUnit unit, Edge edge)
+        => unit.MovementType == MovementType.Waterbound
+            && edge.EdgeType == EdgeType.Port
+            && edge.Destination.Settlement is not null;
+
     private static bool ValidMove(MilitaryUnit unit, Move x)
     {
         var validMove = x.MoveType == MoveType.OnlyPassingThrough ||
                                     x.MoveType == MoveType.Embark ||
-                                    unit.CanStopOn.HasFlag(x.Edge.Destination.TerrainType);
+                                    unit.CanStopOn.HasFlag(x.Edge.Destination.TerrainType) ||
+                                    IsWaterboundMovingToCoastalSettlement(unit, x.Edge);
         return validMove;
     }
 
@@ -410,7 +420,7 @@ public class MilitaryUnit
             return false;
         }
 
-        potentialMove = unit.EdgeMovementCosts[edge.EdgeType] < Terrain.Impassable || (unit.UsesRoads && edge.HasRoad);
+        potentialMove = unit.EdgeMovementCosts[edge.EdgeType] < Terrain.Impassable || (unit.UsesRoads && edge.HasRoad) || IsWaterboundMovingToCoastalSettlement(unit, edge);
 
         if (!potentialMove)
         {

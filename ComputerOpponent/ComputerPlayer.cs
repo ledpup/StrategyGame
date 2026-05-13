@@ -42,37 +42,37 @@ public class ComputerPlayer
     {
         get
         {
-            if (_friendlyUnitInfluenceModifier == null)
+            if (field == null)
             {
-                _friendlyUnitInfluenceModifier = [];
+                field = [];
                 foreach (var role in Enum.GetValues<Role>())
                 {
-                    _friendlyUnitInfluenceModifier.Add(role, 0.5f);
+                    field.Add(role, 0.5f);
                 }
-                _friendlyUnitInfluenceModifier[Role.Defensive] = 1f;
-                _friendlyUnitInfluenceModifier[Role.Scout] = -0.5f;
-                _friendlyUnitInfluenceModifier[Role.Besieger] = -0.25f;
+                field[Role.Defensive] = 1f;
+                field[Role.Scout] = -0.5f;
+                field[Role.Besieger] = -0.25f;
             }
-            return _friendlyUnitInfluenceModifier;
+            return field;
         }
     }
-    Dictionary<Role, float> _friendlyUnitInfluenceModifier;
+
     static Dictionary<Role, float> EnemyUnitInfluenceModifier
     {
         get
         {
-            if (_enemyUnitInfluenceModifier == null)
+            if (field == null)
             {
-                _enemyUnitInfluenceModifier = [];
+                field = [];
                 foreach (var role in Enum.GetValues<Role>())
                 {
-                    _enemyUnitInfluenceModifier.Add(role, 1f);
+                    field.Add(role, 1f);
                 }
-                _enemyUnitInfluenceModifier[Role.Defensive] = -0.5f;
-                _enemyUnitInfluenceModifier[Role.Offensive] = 1.5f;
-                _enemyUnitInfluenceModifier[Role.Scout] = -0.5f;
+                field[Role.Defensive] = -0.5f;
+                field[Role.Offensive] = 1.5f;
+                field[Role.Scout] = -0.5f;
             }
-            return _enemyUnitInfluenceModifier;
+            return field;
         }
     }
 
@@ -80,38 +80,37 @@ public class ComputerPlayer
     {
         get
         {
-            if (_friendlySettlementInfluence == null)
+            if (field == null)
             {
-                _friendlySettlementInfluence = [];
+                field = [];
                 foreach (var role in Enum.GetValues<Role>())
                 {
-                    _friendlySettlementInfluence.Add(role, -1f);
+                    field.Add(role, -1f);
                 }
-                _friendlySettlementInfluence[Role.Defensive] = 2f;
-                _friendlySettlementInfluence[Role.Scout] = -2f;
-                _friendlySettlementInfluence[Role.Besieger] = -2f;
+                field[Role.Defensive] = 2f;
+                field[Role.Scout] = -2f;
+                field[Role.Besieger] = -2f;
             }
-            return _friendlySettlementInfluence;
+            return field;
         }
     }
-    Dictionary<Role, float> _friendlySettlementInfluence;
 
     static Dictionary<Role, float> EnemySettlementInfluenceModifier
     {
         get
         {
-            if (_enemySettlementInfluence == null)
+            if (field == null)
             {
-                _enemySettlementInfluence = [];
+                field = [];
                 foreach (var role in Enum.GetValues<Role>())
                 {
-                    _enemySettlementInfluence.Add(role, 1f);
+                    field.Add(role, 1f);
                 }
-                _enemySettlementInfluence[Role.Besieger] = 2f;
-                _enemySettlementInfluence[Role.Defensive] = -2f;
-                _enemySettlementInfluence[Role.Scout] = 0.5f;
+                field[Role.Besieger] = 2f;
+                field[Role.Defensive] = -2f;
+                field[Role.Scout] = 0.5f;
             }
-            return _enemySettlementInfluence;
+            return field;
         }
     }
 
@@ -127,14 +126,13 @@ public class ComputerPlayer
     {
         get
         {
-            if (_roles == null)
+            if (field == null)
             {
-                _roles = [.. Enum.GetValues<Role>()];
+                field = [.. Enum.GetValues<Role>()];
             }
-            return _roles;
+            return field;
         }
     }
-    static List<Role> _roles;
 
     public UnitAiState TrackUnit(MilitaryUnit unit, Role role = Role.Balanced)
     {
@@ -467,8 +465,6 @@ public class ComputerPlayer
         return null;
     }
 
-    static Dictionary<Role, float> _enemySettlementInfluence;
-
     public static IEnumerable<PathFindTile> ClosestEnemySettlementPath(GameState board, MilitaryUnit unit)
     {
         var settlements = board.Settlements
@@ -527,12 +523,6 @@ public class ComputerPlayer
 
         return closestPort;
     }
-
-
-
-    static Dictionary<Role, float> _enemyUnitInfluenceModifier;
-
-
 
     public void GenerateInfluenceMaps(GameState board, int numberOfPlayers)
     {

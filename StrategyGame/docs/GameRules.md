@@ -40,9 +40,9 @@
 
 ### Naval movement rules
 (NM1) A waterbound unit may only move on water and reef hexes.
-(NM2) Exception to (NM1): a waterbound unit may stop on a coastal settlement tile if there is a port edge between the water and the settlement tile.
-(NM3) A land unit may embark on a waterbound unit if they are in a coastal settlement and there is a port edge between the land and water hexes.
-(NM4) A land unit may embark on a waterbound unit if they are adjacent to a water hex and there is a port edge between the land and water hexes.
+(NM2) Exception to (NM1): a waterbound unit may stop on a coastal settlement land tile if there is a port edge between the water tile and the settlement tile.
+(NM3) A land unit may embark on a waterbound unit if they are both in a coastal settlement and there is a port edge between the land and water hexes.
+(NM4) A land unit may embark on a waterbound unit if the waterbound unit is on an adjacent water hex and there is a port edge between the land and water hex.
 (NM5) A waterbound unit may only ferry land units if their transport capacity is sufficient to carry land units.
 (NM6) A waterbound unit may transport multiple land units.
 (NM7) If an airborne unit is lost during a conflict, all land units it was transporting are lost.

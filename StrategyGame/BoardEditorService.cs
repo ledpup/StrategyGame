@@ -176,15 +176,13 @@ internal class SimulationSession
     // Each subsequent entry is the board after that turn resolved.
     private readonly List<MapDocument> snapshots = [];
 
-    private int currentIndex = 0;
-
-    public int CurrentTurn => currentIndex;
+    public int CurrentTurn { get; private set; } = 0;
     public bool IsFinished { get; private set; }
 
     public bool CanStepForward =>
-        !IsFinished || currentIndex < snapshots.Count - 1;
+        !IsFinished || CurrentTurn < snapshots.Count - 1;
 
-    public bool CanStepBack => currentIndex > 0;
+    public bool CanStepBack => CurrentTurn > 0;
 
     public GameState CurrentBoard { get; private set; }
 
@@ -222,17 +220,17 @@ internal class SimulationSession
     public bool StepForward()
     {
         // If we already have the next snapshot cached, just move the pointer.
-        if (currentIndex < snapshots.Count - 1)
+        if (CurrentTurn < snapshots.Count - 1)
         {
-            currentIndex++;
-            CurrentBoard = snapshots[currentIndex].ToGameState();
+            CurrentTurn++;
+            CurrentBoard = snapshots[CurrentTurn].ToGameState();
             return true;
         }
 
         if (IsFinished) return false;
 
         // Compute and cache the next turn.
-        var sim = snapshots[currentIndex].ToGameState(currentIndex);
+        var sim = snapshots[CurrentTurn].ToGameState(CurrentTurn);
         computerPlayer.GenerateInfluenceMaps(sim, numberOfPlayers);
         computerPlayer.SetStrategicAction(sim);
         var orders = computerPlayer.CreateOrders(sim, sim.Units.Where(x => x.IsAlive).ToList());
@@ -244,7 +242,7 @@ internal class SimulationSession
         sim.Turn++;
 
         snapshots.Add(MapDocument.FromGameState(sim));
-        currentIndex++;
+        CurrentTurn++;
         CurrentBoard = sim;
 
         // Check end conditions — only stop early if sides have actually been eliminated
@@ -264,15 +262,15 @@ internal class SimulationSession
     public bool StepBack()
     {
         if (!CanStepBack) return false;
-        currentIndex--;
-        CurrentBoard = snapshots[currentIndex].ToGameState();
+        CurrentTurn--;
+        CurrentBoard = snapshots[CurrentTurn].ToGameState();
         return true;
     }
 
     /// <summary>Jumps back to turn 0.</summary>
     public void Restart()
     {
-        currentIndex = 0;
+        CurrentTurn = 0;
         IsFinished = false;
         CurrentBoard = snapshots[0].ToGameState();
     }

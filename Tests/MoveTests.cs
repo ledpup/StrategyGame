@@ -719,6 +719,56 @@ public class MoveTests
     }
 
     [TestMethod]
+    public void PossibleMoves_WaterboundUnitAdjacentToCoastalSettlementViaPortEdge_CanStopOnSettlementTile()
+    {
+        // NM2: a waterbound unit may stop on a coastal settlement land tile if there is a port edge between the water tile and the settlement tile
+        var settlements = new[] { "196,City,1,6" };
+        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges, settlements));
+
+        var t196 = board[196];
+        var t224 = board[224];
+
+        Assert.IsNotNull(t196.Settlement, "Tile 196 should have a settlement for NM2 test");
+        Assert.IsTrue(t224.Neighbours.Any(n => n.Destination.Index == 196 && n.EdgeType == EdgeType.Port), "Tile 224 should have a port edge to tile 196");
+
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[224], "1st Fleet") };
+
+        var moves = units[0].PossibleMoves();
+
+        // Tile 196 is a grassland settlement accessible via port edge from tile 224 (water)
+        Assert.Contains(x => x.Edge.Destination.Index == 196, moves);
+    }
+
+    [TestMethod]
+    public void PossibleMoves_WaterboundUnitAdjacentToLandTileWithoutSettlementViaPortEdge_CannotStopOnLandTile()
+    {
+        // NM2 only applies when there is a settlement on the land tile; without a settlement the unit cannot stop there
+        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
+
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[224], "1st Fleet") };
+
+        var moves = units[0].PossibleMoves();
+
+        // Tile 196 is a grassland tile with a port edge from tile 224 but has no settlement, so the unit cannot stop there
+        Assert.DoesNotContain(x => x.Edge.Destination.Index == 196, moves);
+    }
+
+    [TestMethod]
+    public void PossibleMoves_WaterboundUnitAtCoastalSettlement_CanLeaveToAdjacentWaterTileViaPortEdge()
+    {
+        // NM2: a waterbound unit that has stopped at a coastal settlement must be able to leave back to adjacent water tiles via the port edge
+        var settlements = new[] { "196,City,1,6" };
+        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges, settlements));
+
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[196], "1st Fleet") };
+
+        var moves = units[0].PossibleMoves();
+
+        // Tile 224 is the adjacent water tile connected to the settlement at tile 196 via a port edge
+        Assert.Contains(x => x.Edge.Destination.Index == 224, moves);
+    }
+
+    [TestMethod]
     public void ConflictTest()
     {
         var tile1 = new Tile(1, 1, 1);

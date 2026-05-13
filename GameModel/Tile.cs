@@ -31,7 +31,6 @@ public class Tile
         BaseTerrainType = terrainType.HasFlag(TerrainType.Water) || terrainType.HasFlag(TerrainType.Reef) ? BaseTerrainType.Water : BaseTerrainType.Land;
         TerrainType = terrainType;
         IsEdgeOfMap = isEdgeOfMap;
-
     }
 
     public string ToOffsetCoordsString()
@@ -46,16 +45,6 @@ public class Tile
     }
 
     public float? Supply { get; set; }
-
-    //public double CalculateMoveCostAStar(MilitaryUnit unit, Tile destination)
-    //{
-    //    var cost = (double)CalculateMoveCost(unit, destination);
-    //    if (!unit.CanStopOn.HasFlag(destination.TerrainType))
-    //    {
-    //        cost *= 1.5D;
-    //    }
-    //    return cost;
-    //}
 
     public List<Edge> Neighbours { get; set; }
 
@@ -73,19 +62,18 @@ public class Tile
         {
             if (searchedForCoast)
             {
-                return isCoast;
+                return field;
             }
 
             searchedForCoast = true;
 
-            isCoast = Terrain.AllWater.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.AllLand.HasFlag(x.Destination.TerrainType));
+            field = Terrain.AllWater.HasFlag(TerrainType) && Neighbours.Any(x => Terrain.AllLand.HasFlag(x.Destination.TerrainType));
 
-            return isCoast;
+            return field;
         }
     }
 
-    bool isCoast;
-    bool searchedForCoast;
+    private bool searchedForCoast;
 
     public bool IsSea
     {
@@ -93,19 +81,18 @@ public class Tile
         {
             if (searchedForSea)
             {
-                return isSea;
+                return field;
             }
 
             searchedForSea = true;
 
-            isSea = Terrain.AllWater.HasFlag(TerrainType) && (Neighbours.Any(x => x.Destination.IsSea) || IsEdgeOfMap);
+            field = Terrain.AllWater.HasFlag(TerrainType) && (Neighbours.Any(x => x.Destination.IsSea) || IsEdgeOfMap);
 
-            return isSea;
+            return field;
         }
     }
 
-    bool isSea;
-    bool searchedForSea;
+    private bool searchedForSea;
 
     public bool IsLake
     {
@@ -113,19 +100,18 @@ public class Tile
         {
             if (searchedForLake)
             {
-                return isLake;
+                return field;
             }
 
             searchedForLake = true;
 
-            isLake = Terrain.AllWater.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Destination.IsSea);
+            field = Terrain.AllWater.HasFlag(TerrainType) && !IsEdgeOfMap && !Neighbours.Any(x => x.Destination.IsSea);
 
-            return isLake;
+            return field;
         }
     }
 
-    bool isLake;
-    bool searchedForLake;
+    private bool searchedForLake;
 
     public TerrainType GetTerrainTypeByTemperature(double temperature)
     {
@@ -190,20 +176,18 @@ public class Tile
     {
         get
         {
-            if (stackLimit == 0)
+            if (field == 0)
             {
-                stackLimit = Terrain.TerrainStackLimit[TerrainType];
+                field = Terrain.TerrainStackLimit[TerrainType];
                 if (Settlement != null)
                 {
-                    stackLimit++;
+                    field++;
                 }
             }
 
-            return stackLimit;
+            return field;
         }
-    }
-
-    int stackLimit = 0;
+    } = 0;
 
     public bool OverStackLimit(IEnumerable<MilitaryUnit> tileUnits, int playerIndex)
     {

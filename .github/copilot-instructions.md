@@ -6,3 +6,6 @@
 
 ## Test Naming Conventions
 - Name tests using the pattern `MethodName_StateUnderTest_ExpectedOutcome`.
+
+## Game Rules
+- When implementing a game rule from `GameRules.md`, add corresponding unit tests that cover both the positive case (rule applies) and the negative case (rule does not apply). Name those tests using the Test Naming Conventions above.

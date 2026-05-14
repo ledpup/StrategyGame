@@ -15,39 +15,44 @@ public class PathFindTests
     static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
     static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
+    GameState gameState;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        gameState = new GameState(new Board(GameBoard, TileEdges));
+    }
+
     [TestMethod]
     public void RenderPathfind_ValidBoard_RendersPathsWithoutError()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
-
-        var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
+        var unit = new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[1, 1]);
 
         var lines = new List<Centreline>();
 
-        lines.AddRange(Centreline.PathFindTilesToCentrelines(PathFinder.FindShortestPath(board[28], board[196], unit)));
-        lines.AddRange(Centreline.PathFindTilesToCentrelines(PathFinder.FindShortestPath(board[91], board[175], unit)));
+        lines.AddRange(Centreline.PathFindTilesToCentrelines(PathFinder.FindShortestPath(gameState[28], gameState[196], unit)));
+        lines.AddRange(Centreline.PathFindTilesToCentrelines(PathFinder.FindShortestPath(gameState[91], gameState[175], unit)));
 
-        var labels = new string[board.Width * board.Height];
-        for (var i = 0; i < board.Tiles.Length; i++)
+        var labels = new string[gameState.Width * gameState.Height];
+        for (var i = 0; i < gameState.Tiles.Length; i++)
         {
             labels[i] = i.ToString();
         }
 
-        GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels, lines);
+        GameBoardRenderer.RenderAndSave("BasicBoardPathFind.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels, lines);
     }
 
     [TestMethod]
     public void FindShortestPath_LandUnitWithReachableDestination_ReturnsExpectedPath()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
+        var unit = new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[1, 1]);
 
-        var shortestPath = PathFinder.FindShortestPath(board[1, 1], board[194], unit).ToArray();
+        var shortestPath = PathFinder.FindShortestPath(gameState[1, 1], gameState[194], unit).ToArray();
 
         var lines = new List<Centreline>();
         lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-        GameBoardRenderer.RenderAndSave("LandUnitPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, lines);
+        GameBoardRenderer.RenderAndSave("LandUnitPathFind.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, lines);
 
         Assert.HasCount(10, shortestPath);
 
@@ -68,11 +73,10 @@ public class PathFindTests
     [TestMethod]
     public void FindShortestPath_LandUnitWithUnreachableDestination_ReturnsNull()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate(), location: board[1, 1]);
+        var unit = new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[1, 1]);
 
-        var shortestPath = PathFinder.FindShortestPath(unit.Location, board[247], unit);
+        var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[247], unit);
 
         Assert.IsNull(shortestPath);
     }
@@ -80,15 +84,14 @@ public class PathFindTests
     [TestMethod]
     public void FindShortestPath_WaterboundUnitMovingToPort_ReturnsExpectedPath()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, location: board[20, 5]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 1, gameState.Players[0], location: gameState[20, 5]);
 
-        var shortestPath = PathFinder.FindShortestPath(unit.Location, board[291], unit).ToArray();
+        var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[291], unit).ToArray();
 
         var lines = new List<Centreline>();
         lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-        GameBoardRenderer.RenderAndSave("NavelUnitMoveToPortPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, lines);
+        GameBoardRenderer.RenderAndSave("NavelUnitMoveToPortPathFind.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, lines);
 
         Assert.AreEqual(shortestPath[0].Hex, unit.Location.Hex); // Origin
 
@@ -106,15 +109,14 @@ public class PathFindTests
     [TestMethod]
     public void FindShortestPath_AirborneUnitCrossingNonStoppableTerrain_ReturnsExpectedPath()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[24, 15]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 1, gameState.Players[0], location: gameState[24, 15]);
 
-        var shortestPath = PathFinder.FindShortestPath(unit.Location, board[365], unit).ToArray();
+        var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[365], unit).ToArray();
 
         var lines = new List<Centreline>();
         lines.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-        GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, lines);
+        GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOn.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, lines);
 
         Assert.AreEqual(unit.Location.Hex, shortestPath[0].Hex); // Origin
 
@@ -134,15 +136,14 @@ public class PathFindTests
     [TestMethod]
     public void FindShortestPath_AirborneUnitFromCoastlineCrossingNonStoppableTerrain_ReturnsPathAndMoveOrder()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[19, 13]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 1, gameState.Players[0], location: gameState[19, 13]);
 
-        var shortestPath = PathFinder.FindShortestPath(unit.Location, board[365], unit).ToArray();
+        var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[365], unit).ToArray();
 
         var vectors = new List<Centreline>();
         vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-        Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, vectors);
+        Visualise.GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverTerrainThatItCantStopOnFromCoastLine.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors);
 
 
         Assert.AreEqual(unit.Location.Hex, shortestPath[0].Hex); // Origin
@@ -162,26 +163,25 @@ public class PathFindTests
     [TestMethod]
     public void FindShortestPath_AirborneUnitCrossingWall_ReturnsValidWallCrossingPath()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 5, IsTransporter = true }, location: board[119]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 5, IsTransporter = true }, 1, gameState.Players[0], location: gameState[119]);
 
-        var shortestPath = PathFinder.FindShortestPath(unit.Location, board[95], unit).ToArray();
+        var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[95], unit).ToArray();
 
         var vectors = new List<Centreline>();
         vectors.AddRange(Centreline.PathFindTilesToCentrelines(shortestPath));
-        GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, vectors);
+        GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPathFind.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors);
 
         var moveOrder = unit.ShortestPathToMoveCommand(shortestPath);
 
         vectors = [.. Centreline.MoveOrderToCentrelines(moveOrder)];
 
-        GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, units: board.Units, lines: vectors);
+        GameBoardRenderer.RenderAndSave($"AirborneUnitMoveOverWallMoveOrder.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: gameState.Units, lines: vectors);
 
 
         var moves = unit.PossibleMoves();
         moves.ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
-        GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPossibleMoves.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements);
+        GameBoardRenderer.RenderAndSave("AirborneUnitMoveOverWallPossibleMoves.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements);
 
 
         Assert.AreEqual(unit.Location.Hex, shortestPath[0].Hex); // Origin

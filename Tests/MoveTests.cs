@@ -12,6 +12,14 @@ namespace Tests;
 [TestClass]
 public class MoveTests
 {
+    GameState board;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
+    }
+
     [TestMethod]
     public void TerrainTypeTests()
     {
@@ -24,9 +32,8 @@ public class MoveTests
     [TestMethod]
     public void LandUnitMoveList()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate(), location: board[335]) };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate(), 1, board.Players[0], board[335]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -59,54 +66,13 @@ public class MoveTests
         Assert.DoesNotContain(x => x.Edge.Destination.Index == 389, moves);
     }
 
-    [TestMethod]
-    public void LandUnitMoveList2()
-    {
-        //var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        //var units = new List<MilitaryUnit> { new MilitaryUnit(location: board[335]) };
-
-        ////var moves = units[0].PossibleMoves();
-
-        //var blockedHexes = board.Tiles.Where(x => x.TerrainType == TerrainType.Mountain || x.TerrainType == TerrainType.Water).Select(x => x.Hex).ToList();
-
-        //var moves = CalculateRange.UnitRangeForTurn(units[0].Location, units[0].MovementPoints, units[0].UsesRoads, units[0].EdgeMovementCosts, units[0].TerrainMovementCosts);
-
-        //moves.ToList().ForEach(x => board[x.Destination.Index].IsSelected = true);
-
-        //GameBoardRenderer.RenderAndSave("LandUnitMoves2.png", board.Height, board.Tiles, board.Edges, board.Settlements, null, null, units);
-
-        //Assert.AreEqual(11, moves.Count());
-
-        //Assert.IsTrue(moves.Any(x => x.Destination.Index == 334));
-        //Assert.IsTrue(moves.Any(x => x.Destination.Index == 361));
-        //Assert.IsTrue(moves.Any(x => x.Destination.Index == 336));
-        //Assert.IsTrue(moves.Any(x => x.Destination.Index == 309));
-        //Assert.IsTrue(moves.Any(x => x.Destination.Index == 310));
-        //Assert.IsTrue(moves.Any(x => x.Destination.Index == 308));
-
-        //// Can't go into the ocean
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 281));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 306));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 333));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 360));
-
-        //// Can't go over mountains
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 337));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 363));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 362));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 388));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 364));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 390));
-        //Assert.IsFalse(moves.Any(x => x.Destination.Index == 389));
-    }
 
     [TestMethod]
     public void LandUnitMoveListWithRoad()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { RoadMovementBonus = 2 }, location: board[345]) };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { RoadMovementBonus = 2 }, 0, board.Players[0], board[345]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -134,9 +100,8 @@ public class MoveTests
     [TestMethod]
     public void LandUnitMoveListWithRoadOverMountain()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { RoadMovementBonus = 1 }, 0, 1, board[85], "1st Infantry") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { RoadMovementBonus = 1 }, 0, board.Players[0], board[85]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -164,11 +129,10 @@ public class MoveTests
     [TestMethod]
     public void LandUnitMoveOverMountainWithRoad()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, location: board[4, 3]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 0, board.Players[0], board[4, 3]),
         };
 
         var moves = units[0].PossibleMoves();
@@ -183,9 +147,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneMoveListWithRoadAndMountain()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Airborne }, 0, 1, board[85], "1st Infantry") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Airborne }, 0, board.Players[0], board[85]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -216,9 +179,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneMoveList()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, 1, board[364], "1st Airborne") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, board.Players[0], board[364]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -268,7 +230,7 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitCanStopOn()
     {
-        var airborneUnit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne });
+        var airborneUnit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne }, 1, board.Players[0]);
 
         Assert.IsTrue(airborneUnit.CanStopOn.HasFlag(TerrainType.Forest));
 
@@ -280,9 +242,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitValidMoves()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne }, location: board[1, 1]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne }, 1, board.Players[0], board[1, 1]);
         var moveList = unit.PossibleMoves();
 
         Assert.Contains(x => x.Edge.Destination == board[1, 2], moveList);
@@ -296,9 +257,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitValidMovesOverWater()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne }, location: board[4, 9]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne }, 0, board.Players[0], board[4, 9]);
         var moveList = unit.PossibleMoves();
 
         moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
@@ -327,9 +287,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitValidMovesOverWaterFromShortestPath()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 4 }, location: board[147]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 4 }, 1, board.Players[0], board[147]);
         var moveList = unit.PossibleMoves();
 
         var pathToTransporteesDestination = PathFinder.FindShortestPath(unit.Location, board[196], unit);
@@ -345,9 +304,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitShortestPathWithLongRouteOverWater()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, location: board[202]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 1, board.Players[0], board[202]);
         var moveList = unit.PossibleMoves();
 
         var pathToTransporteesDestination = PathFinder.FindShortestPath(unit.Location, board[381], unit);
@@ -363,9 +321,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitShortestPathWithLongerRouteOverWater()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, location: board[187]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 1, board.Players[0], board[187]);
         var moveList = unit.PossibleMoves();
 
         var pathToTransporteesDestination = PathFinder.FindShortestPath(unit.Location, board[456], unit);
@@ -380,9 +337,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitShortestPathCornerToCorner()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, location: board[28]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 1, board.Players[0], board[28]);
         var moveList = unit.PossibleMoves();
 
         var pathToTransporteesDestination = PathFinder.FindShortestPath(unit.Location, board[484], unit);
@@ -397,9 +353,8 @@ public class MoveTests
     [TestMethod]
     public void AirborneUnitValidMovesOverContinent()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, location: board[19, 13]);
+        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 1, board.Players[0], board[19, 13]);
         var moveList = unit.PossibleMoves();
 
         moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
@@ -408,32 +363,17 @@ public class MoveTests
 
         Assert.HasCount(154, moveList);
 
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 9])); // Mountain
-        //Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[5, 9]));
-
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 8])); // Water
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[4, 8])); // Water
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[5, 8])); // Water
-
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 7])); // Reef
         Assert.Contains(x => x.Edge.Destination == board[16, 12], moveList);
         Assert.Contains(x => x.Edge.Destination == board[16, 13], moveList);
         Assert.Contains(x => x.Edge.Destination == board[16, 14], moveList);
         Assert.Contains(x => x.Edge.Destination == board[16, 15], moveList);
-
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[3, 10])); // Water
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[4, 10])); // Water
-        //Assert.IsFalse(moveList.Any(x => x.Neighbour.Tile == board[5, 10])); // Water
-
-        //Assert.IsTrue(moveList.Any(x => x.Neighbour.Tile == board[4, 11]));
     }
 
     [TestMethod]
     public void LandUnitNearRiverAndRoad()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate(), 0, 0, board[1, 1], "1st Infantry") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate(), 0, board.Players[0], board[1, 1], "1st Infantry") };
 
         var moves = units[0].PossibleMoves();
 
@@ -454,9 +394,8 @@ public class MoveTests
     [TestMethod]
     public void LandUnitNearBridgeAndRoad()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate(), 0, 0, board[141], "1st Infantry") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate(), 0, board.Players[0], board[141], "1st Infantry") };
 
         var moves = units[0].PossibleMoves();
 
@@ -481,9 +420,8 @@ public class MoveTests
     [TestMethod]
     public void AmphibiousUnitNearRiverAndRoad()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Land }, 0, 1, board[1, 1], "1st Amphibious") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Land }, 0, board.Players[0], board[1, 1]) };
         units[0].TerrainMovementCosts[TerrainType.Swamp] = 1;
         units[0].EdgeMovementCosts[EdgeType.River] = 0;
 
@@ -505,9 +443,8 @@ public class MoveTests
     [TestMethod]
     public void AquaticUnitMoves()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[225], "1st Fleet") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, board.Players[0], board[225]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -529,14 +466,57 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void EmbarkOnShip()
+    public void EmbarkOnShip_LandUnitAndWaterboundAtCoastalSettlement_LandUnitEmbarks()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
+        // NM3: a land unit may embark on a waterbound unit if they are both in a coastal settlement and there is a port edge between the land and water hexes
+        var settlements = new[] { "196,City,1,6" };
+        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges, settlements));
 
         board.Units =
         [
-            new(new UnitTemplate { MovementPoints = 3, TransportableBy = [MovementType.Waterbound] }, 0, location: board[196]),
-            new(new UnitTemplate { MovementType = MovementType.Waterbound, IsTransporter = true }, 1, location: board[224]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 1, board.Players[0], board[196]),
+            new(new UnitTemplate { MovementType = MovementType.Waterbound, IsTransporter = true }, 2, board.Players[0], board[196]),
+        ];
+
+        var unitOrders = new List<IUnitCommand>
+        {
+            new TransportCommand(board.Units[1], board.Units[0]),
+        };
+        board.ResolveOrders(unitOrders);
+
+        Assert.AreEqual(board.Units[1], board.Units[0].TransportedBy, "Land unit should be embarked on the waterbound unit at the coastal settlement");
+    }
+
+    [TestMethod]
+    public void EmbarkOnShip_LandUnitAtSettlementWaterboundOnWater_LandUnitCannotEmbark()
+    {
+        // NM3 requires both units to be at the coastal settlement; if the ship is on water the land unit cannot embark without moving
+        var settlements = new[] { "196,City,1,6" };
+        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges, settlements));
+
+        board.Units =
+        [
+            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 1, board.Players[0], board[196]),
+            new(new UnitTemplate { MovementType = MovementType.Waterbound, IsTransporter = true }, 2, board.Players[0], board[224]),
+        ];
+
+        var unitOrders = new List<IUnitCommand>
+        {
+            new TransportCommand(board.Units[1], board.Units[0]),
+        };
+        board.ResolveOrders(unitOrders);
+
+        Assert.IsNull(board.Units[0].TransportedBy, "Land unit should not be embarked when the waterbound unit is on water, not at the settlement");
+    }
+
+    [TestMethod]
+    public void EmbarkOnShip()
+    {
+
+        board.Units =
+        [
+            new(new UnitTemplate { MovementPoints = 3, TransportableBy = [MovementType.Waterbound] }, 0, board.Players[0], board[196]),
+            new(new UnitTemplate { MovementType = MovementType.Waterbound, IsTransporter = true }, 1, board.Players[0], board[224]),
         ];
 
         var computerPlayer = new ComputerPlayer(board.Units);
@@ -545,23 +525,17 @@ public class MoveTests
         var unitOrders = computerPlayer.CreateOrders(board, board.Units);
         board.ResolveOrders(unitOrders);
 
-        //var lines = new List<Centreline>();
-        //unitOrders.ForEach(x => unitOrders.AddRange(Centreline.MoveOrderToCentrelines((MoveOrder)x)));
-
-        //GameBoardRenderer.RenderAndSave("EmbarkOnShip.png", board.Height, board.Tiles, board.Edges, board.Settlements, null, null, board.Units);
-
         Assert.AreEqual(board[8, 8], board.Units[0].Location);
     }
 
     [TestMethod]
     public void ResolveMove()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
         board.Units =
         [
-            new(new UnitTemplate { MovementPoints = 5 }, location: board[1, 1]),
-            new(new UnitTemplate(), location: board[1, 1]),
+            new(new UnitTemplate { MovementPoints = 5 }, 0, board.Players[0], board[1, 1]),
+            new(new UnitTemplate(), 1, board.Players[0], board[1, 1]),
         ];
 
         var moves1 = new Move[]
@@ -592,12 +566,11 @@ public class MoveTests
     [TestMethod]
     public void AdjacentUnitsOfSameStrengthSwapHexes()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
         board.Units =
         [
-            new(new UnitTemplate(), location: board[1, 1]),
-            new(new UnitTemplate(), 0, 1, board[2, 2]),
+            new(new UnitTemplate(), 0, board.Players[0], board[1, 1]),
+            new(new UnitTemplate(), 1, board.Players[0], board[2, 2]),
         ];
 
         var moves1 = new Move[]
@@ -625,13 +598,12 @@ public class MoveTests
     [TestMethod]
     public void AdjacentUnitsOfDifferentStrengthSwapHexes()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
         board.Units =
         [
-            new(new UnitTemplate(), location: board[1, 1]),
-            new(new UnitTemplate(), 0, 1, board[2, 2]),
-            new(new UnitTemplate(), 0, 1, board[2, 2]),
+            new(new UnitTemplate(), 0, board.Players[0], board[1, 1]),
+            new(new UnitTemplate(), 1, board.Players[0], board[2, 2]),
+            new(new UnitTemplate(), 2, board.Players[0], board[2, 2]),
         ];
 
         var moves1 = new Move[]
@@ -661,14 +633,13 @@ public class MoveTests
     [TestMethod]
     public void ResolveMove_ConflictArrises_ConflictedUnitsStop()
     {
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
         board.Units =
         [
-            new(new UnitTemplate { MovementPoints = 3 }, 0, 1, board[1, 1], "1st Infantry"),
-            new(new UnitTemplate { MovementPoints = 3 }, 1, 2, board[4, 1], "2nd Infantry"),
+            new(new UnitTemplate { MovementPoints = 3 }, 1, board.Players[0], board[1, 1]),
+            new(new UnitTemplate { MovementPoints = 3 }, 2, board.Players[0], board[4, 1]),
 
-            new(new UnitTemplate { MovementPoints = 6 }, 2, 1, board[10, 2], "1st Infantry"),
-            new(new UnitTemplate(), 3, 2, board[10, 3], "2nd Infantry"),
+            new(new UnitTemplate { MovementPoints = 6 }, 3, board.Players[0], board[10, 2]),
+            new(new UnitTemplate(), 4, board.Players[0], board[10, 3]),
         ];
 
         var moves1 = new Move[]
@@ -731,7 +702,7 @@ public class MoveTests
         Assert.IsNotNull(t196.Settlement, "Tile 196 should have a settlement for NM2 test");
         Assert.IsTrue(t224.Neighbours.Any(n => n.Destination.Index == 196 && n.EdgeType == EdgeType.Port), "Tile 224 should have a port edge to tile 196");
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[224], "1st Fleet") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, board.Players[0], board[224]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -743,9 +714,8 @@ public class MoveTests
     public void PossibleMoves_WaterboundUnitAdjacentToLandTileWithoutSettlementViaPortEdge_CannotStopOnLandTile()
     {
         // NM2 only applies when there is a settlement on the land tile; without a settlement the unit cannot stop there
-        var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[224], "1st Fleet") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, board.Players[0], board[224]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -760,7 +730,7 @@ public class MoveTests
         var settlements = new[] { "196,City,1,6" };
         var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges, settlements));
 
-        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, 2, board[196], "1st Fleet") };
+        var units = new List<MilitaryUnit> { new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3 }, 0, board.Players[0], board[196]) };
 
         var moves = units[0].PossibleMoves();
 
@@ -776,9 +746,10 @@ public class MoveTests
 
         var units = new List<MilitaryUnit>
         {
-                        new(new UnitTemplate()) { Location = tile1 },
-                        new(new UnitTemplate()) { OwnerIndex = 2, Location = tile1 },
-                        new(new UnitTemplate()) { Location = tile2 },
+                        new(new UnitTemplate(), 1, board.Players[0], tile1),
+                        new(new UnitTemplate(), 2, board.Players[0], tile2),
+
+                        new(new UnitTemplate(), 3, board.Players[1], tile1),
         };
 
         var movingUnits = new List<MilitaryUnit>

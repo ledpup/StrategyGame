@@ -11,34 +11,40 @@ public class StackTests
     static string[] GameBoard = File.ReadAllLines("BasicBoard.txt");
     static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
+    GameState gameState;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        gameState = new GameState(new Board(GameBoard, settlements: Settlements));
+    }
+
     [TestMethod]
     public void StackLimits()
     {
-        var board = new GameState(new Board(GameBoard, settlements: Settlements));
 
-        Assert.AreEqual(4, board[1, 2].StackLimit);
-        Assert.AreEqual(5, board[1, 3].StackLimit);
-        Assert.AreEqual(2, board[6, 1].StackLimit);
+        Assert.AreEqual(4, gameState[1, 2].StackLimit);
+        Assert.AreEqual(5, gameState[1, 3].StackLimit);
+        Assert.AreEqual(2, gameState[6, 1].StackLimit);
     }
 
     [TestMethod]
     public void OverStackLimit()
     {
-        var board = new GameState(new Board(GameBoard, settlements: Settlements));
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { RoadMovementBonus = 1 }, location: board[6, 1]),
-            new(new UnitTemplate(), location: board[6, 1]),
-            new(new UnitTemplate(), location: board[6, 1]),
-            new(new UnitTemplate(), location: board[6, 1]),
+            new MilitaryUnit(new UnitTemplate { RoadMovementBonus = 1 }, 1, gameState.Players[0], location: gameState[6, 1]),
+            new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[6, 1]),
+            new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[6, 1]),
+            new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[6, 1]),
         };
-        board.Units.AddRange(units);
+        gameState.Units.AddRange(units);
 
-        Assert.AreEqual(2, board[6, 1].StackLimit);
-        Assert.IsTrue(board.OverStackLimit(board[6, 1], 0));
+        Assert.AreEqual(2, gameState[6, 1].StackLimit);
+        Assert.IsTrue(gameState.OverStackLimit(gameState[6, 1], 0));
 
-        board.ResolveStackLimits(0);
+        gameState.ResolveStackLimits(0);
 
         units.ForEach(x => Assert.AreEqual(4, x.Morale));
     }
@@ -46,72 +52,10 @@ public class StackTests
     [TestMethod]
     public void CanTransport()
     {
-        var inf = new MilitaryUnit(new UnitTemplate { TransportableBy = [MovementType.Airborne] });
-        var air = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true });
+        var inf = new MilitaryUnit(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 1, gameState.Players[0]);
+        var air = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true }, 1, gameState.Players[0]);
 
 
         Assert.IsTrue(air.CanTransport(inf));
     }
-
-    //[TestMethod]
-    //public void CanTransport_AquaticAndAirborne_CanTransportAquatic()
-    //{
-    //    var aquatic = UnitInitialValues.DefaultValues();
-    //    aquatic.Size = 1f;
-
-    //    var units = new List<Unit> {
-    //                                    new Unit(BaseUnitType.Land),
-    //                                    new Unit(BaseUnitType.Airborne),
-    //                                    new Unit(BaseUnitType.Aquatic, aquatic),
-    //                                };
-
-    //    var stack = new Stack(units);
-
-    //    var transporting = stack.Transporting();
-    //    Assert.AreEqual(UnitType.Aquatic, transporting);
-    //}
-
-    //[TestMethod]
-    //public void StackMoveList_LandUnits_ThreeMovesOnCorrectTerrain()
-    //{
-    //    var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
-
-    //    var units = new List<Unit> 
-    //    { 
-    //        new Unit(BaseUnitType.Land),
-    //        new Unit(BaseUnitType.Land),
-    //    };
-    //    units.ForEach(x => x.Tile = board[1, 1]);
-
-
-    //    var stack = new Stack(units);
-
-    //    var amphibiousMoveList = Unit.MoveList(units[1]);
-    //    Assert.AreEqual(5, amphibiousMoveList.Count());
-
-    //    var moveList = stack.MoveList();
-    //    Assert.AreEqual(3, moveList.Count());
-    //}
-
-    //[TestMethod]
-    //public void StackMoveList_TransportingUnits_ThreeMovesOnCorrectTerrain()
-    //{
-    //    var board = Board.LoadBoard(BoardTests.GameBoard, BoardTests.TileEdges);
-
-    //    var units = new List<Unit> 
-    //    { 
-    //        new Unit(BaseUnitType.Land),
-    //        new Unit(BaseUnitType.Airborne),
-    //    };
-    //    units.ForEach(x => x.Tile = board[1, 1]);
-
-    //    var stack = new Stack(units);
-
-    //    Assert.AreEqual(UnitType.Airborne, stack.Transporting());
-
-    //    var moveList = stack.MoveList().ToList();
-
-    //    Assert.AreEqual(6, moveList.Count);
-    //    moveList.ForEach(x => Assert.IsFalse(x.Destination.TerrainType.HasFlag(Terrain.AquaticTerrain)));
-    //}
 }

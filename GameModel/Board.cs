@@ -23,7 +23,7 @@ public class Board
 
     public List<Settlement> Settlements;
 
-    public Board(string[] tiles, string[] edges = null, string[] settlements = null, Logger logger = null)
+    public Board(string[] tiles, string[] edges = null, List<Settlement> settlements, Logger logger = null)
     {
         Width = tiles[0].Length;
         Height = tiles.Length;
@@ -33,12 +33,11 @@ public class Board
         BuildEdgeLookup();
         InitialiseNeighbours(Edges);
         CalculateTileDistanceFromTheSea();
-        Settlements = IntitaliseSettlements(settlements);
+        Settlements = settlements;
         InitialiseSupply();
         CalculateContiguousRegions();
 
-        Logger = logger;
-        Logger ??= LogManager.GetCurrentClassLogger();
+        Logger = logger ?? LogManager.GetCurrentClassLogger();
 
         TerrainTemperatureModifiers = [];
         foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
@@ -91,7 +90,7 @@ public class Board
         var supplyCalculated = new HashSet<Tile>();
         foreach (var settlement in Settlements)
         {
-            CalculateSupply(this[settlement.Index], settlement.OwnerIndex, settlement.Supply, supplyCalculated);
+            CalculateSupply(this[settlement.Id], settlement.Owner.Id, settlement.Supply, supplyCalculated);
         }
     }
 
@@ -159,28 +158,6 @@ public class Board
                 }
             }
         }
-    }
-
-    private List<Settlement> IntitaliseSettlements(string[] tilePoints)
-    {
-        var settlements = new List<Settlement>();
-
-        if (tilePoints == null)
-        {
-            return settlements;
-        }
-
-        foreach (var point in tilePoints)
-        {
-            var settlementProperties = point.Split(',');
-            var index = int.Parse(settlementProperties[0]);
-            var settlementType = Enum.Parse<SettlementType>(settlementProperties[2]);
-            var settlement = new Settlement(index, settlementType, TileArray[index], int.Parse(settlementProperties[2]), int.Parse(settlementProperties[3]));
-
-            settlements.Add(settlement);
-        }
-
-        return settlements;
     }
 
     private void CalculateTileDistanceFromTheSea()

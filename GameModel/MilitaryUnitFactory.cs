@@ -5,27 +5,27 @@ using System.Collections.Generic;
 public class MilitaryUnitFactory(UnitTemplateFactory templateFactory)
 {
     private readonly UnitTemplateFactory templateFactory = templateFactory;
-    private readonly Dictionary<(UnitTemplateName, int ownerIndex), int> sequenceCounters = [];
+    private readonly Dictionary<(UnitTemplateName, int ownerId), int> sequenceCounters = [];
 
-    public MilitaryUnit Create(UnitTemplateName templateName, string unitName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
+    public MilitaryUnit Create(UnitTemplateName templateName, int id, Player owner, string unitName, Tile location = null, int turnBuilt = 0)
     {
         var template = templateFactory.Get(templateName);
-        return new MilitaryUnit(template, ownerIndex: ownerIndex, location: location, name: unitName, turnBuilt: turnBuilt);
+        return new MilitaryUnit(template, id, owner, location: location, name: unitName, turnBuilt: turnBuilt);
     }
 
-    public MilitaryUnit CreateNext(UnitTemplateName templateName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
+    public MilitaryUnit CreateNext(UnitTemplateName templateName, int id, Player owner, Tile location = null, int turnBuilt = 0)
     {
-        if (!sequenceCounters.TryGetValue((templateName, ownerIndex), out var count))
+        if (!sequenceCounters.TryGetValue((templateName, owner.Id), out var count))
         {
             count = 0;
         }
 
         count++;
-        sequenceCounters[(templateName, ownerIndex)] = count;
+        sequenceCounters[(templateName, owner.Id)] = count;
 
         var ordinal = ToOrdinal(count);
         var unitName = $"{ordinal} {templateName.ToDisplayName()}";
-        return Create(templateName, unitName, ownerIndex, location, turnBuilt);
+        return Create(templateName, id, owner, unitName, location, turnBuilt);
     }
 
     private static string ToOrdinal(int number)

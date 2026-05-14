@@ -18,39 +18,46 @@ public class InfluenceMapTests
     static string[] Edges = File.ReadAllLines("BasicBoardEdges.txt");
     static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
+    GameState gameState;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        gameState = new GameState(new Board(GameBoard, Edges, Settlements));
+    }
+
     [TestMethod]
     public void DisplayInfluenceMap()
     {
-        var board = new GameState(new Board(GameBoard, Edges, Settlements));
 
         var numberOfPlayers = 2;
 
-        board.Units =
+        gameState.Units =
         [
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, 0, board[114], "1st Airborne"),
-            new(new UnitTemplate { MovementPoints = 3 }, 1, 0, board[110], "1st Infantry"),
-            new(new UnitTemplate(), 2, 0, board[31], "2nd Infantry"),
-            new(new UnitTemplate(), 3, 0, board[56], "3rd Infantry"),
-            new(new UnitTemplate(), 4, 0, board[65], "4th Infantry"),
+            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, gameState.Players[0], gameState[114], "1st Airborne"),
+            new(new UnitTemplate { MovementPoints = 3 }, 1, gameState.Players[0], gameState[110], "1st Infantry"),
+            new(new UnitTemplate(), 2, gameState.Players[0], gameState[31], "2nd Infantry"),
+            new(new UnitTemplate(), 3, gameState.Players[0], gameState[56], "3rd Infantry"),
+            new(new UnitTemplate(), 4, gameState.Players[0], gameState[65], "4th Infantry"),
 
-            new(new UnitTemplate(), 5, 1, board[111], "1st Infantry"),
-            new(new UnitTemplate(), 6, 1, board[111], "2nd Infantry"),
+            new(new UnitTemplate(), 5, gameState.Players[1], gameState[111], "1st Infantry"),
+            new(new UnitTemplate(), 6, gameState.Players[1], gameState[111], "2nd Infantry"),
 
-            new(new UnitTemplate(), 7, 1, board[168], "3rd Infantry"),
+            new(new UnitTemplate(), 7, gameState.Players[1], gameState[168], "3rd Infantry"),
         ];
 
-        board.Units[0].TerrainTypeBattleModifier[TerrainType.Swamp] = 1;
-        board.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
+        gameState.Units[0].TerrainTypeBattleModifier[TerrainType.Swamp] = 1;
+        gameState.Units[1].TerrainTypeBattleModifier[TerrainType.Forest] = 1;
 
-        var computerPlayer = new ComputerPlayer(board.Units);
+        var computerPlayer = new ComputerPlayer(gameState.Units);
 
-        computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+        computerPlayer.GenerateInfluenceMaps(gameState, numberOfPlayers);
 
         var moveOrders = new List<IUnitCommand>();
 
-        board.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
+        gameState.Units.Where(x => x.IsAlive).ToList().ForEach(x =>
         {
-            var moveOrder = computerPlayer.FindBestMoveOrderForUnit(x, board);
+            var moveOrder = computerPlayer.FindBestMoveOrderForUnit(x, gameState);
             if (moveOrder != null)
                 moveOrders.Add(moveOrder);
         });
@@ -58,59 +65,58 @@ public class InfluenceMapTests
         var vectors = new List<Centreline>();
         moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
-        GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, vectors, board.Units);
+        GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors, gameState.Units);
 
-        board.ResolveOrders(moveOrders);
+        gameState.ResolveOrders(moveOrders);
 
-        GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, board.Units);
+        GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
     }
 
     [TestMethod]
     public void SelectBestMoveFromInfluenceMap()
     {
-        var board = new GameState(new Board(GameBoard, Edges, Settlements));
 
         var numberOfPlayers = 2;
 
-        board.Units =
+        gameState.Units =
         [
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, 0, board[114]),
-            new(new UnitTemplate { MovementPoints = 3 }, 1, 0, board[110]),
-            new(new UnitTemplate(), 2, 0, board[31]),
-            new(new UnitTemplate(), 3, 0, board[56]),
-            new(new UnitTemplate(), 4, 0, board[65]),
+            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, gameState.Players[0], gameState[114]),
+            new(new UnitTemplate { MovementPoints = 3 }, 1, gameState.Players[0], gameState[110]),
+            new(new UnitTemplate(), 2, gameState.Players[0], gameState[31]),
+            new(new UnitTemplate(), 3, gameState.Players[0], gameState[56]),
+            new(new UnitTemplate(), 4, gameState.Players[0], gameState[65]),
 
-            new(new UnitTemplate(), 5, 1, board[111]),
-            new(new UnitTemplate(), 6, 1, board[111]),
-            new(new UnitTemplate(), 7, 1, board[168]),
+            new(new UnitTemplate(), 5, gameState.Players[1], gameState[111]),
+            new(new UnitTemplate(), 6, gameState.Players[1], gameState[111]),
+            new(new UnitTemplate(), 7, gameState.Players[1], gameState[168]),
         ];
 
 
-        var computerPlayer = new ComputerPlayer(board.Units);
-        computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+        var computerPlayer = new ComputerPlayer(gameState.Units);
+        computerPlayer.GenerateInfluenceMaps(gameState, numberOfPlayers);
 
-        var results = Hex.HexesWithinArea(board.Units[1].Location.Hex, 4, board.Width, board.Height);
-        results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
+        var results = Hex.HexesWithinArea(gameState.Units[1].Location.Hex, 4, gameState.Width, gameState.Height);
+        results.ToList().ForEach(x => gameState[Hex.HexToIndex(x, gameState.Width, gameState.Height)].IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, board.Units);
+        GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
 
-        var roleMovementType = computerPlayer.GetUnitState(board.Units[1]).GetRoleMovementType(board.Units[1]);
-        var tilesOrderedInfluence = board.Tiles
+        var roleMovementType = computerPlayer.GetUnitState(gameState.Units[1]).GetRoleMovementType(gameState.Units[1]);
+        var tilesOrderedInfluence = gameState.Tiles
             .Where(x => results.Contains(x.Hex))
-            .OrderByDescending(x => computerPlayer.AggregateInfluence[x.Index][roleMovementType][board.Units[1].OwnerIndex])
+            .OrderByDescending(x => computerPlayer.AggregateInfluence[x.Index][roleMovementType][gameState.Units[1].Owner.Id])
             .ToList();
 
         IEnumerable<PathFindTile> bestPossibleDestination = null;
         foreach (var tile in tilesOrderedInfluence)
         {
-            bestPossibleDestination = PathFinder.FindShortestPath(board.Units[1].Location, tile, board.Units[1]);
+            bestPossibleDestination = PathFinder.FindShortestPath(gameState.Units[1].Location, tile, gameState.Units[1]);
             if (bestPossibleDestination != null)
                 break;
         }
 
         if (bestPossibleDestination != null)
         {
-            var moveOrder = board.Units[1].ShortestPathToMoveCommand(bestPossibleDestination.ToArray());
+            var moveOrder = gameState.Units[1].ShortestPathToMoveCommand(bestPossibleDestination.ToArray());
         }
     }
 }

@@ -54,7 +54,7 @@
 
 ## Settlement rules
 (S1) A settlement can be built on any land hex tile.
-(S2) Settlements may be owned by a player or neutral.
+(S2) Settlements are owned by a player.
 (S3) A settlement can be captured by moving a unit into the settlement's hex tile.
 (S4) Most units may move into and occupy a settlement tile.
 (S5) Further clarification to (S4): a waterbound unit may occupy a coastal settlement tile if there is a port edge between the water and the settlement tile (NM2).

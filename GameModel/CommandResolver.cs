@@ -95,10 +95,10 @@ public class CommandResolver(GameState gameState)
             var removeUnitMoves = new Dictionary<MilitaryUnit, Move>();
             foreach (var stepMove in unitStepMoves)
             {
-                if (unitStepMoves.Any(x => x.Value.Edge.Destination == stepMove.Value.Origin && x.Key.OwnerIndex != stepMove.Key.OwnerIndex))
+                if (unitStepMoves.Any(x => x.Value.Edge.Destination == stepMove.Value.Origin && x.Key.Owner.Id != stepMove.Key.Owner.Id))
                 {
-                    var originStrength = gameState.UnitsAt(stepMove.Value.Origin).Where(x => x.OwnerIndex == stepMove.Key.OwnerIndex).Sum(x => x.Strength);
-                    var destinationStrength = gameState.UnitsAt(stepMove.Value.Edge.Destination).Where(x => x.OwnerIndex != stepMove.Key.OwnerIndex).Sum(x => x.Strength);
+                    var originStrength = gameState.UnitsAt(stepMove.Value.Origin).Where(x => x.Owner.Id == stepMove.Key.Owner.Id).Sum(x => x.Strength);
+                    var destinationStrength = gameState.UnitsAt(stepMove.Value.Edge.Destination).Where(x => x.Owner.Id != stepMove.Key.Owner.Id).Sum(x => x.Strength);
 
                     if (originStrength <= destinationStrength)
                     {

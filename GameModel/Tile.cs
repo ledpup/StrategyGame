@@ -196,12 +196,12 @@ public class Tile
 
     internal int OverStackLimitCount(IEnumerable<MilitaryUnit> tileUnits, int playerIndex)
     {
-        return tileUnits.Count(x => x.IsAlive && x.OwnerIndex == playerIndex) - StackLimit;
+        return tileUnits.Count(x => x.IsAlive && x.Owner.Id == playerIndex) - StackLimit;
     }
 
     internal static bool IsInConflict(IEnumerable<MilitaryUnit> tileUnits)
     {
-        return tileUnits.Where(x => x.IsAlive).GroupBy(x => x.OwnerIndex).Count() > 1;
+        return tileUnits.Where(x => x.IsAlive).GroupBy(x => x.Owner.Id).Count() > 1;
     }
 
     public bool IsEdgeOfMap { get; private set; }

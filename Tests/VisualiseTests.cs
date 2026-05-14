@@ -19,39 +19,45 @@ public class VisualiseTests
 
     Func<PathFindTile, PathFindTile, double> distance = (node1, node2) => node1.MoveCost[node2.Hex];
 
+    GameState gameState;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        gameState = new GameState(new Board(GameBoard, TileEdges, Settlements));
+    }
+
     [TestMethod]
     public void VisualiseBoardTest()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
-        var labels = new string[board.Width * board.Height];
-        board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Index.ToString());
-        GameBoardRenderer.RenderAndSave("Coords - index.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
+        var labels = new string[gameState.Width * gameState.Height];
+        gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.Index.ToString());
+        GameBoardRenderer.RenderAndSave("Coords - index.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
 
-        board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ToOffsetCoordsString());
-        GameBoardRenderer.RenderAndSave("Coords - offset.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
+        gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.ToOffsetCoordsString());
+        GameBoardRenderer.RenderAndSave("Coords - offset.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
 
-        board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Hex.ToString());
-        GameBoardRenderer.RenderAndSave("Coords - cube.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
+        gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.Hex.ToString());
+        GameBoardRenderer.RenderAndSave("Coords - cube.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
 
-        board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
-        GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
+        gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
+        GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
     }
 
     [TestMethod]
     public void VisualiseUnitOnBoardTest()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate()) { Location = board[1, 1] },
-            new(new UnitTemplate()) { Location = board[1, 1] },
-            new(new UnitTemplate()) { Location = board[1, 1] },
-            new(new UnitTemplate()) { Location = board[1, 1], OwnerIndex = 2 }
+            new(new UnitTemplate(), 1, gameState.Players[0], gameState[1, 1]),
+            new(new UnitTemplate(), 2, gameState.Players[0], gameState[1, 1]),
+            new(new UnitTemplate(), 3, gameState.Players[1], gameState[1, 1]),
+            new(new UnitTemplate(), 4, gameState.Players[2], gameState[1, 1])
         };
 
-        GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, units: units);
+        GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: units);
     }
 
 

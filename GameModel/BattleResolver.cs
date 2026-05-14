@@ -8,10 +8,10 @@ public static class BattleResolver
 {
     public static BattleReport ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, SettlementType settlement = SettlementType.None, int siegeDuration = 1)
     {
-        var groupedUnits = units.GroupBy(x => x.OwnerIndex);
+        var groupedUnits = units.GroupBy(x => x.Owner.Id);
         if (groupedUnits.Count() == 1)
         {
-            throw new Exception("Battle can not occur because all units in tile are owned by " + units[0].OwnerIndex);
+            throw new Exception("Battle can not occur because all units in tile are owned by " + units[0].Owner);
         }
 
         units.ForEach(x =>
@@ -28,7 +28,7 @@ public static class BattleResolver
             {
                 OwnerId = group.Key,
                 Units = group.ToList(),
-                OpponentUnits = units.Where(x => x.OwnerIndex != group.Key).ToList(),
+                OpponentUnits = units.Where(x => x.Owner.Id != group.Key).ToList(),
             };
 
             var opponentUnitsCount = (double)combatantInBattle.OpponentUnits.Count;
@@ -92,7 +92,7 @@ public static class BattleResolver
 
     private static BattleReport CreateBattleReport(int turn, List<MilitaryUnit> units)
     {
-        var numberOfPlayers = units.GroupBy(x => x.OwnerIndex).Select(x => x.Key).Count();
+        var numberOfPlayers = units.GroupBy(x => x.Owner.Id).Select(x => x.Key).Count();
 
         var battleReport = new BattleReport(numberOfPlayers)
         {
@@ -101,7 +101,7 @@ public static class BattleResolver
 
         foreach (UnitType unitType in Enum.GetValues<UnitType>())
         {
-            units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.OwnerIndex][unitType] += -x.Events.Where(y => y.Turn == turn && y.Reason == "Personnel change").Sum(z => (int)z.Value));
+            units.Where(x => x.UnitType == unitType).ToList().ForEach(x => battleReport.CasualtiesByPlayerAndType[x.Owner.Id][unitType] += -x.Events.Where(y => y.Turn == turn && y.Reason == "Personnel change").Sum(z => (int)z.Value));
         }
 
         units.ForEach(x =>
@@ -110,9 +110,9 @@ public static class BattleResolver
 
             battleReport.CasualtyLog.Add(new CasualtyLogEntry
             {
-                OwnerIndex = x.OwnerIndex,
+                OwnerIndex = x.Owner.Id,
                 Text = x.IsAlive ? losses > 1
-                                    ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : "", x.Personnel)
+                                    ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : string.Empty, x.Personnel)
                                     : string.Format("{0} no losses", x.Name)
                              : string.Format("{0} destroyed", x.Name),
             });

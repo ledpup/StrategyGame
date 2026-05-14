@@ -6,7 +6,19 @@ using GameModel.Commands;
 
 public class GameState
 {
+    public GameState(Board board, List<MilitaryUnit> units = null, int turn = 0)
+    {
+        Players = InitialisePlayers();
+        Board = board;
+        Units = units ?? [];
+        Turn = turn;
+        MoveCommands = [];
+        Board.CalculateTemperature(turn);
+    }
+
     public Board Board { get; }
+
+    public List<Player> Players { get; private set; }
 
     public List<MilitaryUnit> Units { get; set; }
 
@@ -29,13 +41,15 @@ public class GameState
 
     public Tile this[int x, int y] => Board[x, y];
 
-    public GameState(Board board, List<MilitaryUnit> units = null, int turn = 0)
+    private static List<Player> InitialisePlayers()
     {
-        Board = board;
-        Units = units ?? [];
-        Turn = turn;
-        MoveCommands = [];
-        Board.CalculateTemperature(turn);
+        return
+        [
+            new Player(1, "Pheltharion Empire"),
+            new Player(2, "Vordenmak"),
+            new Player(3, "Sylvara"),
+            new Player(4, "Drakmoor"),
+        ];
     }
 
     public void CalculateTemperature(int turn) => Board.CalculateTemperature(turn);
@@ -55,7 +69,7 @@ public class GameState
             {
                 var overStackLimitCount = x.OverStackLimitCount(tileUnits, playerIndex);
                 tileUnits
-                    .Where(y => y.IsAlive && y.OwnerIndex == playerIndex)
+                    .Where(y => y.IsAlive && y.Owner.Id == playerIndex)
                     .ToList()
                     .ForEach(y => y.ChangeMorale(Turn, -.5 * overStackLimitCount, $"Units are over the stack limit of {x.StackLimit} by {overStackLimitCount} units"));
             }
@@ -82,15 +96,15 @@ public class GameState
     {
         Settlements.ForEach(x =>
         {
-            var unitsAtSettlementByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.OwnerIndex).ToList();
+            var unitsAtSettlementByOwner = Units.Where(y => y.IsAlive && y.Location == x.Location).GroupBy(y => y.Owner.Id).ToList();
             if (unitsAtSettlementByOwner.Count == 1)
             {
-                if (x.OwnerIndex == unitsAtSettlementByOwner.First().Key)
+                if (x.Owner.Id == unitsAtSettlementByOwner.First().Key)
                 {
                     return;
                 }
 
-                x.OwnerIndex = unitsAtSettlementByOwner.First().Key;
+                x.Owner = Players.First(p => p.Id == unitsAtSettlementByOwner.First().Key);
                 var units = unitsAtSettlementByOwner.First().ToList();
                 var numberOfUnits = units.Count;
                 units.ForEach(y => y.ChangeMorale(Turn, 2D / numberOfUnits, $"Morale increase from pillaging {x.SettlementType}"));

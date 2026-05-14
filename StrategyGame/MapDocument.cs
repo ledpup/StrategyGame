@@ -25,8 +25,11 @@ internal class MapDocument
         };
     }
 
-    public Board ToBoard() =>
-        new Board(Tiles, Edges.ToArray(), Settlements.ToArray());
+    public Board ToBoard()
+    {
+        var players = GameState.InitialisePlayers();
+        return new Board(Tiles, Edges.ToArray(), Settlements.ToArray(), players);
+    }
 
     public GameState ToGameState(int turn = 0)
     {

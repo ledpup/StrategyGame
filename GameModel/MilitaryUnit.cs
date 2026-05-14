@@ -47,11 +47,15 @@ public class MilitaryUnit
         }
     }
 
-    public int Index;
+    public int Id { get; set; }
+
+    public int Index => Id;
+
+    public int OwnerIndex => Owner?.Id ?? 0;
 
     public string Name { get; set; }
 
-    public int OwnerIndex { get; set; }
+    public Player Owner { get; set; }
 
     public UnitTemplate UnitTemplate { get; set; }
 
@@ -129,8 +133,10 @@ public class MilitaryUnit
         return MovementType.ToString() + " " + Name + " (" + Strength + ") at " + Location.ToString();
     }
 
-    public MilitaryUnit(UnitTemplate template, int index = 0, int ownerIndex = 0, Tile location = null, string name = null, int turnBuilt = 0, float[] moraleMoveCost = null)
+    public MilitaryUnit(UnitTemplate template, int id, Player owner, Tile location = null, string name = null, int turnBuilt = 0, float[] moraleMoveCost = null)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(1, id, nameof(id));
+
         UnitTemplate = template;
 
         BattleQualityModifiers = [];
@@ -162,9 +168,9 @@ public class MilitaryUnit
         UsesRoads = template.UsesRoads;
         CanStopOn = template.CanStopOn;
 
-        Index = index;
-        Name = name ?? template.Name ?? "Unit " + index + " (owned by " + ownerIndex + ")";
-        OwnerIndex = ownerIndex;
+        Id = id;
+        Name = name ?? template.Name ?? "Unit " + id + " (owned by " + owner.Id + ")";
+        Owner = owner;
         Location = location;
         RoadMovementBonus = template.RoadMovementBonus;
         TransportableBy = template.TransportableBy ?? [];
@@ -224,13 +230,13 @@ public class MilitaryUnit
         Events.Add(new UnitEvent(turn, moraleChange, reason));
     }
 
-    public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.OwnerIndex != o.OwnerIndex && p.Location == o.Location && p.MovementType == o.MovementType;
+    public static Func<MilitaryUnit, MilitaryUnit, bool> IsInConflictDuringMovement = (p, o) => p.Owner.Id != o.Owner.Id && p.Location == o.Location && p.MovementType == o.MovementType;
 
     public Tile Location { get; set; }
 
     public override int GetHashCode()
     {
-        return Index;
+        return Id;
     }
 
     public int MovementPoints

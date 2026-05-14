@@ -137,18 +137,18 @@ public class ComputerPlayer
     public UnitAiState TrackUnit(MilitaryUnit unit, Role role = Role.Balanced)
     {
         var state = new UnitAiState(role);
-        UnitStates[unit.Index] = state;
+        UnitStates[unit.Id] = state;
         return state;
     }
 
     public bool IsTracked(MilitaryUnit unit)
     {
-        return unit != null && UnitStates.ContainsKey(unit.Index);
+        return unit != null && UnitStates.ContainsKey(unit.Id);
     }
 
     public UnitAiState GetUnitState(MilitaryUnit unit)
     {
-        return UnitStates[unit.Index];
+        return UnitStates[unit.Id];
     }
 
     public UnitAiState TryGetUnitState(MilitaryUnit unit)
@@ -156,16 +156,16 @@ public class ComputerPlayer
         if (unit == null)
             return null;
 
-        UnitStates.TryGetValue(unit.Index, out var state);
+        UnitStates.TryGetValue(unit.Id, out var state);
         return state;
     }
     public void SetStrategicAction(GameState board)
     {
         foreach (var unitState in UnitStates)
         {
-            unitState.Value.StrategicAction = OperationalAction.None;
+            unitState.Value.OperationalAction = OperationalAction.None;
 
-            var unit = board.Units.SingleOrDefault(x => x.Index == unitState.Key);
+            var unit = board.Units.SingleOrDefault(x => x.Id == unitState.Key);
             if (unit == null || !unit.IsAlive)
                 continue;
 
@@ -174,7 +174,7 @@ public class ComputerPlayer
             {
                 case MovementType.Airborne:
                     // If there are any enemy land or airborne units that are nearby, don't do pickup or airlift
-                    if (board.Units.Any(x => x.OwnerIndex != unit.OwnerIndex &&
+                    if (board.Units.Any(x => x.Owner.Id != unit.Owner.Id &&
                                 (x.MovementType == MovementType.Land || x.MovementType == MovementType.Airborne) &&
                                 (unit.Location == x.Location
                                 || ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5)))
@@ -183,11 +183,11 @@ public class ComputerPlayer
                     }
                     if (!unit.Transporting.Any())
                     {
-                        unitState.Value.StrategicAction = OperationalAction.Pickup;
+                        unitState.Value.OperationalAction = OperationalAction.Pickup;
                     }
                     else if (unit.Transporting.Any())
                     {
-                        unitState.Value.StrategicAction = OperationalAction.AirliftToDestination;
+                        unitState.Value.OperationalAction = OperationalAction.AirliftToDestination;
                     }
                     break;
                 case MovementType.Land:
@@ -195,32 +195,32 @@ public class ComputerPlayer
                     // and there are no enemy settlements or units nearby
                     if (unit.TransportedBy == null &&
                                 unitState.Value.Role != Role.Defensive &&
-                                !board.Settlements.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex) &&
-                                !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.OwnerIndex != unit.OwnerIndex)
+                                !board.Settlements.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.Owner.Id != unit.Owner.Id) &&
+                                !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.Owner.Id != unit.Owner.Id)
                                 )
                     {
-                        unitState.Value.StrategicAction = OperationalAction.Embark;
+                        unitState.Value.OperationalAction = OperationalAction.Embark;
                     }
                     else if (unit.TransportedBy != null)
                     {
-                        unitState.Value.StrategicAction = OperationalAction.Disembark;
+                        unitState.Value.OperationalAction = OperationalAction.Disembark;
                     }
                     break;
                 case MovementType.Waterbound:
                     // If there are any enemy units nearby, don't dock or transport to destination
                     if (board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId
-                                        && x.OwnerIndex != unit.OwnerIndex
+                                        && x.Owner.Id != unit.Owner.Id
                                         && ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5))
                     {
                         break;
                     }
                     if (!unit.Transporting.Any())
                     {
-                        unitState.Value.StrategicAction = OperationalAction.Dock;
+                        unitState.Value.OperationalAction = OperationalAction.Dock;
                     }
                     else if (unit.Transporting.Any())
                     {
-                        unitState.Value.StrategicAction = OperationalAction.TransportToDestination;
+                        unitState.Value.OperationalAction = OperationalAction.TransportToDestination;
                     }
                     break;
             }
@@ -250,7 +250,7 @@ public class ComputerPlayer
 
         var unitState = GetUnitState(unit);
 
-        switch (unitState.StrategicAction)
+        switch (unitState.OperationalAction)
         {
             case OperationalAction.None:
                 {
@@ -260,7 +260,7 @@ public class ComputerPlayer
                     break;
                 }
             case OperationalAction.Embark:
-                Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && GetUnitState(x).StrategicAction == OperationalAction.Pickup;
+                Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && GetUnitState(x).OperationalAction == OperationalAction.Pickup;
                 var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule);
 
                 //Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;
@@ -318,7 +318,7 @@ public class ComputerPlayer
             case OperationalAction.Disembark:
                 if (unit.TransportedBy.MovementType == MovementType.Airborne)
                 {
-                    if (board.Settlements.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
+                    if (board.Settlements.Any(x => x.Owner.Id != unit.Owner.Id && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
                     {
                         unitOrders.Add(new UnloadCommand(unit));
                     }
@@ -329,7 +329,7 @@ public class ComputerPlayer
                     if (board.Settlements.Any(y => tileEdges.Any(z =>
                                                                     z.EdgeType == EdgeType.Port
                                                                     && (z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) || (z.Origin.ContiguousRegionId == y.Location.ContiguousRegionId))
-                                                                    && y.OwnerIndex != unit.OwnerIndex))
+                                                                    && y.Owner.Id != unit.Owner.Id))
                     {
                         unitOrders.Add(unit.PossibleMoves().First().GetMoveOrder(unit));
                         unit.TransportedBy.Transporting.Remove(unit);
@@ -340,7 +340,7 @@ public class ComputerPlayer
 
             case OperationalAction.Dock:
                 {
-                    if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && GetUnitState(x).StrategicAction == OperationalAction.Embark))
+                    if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && GetUnitState(x).OperationalAction == OperationalAction.Embark))
                     {
                         closestPortPath = ClosestPortPath(board, unit);
 
@@ -405,7 +405,7 @@ public class ComputerPlayer
                         if (moveOrder != null)
                             unitOrders.Add(moveOrder);
 
-                        if (board.Settlements.Any(x => x.OwnerIndex != unit.OwnerIndex && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
+                        if (board.Settlements.Any(x => x.Owner.Id != unit.Owner.Id && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
                         {
                             unit.Transporting.ForEach(x => unitOrders.Add(new UnloadCommand(x, moveOrder.Moves.Last().Edge.Destination)));
                         }
@@ -420,7 +420,7 @@ public class ComputerPlayer
     private MilitaryUnit ClosestEmbarkingUnitPath(GameState board, List<MilitaryUnit> units, Tile origin)
     {
         var closestUnit = units
-                                .Where(x => GetUnitState(x).StrategicAction == OperationalAction.Embark)
+                                .Where(x => GetUnitState(x).OperationalAction == OperationalAction.Embark)
                                 .OrderBy(x => Hex.Distance(x.Location.Hex, origin.Hex))
                                 .FirstOrDefault();
 
@@ -468,7 +468,7 @@ public class ComputerPlayer
     public static IEnumerable<PathFindTile> ClosestEnemySettlementPath(GameState board, MilitaryUnit unit)
     {
         var settlements = board.Settlements
-            .Where(x => x.OwnerIndex != unit.OwnerIndex)
+            .Where(x => x.Owner.Id != unit.Owner.Id)
             .OrderBy(x => Hex.Distance(unit.Location.Hex, x.Location.Hex))
             .ToList();
 
@@ -491,16 +491,16 @@ public class ComputerPlayer
             {
                 if (x.ContiguousRegionId == unit.Location.ContiguousRegionId && x.HasPort)
                 {
-                    switch (unitState.StrategicAction)
+                    switch (unitState.OperationalAction)
                     {
                         case OperationalAction.Dock:
                             // Only go to a port that has units that want to embark
-                            if (!board.Units.Any(y => IsTracked(y) && x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && GetUnitState(y).StrategicAction == OperationalAction.Embark))
+                            if (!board.Units.Any(y => IsTracked(y) && x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && GetUnitState(y).OperationalAction == OperationalAction.Embark))
                                 return;
                             break;
                         case OperationalAction.TransportToDestination:
                             // Only go to a port that has enemy settlement(s)
-                            if (!board.Settlements.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.OwnerIndex != unit.OwnerIndex))
+                            if (!board.Settlements.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.Owner.Id != unit.Owner.Id))
                                 return;
                             break;
                     }
@@ -586,11 +586,11 @@ public class ComputerPlayer
                 if (influence == 0f)
                     continue;
 
-                friendlyUnitMapsByPlayer[unit.OwnerIndex].AddValue(index, influence);
+                friendlyUnitMapsByPlayer[unit.Owner.Id].AddValue(index, influence);
 
                 for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
                 {
-                    if (playerIndex == unit.OwnerIndex)
+                    if (playerIndex == unit.Owner.Id)
                         continue;
 
                     enemyUnitMapsByPlayer[playerIndex].AddValue(index, influence);
@@ -611,7 +611,7 @@ public class ComputerPlayer
 
                 for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
                 {
-                    var isFriendlyForPlayer = settlement.OwnerIndex == playerIndex;
+                    var isFriendlyForPlayer = settlement.Owner.Id == playerIndex;
                     var movementMapSet = isFriendlyForPlayer ? friendlySettlementMapsByPlayer[playerIndex] : enemySettlementMapsByPlayer[playerIndex];
 
                     // Air influence is always relevant, while land and water require same contiguous region.
@@ -701,7 +701,7 @@ public class ComputerPlayer
         var roleMovementType = unitState.GetRoleMovementType(unit);
         var tilesOrderedInfluence = board.Tiles
             .Where(x => results.Contains(x.Hex))
-            .OrderByDescending(x => AggregateInfluence[x.Index][roleMovementType][unit.OwnerIndex] - 1 * FriendlyUnitInfluenceModifier[unitState.Role] / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
+            .OrderByDescending(x => AggregateInfluence[x.Index][roleMovementType][unit.Owner.Id] - 1 * FriendlyUnitInfluenceModifier[unitState.Role] / (Hex.Distance(x.Hex, unit.Location.Hex) + 1))
             .ToList();
 
         IEnumerable<PathFindTile> bestPossibleDestination = null;

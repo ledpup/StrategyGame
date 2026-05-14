@@ -17,6 +17,14 @@ public class TransportTests
     public static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
     static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
+    GameState gameState;
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        gameState = new GameState(new Board(GameBoard, TileEdges, Settlements));
+    }
+
 
     [TestMethod]
     public void Ports()
@@ -27,11 +35,11 @@ public class TransportTests
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 0, location: gameState[20, 5]),
-            new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3, IsTransporter = true }, 1, location: gameState[3, 10]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound], RoadMovementBonus = 1 }, 2, location: gameState[24, 16]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 3, location: gameState[1, 1]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 4, location: gameState[1, 1]),
+            new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 1, gameState.Players[0], location: gameState[20, 5]),
+            new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3, IsTransporter = true }, 2, gameState.Players[1], location: gameState[3, 10]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound], RoadMovementBonus = 1 }, 3, gameState.Players[0], location: gameState[24, 16]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 4, gameState.Players[1], location: gameState[1, 1]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 5, gameState.Players[0], location: gameState[1, 1]),
         };
 
         units[3].TerrainMovementCosts[TerrainType.Swamp] = 1;
@@ -94,20 +102,19 @@ public class TransportTests
     [TestMethod]
     public void TransportByAir()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, location: board[1, 1]),
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[1, 1]),
+            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, 1, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 2, gameState.Players[0], location: gameState[1, 1]),
         };
 
-        board.Units = units;
+        gameState.Units = units;
 
         var moves = new Move[]
         {
-            new(board[1, 1], board[2, 2], null, 2, 1),
-            new(board[2, 2], board[3, 2], null, 1, 2),
+            new(gameState[1, 1], gameState[2, 2], null, 2, 1),
+            new(gameState[2, 2], gameState[3, 2], null, 1, 2),
         };
 
         var unitOrders = new List<IUnitCommand>
@@ -116,32 +123,31 @@ public class TransportTests
             new TransportCommand(units[1], units[0]),
 
         };
-        board.ResolveOrders(unitOrders);
+        gameState.ResolveOrders(unitOrders);
 
         Assert.AreEqual(units[0], units[1].Transporting.Single());
         Assert.AreEqual(units[1], units[0].TransportedBy);
 
-        Assert.AreEqual(board[3, 2], units[0].Location);
-        Assert.AreEqual(board[3, 2], units[1].Location);
+        Assert.AreEqual(gameState[3, 2], units[0].Location);
+        Assert.AreEqual(gameState[3, 2], units[1].Location);
     }
 
     [TestMethod]
     public void MoveTransportedUnit()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { RoadMovementBonus = 1 }, location: board[1, 1], name: "1st Dragoons"),
-            new(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true }, location: board[1, 1]),
+            new(new UnitTemplate { RoadMovementBonus = 1 }, 1, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true }, 2, gameState.Players[0], location: gameState[1, 1]),
         };
 
-        board.Units = units;
+        gameState.Units = units;
 
         var moves = new Move[]
         {
-            new(board[1, 1], board[2, 2], null, 2, 1),
-            new(board[2, 2], board[3, 2], null, 1, 2),
+            new(gameState[1, 1], gameState[2, 2], null, 2, 1),
+            new(gameState[2, 2], gameState[3, 2], null, 1, 2),
         };
 
         var unitOrders = new List<IUnitCommand>
@@ -150,7 +156,7 @@ public class TransportTests
             new MoveCommand(moves, units[0]),
         };
         bool exceptionThrown = false;
-        try { board.ResolveOrders(unitOrders); }
+        try { gameState.ResolveOrders(unitOrders); }
         catch (Exception) { exceptionThrown = true; }
         Assert.IsTrue(exceptionThrown, "Expected an Exception to be thrown.");
     }
@@ -158,20 +164,19 @@ public class TransportTests
     [TestMethod]
     public void UnloadUnit()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, location: board[1, 1]),
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, location: board[1, 1]),
+            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, 1, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 2, gameState.Players[0], location: gameState[1, 1]),
         };
 
-        board.Units = units;
+        gameState.Units = units;
 
         var moves = new Move[]
         {
-            new(board[1, 1], board[2, 2], null, 2, 1),
-            new(board[2, 2], board[3, 2], null, 1, 2),
+            new(gameState[1, 1], gameState[2, 2], null, 2, 1),
+            new(gameState[2, 2], gameState[3, 2], null, 1, 2),
         };
 
         var unitOrders = new List<IUnitCommand>
@@ -179,7 +184,7 @@ public class TransportTests
             new MoveCommand(moves, units[1]),
             new TransportCommand(units[1], units[0]),
         };
-        board.ResolveOrders(unitOrders);
+        gameState.ResolveOrders(unitOrders);
 
         Assert.AreEqual(units[0], units[1].Transporting.Single());
         Assert.AreEqual(units[1], units[0].TransportedBy);
@@ -188,7 +193,7 @@ public class TransportTests
         [
             new UnloadCommand(units[0]),
         ];
-        board.ResolveOrders(unitOrders);
+        gameState.ResolveOrders(unitOrders);
 
         Assert.IsEmpty(units[1].Transporting);
         Assert.IsNull(units[0].TransportedBy);
@@ -197,22 +202,21 @@ public class TransportTests
     [TestMethod]
     public void AirborneUnitAirlift()
     {
-        var board = new GameState(new Board(GameBoard, TileEdges, Settlements));
         var numberOfPlayers = 2;
-        var labels = new string[board.Width, board.Height];
+        var labels = new string[gameState.Width, gameState.Height];
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 4, IsTransporter = true }, 0, location: board[24, 11]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Airborne], RoadMovementBonus = 1 }, 1, location: board[22, 15]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 2, location: board[1, 1]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 3, location: board[1, 1]),
+            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 4, IsTransporter = true }, 1, gameState.Players[0], location: gameState[24, 11]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Airborne], RoadMovementBonus = 1 }, 2, gameState.Players[0], location: gameState[22, 15]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 3, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 4, gameState.Players[0], location: gameState[1, 1]),
         };
 
         units[2].TerrainTypeBattleModifier[TerrainType.Swamp] = 1;
         units[2].EdgeMovementCosts[EdgeType.River] = 0;
 
-        board.Units = units;
+        gameState.Units = units;
 
         var computerPlayer = new ComputerPlayer(new Dictionary<MilitaryUnit, Role>
         {
@@ -224,26 +228,26 @@ public class TransportTests
 
         for (var turn = 0; turn < 25; turn++)
         {
-            computerPlayer.GenerateInfluenceMaps(board, numberOfPlayers);
+            computerPlayer.GenerateInfluenceMaps(gameState, numberOfPlayers);
 
-            GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, null, null, board.Units);
+            GameBoardRenderer.Render(RenderPipeline.Board, RenderPipeline.Units, gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
 
             // Remove any units that have been destroyed for the purposes of unit orders
             units = units.Where(x => x.IsAlive).ToList();
-            computerPlayer.SetStrategicAction(board);
-            var unitOrders = computerPlayer.CreateOrders(board, units);
+            computerPlayer.SetStrategicAction(gameState);
+            var unitOrders = computerPlayer.CreateOrders(gameState, units);
 
             var lines = new List<Centreline>();
             unitOrders.OfType<MoveCommand>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-            GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, units: board.Units, lines: lines);
+            GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: gameState.Units, lines: lines);
 
-            board.ResolveOrders(unitOrders);
-            board.ChangeSettlementOwners();
+            gameState.ResolveOrders(unitOrders);
+            gameState.ChangeSettlementOwners();
 
-            board.Turn++;
+            gameState.Turn++;
 
-            switch (board.Turn)
+            switch (gameState.Turn)
             {
                 case 1:
                     Assert.AreEqual(429, units[0].Location.Index);
@@ -295,32 +299,6 @@ public class TransportTests
                     Assert.IsNull(units[1].TransportedBy);
                     Assert.AreEqual(units[0], units[3].TransportedBy);
                     break;
-                    //case 11:
-                    //    Assert.AreEqual(304, units[0].Location.Index);
-                    //    Assert.AreEqual(438, units[1].Location.Index);
-                    //    Assert.AreEqual(null, units[1].TransportedBy);
-                    //    break;
-                    //case 12:
-                    //    Assert.AreEqual(196, units[0].Location.Index);
-                    //    Assert.AreEqual(436, units[1].Location.Index);
-                    //    Assert.AreEqual(null, units[1].TransportedBy);
-                    //    Assert.AreEqual(196, units[3].Location.Index);
-                    //    Assert.AreEqual(units[0], units[3].TransportedBy);
-                    //    break;
-                    //case 13:
-                    //    Assert.AreEqual(172, units[0].Location.Index);
-                    //    Assert.AreEqual(408, units[1].Location.Index);
-                    //    Assert.AreEqual(null, units[1].TransportedBy);
-                    //    Assert.AreEqual(172, units[3].Location.Index);
-                    //    Assert.AreEqual(units[0], units[3].TransportedBy);
-                    //    break;
-                    //case 14:
-                    //    Assert.AreEqual(148, units[0].Location.Index);
-                    //    Assert.AreEqual(381, units[1].Location.Index);
-                    //    Assert.AreEqual(null, units[1].TransportedBy);
-                    //    Assert.AreEqual(148, units[3].Location.Index);
-                    //    Assert.AreEqual(null, units[3].TransportedBy);
-                    //    break;
             }
         }
     }

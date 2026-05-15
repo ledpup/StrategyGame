@@ -30,7 +30,7 @@ public class StrategicActionTests
         gameState.Units =
         [
             new(new UnitTemplate { OperationalDomain = OperationalDomain.Waterbound, MovementPoints = 5, IsTransporter = true }, gameState.Players[0], location: gameState[20, 5]),
-            new(new UnitTemplate { OperationalDomain = OperationalDomain.Waterbound, MovementPoints = 3, IsTransporter = true }, gameState.Players[0], location: gameState[18, 7]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Waterbound, MovementPoints = 3, IsTransporter = true }, gameState.Players[1], location: gameState[18, 7]),
         ];
 
         var computerPlayer = new ComputerPlayer(gameState.Units);
@@ -68,7 +68,7 @@ public class StrategicActionTests
             new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 4, IsTransporter = true }, gameState.Players[0], location: gameState[24, 11]),
             new(new UnitTemplate { TransportableBy = [OperationalDomain.Airborne], RoadMovementBonus = 1 }, gameState.Players[0], location: gameState[22, 15]),
 
-            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 4, IsTransporter = true }, gameState.Players[0], location: gameState[25, 12]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 4, IsTransporter = true }, gameState.Players[1], location: gameState[25, 12]),
         };
 
         gameState.Units = units;

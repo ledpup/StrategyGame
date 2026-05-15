@@ -500,7 +500,15 @@ public class ComputerPlayer
                             break;
                         case OperationalAction.TransportToDestination:
                             // Only go to a port that has enemy settlement(s)
-                            if (!board.Settlements.Any(y => x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && y.Owner.Id != unit.Owner.Id))
+                            var portDestinationRegionIds = x.Neighbours
+                                .Where(z => z.EdgeType == EdgeType.Port)
+                                .Select(z => z.Destination.ContiguousRegionId)
+                                .ToList();
+
+                            if (!board.Settlements.Any(y => portDestinationRegionIds.Contains(y.Location.ContiguousRegionId) && y.Owner.Id != unit.Owner.Id))
+                                return;
+
+                            if (board.Units.Any(y => y.Owner.Id == unit.Owner.Id && portDestinationRegionIds.Contains(y.Location.ContiguousRegionId)))
                                 return;
                             break;
                     }
@@ -739,6 +747,9 @@ public class ComputerPlayer
 
     public static int ShortestPathDistance(Tile origin, Tile destination, MilitaryUnit unit)
     {
+        if (origin == destination)
+            return 0;
+
         var path = PathFinder.FindShortestPath(origin, destination, unit.MovementPoints, unit.UsesRoads, unit.TransportedByWater, unit.EdgeMovementCosts, unit.TerrainMovementCosts, unit.CanStopOn);
         if (path == null)
             return int.MaxValue;

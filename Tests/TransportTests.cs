@@ -66,7 +66,6 @@ public class TransportTests
             var aliveUnits = gameState.Units.Where(x => x.IsAlive).ToList();
             computerPlayer.SetStrategicAction(gameState);
             var moveOrders = computerPlayer.CreateOrders(gameState, aliveUnits);
-
             var lines = new List<Centreline>();
             moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 

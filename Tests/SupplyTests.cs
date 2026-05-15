@@ -19,8 +19,9 @@ public class SupplyTests
         var gameState = new GameState(new Board(GameBoard, Edges));
         gameState.Board.ParseSettlements(Settlements, gameState.Players);
 
-        gameState[3, 4].Settlement.Owner.Id = gameState.Players[1].Id;
-        gameState.Units = [new(new UnitTemplate(), gameState.Players[1], gameState[3, 4])];
+        var settlementTile = gameState[82];
+        settlementTile.Settlement.Owner = gameState.Players[1];
+        gameState.Units = [new(new UnitTemplate(), gameState.Players[1], settlementTile)];
         gameState.InitialiseSupply();
 
         var labels = new string[gameState.Width * gameState.Height];

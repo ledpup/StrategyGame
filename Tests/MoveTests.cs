@@ -570,7 +570,7 @@ public class MoveTests
         gameState.Units =
         [
             new(new UnitTemplate(), gameState.Players[0], gameState[1, 1]),
-            new(new UnitTemplate(), gameState.Players[0], gameState[2, 2]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[2, 2]),
         ];
 
         var moves1 = new Move[]
@@ -602,8 +602,8 @@ public class MoveTests
         gameState.Units =
         [
             new(new UnitTemplate(), gameState.Players[0], gameState[1, 1]),
-            new(new UnitTemplate(), gameState.Players[0], gameState[2, 2]),
-            new(new UnitTemplate(), gameState.Players[0], gameState[2, 2]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[2, 2]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[2, 2]),
         ];
 
         var moves1 = new Move[]
@@ -636,10 +636,10 @@ public class MoveTests
         gameState.Units =
         [
             new(new UnitTemplate { MovementPoints = 3 }, gameState.Players[0], gameState[1, 1]),
-            new(new UnitTemplate { MovementPoints = 3 }, gameState.Players[0], gameState[4, 1]),
+            new(new UnitTemplate { MovementPoints = 3 }, gameState.Players[1], gameState[4, 1]),
 
             new(new UnitTemplate { MovementPoints = 6 }, gameState.Players[0], gameState[10, 2]),
-            new(new UnitTemplate(), gameState.Players[0], gameState[10, 3]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[10, 3]),
         ];
 
         var moves1 = new Move[]
@@ -695,7 +695,7 @@ public class MoveTests
         // NM2: a waterbound unit may stop on a coastal settlement land tile if there is a port edge between the water tile and the settlement tile
         var settlements = new[] { "196,City,1,6" };
         var board = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
-        gameState.Board.ParseSettlements(settlements, gameState.Players);
+        board.Board.ParseSettlements(settlements, board.Players);
 
         var t196 = board[196];
         var t224 = board[224];

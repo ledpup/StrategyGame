@@ -33,8 +33,11 @@ internal class MapDocument
     public GameState ToGameState(int turn = 0)
     {
         var board = ToBoard();
-        var units = Units.Select(ToMilitaryUnit(board)).ToList();
-        return new GameState(board, units, turn);
+        var gameState = new GameState(board, turn: turn);
+        board.ParseSettlements(Settlements.ToArray(), gameState.Players);
+        gameState.Units = Units.Select(ToMilitaryUnit(board, gameState.Players)).ToList();
+        board.InitialiseSupply();
+        return gameState;
     }
 
     public static MapDocument FromBoard(Board board) => FromGameState(new GameState(board));
@@ -61,7 +64,7 @@ internal class MapDocument
                 .OrderBy(x => x)
                 .ToList(),
             Settlements = board.Settlements
-                .Select(x => $"{x.SettlementType},{x.Owner.Colour},{(int)x.Supply}")
+                .Select(x => $"{x.Location.Index},{x.SettlementType},{x.Owner.Colour},{(int)x.Supply}")
                 .OrderBy(x => x)
                 .ToList(),
             Units = gameState.Units
@@ -128,10 +131,11 @@ internal class MapDocument
         return lines ?? [];
     }
 
-    private static Func<UnitDocument, MilitaryUnit> ToMilitaryUnit(Board board)
+    private static Func<UnitDocument, MilitaryUnit> ToMilitaryUnit(Board board, List<Player> players)
     {
         return x =>
         {
+            var owner = players.FirstOrDefault(player => player.Colour == (PlayerColour)x.OwnerIndex) ?? new Player((PlayerColour)x.OwnerIndex, ((PlayerColour)x.OwnerIndex).ToString());
             var template = new UnitTemplate
             {
                 UnitTemplateName = x.UnitTemplateName,
@@ -147,7 +151,11 @@ internal class MapDocument
                 CombatInitiative = x.CombatInitiative,
                 Morale = x.InitialMorale,
             };
-            return new MilitaryUnit(template, x.Owner, board[x.TileIndex], turnBuilt: x.TurnBuilt);
+            var unit = new MilitaryUnit(template, owner, board[x.TileIndex], x.Name, turnBuilt: x.TurnBuilt)
+            {
+                Id = x.Id,
+            };
+            return unit;
         };
     }
 
@@ -170,7 +178,9 @@ internal class MapDocument
 
 internal class UnitDocument
 {
-    public UnitTemplateName UnitTemplateName { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    public UnitTemplateName? UnitTemplateName { get; set; }
 
     public string Name { get; set; }
     public int OwnerIndex { get; set; }
@@ -192,9 +202,9 @@ internal class UnitDocument
     {
         return new UnitDocument
         {
-            Index = unit.Id,
+            Id = unit.Id,
             UnitTemplateName = unit.UnitTemplate.UnitTemplateName,
-            OwnerIndex = unit.OwnerIndex,
+            OwnerIndex = (int)unit.Owner.Colour,
             TileIndex = unit.Location.Index,
             MovementType = unit.MovementType,
             BaseMovementPoints = unit.BaseMovementPoints,
@@ -214,7 +224,7 @@ internal class UnitDocument
     public string ToLine()
     {
         var transportableBy = string.Join('|', TransportableBy);
-        return $"{Index},{UnitTemplateName},{OwnerIndex},{TileIndex},{MovementType},{BaseMovementPoints},{RoadMovementBonus},{UnitType},{BaseQuality},{InitialQuantity},{Size},{IsTransporter},{transportableBy},{CombatInitiative},{InitialMorale},{TurnBuilt}";
+        return $"{Id},{UnitTemplateName},{OwnerIndex},{TileIndex},{MovementType},{BaseMovementPoints},{RoadMovementBonus},{UnitType},{BaseQuality},{InitialQuantity},{Size},{IsTransporter},{transportableBy},{CombatInitiative},{InitialMorale},{TurnBuilt}";
     }
 
     public static UnitDocument Parse(string line)
@@ -232,7 +242,7 @@ internal class UnitDocument
 
         return new UnitDocument
         {
-            Index = int.Parse(columns[0]),
+            Id = Guid.TryParse(columns[0], out var id) ? id : Guid.NewGuid(),
             UnitTemplateName = Enum.Parse<UnitTemplateName>(columns[1]),
             OwnerIndex = int.Parse(columns[2]),
             TileIndex = int.Parse(columns[3]),

@@ -5,21 +5,21 @@ using System.Collections.Generic;
 
 public class BattleReport
 {
-    public Dictionary<UnitType, Guid>[] CasualtiesByPlayerAndType { get; set; }
+    public Dictionary<Guid, Dictionary<UnitType, int>> CasualtiesByPlayerAndType { get; set; }
 
     public int Turn { get; set; }
 
     public List<CasualtyLogEntry> CasualtyLog { get; set; }
 
-    public BattleReport(int numberOfCombatants)
+    public BattleReport(IEnumerable<Guid> playerIds)
     {
-        CasualtiesByPlayerAndType = new Dictionary<UnitType, Guid>[numberOfCombatants];
-        for (var i = 0; i < numberOfCombatants; i++)
+        CasualtiesByPlayerAndType = [];
+        foreach (var playerId in playerIds)
         {
-            CasualtiesByPlayerAndType[i] = [];
+            CasualtiesByPlayerAndType[playerId] = [];
             foreach (UnitType unitType in Enum.GetValues<UnitType>())
             {
-                CasualtiesByPlayerAndType[i].Add(unitType, Guid.Empty);
+                CasualtiesByPlayerAndType[playerId].Add(unitType, 0);
             }
         }
 

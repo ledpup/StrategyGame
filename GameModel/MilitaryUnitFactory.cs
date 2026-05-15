@@ -7,11 +7,17 @@ public class MilitaryUnitFactory(UnitTemplateFactory templateFactory)
 {
     private readonly UnitTemplateFactory templateFactory = templateFactory;
     private readonly Dictionary<(UnitTemplateName, Guid OwnerId), int> sequenceCounters = [];
+    private readonly Dictionary<int, Player> playersByOwnerIndex = [];
 
     public MilitaryUnit Create(UnitTemplateName templateName, Player owner, string unitName, Tile location = null, int turnBuilt = 0)
     {
         var template = templateFactory.Get(templateName);
         return new MilitaryUnit(template, owner, location: location, name: unitName, turnBuilt: turnBuilt);
+    }
+
+    public MilitaryUnit Create(UnitTemplateName templateName, string unitName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
+    {
+        return Create(templateName, GetPlayer(ownerIndex), unitName, location, turnBuilt);
     }
 
     public MilitaryUnit CreateNext(UnitTemplateName templateName, Player owner, Tile location = null, int turnBuilt = 0)
@@ -27,6 +33,23 @@ public class MilitaryUnitFactory(UnitTemplateFactory templateFactory)
         var ordinal = ToOrdinal(count);
         var unitName = $"{ordinal} {templateName.ToDisplayName()}";
         return Create(templateName, owner, unitName, location, turnBuilt);
+    }
+
+    public MilitaryUnit CreateNext(UnitTemplateName templateName, int ownerIndex = 0, Tile location = null, int turnBuilt = 0)
+    {
+        return CreateNext(templateName, GetPlayer(ownerIndex), location, turnBuilt);
+    }
+
+    private Player GetPlayer(int ownerIndex)
+    {
+        if (!playersByOwnerIndex.TryGetValue(ownerIndex, out var player))
+        {
+            var colour = Enum.IsDefined(typeof(PlayerColour), ownerIndex) ? (PlayerColour)ownerIndex : PlayerColour.Red;
+            player = new Player(colour, colour.ToString());
+            playersByOwnerIndex[ownerIndex] = player;
+        }
+
+        return player;
     }
 
     private static string ToOrdinal(int number)

@@ -92,9 +92,9 @@ public static class BattleResolver
 
     private static BattleReport CreateBattleReport(int turn, List<MilitaryUnit> units)
     {
-        var numberOfPlayers = units.GroupBy(x => x.Owner.Id).Select(x => x.Key).Count();
+        var playerIds = units.Select(x => x.Owner.Id).Distinct().ToList();
 
-        var battleReport = new BattleReport(numberOfPlayers)
+        var battleReport = new BattleReport(playerIds)
         {
             Turn = turn,
         };

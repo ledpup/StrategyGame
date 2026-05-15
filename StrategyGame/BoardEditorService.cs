@@ -83,7 +83,7 @@ internal static class BoardEditorService
             return gameState;
 
         var document = MapDocument.FromGameState(gameState);
-        var nextIndex = document.Units.Any() ? document.Units.Max(x => x.Index) + 1 : 0;
+        var nextIndex = document.Units.Count;
         var isTransporter = movementType != OperationalDomain.Land;
         var transportableBy = new List<OperationalDomain>();
         if (movementType == OperationalDomain.Land)
@@ -95,6 +95,7 @@ internal static class BoardEditorService
         document.Units.Add(new UnitDocument
         {
             Name = $"Unit {nextIndex} (owned by {ownerIndex})",
+            UnitTemplateName = UnitTemplateName.DwarvenInfantry,
             OwnerIndex = ownerIndex,
             TileIndex = tile.Index,
             MovementType = movementType,

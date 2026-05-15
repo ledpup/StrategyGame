@@ -116,11 +116,11 @@ public class ComputerPlayer
 
     public Dictionary<Guid, UnitAiState> UnitStates { get; set; }
 
-    public Dictionary<int, Dictionary<RoleMovementType, float[]>> AggregateInfluence { get; private set; }
-    public Dictionary<int, float[]> FriendlyUnitInfluence { get; private set; }
-    public Dictionary<int, float[]> EnemyUnitInfluence { get; private set; }
-    public Dictionary<int, Dictionary<OperationalDomain, float[]>> FriendlySettlementInfluenceMap { get; private set; }
-    public Dictionary<int, Dictionary<OperationalDomain, float[]>> EnemySettlementInfluenceMap { get; private set; }
+    public Dictionary<int, Dictionary<RoleMovementType, Dictionary<Guid, float>>> AggregateInfluence { get; private set; }
+    public Dictionary<int, Dictionary<Guid, float>> FriendlyUnitInfluence { get; private set; }
+    public Dictionary<int, Dictionary<Guid, float>> EnemyUnitInfluence { get; private set; }
+    public Dictionary<int, Dictionary<OperationalDomain, Dictionary<Guid, float>>> FriendlySettlementInfluenceMap { get; private set; }
+    public Dictionary<int, Dictionary<OperationalDomain, Dictionary<Guid, float>>> EnemySettlementInfluenceMap { get; private set; }
 
     public static List<Role> Roles
     {
@@ -527,6 +527,12 @@ public class ComputerPlayer
     public void GenerateInfluenceMaps(GameState gameState, int numberOfPlayers)
     {
         var aliveUnits = gameState.Units.Where(x => x.IsAlive).ToList();
+        var playerIds = gameState.Players
+            .Select(x => x.Id)
+            .Concat(aliveUnits.Select(x => x.Owner.Id))
+            .Concat(gameState.Settlements.Select(x => x.Owner.Id))
+            .Distinct()
+            .ToList();
 
         AggregateInfluence = [];
         FriendlyUnitInfluence = [];
@@ -536,39 +542,39 @@ public class ComputerPlayer
 
         gameState.Tiles.ToList().ForEach(x =>
         {
-            FriendlyUnitInfluence[x.Index] = new float[numberOfPlayers];
-            EnemyUnitInfluence[x.Index] = new float[numberOfPlayers];
+            FriendlyUnitInfluence[x.Index] = playerIds.ToDictionary(playerId => playerId, _ => 0f);
+            EnemyUnitInfluence[x.Index] = playerIds.ToDictionary(playerId => playerId, _ => 0f);
             FriendlySettlementInfluenceMap[x.Index] = [];
             EnemySettlementInfluenceMap[x.Index] = [];
 
             MilitaryUnit.MovementTypes.ForEach(y =>
             {
-                FriendlySettlementInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
-                EnemySettlementInfluenceMap[x.Index].Add(y, new float[numberOfPlayers]);
+                FriendlySettlementInfluenceMap[x.Index].Add(y, playerIds.ToDictionary(playerId => playerId, _ => 0f));
+                EnemySettlementInfluenceMap[x.Index].Add(y, playerIds.ToDictionary(playerId => playerId, _ => 0f));
             });
 
-            var tileInfluence = new Dictionary<RoleMovementType, float[]>();
-            Roles.ForEach(y => MilitaryUnit.MovementTypes.ForEach(z => tileInfluence.Add(new RoleMovementType(z, y), new float[numberOfPlayers])));
+            var tileInfluence = new Dictionary<RoleMovementType, Dictionary<Guid, float>>();
+            Roles.ForEach(y => MilitaryUnit.MovementTypes.ForEach(z => tileInfluence.Add(new RoleMovementType(z, y), playerIds.ToDictionary(playerId => playerId, _ => 0f))));
             AggregateInfluence[x.Index] = tileInfluence;
         });
 
         // Build reusable influence maps first, then copy values into the legacy dictionaries used by the AI decision code.
-        var friendlyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
-        var enemyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
-        var friendlySettlementMapsByPlayer = new Dictionary<OperationalDomain, BoardInfluenceMap>[numberOfPlayers];
-        var enemySettlementMapsByPlayer = new Dictionary<OperationalDomain, BoardInfluenceMap>[numberOfPlayers];
+        var friendlyUnitMapsByPlayer = new Dictionary<Guid, BoardInfluenceMap>();
+        var enemyUnitMapsByPlayer = new Dictionary<Guid, BoardInfluenceMap>();
+        var friendlySettlementMapsByPlayer = new Dictionary<Guid, Dictionary<OperationalDomain, BoardInfluenceMap>>();
+        var enemySettlementMapsByPlayer = new Dictionary<Guid, Dictionary<OperationalDomain, BoardInfluenceMap>>();
 
-        for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+        foreach (var playerId in playerIds)
         {
-            friendlyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(gameState.Width, gameState.Height);
-            enemyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(gameState.Width, gameState.Height);
-            friendlySettlementMapsByPlayer[playerIndex] = [];
-            enemySettlementMapsByPlayer[playerIndex] = [];
+            friendlyUnitMapsByPlayer[playerId] = new BoardInfluenceMap(gameState.Width, gameState.Height);
+            enemyUnitMapsByPlayer[playerId] = new BoardInfluenceMap(gameState.Width, gameState.Height);
+            friendlySettlementMapsByPlayer[playerId] = [];
+            enemySettlementMapsByPlayer[playerId] = [];
 
             MilitaryUnit.MovementTypes.ForEach(movementType =>
             {
-                friendlySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(gameState.Width, gameState.Height));
-                enemySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(gameState.Width, gameState.Height));
+                friendlySettlementMapsByPlayer[playerId].Add(movementType, new BoardInfluenceMap(gameState.Width, gameState.Height));
+                enemySettlementMapsByPlayer[playerId].Add(movementType, new BoardInfluenceMap(gameState.Width, gameState.Height));
             });
         }
 
@@ -588,12 +594,12 @@ public class ComputerPlayer
 
                 friendlyUnitMapsByPlayer[unit.Owner.Id].AddValue(index, influence);
 
-                foreach (var player in gameState.Players)
+                foreach (var playerId in playerIds)
                 {
-                    if (player.Id == unit.Owner.Id)
+                    if (playerId == unit.Owner.Id)
                         continue;
 
-                    enemyUnitMapsByPlayer[player.Id].AddValue(index, influence);
+                    enemyUnitMapsByPlayer[playerId].AddValue(index, influence);
                 }
             }
         }
@@ -609,10 +615,10 @@ public class ComputerPlayer
                 if (influence == 0f)
                     continue;
 
-                for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+                foreach (var playerId in playerIds)
                 {
-                    var isFriendlyForPlayer = settlement.Owner.Id == playerIndex;
-                    var movementMapSet = isFriendlyForPlayer ? friendlySettlementMapsByPlayer[playerIndex] : enemySettlementMapsByPlayer[playerIndex];
+                    var isFriendlyForPlayer = settlement.Owner.Id == playerId;
+                    var movementMapSet = isFriendlyForPlayer ? friendlySettlementMapsByPlayer[playerId] : enemySettlementMapsByPlayer[playerId];
 
                     // Air influence is always relevant, while land and water require same contiguous region.
                     movementMapSet[OperationalDomain.Airborne].AddValue(index, influence);
@@ -626,17 +632,17 @@ public class ComputerPlayer
             }
         }
 
-        for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+        foreach (var playerId in playerIds)
         {
             foreach (var tile in gameState.Tiles)
             {
-                FriendlyUnitInfluence[tile.Index][playerIndex] = friendlyUnitMapsByPlayer[playerIndex].GetValue(tile.Index);
-                EnemyUnitInfluence[tile.Index][playerIndex] = enemyUnitMapsByPlayer[playerIndex].GetValue(tile.Index);
+                FriendlyUnitInfluence[tile.Index][playerId] = friendlyUnitMapsByPlayer[playerId].GetValue(tile.Index);
+                EnemyUnitInfluence[tile.Index][playerId] = enemyUnitMapsByPlayer[playerId].GetValue(tile.Index);
 
                 MilitaryUnit.MovementTypes.ForEach(movementType =>
                 {
-                    FriendlySettlementInfluenceMap[tile.Index][movementType][playerIndex] = friendlySettlementMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
-                    EnemySettlementInfluenceMap[tile.Index][movementType][playerIndex] = enemySettlementMapsByPlayer[playerIndex][movementType].GetValue(tile.Index);
+                    FriendlySettlementInfluenceMap[tile.Index][movementType][playerId] = friendlySettlementMapsByPlayer[playerId][movementType].GetValue(tile.Index);
+                    EnemySettlementInfluenceMap[tile.Index][movementType][playerId] = enemySettlementMapsByPlayer[playerId][movementType].GetValue(tile.Index);
                 });
             }
 
@@ -646,13 +652,13 @@ public class ComputerPlayer
                 {
                     CalculateAggregateInfluence(
                         gameState,
-                        playerIndex,
+                        playerId,
                         role,
                         movementType,
-                        friendlyUnitMapsByPlayer[playerIndex],
-                        enemyUnitMapsByPlayer[playerIndex],
-                        friendlySettlementMapsByPlayer[playerIndex][movementType],
-                        enemySettlementMapsByPlayer[playerIndex][movementType]);
+                        friendlyUnitMapsByPlayer[playerId],
+                        enemyUnitMapsByPlayer[playerId],
+                        friendlySettlementMapsByPlayer[playerId][movementType],
+                        enemySettlementMapsByPlayer[playerId][movementType]);
                 });
             });
         }
@@ -660,7 +666,7 @@ public class ComputerPlayer
 
     private void CalculateAggregateInfluence(
         GameState board,
-        int playerIndex,
+        Guid playerId,
         Role role,
         OperationalDomain movementType,
         IInfluenceMap friendlyUnitMap,
@@ -681,7 +687,7 @@ public class ComputerPlayer
 
         foreach (var tile in board.Tiles)
         {
-            AggregateInfluence[tile.Index][rmt][playerIndex] = combinedMap.GetValue(tile.Index);
+            AggregateInfluence[tile.Index][rmt][playerId] = combinedMap.GetValue(tile.Index);
         }
     }
 

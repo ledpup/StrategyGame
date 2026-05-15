@@ -13,20 +13,24 @@ public class GameAnalysisTests
     {
         var gameAnalysis = new GameAnalysis();
 
-        var players = new Player[2];
+        var players = new[]
+        {
+            new Player(PlayerColour.Red, "Red"),
+            new Player(PlayerColour.Blue, "Blue"),
+        };
 
         var settlements = new List<Settlement>
         {
-            new(0, SettlementType.Fortress, null, 1),
-            new(0, SettlementType.Outpost, null, 1),
+            new(SettlementType.Fortress, null, players[0], 1),
+            new(SettlementType.Outpost, null, players[0], 1),
 
-            new(0, SettlementType.City, null, 2),
+            new(SettlementType.City, null, players[1], 2),
         };
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { Quality = 2, Personnel = 300 }, 0, 1, null, "1st Infantry"),
-            new(new UnitTemplate { Quality = 2, Personnel = 500 }, 1, 2, null, "1st Blue Infantry"),
+            new(new UnitTemplate { Quality = 2, Personnel = 300 }, players[0], null, "1st Infantry"),
+            new(new UnitTemplate { Quality = 2, Personnel = 500 }, players[1], null, "1st Blue Infantry"),
         };
 
         gameAnalysis.CalculateObjectiveFunction(players, settlements, units);

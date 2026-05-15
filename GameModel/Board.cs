@@ -18,7 +18,7 @@ public class Board
 {
     private readonly Logger logger;
 
-    public Board(string[] tiles, string[] edges = null, Logger logger = null)
+    public Board(string[] tiles, string[] edges = null, string[] settlements = null, Logger logger = null)
     {
         Width = tiles[0].Length;
         Height = tiles.Length;
@@ -28,6 +28,7 @@ public class Board
         BuildEdgeLookup();
         InitialiseNeighbours(Edges);
         CalculateTileDistanceFromTheSea();
+        Settlements = ParseSettlements(settlements, []);
         InitialiseSupply();
         CalculateContiguousRegions();
 
@@ -55,6 +56,7 @@ public class Board
 
         if (tilePoints == null)
         {
+            Settlements = settlements;
             return settlements;
         }
 
@@ -71,6 +73,7 @@ public class Board
             settlements.Add(settlement);
         }
 
+        Settlements = settlements;
         return settlements;
     }
 

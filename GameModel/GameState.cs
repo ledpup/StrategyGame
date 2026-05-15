@@ -87,7 +87,9 @@ public class GameState
             var tileUnits = UnitsAt(x).ToList();
             if (Tile.IsInConflict(tileUnits))
             {
-                battleReports.Add(BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, x.Settlement.Owner.Id, SettlementType.Fortress, 2));
+                var settlementType = x.Settlement?.SettlementType ?? SettlementType.None;
+                var residentId = x.Settlement?.Owner.Id ?? Guid.Empty;
+                battleReports.Add(BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, residentId, settlementType, 2));
             }
         });
         return battleReports;

@@ -30,8 +30,8 @@ public class GameAnalysis
         ObjectiveFunctionNormalisedParameters = new Dictionary<ObjFuncParameter, double>[players.Length];
         MaxParameterValue = new double[players.Length];
 
-        var settlementsByPlayer = settlements.GroupBy(x => x.OwnerIndex).ToList();
-        var unitsByPlayer = units.GroupBy(x => x.OwnerIndex).ToList();
+        var settlementsByPlayer = settlements.GroupBy(x => x.Owner.Id).ToDictionary(x => x.Key, x => x.ToList());
+        var unitsByPlayer = units.GroupBy(x => x.Owner.Id).ToDictionary(x => x.Key, x => x.ToList());
 
         ObjectiveFunctionParameterWeight = new Dictionary<ObjFuncParameter, double>
         {
@@ -46,9 +46,14 @@ public class GameAnalysis
             ObjectiveFunctionWeightedParameters[i] = [];
             ObjectiveFunctionNormalisedParameters[i] = [];
 
-            ObjectiveFunctionParameters[i].Add(ObjFuncParameter.SettlementCount, settlementsByPlayer[i].Count());
-            ObjectiveFunctionParameters[i].Add(ObjFuncParameter.SettlementStrength, settlementsByPlayer[i].Sum(x => Settlement.SettlementDefenceModifier(x.SettlementType)));
-            ObjectiveFunctionParameters[i].Add(ObjFuncParameter.UnitStrength, unitsByPlayer[i].Sum(x => x.Strength));
+            settlementsByPlayer.TryGetValue(players[i].Id, out var playerSettlements);
+            unitsByPlayer.TryGetValue(players[i].Id, out var playerUnits);
+            playerSettlements ??= [];
+            playerUnits ??= [];
+
+            ObjectiveFunctionParameters[i].Add(ObjFuncParameter.SettlementCount, playerSettlements.Count);
+            ObjectiveFunctionParameters[i].Add(ObjFuncParameter.SettlementStrength, playerSettlements.Sum(x => Settlement.SettlementDefenceModifier(x.SettlementType)));
+            ObjectiveFunctionParameters[i].Add(ObjFuncParameter.UnitStrength, playerUnits.Sum(x => x.Strength));
 
             foreach (ObjFuncParameter parameter in Enum.GetValues<ObjFuncParameter>())
             {

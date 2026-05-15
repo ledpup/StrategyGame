@@ -10,7 +10,7 @@ public record UnitTemplate(OperationalDomain MovementDomain = OperationalDomain.
 
     public string Name
     {
-        get { return UnitTemplateName is null ? OperationalDomain.ToString() : UnitTemplateName.ToDisplayName(); }
+        get { return UnitTemplateName is null ? OperationalDomain.ToString() : UnitTemplateName.Value.ToDisplayName(); }
     }
 
     public UnitType UnitType { get; set; }

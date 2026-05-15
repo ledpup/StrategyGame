@@ -111,7 +111,7 @@ public class GameBoardRenderer
 
                 foreach (var group in unitsByLocation)
                 {
-                    var unitsAtLocation = group.OrderBy(x => x.OwnerIndex).ToList();
+                    var unitsAtLocation = group.OrderBy(x => x.Owner.Colour).ToList();
 
                     for (var i = 0; i < unitsAtLocation.Count; i++)
                     {
@@ -150,14 +150,19 @@ public class GameBoardRenderer
         return playerIndex == 0 ? Colours.Blue : Colours.Red;
     }
 
+    internal static ArgbColour PlayerColour(PlayerColour playerColour)
+    {
+        return playerColour == GameModel.PlayerColour.Red ? Colours.Blue : Colours.Red;
+    }
+
     public static ArgbColour UnitColour(MilitaryUnit unit)
     {
-        return unit.IsAlive ? PlayerColour(unit.OwnerIndex) : Colours.Black;
+        return unit.IsAlive ? PlayerColour(unit.Owner.Colour) : Colours.Black;
     }
 
     public static ArgbColour SettlementColour(Settlement settlement)
     {
-        return PlayerColour(settlement.OwnerIndex);
+        return PlayerColour(settlement.Owner.Colour);
     }
 
     public static void RenderAndSave(string fileName, int boardWidth, int boardHeight, IEnumerable<Tile> tiles, IEnumerable<GameModel.Edge> edges = null, List<Settlement> settlements = null, string[] labels = null, List<Centreline> lines = null, List<MilitaryUnit> units = null, Tile circles = null)

@@ -25,14 +25,14 @@ public class UnitTemplateFactory
 
     public UnitTemplateFactory()
     {
-        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenInfantry, UnitType = UnitType.Melee, Personnel = 250, TransportableBy = [MovementType.Waterbound, MovementType.Airborne] });
-        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenDragoons, UnitType = UnitType.Melee, Personnel = 100, MovementPoints = 3, TransportableBy = [MovementType.Waterbound] });
-        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenCrossbowmen, UnitType = UnitType.Ranged, Personnel = 150, TransportableBy = [MovementType.Waterbound, MovementType.Airborne] });
+        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenInfantry, UnitType = UnitType.Melee, Personnel = 250, TransportableBy = [OperationalDomain.Waterbound, OperationalDomain.Airborne] });
+        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenDragoons, UnitType = UnitType.Melee, Personnel = 100, MovementPoints = 3, TransportableBy = [OperationalDomain.Waterbound] });
+        Register(new UnitTemplate { UnitTemplateName = UnitTemplateName.DwarvenCrossbowmen, UnitType = UnitType.Ranged, Personnel = 150, TransportableBy = [OperationalDomain.Waterbound, OperationalDomain.Airborne] });
     }
 
     public UnitTemplate Register(UnitTemplate template)
     {
-        var key = Enum.Parse<UnitTemplateName>(template.Name.Replace(" ", ""));
+        var key = Enum.Parse<UnitTemplateName>(template.Name.Replace(" ", string.Empty));
         templates[key] = template;
         return template;
     }

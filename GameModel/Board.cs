@@ -16,14 +16,9 @@ public enum Weather
 
 public class Board
 {
-    public int Width;
-    public int Height;
+    private readonly Logger logger;
 
-    private static Logger Logger;
-
-    public List<Settlement> Settlements;
-
-    public Board(string[] tiles, string[] edges = null, List<Settlement> settlements, Logger logger = null)
+    public Board(string[] tiles, string[] edges = null, Logger logger = null)
     {
         Width = tiles[0].Length;
         Height = tiles.Length;
@@ -33,11 +28,10 @@ public class Board
         BuildEdgeLookup();
         InitialiseNeighbours(Edges);
         CalculateTileDistanceFromTheSea();
-        Settlements = settlements;
         InitialiseSupply();
         CalculateContiguousRegions();
 
-        Logger = logger ?? LogManager.GetCurrentClassLogger();
+        this.logger = logger ?? LogManager.GetCurrentClassLogger();
 
         TerrainTemperatureModifiers = [];
         foreach (TerrainType terrainType in Enum.GetValues<TerrainType>())
@@ -47,6 +41,37 @@ public class Board
 
         TerrainTemperatureModifiers[TerrainType.Mountain] = -10;
         TerrainTemperatureModifiers[TerrainType.Hill] = -5;
+    }
+
+    public int Width { get; private set; }
+
+    public int Height { get; private set; }
+
+    public List<Settlement> Settlements { get; private set; }
+
+    public List<Settlement> ParseSettlements(string[] tilePoints, List<Player> players)
+    {
+        var settlements = new List<Settlement>();
+
+        if (tilePoints == null)
+        {
+            return settlements;
+        }
+
+        foreach (var point in tilePoints)
+        {
+            var settlementProperties = point.Split(',');
+            var index = int.Parse(settlementProperties[0]);
+            var settlementType = Enum.Parse<SettlementType>(settlementProperties[1]);
+            var ownerColour = Enum.Parse<PlayerColour>(settlementProperties[2]);
+            var owner = players.FirstOrDefault(p => p.Colour == ownerColour) ?? new Player(ownerColour, ownerColour.ToString());
+            var supply = int.Parse(settlementProperties[3]);
+            var settlement = new Settlement(settlementType, TileArray[index], owner, supply);
+
+            settlements.Add(settlement);
+        }
+
+        return settlements;
     }
 
     private void CalculateContiguousRegions()
@@ -84,17 +109,19 @@ public class Board
         }
     }
 
+    
+
     public void InitialiseSupply()
     {
         Tiles.ToList().ForEach(x => x.Supply = null);
         var supplyCalculated = new HashSet<Tile>();
         foreach (var settlement in Settlements)
         {
-            CalculateSupply(this[settlement.Id], settlement.Owner.Id, settlement.Supply, supplyCalculated);
+            CalculateSupply(this[settlement.Location.Index], settlement.Owner.Id, settlement.Supply, supplyCalculated);
         }
     }
 
-    private void CalculateSupply(Tile tile, int ownerId, float supply, HashSet<Tile> supplyCalculated)
+    private void CalculateSupply(Tile tile, Guid ownerId, float supply, HashSet<Tile> supplyCalculated)
     {
         if (supplyCalculated.Contains(tile))
         {
@@ -118,7 +145,7 @@ public class Board
             foreach (var neighbour in tile.Neighbours)
             {
                 float neighbourSupply = 0;
-                if (neighbour.Destination.OwnerId == ownerId || neighbour.Destination.OwnerId == null)
+                if (neighbour.Destination.Settlement?.Owner.Id == ownerId || neighbour.Destination.Settlement?.Owner == null)
                 {
                     var tileEdge = GetEdgeBetween(tile, neighbour.Destination);
                     if (tileEdge != null)

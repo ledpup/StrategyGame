@@ -23,7 +23,8 @@ public class InfluenceMapTests
     [TestInitialize]
     public void TestInitialize()
     {
-        gameState = new GameState(new Board(GameBoard, Edges, Settlements));
+        gameState = new GameState(new Board(GameBoard, Edges));
+        gameState.Board.ParseSettlements(Settlements, gameState.Players);
     }
 
     [TestMethod]
@@ -34,16 +35,16 @@ public class InfluenceMapTests
 
         gameState.Units =
         [
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, gameState.Players[0], gameState[114], "1st Airborne"),
-            new(new UnitTemplate { MovementPoints = 3 }, 1, gameState.Players[0], gameState[110], "1st Infantry"),
-            new(new UnitTemplate(), 2, gameState.Players[0], gameState[31], "2nd Infantry"),
-            new(new UnitTemplate(), 3, gameState.Players[0], gameState[56], "3rd Infantry"),
-            new(new UnitTemplate(), 4, gameState.Players[0], gameState[65], "4th Infantry"),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3 }, gameState.Players[0], gameState[114]),
+            new(new UnitTemplate { MovementPoints = 3 }, gameState.Players[0], gameState[110]),
+            new(new UnitTemplate(), gameState.Players[0], gameState[31]),
+            new(new UnitTemplate(), gameState.Players[0], gameState[56]),
+            new(new UnitTemplate(), gameState.Players[0], gameState[65]),
 
-            new(new UnitTemplate(), 5, gameState.Players[1], gameState[111], "1st Infantry"),
-            new(new UnitTemplate(), 6, gameState.Players[1], gameState[111], "2nd Infantry"),
+            new(new UnitTemplate(), gameState.Players[1], gameState[111]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[111]),
 
-            new(new UnitTemplate(), 7, gameState.Players[1], gameState[168], "3rd Infantry"),
+            new(new UnitTemplate(), gameState.Players[1], gameState[168]),
         ];
 
         gameState.Units[0].TerrainTypeBattleModifier[TerrainType.Swamp] = 1;
@@ -80,15 +81,14 @@ public class InfluenceMapTests
 
         gameState.Units =
         [
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3 }, 0, gameState.Players[0], gameState[114]),
-            new(new UnitTemplate { MovementPoints = 3 }, 1, gameState.Players[0], gameState[110]),
-            new(new UnitTemplate(), 2, gameState.Players[0], gameState[31]),
-            new(new UnitTemplate(), 3, gameState.Players[0], gameState[56]),
-            new(new UnitTemplate(), 4, gameState.Players[0], gameState[65]),
-
-            new(new UnitTemplate(), 5, gameState.Players[1], gameState[111]),
-            new(new UnitTemplate(), 6, gameState.Players[1], gameState[111]),
-            new(new UnitTemplate(), 7, gameState.Players[1], gameState[168]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3 }, gameState.Players[0], gameState[114]),
+            new(new UnitTemplate { MovementPoints = 3 }, gameState.Players[0], gameState[110]),
+            new(new UnitTemplate(), gameState.Players[0], gameState[31]),
+            new(new UnitTemplate(), gameState.Players[0], gameState[56]),
+            new(new UnitTemplate(), gameState.Players[0], gameState[65]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[111]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[111]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[168]),
         ];
 
 

@@ -24,7 +24,8 @@ public class VisualiseTests
     [TestInitialize]
     public void TestInitialize()
     {
-        gameState = new GameState(new Board(GameBoard, TileEdges, Settlements));
+        gameState = new GameState(new Board(GameBoard, TileEdges));
+        gameState.Board.ParseSettlements(Settlements, gameState.Players);
     }
 
     [TestMethod]
@@ -51,10 +52,10 @@ public class VisualiseTests
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate(), 1, gameState.Players[0], gameState[1, 1]),
-            new(new UnitTemplate(), 2, gameState.Players[0], gameState[1, 1]),
-            new(new UnitTemplate(), 3, gameState.Players[1], gameState[1, 1]),
-            new(new UnitTemplate(), 4, gameState.Players[2], gameState[1, 1])
+            new(new UnitTemplate(), gameState.Players[0], gameState[1, 1]),
+            new(new UnitTemplate(), gameState.Players[0], gameState[1, 1]),
+            new(new UnitTemplate(), gameState.Players[1], gameState[1, 1]),
+            new(new UnitTemplate(), gameState.Players[2], gameState[1, 1])
         };
 
         GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: units);

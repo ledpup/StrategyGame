@@ -1,24 +1,26 @@
 ﻿namespace GameModel;
 
+using System;
+
 public enum PlayerColour
 {
-    Red = 1,
-    Blue = 2,
-    Green = 3,
-    Black = 4,
+    Red,
+    Blue,
+    Green,
+    Black,
 }
 
-public class Player(int id, string name)
+public class Player(PlayerColour colour, string name)
 {
-    public int Id { get; set; } = id;
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Name { get; set; } = name;
 
-    public PlayerColour Colour { get; set; } = (PlayerColour)id;
+    public PlayerColour Colour { get; set; } = colour;
 
     public override int GetHashCode()
     {
-        return Id;
+        return Colour.GetHashCode();
     }
 
     public override string ToString()

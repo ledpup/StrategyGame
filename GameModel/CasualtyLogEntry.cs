@@ -1,8 +1,10 @@
 ﻿namespace GameModel;
 
+using System;
+
 public class CasualtyLogEntry
 {
-    public int OwnerIndex { get; set; }
+    public Guid OwnerId { get; set; }
 
     public string Text { get; set; }
 }

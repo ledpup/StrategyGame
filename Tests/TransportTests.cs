@@ -22,24 +22,24 @@ public class TransportTests
     [TestInitialize]
     public void TestInitialize()
     {
-        gameState = new GameState(new Board(GameBoard, TileEdges, Settlements));
+        gameState = new GameState(new Board(GameBoard, TileEdges));
+        gameState.Board.ParseSettlements(Settlements, gameState.Players);
     }
 
 
     [TestMethod]
     public void Ports()
     {
-        var gameState = new GameState(new Board(GameBoard, TileEdges, Settlements));
         var numberOfPlayers = 2;
         var labels = new string[gameState.Width, gameState.Height];
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 1, gameState.Players[0], location: gameState[20, 5]),
-            new(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 3, IsTransporter = true }, 2, gameState.Players[1], location: gameState[3, 10]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound], RoadMovementBonus = 1 }, 3, gameState.Players[0], location: gameState[24, 16]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 4, gameState.Players[1], location: gameState[1, 1]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Waterbound] }, 5, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Waterbound, MovementPoints = 5, IsTransporter = true }, gameState.Players[0], location: gameState[20, 5]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Waterbound, MovementPoints = 3, IsTransporter = true }, gameState.Players[1], location: gameState[3, 10]),
+            new(new UnitTemplate { TransportableBy = [OperationalDomain.Waterbound], RoadMovementBonus = 1 }, gameState.Players[0], location: gameState[24, 16]),
+            new(new UnitTemplate { TransportableBy = [OperationalDomain.Waterbound] }, gameState.Players[1], location: gameState[1, 1]),
+            new(new UnitTemplate { TransportableBy = [OperationalDomain.Waterbound] }, gameState.Players[0], location: gameState[1, 1]),
         };
 
         units[3].TerrainMovementCosts[TerrainType.Swamp] = 1;
@@ -105,8 +105,8 @@ public class TransportTests
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, 1, gameState.Players[0], location: gameState[1, 1]),
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 2, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [OperationalDomain.Airborne] }, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3, IsTransporter = true }, gameState.Players[0], location: gameState[1, 1]),
         };
 
         gameState.Units = units;
@@ -138,8 +138,8 @@ public class TransportTests
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { RoadMovementBonus = 1 }, 1, gameState.Players[0], location: gameState[1, 1]),
-            new(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true }, 2, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { RoadMovementBonus = 1 }, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, IsTransporter = true }, gameState.Players[0], location: gameState[1, 1]),
         };
 
         gameState.Units = units;
@@ -167,8 +167,8 @@ public class TransportTests
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [MovementType.Airborne] }, 1, gameState.Players[0], location: gameState[1, 1]),
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 2, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { RoadMovementBonus = 1, TransportableBy = [OperationalDomain.Airborne] }, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3, IsTransporter = true }, gameState.Players[0], location: gameState[1, 1]),
         };
 
         gameState.Units = units;
@@ -207,10 +207,10 @@ public class TransportTests
 
         var units = new List<MilitaryUnit>
         {
-            new(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 4, IsTransporter = true }, 1, gameState.Players[0], location: gameState[24, 11]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Airborne], RoadMovementBonus = 1 }, 2, gameState.Players[0], location: gameState[22, 15]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 3, gameState.Players[0], location: gameState[1, 1]),
-            new(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 4, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 4, IsTransporter = true }, gameState.Players[0], location: gameState[24, 11]),
+            new(new UnitTemplate { TransportableBy = [OperationalDomain.Airborne], RoadMovementBonus = 1 }, gameState.Players[0], location: gameState[22, 15]),
+            new(new UnitTemplate { TransportableBy = [OperationalDomain.Airborne] }, gameState.Players[0], location: gameState[1, 1]),
+            new(new UnitTemplate { TransportableBy = [OperationalDomain.Airborne] }, gameState.Players[0], location: gameState[1, 1]),
         };
 
         units[2].TerrainTypeBattleModifier[TerrainType.Swamp] = 1;

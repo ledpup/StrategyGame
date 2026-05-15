@@ -2,19 +2,18 @@ namespace GameModel;
 
 using System.Collections.Generic;
 
-public record UnitTemplate
+public record UnitTemplate(OperationalDomain MovementDomain = OperationalDomain.Land)
 {
+    public OperationalDomain OperationalDomain { get; set; } = MovementDomain;
 
-    public UnitTemplateName UnitTemplateName { get; set; }
+    public UnitTemplateName? UnitTemplateName { get; set; }
 
     public string Name
     {
-        get { return UnitTemplateName.ToDisplayName(); }
+        get { return UnitTemplateName is null ? OperationalDomain.ToString() : UnitTemplateName.ToDisplayName(); }
     }
 
     public UnitType UnitType { get; set; }
-
-    public MovementType MovementType { get; set; } = MovementType.Land;
 
     public int MovementPoints { get; set; } = 2;
 
@@ -27,7 +26,7 @@ public record UnitTemplate
 
         set
         {
-            if (MovementType == MovementType.Land)
+            if (OperationalDomain == OperationalDomain.Land)
             {
                 field = value;
             }
@@ -46,15 +45,15 @@ public record UnitTemplate
 
     public bool IsTransporter { get; set; } = false;
 
-    public List<MovementType> TransportableBy { get; set; }
+    public List<OperationalDomain> TransportableBy { get; set; }
 
     public int CombatInitiative { get; set; } = 10;
 
     public double Morale { get; set; } = 5;
 
-    public Dictionary<TerrainType, int> TerrainMovementCosts => MovementType switch
+    public Dictionary<TerrainType, int> TerrainMovementCosts => OperationalDomain switch
     {
-        MovementType.Land => new Dictionary<TerrainType, int>
+        OperationalDomain.Land => new Dictionary<TerrainType, int>
         {
             { TerrainType.Grassland, 1 },
             { TerrainType.Desert,    2 },
@@ -65,7 +64,7 @@ public record UnitTemplate
             { TerrainType.Swamp,     2 },
             { TerrainType.Reef,      Terrain.Impassable },
         },
-        MovementType.Airborne => new Dictionary<TerrainType, int>
+        OperationalDomain.Airborne => new Dictionary<TerrainType, int>
         {
             { TerrainType.Grassland, 1 },
             { TerrainType.Desert,    1 },
@@ -76,7 +75,7 @@ public record UnitTemplate
             { TerrainType.Swamp,     1 },
             { TerrainType.Reef,      1 },
         },
-        MovementType.Waterbound => new Dictionary<TerrainType, int>
+        OperationalDomain.Waterbound => new Dictionary<TerrainType, int>
         {
             { TerrainType.Grassland, Terrain.Impassable },
             { TerrainType.Desert,    Terrain.Impassable },
@@ -90,9 +89,9 @@ public record UnitTemplate
         _ => [],
     };
 
-    public Dictionary<EdgeType, int> EdgeMovementCosts => MovementType switch
+    public Dictionary<EdgeType, int> EdgeMovementCosts => OperationalDomain switch
     {
-        MovementType.Land => new Dictionary<EdgeType, int>
+        OperationalDomain.Land => new Dictionary<EdgeType, int>
         {
             { EdgeType.None,     0 },
             { EdgeType.River,    Terrain.Impassable },
@@ -103,7 +102,7 @@ public record UnitTemplate
             { EdgeType.Wall,     Terrain.Impassable },
             { EdgeType.Port,     1 },
         },
-        MovementType.Airborne => new Dictionary<EdgeType, int>
+        OperationalDomain.Airborne => new Dictionary<EdgeType, int>
         {
             { EdgeType.None,     0 },
             { EdgeType.River,    0 },
@@ -114,7 +113,7 @@ public record UnitTemplate
             { EdgeType.Wall,     0 },
             { EdgeType.Port,     0 },
         },
-        MovementType.Waterbound => new Dictionary<EdgeType, int>
+        OperationalDomain.Waterbound => new Dictionary<EdgeType, int>
         {
             { EdgeType.None,     0 },
             { EdgeType.River,    Terrain.Impassable },
@@ -128,13 +127,13 @@ public record UnitTemplate
         _ => [],
     };
 
-    public bool UsesRoads => MovementType == MovementType.Land;
+    public bool UsesRoads => OperationalDomain == OperationalDomain.Land;
 
-    public TerrainType CanStopOn => MovementType switch
+    public TerrainType CanStopOn => OperationalDomain switch
     {
-        MovementType.Land => Terrain.NonMountainousLand,
-        MovementType.Airborne => Terrain.NonMountainousLand,
-        MovementType.Waterbound => Terrain.AllWater,
+        OperationalDomain.Land => Terrain.NonMountainousLand,
+        OperationalDomain.Airborne => Terrain.NonMountainousLand,
+        OperationalDomain.Waterbound => Terrain.AllWater,
         _ => default,
     };
 }

@@ -1,5 +1,6 @@
 namespace GameModel;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameModel.Commands;
@@ -45,10 +46,10 @@ public class GameState
     {
         return
         [
-            new Player(1, "Pheltharion Empire"),
-            new Player(2, "Vordenmak"),
-            new Player(3, "Sylvara"),
-            new Player(4, "Drakmoor"),
+            new Player(PlayerColour.Red, "Pheltharion Empire"),
+            new Player(PlayerColour.Blue, "Vordenmak"),
+            new Player(PlayerColour.Green, "Sylvara"),
+            new Player(PlayerColour.Black, "Drakmoor"),
         ];
     }
 
@@ -58,18 +59,18 @@ public class GameState
 
     public IEnumerable<MilitaryUnit> UnitsAt(Tile tile) => Units.Where(x => x.Location == tile);
 
-    public bool OverStackLimit(Tile tile, int playerIndex) => tile.OverStackLimit(UnitsAt(tile), playerIndex);
+    public bool OverStackLimit(Tile tile, Guid playerId) => tile.OverStackLimit(UnitsAt(tile), playerId);
 
-    public void ResolveStackLimits(int playerIndex)
+    public void ResolveStackLimits(Guid playerId)
     {
         Tiles.ToList().ForEach(x =>
         {
             var tileUnits = UnitsAt(x).ToList();
-            if (x.OverStackLimit(tileUnits, playerIndex))
+            if (x.OverStackLimit(tileUnits, playerId))
             {
-                var overStackLimitCount = x.OverStackLimitCount(tileUnits, playerIndex);
+                var overStackLimitCount = x.OverStackLimitCount(tileUnits, playerId);
                 tileUnits
-                    .Where(y => y.IsAlive && y.Owner.Id == playerIndex)
+                    .Where(y => y.IsAlive && y.Owner.Id == playerId)
                     .ToList()
                     .ForEach(y => y.ChangeMorale(Turn, -.5 * overStackLimitCount, $"Units are over the stack limit of {x.StackLimit} by {overStackLimitCount} units"));
             }
@@ -86,7 +87,7 @@ public class GameState
             var tileUnits = UnitsAt(x).ToList();
             if (Tile.IsInConflict(tileUnits))
             {
-                battleReports.Add(BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, 3, SettlementType.Fortress, 2));
+                battleReports.Add(BattleResolver.ResolveBattle(x.ToString(), Turn, TerrainType.Mountain, Weather.Cold, tileUnits, x.Settlement.Owner.Id, SettlementType.Fortress, 2));
             }
         });
         return battleReports;

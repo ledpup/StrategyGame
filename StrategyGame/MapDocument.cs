@@ -27,8 +27,7 @@ internal class MapDocument
 
     public Board ToBoard()
     {
-        var players = GameState.InitialisePlayers();
-        return new Board(Tiles, Edges.ToArray(), Settlements.ToArray(), players);
+        return new Board(Tiles, Edges.ToArray());
     }
 
     public GameState ToGameState(int turn = 0)
@@ -62,12 +61,11 @@ internal class MapDocument
                 .OrderBy(x => x)
                 .ToList(),
             Settlements = board.Settlements
-                .Select(x => $"{x.Index},{x.SettlementType},{x.OwnerIndex},{(int)x.Supply}")
+                .Select(x => $"{x.SettlementType},{x.Owner.Colour},{(int)x.Supply}")
                 .OrderBy(x => x)
                 .ToList(),
             Units = gameState.Units
                 .Select(UnitDocument.FromMilitaryUnit)
-                .OrderBy(x => x.Index)
                 .ToList(),
         };
     }
@@ -137,7 +135,7 @@ internal class MapDocument
             var template = new UnitTemplate
             {
                 UnitTemplateName = x.UnitTemplateName,
-                MovementType = x.MovementType,
+                OperationalDomain = x.MovementType,
                 MovementPoints = x.BaseMovementPoints,
                 RoadMovementBonus = x.RoadMovementBonus,
                 UnitType = x.UnitType,
@@ -149,7 +147,7 @@ internal class MapDocument
                 CombatInitiative = x.CombatInitiative,
                 Morale = x.InitialMorale,
             };
-            return new MilitaryUnit(template, x.Index, x.OwnerIndex, board[x.TileIndex], turnBuilt: x.TurnBuilt);
+            return new MilitaryUnit(template, x.Owner, board[x.TileIndex], turnBuilt: x.TurnBuilt);
         };
     }
 
@@ -172,13 +170,12 @@ internal class MapDocument
 
 internal class UnitDocument
 {
-    public int Index { get; set; }
     public UnitTemplateName UnitTemplateName { get; set; }
 
     public string Name { get; set; }
     public int OwnerIndex { get; set; }
     public int TileIndex { get; set; }
-    public MovementType MovementType { get; set; }
+    public OperationalDomain MovementType { get; set; }
     public int BaseMovementPoints { get; set; }
     public int RoadMovementBonus { get; set; }
     public UnitType UnitType { get; set; }
@@ -186,7 +183,7 @@ internal class UnitDocument
     public int InitialQuantity { get; set; }
     public double Size { get; set; }
     public bool IsTransporter { get; set; }
-    public List<MovementType> TransportableBy { get; set; }
+    public List<OperationalDomain> TransportableBy { get; set; }
     public int CombatInitiative { get; set; }
     public double InitialMorale { get; set; }
     public int TurnBuilt { get; set; }
@@ -195,7 +192,7 @@ internal class UnitDocument
     {
         return new UnitDocument
         {
-            Index = unit.Index,
+            Index = unit.Id,
             UnitTemplateName = unit.UnitTemplate.UnitTemplateName,
             OwnerIndex = unit.OwnerIndex,
             TileIndex = unit.Location.Index,
@@ -223,13 +220,13 @@ internal class UnitDocument
     public static UnitDocument Parse(string line)
     {
         var columns = line.Split(',');
-        var transportableBy = new List<MovementType>();
+        var transportableBy = new List<OperationalDomain>();
         if (columns.Length > 12 && !string.IsNullOrWhiteSpace(columns[12]))
         {
             transportableBy = columns[12]
                 .Split('|')
                 .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(x => Enum.Parse<MovementType>(x))
+                .Select(x => Enum.Parse<OperationalDomain>(x))
                 .ToList();
         }
 
@@ -239,7 +236,7 @@ internal class UnitDocument
             UnitTemplateName = Enum.Parse<UnitTemplateName>(columns[1]),
             OwnerIndex = int.Parse(columns[2]),
             TileIndex = int.Parse(columns[3]),
-            MovementType = Enum.Parse<MovementType>(columns[4]),
+            MovementType = Enum.Parse<OperationalDomain>(columns[4]),
             BaseMovementPoints = int.Parse(columns[5]),
             RoadMovementBonus = int.Parse(columns[6]),
             UnitType = Enum.Parse<UnitType>(columns[7]),

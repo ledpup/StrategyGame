@@ -13,7 +13,7 @@ public enum UnitType
     Siege,
 }
 
-public enum MovementType
+public enum OperationalDomain
 {
     Airborne,
     Land,
@@ -30,14 +30,14 @@ public enum BattleQualityModifier
 
 public class MilitaryUnit
 {
-    public static List<MovementType> MovementTypes
+    public static List<OperationalDomain> MovementTypes
     {
         get
         {
             if (field == null)
             {
                 field = [];
-                foreach (var role in Enum.GetValues<MovementType>())
+                foreach (var role in Enum.GetValues<OperationalDomain>())
                 {
                     field.Add(role);
                 }
@@ -47,11 +47,7 @@ public class MilitaryUnit
         }
     }
 
-    public int Id { get; set; }
-
-    public int Index => Id;
-
-    public int OwnerIndex => Owner?.Id ?? 0;
+    public Guid Id { get; set; }
 
     public string Name { get; set; }
 
@@ -64,9 +60,9 @@ public class MilitaryUnit
         get { return UnitTemplate.UnitType; }
     }
 
-    public MovementType MovementType
+    public OperationalDomain MovementType
     {
-        get { return UnitTemplate.MovementType; }
+        get { return UnitTemplate.OperationalDomain; }
     }
 
     public int BaseMovementPoints
@@ -133,11 +129,16 @@ public class MilitaryUnit
         return MovementType.ToString() + " " + Name + " (" + Strength + ") at " + Location.ToString();
     }
 
-    public MilitaryUnit(UnitTemplate template, int id, Player owner, Tile location = null, string name = null, int turnBuilt = 0, float[] moraleMoveCost = null)
+    public MilitaryUnit(UnitTemplate template, Player owner, Tile location = null, string name = null, int turnBuilt = 0, float[] moraleMoveCost = null)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(1, id, nameof(id));
-
+        Id = Guid.NewGuid();
         UnitTemplate = template;
+        Name = name ?? template.Name;
+        Owner = owner;
+        Location = location;
+        RoadMovementBonus = template.RoadMovementBonus;
+        TransportableBy = template.TransportableBy ?? [];
+        Transporting = [];
 
         BattleQualityModifiers = [];
         foreach (BattleQualityModifier battleQualityModifier in Enum.GetValues<BattleQualityModifier>())
@@ -167,14 +168,6 @@ public class MilitaryUnit
         EdgeMovementCosts = new Dictionary<EdgeType, int>(template.EdgeMovementCosts);
         UsesRoads = template.UsesRoads;
         CanStopOn = template.CanStopOn;
-
-        Id = id;
-        Name = name ?? template.Name ?? "Unit " + id + " (owned by " + owner.Id + ")";
-        Owner = owner;
-        Location = location;
-        RoadMovementBonus = template.RoadMovementBonus;
-        TransportableBy = template.TransportableBy ?? [];
-        Transporting = [];
 
         Quality = BaseQuality;
         CombatInitiative = template.CombatInitiative;
@@ -236,7 +229,7 @@ public class MilitaryUnit
 
     public override int GetHashCode()
     {
-        return Id;
+        return Name.GetHashCode();
     }
 
     public int MovementPoints
@@ -245,7 +238,7 @@ public class MilitaryUnit
         {
             var movementPoints = BaseMovementPoints;
 
-            if (MovementType == MovementType.Airborne && Transporting.Any())
+            if (MovementType == OperationalDomain.Airborne && Transporting.Any())
             {
                 return movementPoints -= 1;
             }
@@ -301,13 +294,13 @@ public class MilitaryUnit
 
     public MilitaryUnit TransportedBy { get; set; }
 
-    public List<MovementType> TransportableBy { get; private set; }
+    public List<OperationalDomain> TransportableBy { get; private set; }
 
     public bool UsesRoads { get; private set; }
 
     public bool TransportedByWater
     {
-        get { return TransportedBy != null && TransportedBy.MovementType == MovementType.Waterbound; }
+        get { return TransportedBy != null && TransportedBy.MovementType == OperationalDomain.Waterbound; }
     }
 
     public IEnumerable<Move> PossibleMoves()
@@ -335,7 +328,7 @@ public class MilitaryUnit
 
     private void AddRoadMoves(List<Move> possibleMoves)
     {
-        if (MovementType == MovementType.Land && TransportedBy == null)
+        if (MovementType == OperationalDomain.Land && TransportedBy == null)
         {
             var roadMovesAlreadyConsidered = new List<Move>();
             var roadMoves = GenerateRoadMoves(this, Location, null, roadMovesAlreadyConsidered, MovementPoints + RoadMovementBonus, 1);
@@ -380,7 +373,7 @@ public class MilitaryUnit
 
     private static MoveType GetMoveType(Tile origin, Tile destination, MilitaryUnit unit)
     {
-        if (unit.MovementType == MovementType.Land)
+        if (unit.MovementType == OperationalDomain.Land)
         {
             if (unit.TransportedBy == null && origin.Neighbours.Single(x => x.Destination == destination).EdgeType == EdgeType.Port)
             {
@@ -403,7 +396,7 @@ public class MilitaryUnit
 
     // NM2: a waterbound unit may stop on a coastal settlement land tile if there is a port edge between the water tile and the settlement tile
     private static bool IsWaterboundMovingToCoastalSettlement(MilitaryUnit unit, Edge edge)
-        => unit.MovementType == MovementType.Waterbound
+        => unit.MovementType == OperationalDomain.Waterbound
             && edge.EdgeType == EdgeType.Port
             && edge.Destination.Settlement is not null;
 

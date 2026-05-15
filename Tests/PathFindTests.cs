@@ -26,7 +26,7 @@ public class PathFindTests
     [TestMethod]
     public void RenderPathfind_ValidBoard_RendersPathsWithoutError()
     {
-        var unit = new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[1, 1]);
+        var unit = new MilitaryUnit(new UnitTemplate(), gameState.Players[0], gameState[1, 1]);
 
         var lines = new List<Centreline>();
 
@@ -46,7 +46,7 @@ public class PathFindTests
     public void FindShortestPath_LandUnitWithReachableDestination_ReturnsExpectedPath()
     {
 
-        var unit = new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[1, 1]);
+        var unit = new MilitaryUnit(new UnitTemplate(), gameState.Players[0], gameState[1, 1]);
 
         var shortestPath = PathFinder.FindShortestPath(gameState[1, 1], gameState[194], unit).ToArray();
 
@@ -74,7 +74,7 @@ public class PathFindTests
     public void FindShortestPath_LandUnitWithUnreachableDestination_ReturnsNull()
     {
 
-        var unit = new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[1, 1]);
+        var unit = new MilitaryUnit(new UnitTemplate(), gameState.Players[0], gameState[1, 1]);
 
         var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[247], unit);
 
@@ -85,7 +85,7 @@ public class PathFindTests
     public void FindShortestPath_WaterboundUnitMovingToPort_ReturnsExpectedPath()
     {
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Waterbound, MovementPoints = 5, IsTransporter = true }, 1, gameState.Players[0], location: gameState[20, 5]);
+        var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Waterbound, MovementPoints = 5, IsTransporter = true }, gameState.Players[0], gameState[20, 5]);
 
         var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[291], unit).ToArray();
 
@@ -110,7 +110,7 @@ public class PathFindTests
     public void FindShortestPath_AirborneUnitCrossingNonStoppableTerrain_ReturnsExpectedPath()
     {
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 1, gameState.Players[0], location: gameState[24, 15]);
+        var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3, IsTransporter = true }, gameState.Players[0], gameState[24, 15]);
 
         var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[365], unit).ToArray();
 
@@ -137,7 +137,7 @@ public class PathFindTests
     public void FindShortestPath_AirborneUnitFromCoastlineCrossingNonStoppableTerrain_ReturnsPathAndMoveOrder()
     {
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 3, IsTransporter = true }, 1, gameState.Players[0], location: gameState[19, 13]);
+        var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3, IsTransporter = true }, gameState.Players[0], location: gameState[19, 13]);
 
         var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[365], unit).ToArray();
 
@@ -164,7 +164,7 @@ public class PathFindTests
     public void FindShortestPath_AirborneUnitCrossingWall_ReturnsValidWallCrossingPath()
     {
 
-        var unit = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, MovementPoints = 5, IsTransporter = true }, 1, gameState.Players[0], location: gameState[119]);
+        var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 5, IsTransporter = true }, gameState.Players[0], location: gameState[119]);
 
         var shortestPath = PathFinder.FindShortestPath(unit.Location, gameState[95], unit).ToArray();
 

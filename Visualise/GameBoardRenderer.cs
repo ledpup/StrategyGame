@@ -118,15 +118,15 @@ public class GameBoardRenderer
                         var colour = UnitColour(unitsAtLocation[i]);
                         switch (unitsAtLocation[i].MovementType)
                         {
-                            case MovementType.Airborne:
+                            case OperationalDomain.Airborne:
                                 gameBoardDrawing2D.DrawTriangle(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                 break;
 
-                            case MovementType.Waterbound:
+                            case OperationalDomain.Waterbound:
                                 gameBoardDrawing2D.DrawTrapezium(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                 break;
 
-                            case MovementType.Land:
+                            case OperationalDomain.Land:
                                 gameBoardDrawing2D.DrawCircle(group.Key.Hex, (float)((i + 1) / (float)unitsAtLocation.Count * Math.PI * 2), colour);
                                 break;
                         }

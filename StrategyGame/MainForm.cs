@@ -107,7 +107,7 @@ internal class MainForm : Form
 
         // ── unit panel ───────────────────────────────────────────────
         unitTypeComboBox = CreateComboBox(typeof(UnitType));
-        movementTypeComboBox = CreateComboBox(typeof(MovementType));
+        movementTypeComboBox = CreateComboBox(typeof(OperationalDomain));
         unitPanel = MakePanel(
             Label("Unit"),
             unitTypeComboBox,
@@ -488,7 +488,7 @@ internal class MainForm : Form
                 break;
             case EditorTool.Unit:
                 BeginEdit();
-                board = BoardEditorService.AddUnit(board, tile, (UnitType)unitTypeComboBox.SelectedItem, (MovementType)movementTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
+                board = BoardEditorService.AddUnit(board, tile, (UnitType)unitTypeComboBox.SelectedItem, (OperationalDomain)movementTypeComboBox.SelectedItem, (int)ownerNumeric.Value);
                 CommitEdit($"Add unit at {tile.Index}");
                 selectedTile = null;
                 SetStatus($"Unit added at tile {tile.Index}");

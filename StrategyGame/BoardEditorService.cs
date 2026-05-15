@@ -77,30 +77,29 @@ internal static class BoardEditorService
         return document.ToGameState(gameState.Turn);
     }
 
-    public static GameState AddUnit(GameState gameState, Tile tile, UnitType unitType, MovementType movementType, int ownerIndex = 0)
+    public static GameState AddUnit(GameState gameState, Tile tile, UnitType unitType, OperationalDomain movementType, int ownerIndex = 0)
     {
         if (tile == null)
             return gameState;
 
         var document = MapDocument.FromGameState(gameState);
         var nextIndex = document.Units.Any() ? document.Units.Max(x => x.Index) + 1 : 0;
-        var isTransporter = movementType != MovementType.Land;
-        var transportableBy = new List<MovementType>();
-        if (movementType == MovementType.Land)
+        var isTransporter = movementType != OperationalDomain.Land;
+        var transportableBy = new List<OperationalDomain>();
+        if (movementType == OperationalDomain.Land)
         {
-            transportableBy.Add(MovementType.Airborne);
-            transportableBy.Add(MovementType.Waterbound);
+            transportableBy.Add(OperationalDomain.Airborne);
+            transportableBy.Add(OperationalDomain.Waterbound);
         }
 
         document.Units.Add(new UnitDocument
         {
-            Index = nextIndex,
             Name = $"Unit {nextIndex} (owned by {ownerIndex})",
             OwnerIndex = ownerIndex,
             TileIndex = tile.Index,
             MovementType = movementType,
-            BaseMovementPoints = movementType == MovementType.Airborne ? 4 : movementType == MovementType.Waterbound ? 5 : 2,
-            RoadMovementBonus = movementType == MovementType.Land ? 1 : 0,
+            BaseMovementPoints = movementType == OperationalDomain.Airborne ? 4 : movementType == OperationalDomain.Waterbound ? 5 : 2,
+            RoadMovementBonus = movementType == OperationalDomain.Land ? 1 : 0,
             UnitType = unitType,
             BaseQuality = 1,
             InitialQuantity = 100,
@@ -111,7 +110,7 @@ internal static class BoardEditorService
             InitialMorale = 5,
             TurnBuilt = 0,
         });
-        document.Units = document.Units.OrderBy(x => x.Index).ToList();
+        document.Units = document.Units.ToList();
         return document.ToGameState(gameState.Turn);
     }
 
@@ -197,12 +196,12 @@ internal class SimulationSession
         CurrentBoard = MapDocument.FromGameState(gameState).ToGameState(gameState.Turn);
         snapshots.Add(MapDocument.FromGameState(CurrentBoard));
 
-        var ownerCount = CurrentBoard.Units.Select(x => x.OwnerIndex).DefaultIfEmpty(0).Distinct().Count();
+        var ownerCount = CurrentBoard.Units.Select(x => x.Owner.Id).Distinct().Count();
         numberOfPlayers = Math.Max(2, ownerCount);
         computerPlayer = new ComputerPlayer(CurrentBoard.Units);
 
-        initialUnitOwners = CurrentBoard.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
-        initialSettlementOwners = CurrentBoard.Settlements.Select(x => x.OwnerIndex).Distinct().Count();
+        initialUnitOwners = CurrentBoard.Units.Where(x => x.IsAlive).Select(x => x.Owner.Id).Distinct().Count();
+        initialSettlementOwners = CurrentBoard.Settlements.Select(x => x.Owner.Id).Distinct().Count();
     }
 
     public string StatusLine()
@@ -210,7 +209,7 @@ internal class SimulationSession
         var alive = CurrentBoard.Units.Count(u => u.IsAlive);
         var owners = string.Join(", ",
             CurrentBoard.Settlements
-                .GroupBy(s => s.OwnerIndex)
+                .GroupBy(s => s.Owner.Id)
                 .OrderBy(g => g.Key)
                 .Select(g => $"P{g.Key}:{g.Count()}"));
         return $"Turn {CurrentTurn}  |  Units alive: {alive}  |  Settlements: {owners}";
@@ -235,8 +234,8 @@ internal class SimulationSession
         computerPlayer.SetStrategicAction(sim);
         var orders = computerPlayer.CreateOrders(sim, sim.Units.Where(x => x.IsAlive).ToList());
         sim.ResolveOrders(orders);
-        for (var i = 0; i < numberOfPlayers; i++)
-            sim.ResolveStackLimits(i);
+        foreach (var player in CurrentBoard.Players)
+            sim.ResolveStackLimits(player.Id);
         sim.ConductBattles();
         sim.ChangeSettlementOwners();
         sim.Turn++;
@@ -246,8 +245,8 @@ internal class SimulationSession
         CurrentBoard = sim;
 
         // Check end conditions — only stop early if sides have actually been eliminated
-        var aliveOwners = sim.Units.Where(x => x.IsAlive).Select(x => x.OwnerIndex).Distinct().Count();
-        var settlementOwners = sim.Settlements.Select(x => x.OwnerIndex).Distinct().Count();
+        var aliveOwners = sim.Units.Where(x => x.IsAlive).Select(x => x.Owner.Id).Distinct().Count();
+        var settlementOwners = sim.Settlements.Select(x => x.Owner.Id).Distinct().Count();
         if (sim.Turn >= maxTurns
             || (initialUnitOwners > 1 && aliveOwners <= 1)
             || (initialSettlementOwners > 1 && settlementOwners <= 1))

@@ -9,8 +9,8 @@ public enum Role
     Scout,
 }
 
-public struct RoleMovementType(GameModel.MovementType movementType, Role role)
+public struct RoleMovementType(GameModel.OperationalDomain movementType, Role role)
 {
-    public GameModel.MovementType MovementType = movementType;
+    public GameModel.OperationalDomain MovementType = movementType;
     public Role Role = role;
 }

@@ -114,13 +114,13 @@ public class ComputerPlayer
         }
     }
 
-    public Dictionary<int, UnitAiState> UnitStates { get; set; }
+    public Dictionary<Guid, UnitAiState> UnitStates { get; set; }
 
     public Dictionary<int, Dictionary<RoleMovementType, float[]>> AggregateInfluence { get; private set; }
     public Dictionary<int, float[]> FriendlyUnitInfluence { get; private set; }
     public Dictionary<int, float[]> EnemyUnitInfluence { get; private set; }
-    public Dictionary<int, Dictionary<MovementType, float[]>> FriendlySettlementInfluenceMap { get; private set; }
-    public Dictionary<int, Dictionary<MovementType, float[]>> EnemySettlementInfluenceMap { get; private set; }
+    public Dictionary<int, Dictionary<OperationalDomain, float[]>> FriendlySettlementInfluenceMap { get; private set; }
+    public Dictionary<int, Dictionary<OperationalDomain, float[]>> EnemySettlementInfluenceMap { get; private set; }
 
     public static List<Role> Roles
     {
@@ -172,10 +172,10 @@ public class ComputerPlayer
             //var pathFindTiles = board.ValidMovesWithMoveCostsForUnit(unit);
             switch (unit.MovementType)
             {
-                case MovementType.Airborne:
+                case OperationalDomain.Airborne:
                     // If there are any enemy land or airborne units that are nearby, don't do pickup or airlift
                     if (board.Units.Any(x => x.Owner.Id != unit.Owner.Id &&
-                                (x.MovementType == MovementType.Land || x.MovementType == MovementType.Airborne) &&
+                                (x.MovementType == OperationalDomain.Land || x.MovementType == OperationalDomain.Airborne) &&
                                 (unit.Location == x.Location
                                 || ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5)))
                     {
@@ -190,7 +190,7 @@ public class ComputerPlayer
                         unitState.Value.OperationalAction = OperationalAction.AirliftToDestination;
                     }
                     break;
-                case MovementType.Land:
+                case OperationalDomain.Land:
                     // Only embark if not already being transported, not in a defensive role, 
                     // and there are no enemy settlements or units nearby
                     if (unit.TransportedBy == null &&
@@ -206,7 +206,7 @@ public class ComputerPlayer
                         unitState.Value.OperationalAction = OperationalAction.Disembark;
                     }
                     break;
-                case MovementType.Waterbound:
+                case OperationalDomain.Waterbound:
                     // If there are any enemy units nearby, don't dock or transport to destination
                     if (board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId
                                         && x.Owner.Id != unit.Owner.Id
@@ -235,10 +235,10 @@ public class ComputerPlayer
         var aiControlledUnits = units.Where(IsTracked).ToList();
         var unitOrders = new List<IUnitCommand>();
 
-        var landAndWaterUnits = aiControlledUnits.Where(x => x.MovementType != MovementType.Airborne).ToList();
+        var landAndWaterUnits = aiControlledUnits.Where(x => x.MovementType != OperationalDomain.Airborne).ToList();
         landAndWaterUnits.ForEach(unit => unitOrders.AddRange(CreateOrdersForUnit(board, aiControlledUnits, null, unit)));
 
-        var airborne = aiControlledUnits.Where(x => x.MovementType == MovementType.Airborne).ToList();
+        var airborne = aiControlledUnits.Where(x => x.MovementType == OperationalDomain.Airborne).ToList();
         airborne.ForEach(unit => unitOrders.AddRange(CreateOrdersForUnit(board, aiControlledUnits, unitOrders, unit)));
 
         return unitOrders;
@@ -260,7 +260,7 @@ public class ComputerPlayer
                     break;
                 }
             case OperationalAction.Embark:
-                Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == MovementType.Airborne && GetUnitState(x).OperationalAction == OperationalAction.Pickup;
+                Func<MilitaryUnit, bool> airborneRule = (x) => x.MovementType == OperationalDomain.Airborne && GetUnitState(x).OperationalAction == OperationalAction.Pickup;
                 var closestAvailableAirborneUnitPath = ClosestAvailableTransportPath(board, unit, units, airborneRule);
 
                 //Func<MilitaryUnit, bool> aquaticRule = (x) => x.MovementType == MovementType.Water && x.StrategicAction == StrategicAction.Dock;
@@ -316,14 +316,14 @@ public class ComputerPlayer
 
                 break;
             case OperationalAction.Disembark:
-                if (unit.TransportedBy.MovementType == MovementType.Airborne)
+                if (unit.TransportedBy.MovementType == OperationalDomain.Airborne)
                 {
                     if (board.Settlements.Any(x => x.Owner.Id != unit.Owner.Id && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
                     {
                         unitOrders.Add(new UnloadCommand(unit));
                     }
                 }
-                if (unit.TransportedBy.MovementType == MovementType.Waterbound)
+                if (unit.TransportedBy.MovementType == OperationalDomain.Waterbound)
                 {
                     var tileEdges = Edge.GetEdges(board.Edges, unit.Location);
                     if (board.Settlements.Any(y => tileEdges.Any(z =>
@@ -524,9 +524,9 @@ public class ComputerPlayer
         return closestPort;
     }
 
-    public void GenerateInfluenceMaps(GameState board, int numberOfPlayers)
+    public void GenerateInfluenceMaps(GameState gameState, int numberOfPlayers)
     {
-        var aliveUnits = board.Units.Where(x => x.IsAlive).ToList();
+        var aliveUnits = gameState.Units.Where(x => x.IsAlive).ToList();
 
         AggregateInfluence = [];
         FriendlyUnitInfluence = [];
@@ -534,7 +534,7 @@ public class ComputerPlayer
         FriendlySettlementInfluenceMap = [];
         EnemySettlementInfluenceMap = [];
 
-        board.Tiles.ToList().ForEach(x =>
+        gameState.Tiles.ToList().ForEach(x =>
         {
             FriendlyUnitInfluence[x.Index] = new float[numberOfPlayers];
             EnemyUnitInfluence[x.Index] = new float[numberOfPlayers];
@@ -555,31 +555,31 @@ public class ComputerPlayer
         // Build reusable influence maps first, then copy values into the legacy dictionaries used by the AI decision code.
         var friendlyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
         var enemyUnitMapsByPlayer = new BoardInfluenceMap[numberOfPlayers];
-        var friendlySettlementMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
-        var enemySettlementMapsByPlayer = new Dictionary<MovementType, BoardInfluenceMap>[numberOfPlayers];
+        var friendlySettlementMapsByPlayer = new Dictionary<OperationalDomain, BoardInfluenceMap>[numberOfPlayers];
+        var enemySettlementMapsByPlayer = new Dictionary<OperationalDomain, BoardInfluenceMap>[numberOfPlayers];
 
         for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
         {
-            friendlyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(board.Width, board.Height);
-            enemyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(board.Width, board.Height);
+            friendlyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(gameState.Width, gameState.Height);
+            enemyUnitMapsByPlayer[playerIndex] = new BoardInfluenceMap(gameState.Width, gameState.Height);
             friendlySettlementMapsByPlayer[playerIndex] = [];
             enemySettlementMapsByPlayer[playerIndex] = [];
 
             MilitaryUnit.MovementTypes.ForEach(movementType =>
             {
-                friendlySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
-                enemySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(board.Width, board.Height));
+                friendlySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(gameState.Width, gameState.Height));
+                enemySettlementMapsByPlayer[playerIndex].Add(movementType, new BoardInfluenceMap(gameState.Width, gameState.Height));
             });
         }
 
         foreach (var unit in aliveUnits)
         {
-            var unitMap = new BoardInfluenceMap(board.Width, board.Height);
+            var unitMap = new BoardInfluenceMap(gameState.Width, gameState.Height);
             unitMap.AddRadialInfluence(unit.Location.Hex, 1f, 3);
 
-            for (var index = 0; index < board.Tiles.Length; index++)
+            for (var index = 0; index < gameState.Tiles.Length; index++)
             {
-                if (!unit.CanStopOn.HasFlag(board[index].TerrainType))
+                if (!unit.CanStopOn.HasFlag(gameState[index].TerrainType))
                     continue;
 
                 var influence = unitMap.GetValue(index);
@@ -588,22 +588,22 @@ public class ComputerPlayer
 
                 friendlyUnitMapsByPlayer[unit.Owner.Id].AddValue(index, influence);
 
-                for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+                foreach (var player in gameState.Players)
                 {
-                    if (playerIndex == unit.Owner.Id)
+                    if (player.Id == unit.Owner.Id)
                         continue;
 
-                    enemyUnitMapsByPlayer[playerIndex].AddValue(index, influence);
+                    enemyUnitMapsByPlayer[player.Id].AddValue(index, influence);
                 }
             }
         }
 
-        foreach (var settlement in board.Settlements)
+        foreach (var settlement in gameState.Settlements)
         {
-            var settlementMap = new BoardInfluenceMap(board.Width, board.Height);
+            var settlementMap = new BoardInfluenceMap(gameState.Width, gameState.Height);
             settlementMap.AddRadialInfluence(settlement.Location.Hex, 1f, 5);
 
-            for (var index = 0; index < board.Tiles.Length; index++)
+            for (var index = 0; index < gameState.Tiles.Length; index++)
             {
                 var influence = settlementMap.GetValue(index);
                 if (influence == 0f)
@@ -615,12 +615,12 @@ public class ComputerPlayer
                     var movementMapSet = isFriendlyForPlayer ? friendlySettlementMapsByPlayer[playerIndex] : enemySettlementMapsByPlayer[playerIndex];
 
                     // Air influence is always relevant, while land and water require same contiguous region.
-                    movementMapSet[MovementType.Airborne].AddValue(index, influence);
+                    movementMapSet[OperationalDomain.Airborne].AddValue(index, influence);
 
-                    if (settlement.Location.ContiguousRegionId == board[index].ContiguousRegionId)
+                    if (settlement.Location.ContiguousRegionId == gameState[index].ContiguousRegionId)
                     {
-                        movementMapSet[MovementType.Land].AddValue(index, influence);
-                        movementMapSet[MovementType.Waterbound].AddValue(index, influence);
+                        movementMapSet[OperationalDomain.Land].AddValue(index, influence);
+                        movementMapSet[OperationalDomain.Waterbound].AddValue(index, influence);
                     }
                 }
             }
@@ -628,7 +628,7 @@ public class ComputerPlayer
 
         for (var playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
         {
-            foreach (var tile in board.Tiles)
+            foreach (var tile in gameState.Tiles)
             {
                 FriendlyUnitInfluence[tile.Index][playerIndex] = friendlyUnitMapsByPlayer[playerIndex].GetValue(tile.Index);
                 EnemyUnitInfluence[tile.Index][playerIndex] = enemyUnitMapsByPlayer[playerIndex].GetValue(tile.Index);
@@ -645,7 +645,7 @@ public class ComputerPlayer
                 MilitaryUnit.MovementTypes.ForEach(movementType =>
                 {
                     CalculateAggregateInfluence(
-                        board,
+                        gameState,
                         playerIndex,
                         role,
                         movementType,
@@ -662,7 +662,7 @@ public class ComputerPlayer
         GameState board,
         int playerIndex,
         Role role,
-        MovementType movementType,
+        OperationalDomain movementType,
         IInfluenceMap friendlyUnitMap,
         IInfluenceMap enemyUnitMap,
         IInfluenceMap friendlySettlementMap,

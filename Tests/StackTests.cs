@@ -16,7 +16,8 @@ public class StackTests
     [TestInitialize]
     public void TestInitialize()
     {
-        gameState = new GameState(new Board(GameBoard, settlements: Settlements));
+        gameState = new GameState(new Board(GameBoard));
+        gameState.Board.ParseSettlements(Settlements, gameState.Players);
     }
 
     [TestMethod]
@@ -34,17 +35,17 @@ public class StackTests
 
         var units = new List<MilitaryUnit>
         {
-            new MilitaryUnit(new UnitTemplate { RoadMovementBonus = 1 }, 1, gameState.Players[0], location: gameState[6, 1]),
-            new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[6, 1]),
-            new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[6, 1]),
-            new MilitaryUnit(new UnitTemplate(), 1, gameState.Players[0], location: gameState[6, 1]),
+            new(new UnitTemplate { RoadMovementBonus = 1 }, gameState.Players[0], location: gameState[6, 1]),
+            new(new UnitTemplate(), gameState.Players[0], location: gameState[6, 1]),
+            new(new UnitTemplate(), gameState.Players[0], location: gameState[6, 1]),
+            new(new UnitTemplate(), gameState.Players[0], location: gameState[6, 1]),
         };
         gameState.Units.AddRange(units);
 
         Assert.AreEqual(2, gameState[6, 1].StackLimit);
-        Assert.IsTrue(gameState.OverStackLimit(gameState[6, 1], 0));
+        Assert.IsTrue(gameState.OverStackLimit(gameState[6, 1], gameState.Players[0].Id));
 
-        gameState.ResolveStackLimits(0);
+        gameState.ResolveStackLimits(gameState.Players[0].Id);
 
         units.ForEach(x => Assert.AreEqual(4, x.Morale));
     }
@@ -52,8 +53,8 @@ public class StackTests
     [TestMethod]
     public void CanTransport()
     {
-        var inf = new MilitaryUnit(new UnitTemplate { TransportableBy = [MovementType.Airborne] }, 1, gameState.Players[0]);
-        var air = new MilitaryUnit(new UnitTemplate { MovementType = MovementType.Airborne, IsTransporter = true }, 1, gameState.Players[0]);
+        var inf = new MilitaryUnit(new UnitTemplate { TransportableBy = [OperationalDomain.Airborne] }, gameState.Players[0]);
+        var air = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, IsTransporter = true }, gameState.Players[0]);
 
 
         Assert.IsTrue(air.CanTransport(inf));

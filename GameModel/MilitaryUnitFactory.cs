@@ -1,19 +1,20 @@
 namespace GameModel;
 
+using System;
 using System.Collections.Generic;
 
 public class MilitaryUnitFactory(UnitTemplateFactory templateFactory)
 {
     private readonly UnitTemplateFactory templateFactory = templateFactory;
-    private readonly Dictionary<(UnitTemplateName, int ownerId), int> sequenceCounters = [];
+    private readonly Dictionary<(UnitTemplateName, Guid OwnerId), int> sequenceCounters = [];
 
-    public MilitaryUnit Create(UnitTemplateName templateName, int id, Player owner, string unitName, Tile location = null, int turnBuilt = 0)
+    public MilitaryUnit Create(UnitTemplateName templateName, Player owner, string unitName, Tile location = null, int turnBuilt = 0)
     {
         var template = templateFactory.Get(templateName);
-        return new MilitaryUnit(template, id, owner, location: location, name: unitName, turnBuilt: turnBuilt);
+        return new MilitaryUnit(template, owner, location: location, name: unitName, turnBuilt: turnBuilt);
     }
 
-    public MilitaryUnit CreateNext(UnitTemplateName templateName, int id, Player owner, Tile location = null, int turnBuilt = 0)
+    public MilitaryUnit CreateNext(UnitTemplateName templateName, Player owner, Tile location = null, int turnBuilt = 0)
     {
         if (!sequenceCounters.TryGetValue((templateName, owner.Id), out var count))
         {
@@ -25,7 +26,7 @@ public class MilitaryUnitFactory(UnitTemplateFactory templateFactory)
 
         var ordinal = ToOrdinal(count);
         var unitName = $"{ordinal} {templateName.ToDisplayName()}";
-        return Create(templateName, id, owner, unitName, location, turnBuilt);
+        return Create(templateName, owner, unitName, location, turnBuilt);
     }
 
     private static string ToOrdinal(int number)

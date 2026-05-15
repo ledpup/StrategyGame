@@ -189,14 +189,14 @@ public class Tile
         }
     } = 0;
 
-    public bool OverStackLimit(IEnumerable<MilitaryUnit> tileUnits, int playerIndex)
+    public bool OverStackLimit(IEnumerable<MilitaryUnit> tileUnits, Guid playerId)
     {
-        return OverStackLimitCount(tileUnits, playerIndex) > 0;
+        return OverStackLimitCount(tileUnits, playerId) > 0;
     }
 
-    internal int OverStackLimitCount(IEnumerable<MilitaryUnit> tileUnits, int playerIndex)
+    internal int OverStackLimitCount(IEnumerable<MilitaryUnit> tileUnits, Guid playerId)
     {
-        return tileUnits.Count(x => x.IsAlive && x.Owner.Id == playerIndex) - StackLimit;
+        return tileUnits.Count(x => x.IsAlive && x.Owner.Id == playerId) - StackLimit;
     }
 
     internal static bool IsInConflict(IEnumerable<MilitaryUnit> tileUnits)
@@ -212,11 +212,9 @@ public class Tile
 
     public TerrainType TemperatureAdjustedTerrainType { get; set; }
 
-    public int? OwnerId { get; set; }
-
     public bool IsSelected { get; set; }
 
-    public Settlement Settlement { get; set; }
+    public Settlement? Settlement { get; set; }
 
     public Tile PortDestination
     {

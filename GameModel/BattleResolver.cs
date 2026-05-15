@@ -6,7 +6,7 @@ using System.Linq;
 
 public static class BattleResolver
 {
-    public static BattleReport ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, int residentId = 0, SettlementType settlement = SettlementType.None, int siegeDuration = 1)
+    public static BattleReport ResolveBattle(string locationText, int turn, TerrainType terrainType, Weather weather, List<MilitaryUnit> units, Guid residentId, SettlementType settlement = SettlementType.None, int siegeDuration = 1)
     {
         var groupedUnits = units.GroupBy(x => x.Owner.Id);
         if (groupedUnits.Count() == 1)
@@ -110,7 +110,7 @@ public static class BattleResolver
 
             battleReport.CasualtyLog.Add(new CasualtyLogEntry
             {
-                OwnerIndex = x.Owner.Id,
+                OwnerId = x.Owner.Id,
                 Text = x.IsAlive ? losses > 1
                                     ? string.Format("{0} {1} loss{2}, {3} remain", x.Name, losses, losses > 1 ? "es" : string.Empty, x.Personnel)
                                     : string.Format("{0} no losses", x.Name)

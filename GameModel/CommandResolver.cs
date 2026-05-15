@@ -107,12 +107,12 @@ public class CommandResolver(GameState gameState)
                 }
             }
 
-            unitStepMoves.Where((KeyValuePair<MilitaryUnit, Move> x) => x.Value.Edge.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == MovementType.Land)
+            unitStepMoves.Where((KeyValuePair<MilitaryUnit, Move> x) => x.Value.Edge.Destination.BaseTerrainType == BaseTerrainType.Water && x.Key.MovementType == OperationalDomain.Land)
                 .ToList()
                 .ForEach((KeyValuePair<MilitaryUnit, Move> x) =>
                 {
                     var transportedUnit = x.Key;
-                    var transports = gameState.Units.Where(y => y.MovementType == MovementType.Waterbound && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
+                    var transports = gameState.Units.Where(y => y.MovementType == OperationalDomain.Waterbound && x.Value.Edge.Destination.Hex == y.Location.Hex && y.CanTransport(transportedUnit)).OrderBy(y => y.TransportSize);
                     var transport = transports.FirstOrDefault();
                     if (transport != null)
                     {

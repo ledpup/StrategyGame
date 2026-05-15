@@ -6,7 +6,7 @@ using System.Linq;
 
 public class CombatantInBattle
 {
-    public int OwnerId { get; set; }
+    public Guid OwnerId { get; set; }
 
     public double UnitStrength { get; set; }
 

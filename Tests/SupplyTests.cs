@@ -16,15 +16,16 @@ public class SupplyTests
     [TestMethod]
     public void SupplyTest()
     {
-        var board = new GameState(new Board(GameBoard, Edges, Settlements));
+        var gameState = new GameState(new Board(GameBoard, Edges));
+        gameState.Board.ParseSettlements(Settlements, gameState.Players);
 
-        board[3, 4].OwnerId = 2;
-        board.Units = [new(new UnitTemplate(), 0, 2, board[3, 4], "1st Enemy")];
-        board.InitialiseSupply();
+        gameState[3, 4].Settlement.Owner.Id = gameState.Players[1].Id;
+        gameState.Units = [new(new UnitTemplate(), gameState.Players[1], gameState[3, 4])];
+        gameState.InitialiseSupply();
 
-        var labels = new string[board.Width * board.Height];
-        board.Tiles.ToList().ForEach(x => labels[x.Index] = x.Supply.ToString());
+        var labels = new string[gameState.Width * gameState.Height];
+        gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.Supply.ToString());
 
-        Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithSettlementsAndSupply.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels, null, board.Units);
+        Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithSettlementsAndSupply.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels, null, gameState.Units);
     }
 }

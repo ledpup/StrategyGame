@@ -14,9 +14,9 @@ public enum SettlementType
 
 public class Settlement
 {
-    public Settlement(int id, SettlementType settlementType, Tile tile, Player owner, int supply = 10)
+    public Settlement(SettlementType settlementType, Tile tile, Player owner, int supply = 10)
     {
-        Id = id;
+        Id = Guid.NewGuid();
         SettlementType = settlementType;
         Location = tile;
         Owner = owner;
@@ -25,7 +25,7 @@ public class Settlement
         Location?.Settlement = this;
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public SettlementType SettlementType { get; set; }
 
@@ -45,30 +45,5 @@ public class Settlement
             SettlementType.City => .6f,
             _ => 0f,
         };
-    }
-
-    public static List<Settlement> ParseSettlements(string[] tilePoints, List<Player> players)
-    {
-        var settlements = new List<Settlement>();
-
-        if (tilePoints == null)
-        {
-            return settlements;
-        }
-
-        foreach (var point in tilePoints)
-        {
-            var settlementProperties = point.Split(',');
-            var index = int.Parse(settlementProperties[0]);
-            var settlementType = Enum.Parse<SettlementType>(settlementProperties[1]);
-            var ownerId = int.Parse(settlementProperties[2]);
-            var owner = players.FirstOrDefault(p => p.Id == ownerId) ?? new Player(ownerId, ownerId.ToString());
-            var supply = int.Parse(settlementProperties[3]);
-            var settlement = new Settlement(index, settlementType, TileArray[index], owner, supply);
-
-            settlements.Add(settlement);
-        }
-
-        return settlements;
     }
 }

@@ -28,7 +28,7 @@ public class MapDocumentTests
     // ── CreateDefault ─────────────────────────────────────────────────
 
     [TestMethod]
-    public void CreateDefault_DimensionsCorrect()
+    public void CreateDefault_NewDocument_HasExpectedDimensions()
     {
         var doc = Grassland(5, 4);
         Assert.HasCount(4, doc.Tiles);
@@ -41,7 +41,7 @@ public class MapDocumentTests
     // ── WriteTo / ParseFromLines roundtrip ────────────────────────────
 
     [TestMethod]
-    public void Roundtrip_TilesPreserved()
+    public void Roundtrip_WithTiles_PreservesTiles()
     {
         var doc = Grassland(3, 2);
         doc.Tiles[0] = "GMH";
@@ -51,7 +51,7 @@ public class MapDocumentTests
     }
 
     [TestMethod]
-    public void Roundtrip_EdgesPreserved()
+    public void Roundtrip_WithEdges_PreservesEdges()
     {
         var doc = Grassland();
         doc.Edges.Add("0,1,River,false");
@@ -61,7 +61,7 @@ public class MapDocumentTests
     }
 
     [TestMethod]
-    public void Roundtrip_SettlementsPreserved()
+    public void Roundtrip_WithSettlements_PreservesSettlements()
     {
         var doc = Grassland();
         doc.Settlements.Add("5,City,1,100");
@@ -70,7 +70,7 @@ public class MapDocumentTests
     }
 
     [TestMethod]
-    public void Roundtrip_EmptyDocumentProducesEmptyDocument()
+    public void Roundtrip_EmptyDocument_ProducesEmptyDocument()
     {
         var doc = Grassland(2, 2);
         var rt = Roundtrip(doc);
@@ -81,7 +81,7 @@ public class MapDocumentTests
     // ── TerrainToChar ─────────────────────────────────────────────────
 
     [TestMethod]
-    public void TerrainToChar_AllTerrainTypesHaveChar()
+    public void TerrainToChar_AllTerrainTypes_ReturnsCharacter()
     {
         var types = new[]
         {
@@ -97,7 +97,7 @@ public class MapDocumentTests
     // ── FromBoard / ToBoard ───────────────────────────────────────────
 
     [TestMethod]
-    public void FromBoard_TileCountMatchesDimensions()
+    public void FromBoard_BoardWithTiles_TileCountMatchesDimensions()
     {
         var board = new Board(
             File.ReadAllLines("BasicBoard.txt"),
@@ -109,7 +109,7 @@ public class MapDocumentTests
     }
 
     [TestMethod]
-    public void ToBoard_ThenFromBoard_TileRowsIdentical()
+    public void ToBoardThenFromBoard_DocumentWithTiles_PreservesTileRows()
     {
         var doc = Grassland(4, 3);
         doc.Tiles[1] = "GHMG";
@@ -119,7 +119,7 @@ public class MapDocumentTests
     }
 
     [TestMethod]
-    public void ToBoard_EdgesRoundtrip()
+    public void ToBoard_DocumentWithEdges_PreservesEdges()
     {
         var doc = Grassland(4, 3);
         // Add an edge between tile 0 and tile 1 (adjacent in a 4-wide map)
@@ -133,7 +133,7 @@ public class MapDocumentTests
     // ── ParseFromLines ignores blank lines ────────────────────────────
 
     [TestMethod]
-    public void ParseFromLines_IgnoresBlankLines()
+    public void ParseFromLines_InputWithBlankLines_IgnoresBlankLines()
     {
         var lines = new[]
         {
@@ -151,7 +151,7 @@ public class MapDocumentTests
 public class MapDeltaTests
 {
     [TestMethod]
-    public void TileRow_Serialise_Roundtrip()
+    public void TileRow_Serialise_RoundTrips()
     {
         var d = new MapDelta { Kind = DeltaKind.TileRow, Key = "2", OldValue = "GGG", NewValue = "GMG" };
         var d2 = MapDelta.Parse(d.ToString());
@@ -162,7 +162,7 @@ public class MapDeltaTests
     }
 
     [TestMethod]
-    public void EdgeAdd_Serialise_Roundtrip()
+    public void EdgeAdd_Serialise_RoundTrips()
     {
         var d = new MapDelta { Kind = DeltaKind.EdgeAdd, NewValue = "0,1,River,false" };
         var d2 = MapDelta.Parse(d.ToString());
@@ -181,7 +181,7 @@ public class MapDeltaTests
     }
 
     [TestMethod]
-    public void EdgeAdd_Inverse_IsEdgeRemove()
+    public void EdgeAdd_Inverse_ReturnsEdgeRemove()
     {
         var d = new MapDelta { Kind = DeltaKind.EdgeAdd, NewValue = "0,1,River,false" };
         var inv = d.Inverse();
@@ -190,7 +190,7 @@ public class MapDeltaTests
     }
 
     [TestMethod]
-    public void EdgeRemove_Inverse_IsEdgeAdd()
+    public void EdgeRemove_Inverse_ReturnsEdgeAdd()
     {
         var d = new MapDelta { Kind = DeltaKind.EdgeRemove, OldValue = "0,1,River,false" };
         var inv = d.Inverse();
@@ -199,7 +199,7 @@ public class MapDeltaTests
     }
 
     [TestMethod]
-    public void SettlementAdd_Inverse_IsSettlementRemove()
+    public void SettlementAdd_Inverse_ReturnsSettlementRemove()
     {
         var d = new MapDelta { Kind = DeltaKind.SettlementAdd, NewValue = "5,City,1,100" };
         var inv = d.Inverse();
@@ -208,7 +208,7 @@ public class MapDeltaTests
     }
 
     [TestMethod]
-    public void UnitAdd_Inverse_IsUnitRemove()
+    public void UnitAdd_Inverse_ReturnsUnitRemove()
     {
         var d = new MapDelta { Kind = DeltaKind.UnitAdd, NewValue = "some,unit,line" };
         var inv = d.Inverse();
@@ -261,7 +261,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void Commit_ClearsRedoStack()
+    public void Commit_WithNewChange_ClearsRedoStack()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -279,7 +279,7 @@ public class MapHistoryTests
     // ── Undo ──────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void Undo_RestoresPreviousTileRow()
+    public void Undo_AfterTileRowChange_RestoresPreviousTileRow()
     {
         var h = new MapHistory();
         var before = Grassland();
@@ -291,7 +291,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void Undo_MovesGroupToRedoStack()
+    public void Undo_AfterCommit_MovesGroupToRedoStack()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -303,7 +303,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void Undo_MultipleEdits_RestoredInOrder()
+    public void Undo_MultipleEdits_RestoresInReverseOrder()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -322,7 +322,7 @@ public class MapHistoryTests
     // ── Redo ──────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void Redo_ReappliesForwardChange()
+    public void Redo_AfterUndo_ReappliesForwardChange()
     {
         var h = new MapHistory();
         var before = Grassland();
@@ -337,7 +337,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void Redo_MovesGroupBackToUndoStack()
+    public void Redo_AfterUndo_MovesGroupBackToUndoStack()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -350,7 +350,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void UndoRedo_MultipleTimesIsStable()
+    public void UndoRedo_MultipleTimes_RemainsStable()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -415,7 +415,7 @@ public class MapHistoryTests
     // ── Diff ──────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void Diff_NoChange_EmptyGroup()
+    public void Diff_NoChange_ReturnsEmptyGroup()
     {
         var doc = Grassland();
         var g = MapHistory.Diff(doc, Clone(doc), "test");
@@ -423,7 +423,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void Diff_SingleTileChange_OneDelta()
+    public void Diff_SingleTileChange_ReturnsOneDelta()
     {
         var before = Grassland(3, 2);
         var after = Clone(before);
@@ -436,7 +436,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void Diff_EdgeAdded_OneAddDelta()
+    public void Diff_EdgeAdded_ReturnsOneAddDelta()
     {
         var before = Grassland();
         var after = Clone(before);
@@ -447,7 +447,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void Diff_EdgeRemoved_OneRemoveDelta()
+    public void Diff_EdgeRemoved_ReturnsOneRemoveDelta()
     {
         var before = Grassland();
         before.Edges.Add("0,1,River,false");
@@ -461,7 +461,7 @@ public class MapHistoryTests
     // ── Clear ─────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void Clear_EmptiesBothStacks()
+    public void Clear_WithUndoAndRedo_EmptiesBothStacks()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -476,7 +476,7 @@ public class MapHistoryTests
     // ── Serialise / TryLoad ───────────────────────────────────────────
 
     [TestMethod]
-    public void SaveLoad_UndoStack_Roundtrip()
+    public void SaveLoad_UndoStack_RoundTrips()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -511,7 +511,7 @@ public class MapHistoryTests
     }
 
     [TestMethod]
-    public void SaveLoad_RedoStack_Roundtrip()
+    public void SaveLoad_RedoStack_RoundTrips()
     {
         var h = new MapHistory();
         var a = Grassland();
@@ -548,3 +548,5 @@ public class MapHistoryTests
         Assert.IsFalse(h.TryLoad(Path.Combine(Path.GetTempPath(), "nonexistent_abc123.sgmap")));
     }
 }
+
+

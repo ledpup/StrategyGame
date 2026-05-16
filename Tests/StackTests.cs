@@ -21,7 +21,7 @@ public class StackTests
     }
 
     [TestMethod]
-    public void StackLimits()
+    public void StackLimit_TerrainTypes_ReturnExpectedLimits()
     {
 
         Assert.AreEqual(4, gameState[1, 2].StackLimit);
@@ -30,7 +30,7 @@ public class StackTests
     }
 
     [TestMethod]
-    public void OverStackLimit()
+    public void ResolveStackLimits_OverStackedTile_ReducesMorale()
     {
 
         var units = new List<MilitaryUnit>
@@ -51,7 +51,7 @@ public class StackTests
     }
 
     [TestMethod]
-    public void CanTransport()
+    public void CanTransport_AirborneTransporterWithTransportableUnit_ReturnsTrue()
     {
         var inf = new MilitaryUnit(new UnitTemplate { TransportableBy = [OperationalDomain.Airborne] }, gameState.Players[0]);
         var air = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, IsTransporter = true }, gameState.Players[0]);
@@ -60,3 +60,7 @@ public class StackTests
         Assert.IsTrue(air.CanTransport(inf));
     }
 }
+
+
+
+

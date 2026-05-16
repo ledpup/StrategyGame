@@ -28,7 +28,7 @@ public class InfluenceMapTests
     }
 
     [TestMethod]
-    public void DisplayInfluenceMap()
+    public void GenerateInfluenceMaps_BasicScenario_RendersInfluenceMoves()
     {
 
         var numberOfPlayers = 2;
@@ -74,7 +74,7 @@ public class InfluenceMapTests
     }
 
     [TestMethod]
-    public void SelectBestMoveFromInfluenceMap()
+    public void FindBestMoveOrder_InfluenceMap_SelectsReachableDestination()
     {
 
         var numberOfPlayers = 2;
@@ -120,3 +120,6 @@ public class InfluenceMapTests
         }
     }
 }
+
+
+

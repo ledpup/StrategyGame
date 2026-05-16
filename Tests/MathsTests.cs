@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using Hexagon;
 
@@ -8,14 +8,14 @@ namespace Tests;
 public class MathsTests
 {
     [TestMethod]
-    public void Normalise()
+    public void Normalise_ValueOutsideRange_WrapsIntoRange()
     {
         Assert.AreEqual(1, Maths.Normalise(361, 0, 360));
         Assert.AreEqual(0, Maths.Normalise(720, 0, 360));
     }
 
     [TestMethod]
-    public void DegreesToRadians()
+    public void DegreeToRadian_DegreeValues_ReturnsRadians()
     {
         Assert.AreEqual(0, Math.Round(Maths.DegreeToRadian(0), 5));
         Assert.AreEqual(1.5708D, Math.Round(Maths.DegreeToRadian(90), 5));
@@ -27,7 +27,7 @@ public class MathsTests
     }
 
     [TestMethod]
-    public void GetAngleFromPoints()
+    public void Theta_CardinalAndDiagonalPoints_ReturnsExpectedDegrees()
     {
         Assert.AreEqual(0, PointD.Theta(new PointD(0, 0), new PointD(1, 0)));
         Assert.AreEqual(90, PointD.Theta(new PointD(0, 0), new PointD(0, -1)));
@@ -38,7 +38,7 @@ public class MathsTests
     }
 
     [TestMethod]
-    public void EdgeToCentrePoint()
+    public void EdgeToCentrePoint_HexEdge_ReturnsCentrePoint()
     {
         var layout = new Layout(Layout.flat, new PointD(10, 10), new PointD(0, 0));
         var points = Layout.PolygonCorners(layout, new Hex(1, 1)).ToArray();
@@ -49,3 +49,6 @@ public class MathsTests
         Assert.AreEqual(30.31, Math.Round(point.Y, 2));
     }
 }
+
+
+

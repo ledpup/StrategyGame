@@ -195,3 +195,4 @@ public class PathFindTests
         Assert.Contains(x => x.Edge.EdgeType == EdgeType.Wall, moveOrder.Moves);
     }
 }
+

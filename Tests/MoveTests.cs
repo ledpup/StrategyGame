@@ -21,7 +21,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void TerrainTypeTests()
+    public void TerrainType_NonMountainousLand_ExcludesMountain()
     {
         Assert.IsTrue(Terrain.AllLand.HasFlag(TerrainType.Desert));
         Assert.IsTrue(Terrain.AllLand.HasFlag(TerrainType.Hill));
@@ -30,7 +30,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void LandUnitMoveList()
+    public void PossibleMoves_LandUnit_ReturnsExpectedMoves()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate(), gameState.Players[0], gameState[335]) };
@@ -69,7 +69,7 @@ public class MoveTests
 
 
     [TestMethod]
-    public void LandUnitMoveListWithRoad()
+    public void PossibleMoves_LandUnitWithRoad_ReturnsRoadMoves()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate { RoadMovementBonus = 2 }, gameState.Players[0], gameState[345]) };
@@ -98,7 +98,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void LandUnitMoveListWithRoadOverMountain()
+    public void PossibleMoves_LandUnitWithRoadOverMountain_ReturnsMountainPassMoves()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate { RoadMovementBonus = 1 }, gameState.Players[0], gameState[85]) };
@@ -127,7 +127,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void LandUnitMoveOverMountainWithRoad()
+    public void PossibleMoves_LandUnitAtMountainRoad_CanMoveOverMountain()
     {
 
         var units = new List<MilitaryUnit>
@@ -145,7 +145,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AirborneMoveListWithRoadAndMountain()
+    public void PossibleMoves_AirborneUnitNearRoadAndMountain_ReturnsAirborneMoves()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne }, gameState.Players[0], gameState[85]) };
@@ -177,7 +177,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AirborneMoveList()
+    public void PossibleMoves_AirborneUnit_ReturnsExpectedMoves()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3 }, gameState.Players[0], gameState[364]) };
@@ -228,7 +228,7 @@ public class MoveTests
 
 
     [TestMethod]
-    public void AirborneUnitCanStopOn()
+    public void CanStopOn_AirborneUnit_ExcludesWaterReefAndMountain()
     {
         var airborneUnit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne }, gameState.Players[0], gameState[1, 1]);
 
@@ -240,7 +240,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AirborneUnitValidMoves()
+    public void PossibleMoves_AirborneUnitOnLand_ReturnsValidMoves()
     {
 
         var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne }, gameState.Players[0], gameState[1, 1]);
@@ -255,7 +255,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AirborneUnitValidMovesOverWater()
+    public void PossibleMoves_AirborneUnitNearWater_ReturnsPassingThroughWaterMoves()
     {
 
         var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne }, gameState.Players[0], gameState[4, 9]);
@@ -263,7 +263,7 @@ public class MoveTests
 
         moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWater.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
+        GameBoardRenderer.RenderAndSave("PossibleMoves_AirborneUnitNearWater_ReturnsPassingThroughWaterMoves.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
 
 
         Assert.Contains(x => x.Edge.Destination == gameState[3, 9] && x.MoveType == MoveType.OnlyPassingThrough, moveList); // Mountain
@@ -285,7 +285,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AirborneUnitValidMovesOverWaterFromShortestPath()
+    public void ShortestPath_AirborneUnitOverWater_ReturnsMoveOrderEndingOnLand()
     {
 
         var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 4 }, gameState.Players[0], gameState[147]);
@@ -296,13 +296,13 @@ public class MoveTests
         var moveOrder = unit.ShortestPathToMoveCommand(pathToTransporteesDestination.ToArray());
 
         moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
-        GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverWaterFromShortestPath.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
+        GameBoardRenderer.RenderAndSave("ShortestPath_AirborneUnitOverWater_ReturnsMoveOrderEndingOnLand.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
 
         Assert.AreNotEqual(MoveType.OnlyPassingThrough, moveOrder.Moves.Last().MoveType);
     }
 
     [TestMethod]
-    public void AirborneUnitShortestPathWithLongRouteOverWater()
+    public void FindShortestPath_AirborneUnitWithLongRouteOverWater_RendersPath()
     {
 
         var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3 }, gameState.Players[0], gameState[202]);
@@ -315,11 +315,11 @@ public class MoveTests
         GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWaterPath.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors);
 
         moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
-        GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongRouteOverWater.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
+        GameBoardRenderer.RenderAndSave("FindShortestPath_AirborneUnitWithLongRouteOverWater_RendersPath.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
     }
 
     [TestMethod]
-    public void AirborneUnitShortestPathWithLongerRouteOverWater()
+    public void FindShortestPath_AirborneUnitWithLongerRouteOverWater_RendersPath()
     {
 
         var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3 }, gameState.Players[0], gameState[187]);
@@ -331,11 +331,11 @@ public class MoveTests
 
         vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
 
-        GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathWithLongerRouteOverWater.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors);
+        GameBoardRenderer.RenderAndSave("FindShortestPath_AirborneUnitWithLongerRouteOverWater_RendersPath.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors);
     }
 
     [TestMethod]
-    public void AirborneUnitShortestPathCornerToCorner()
+    public void FindShortestPath_AirborneUnitCornerToCorner_RendersPath()
     {
 
         var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3 }, gameState.Players[0], gameState[28]);
@@ -347,11 +347,11 @@ public class MoveTests
 
         vectors.AddRange(Centreline.PathFindTilesToCentrelines(pathToTransporteesDestination));
 
-        GameBoardRenderer.RenderAndSave("AirborneUnitShortestPathCornerToCorner.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors);
+        GameBoardRenderer.RenderAndSave("FindShortestPath_AirborneUnitCornerToCorner_RendersPath.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors);
     }
 
     [TestMethod]
-    public void AirborneUnitValidMovesOverContinent()
+    public void PossibleMoves_AirborneUnitOverContinent_ReturnsExpectedMoves()
     {
 
         var unit = new MilitaryUnit(new UnitTemplate { OperationalDomain = OperationalDomain.Airborne, MovementPoints = 3 }, gameState.Players[0], gameState[19, 13]);
@@ -359,7 +359,7 @@ public class MoveTests
 
         moveList.Where(x => x.MoveType != MoveType.OnlyPassingThrough).ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("AirborneUnitValidMovesOverContinent.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
+        GameBoardRenderer.RenderAndSave("PossibleMoves_AirborneUnitOverContinent_ReturnsExpectedMoves.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, [unit]);
 
         Assert.HasCount(154, moveList);
 
@@ -370,7 +370,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void LandUnitNearRiverAndRoad()
+    public void PossibleMoves_LandUnitNearRiverAndRoad_BlocksRiverWithoutBridge()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate(), gameState.Players[0], gameState[1, 1], "1st Infantry") };
@@ -379,7 +379,7 @@ public class MoveTests
 
         moves.ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("LandUnitNearRiverAndRoad.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
+        GameBoardRenderer.RenderAndSave("PossibleMoves_LandUnitNearRiverAndRoad_BlocksRiverWithoutBridge.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
 
         Assert.Contains(x => x.Edge.Destination == gameState[1, 2], moves);
         Assert.Contains(x => x.Edge.Destination == gameState[2, 2], moves);
@@ -392,7 +392,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void LandUnitNearBridgeAndRoad()
+    public void PossibleMoves_LandUnitNearBridgeAndRoad_AllowsBridgeCrossing()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate(), gameState.Players[0], gameState[141], "1st Infantry") };
@@ -401,7 +401,7 @@ public class MoveTests
 
         moves.ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("LandUnitNearBridgeAndRoad.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
+        GameBoardRenderer.RenderAndSave("PossibleMoves_LandUnitNearBridgeAndRoad_AllowsBridgeCrossing.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
 
         Assert.HasCount(15, moves);
 
@@ -418,7 +418,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AmphibiousUnitNearRiverAndRoad()
+    public void PossibleMoves_AmphibiousLandUnitNearRiver_AllowsRiverCrossing()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate { OperationalDomain = OperationalDomain.Land }, gameState.Players[0], gameState[1, 1]) };
@@ -429,7 +429,7 @@ public class MoveTests
 
         moves.ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("AmphibiousUnitNearRiverAndRoad.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
+        GameBoardRenderer.RenderAndSave("PossibleMoves_AmphibiousLandUnitNearRiver_AllowsRiverCrossing.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
 
         Assert.HasCount(8, moves);
 
@@ -441,7 +441,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AquaticUnitMoves()
+    public void PossibleMoves_WaterboundUnit_ReturnsExpectedMoves()
     {
 
         var units = new List<MilitaryUnit> { new(new UnitTemplate { OperationalDomain = OperationalDomain.Waterbound, MovementPoints = 3 }, gameState.Players[0], gameState[225]) };
@@ -450,7 +450,7 @@ public class MoveTests
 
         moves.ToList().ForEach(x => x.Edge.Destination.IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("AquaticUnitMoves.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
+        GameBoardRenderer.RenderAndSave("PossibleMoves_WaterboundUnit_ReturnsExpectedMoves.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, units);
 
         Assert.HasCount(138, moves);
 
@@ -466,7 +466,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void EmbarkOnShip_LandUnitAndWaterboundAtCoastalSettlement_LandUnitEmbarks()
+    public void ResolveOrders_LandUnitAndWaterboundAtCoastalSettlement_EmbarksLandUnit()
     {
         // NM3: a land unit may embark on a waterbound unit if they are both in a coastal settlement and there is a port edge between the land and water hexes
         var settlements = new[] { "196,City,1,6" };
@@ -488,7 +488,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void EmbarkOnShip_LandUnitAtSettlementWaterboundOnWater_LandUnitCannotEmbark()
+    public void ResolveOrders_LandUnitAtSettlementAndShipOnWater_DoesNotEmbarkLandUnit()
     {
         // NM3 requires both units to be at the coastal settlement; if the ship is on water the land unit cannot embark without moving
         var settlements = new[] { "196,City,1,6" };
@@ -510,7 +510,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void EmbarkOnShip()
+    public void ResolveOrders_LandUnitAndShip_CreateEmbarkMove()
     {
 
         gameState.Units =
@@ -529,7 +529,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void ResolveMove()
+    public void ResolveOrders_MultipleMoveCommands_MovesUnitsToDestinations()
     {
 
         gameState.Units =
@@ -564,7 +564,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AdjacentUnitsOfSameStrengthSwapHexes()
+    public void ResolveOrders_AdjacentEnemiesOfSameStrengthSwapHexes_BothStayInOriginHexes()
     {
 
         gameState.Units =
@@ -596,7 +596,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void AdjacentUnitsOfDifferentStrengthSwapHexes()
+    public void ResolveOrders_AdjacentEnemiesOfDifferentStrengthSwapHexes_StrongerForceAdvances()
     {
 
         gameState.Units =
@@ -631,7 +631,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void ResolveMove_ConflictArrises_ConflictedUnitsStop()
+    public void ResolveOrders_WhenConflictArises_ConflictedUnitsStop()
     {
         gameState.Units =
         [
@@ -741,7 +741,7 @@ public class MoveTests
     }
 
     [TestMethod]
-    public void ConflictTest()
+    public void DetectConflictedUnits_OpposingMovingUnitsInSameTile_ReturnsBothConflictedUnits()
     {
         var tile1 = new Tile(1, 1, 1);
         var tile2 = new Tile(2, 1, 2);
@@ -768,3 +768,5 @@ public class MoveTests
         Assert.DoesNotContain(units[1], conflictedUnits);
     }
 }
+
+

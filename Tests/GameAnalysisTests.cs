@@ -1,4 +1,4 @@
-﻿using ComputerOpponent;
+using ComputerOpponent;
 using GameModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace Tests;
 public class GameAnalysisTests
 {
     [TestMethod]
-    public void BasicGameAnalysisTest()
+    public void CalculateObjectiveFunction_BasicGameState_CompletesWithoutError()
     {
         var gameAnalysis = new GameAnalysis();
 
@@ -36,3 +36,5 @@ public class GameAnalysisTests
         gameAnalysis.CalculateObjectiveFunction(players, settlements, units);
     }
 }
+
+

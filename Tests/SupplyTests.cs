@@ -14,7 +14,7 @@ public class SupplyTests
     static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
     [TestMethod]
-    public void SupplyTest()
+    public void InitialiseSupply_FriendlySettlement_PropagatesSupply()
     {
         var gameState = new GameState(new Board(GameBoard, Edges));
         gameState.Board.ParseSettlements(Settlements, gameState.Players);
@@ -30,3 +30,5 @@ public class SupplyTests
         Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithSettlementsAndSupply.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels, null, gameState.Units);
     }
 }
+
+

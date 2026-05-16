@@ -14,7 +14,7 @@ public class TemperatureTests
     static string[] TileEdges = File.ReadAllLines("BasicBoardEdges.txt");
 
     [TestMethod]
-    public void CorrectTempTest()
+    public void CalculateTemperature_MultipleTurns_RendersTemperatureMaps()
     {
         var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -35,3 +35,5 @@ public class TemperatureTests
         }
     }
 }
+
+

@@ -10,7 +10,7 @@ namespace Tests;
 public class BoardInfluenceMapTests
 {
     [TestMethod]
-    public void AddThreatInfluence_AddsExpectedFalloffByRadius()
+    public void AddRadialInfluence_RadiusProvided_AddsExpectedFalloff()
     {
         var map = new BoardInfluenceMap(5, 5);
         var origin = new Hex(2, 1);
@@ -27,7 +27,7 @@ public class BoardInfluenceMapTests
     }
 
     [TestMethod]
-    public void Propagate_SpreadsInfluenceToNeighborsUsingDecay()
+    public void Propagate_WithDecay_SpreadsInfluenceToNeighbors()
     {
         var map = new BoardInfluenceMap(5, 5);
         var origin = new Hex(2, 1);
@@ -43,7 +43,7 @@ public class BoardInfluenceMapTests
     }
 
     [TestMethod]
-    public void Combine_MergesWeightedMapsIntoDecisionField()
+    public void Combine_WeightedMaps_MergesIntoDecisionField()
     {
         var mapA = new BoardInfluenceMap(5, 5);
         var mapB = new BoardInfluenceMap(5, 5);
@@ -61,7 +61,7 @@ public class BoardInfluenceMapTests
     }
 
     [TestMethod]
-    public void CopyValues_ReturnsIndependentArray()
+    public void CopyValues_AfterCopy_ReturnsIndependentArray()
     {
         var map = new BoardInfluenceMap(4, 4);
         map.SetValue(3, 5f);
@@ -72,3 +72,5 @@ public class BoardInfluenceMapTests
         Assert.AreEqual(5f, map.GetValue(3), 0.0001f);
     }
 }
+
+

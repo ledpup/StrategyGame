@@ -10,7 +10,7 @@ namespace Tests;
 public class BattleTests
 {
     [TestMethod]
-    public void TwoEnemies_ResolveBattle_200Casualties()
+    public void ResolveBattle_TwoEnemies_AppliesExpectedCasualties()
     {
         var templateFactory = new UnitTemplateFactory();
         var unitFactory = new MilitaryUnitFactory(templateFactory);
@@ -30,7 +30,7 @@ public class BattleTests
     }
 
     [TestMethod]
-    public void TwoEnemies_MoveToSameDestination_BattleOccurs()
+    public void ResolveOrders_TwoEnemiesMoveToSameDestination_CreatesBattle()
     {
         var gameState = new GameState(new Board(BoardTests.GameBoard, BoardTests.TileEdges));
         var unitFactory = new MilitaryUnitFactory(new UnitTemplateFactory());
@@ -54,3 +54,5 @@ public class BattleTests
         Assert.HasCount(1, battles);
     }
 }
+
+

@@ -28,7 +28,7 @@ public class TransportTests
 
 
     [TestMethod]
-    public void Ports()
+    public void CreateOrders_WaterTransportScenario_FollowsExpectedPortRoute()
     {
         var numberOfPlayers = 2;
         var labels = new string[gameState.Width, gameState.Height];
@@ -99,7 +99,7 @@ public class TransportTests
     }
 
     [TestMethod]
-    public void TransportByAir()
+    public void ResolveOrders_AirTransportCommand_TransportsUnitWithAirborneUnit()
     {
 
         var units = new List<MilitaryUnit>
@@ -132,7 +132,7 @@ public class TransportTests
     }
 
     [TestMethod]
-    public void MoveTransportedUnit()
+    public void ResolveOrders_TransportedUnitGivenMoveCommand_ThrowsException()
     {
 
         var units = new List<MilitaryUnit>
@@ -161,7 +161,7 @@ public class TransportTests
     }
 
     [TestMethod]
-    public void UnloadUnit()
+    public void ResolveOrders_UnloadTransportedUnit_RemovesTransportRelationship()
     {
 
         var units = new List<MilitaryUnit>
@@ -199,7 +199,7 @@ public class TransportTests
     }
 
     [TestMethod]
-    public void AirborneUnitAirlift()
+    public void CreateOrders_AirborneAirliftScenario_FollowsExpectedAirliftRoute()
     {
         var numberOfPlayers = 2;
         var labels = new string[gameState.Width, gameState.Height];
@@ -239,7 +239,7 @@ public class TransportTests
             var lines = new List<Centreline>();
             unitOrders.OfType<MoveCommand>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-            GameBoardRenderer.RenderAndSave($"AirborneUnitAirlift{turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: gameState.Units, lines: lines);
+            GameBoardRenderer.RenderAndSave($"CreateOrders_AirborneAirliftScenario_FollowsExpectedAirliftRoute{turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: gameState.Units, lines: lines);
 
             gameState.ResolveOrders(unitOrders);
             gameState.ChangeSettlementOwners();
@@ -302,3 +302,5 @@ public class TransportTests
         }
     }
 }
+
+

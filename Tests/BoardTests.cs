@@ -33,7 +33,7 @@ public class BoardTests
     }
 
     [TestMethod]
-    public void NeighboursTest()
+    public void Board_Neighbours_PopulatesExpectedAdjacentTiles()
     {
         var board = new GameState(new Board(GameBoard));
 
@@ -53,7 +53,7 @@ public class BoardTests
     }
 
     [TestMethod]
-    public void IsSeaTest()
+    public void Tile_WaterConnectedToMapEdge_IsSea()
     {
         var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -61,7 +61,7 @@ public class BoardTests
     }
 
     [TestMethod]
-    public void IsLakeTest()
+    public void Tile_EnclosedWater_IsLake()
     {
         var board = new GameState(new Board(GameBoard, TileEdges));
 
@@ -69,14 +69,14 @@ public class BoardTests
     }
 
     [TestMethod]
-    public void CoordsTests()
+    public void OffsetCoord_FromHexIndex_ReturnsExpectedCoordinate()
     {
         Assert.AreEqual(29, OffsetCoord.OffsetCoordsToIndex(2, 1, 27));
         Assert.AreEqual(new OffsetCoord(2, 1), OffsetCoord.QoffsetFromCube(Hex.IndexToHex(29, 27)));
     }
 
     [TestMethod]
-    public void CoordsHexTests()
+    public void HexIndex_ValidCoordinates_RoundTrips()
     {
         const int boardWidth = 27;
         const int boardHeight = 19;
@@ -106,4 +106,6 @@ public class BoardTests
     }
 
 }
+
+
 

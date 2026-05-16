@@ -1,4 +1,4 @@
-﻿using GameModel;
+using GameModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 
@@ -12,8 +12,10 @@ public class SettlementTests
     static string[] Settlements = File.ReadAllLines("BasicBoardSettlements.txt");
 
     [TestMethod]
-    public void ReadSettlementsTest()
+    public void Board_WithSettlementFile_ParsesSettlements()
     {
         var board = new Board(GameBoard, null, Settlements);
     }
 }
+
+

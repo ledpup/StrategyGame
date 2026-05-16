@@ -23,7 +23,7 @@ public class StrategicActionTests
     }
 
     [TestMethod]
-    public void EnemyNearNavelUnitSoDontDock()
+    public void SetStrategicAction_EnemyNearNavalUnit_DoesNotDock()
     {
         var labels = new string[gameState.Width, gameState.Height];
 
@@ -40,7 +40,7 @@ public class StrategicActionTests
     }
 
     [TestMethod]
-    public void NoEnemyNearNavelUnitSoDock()
+    public void SetStrategicAction_NoEnemyNearNavalUnit_Docks()
     {
         var labels = new string[gameState.Width, gameState.Height];
 
@@ -59,7 +59,7 @@ public class StrategicActionTests
 
 
     [TestMethod]
-    public void EnemyNearAirborneUnitSoDontPickup()
+    public void SetStrategicAction_EnemyNearAirborneUnit_DoesNotPickup()
     {
         var labels = new string[gameState.Width, gameState.Height];
 
@@ -80,7 +80,7 @@ public class StrategicActionTests
     }
 
     [TestMethod]
-    public void EnemyNearAirborneUnitSoPickup()
+    public void SetStrategicAction_NoEnemyNearAirborneUnit_SetsPickup()
     {
         var labels = new string[gameState.Width, gameState.Height];
 
@@ -98,3 +98,5 @@ public class StrategicActionTests
         Assert.AreEqual(OperationalAction.Pickup, computerPlayer.GetUnitState(units[0]).OperationalAction);
     }
 }
+
+

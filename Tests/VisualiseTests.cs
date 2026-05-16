@@ -31,7 +31,7 @@ public class VisualiseTests
     }
 
     [TestMethod]
-    public void VisualiseBoardTest()
+    public void RenderAndSave_BasicBoard_RendersCoordinateMaps()
     {
 
         var labels = new string[gameState.Width * gameState.Height];
@@ -49,7 +49,7 @@ public class VisualiseTests
     }
 
     [TestMethod]
-    public void VisualiseUnitOnBoardTest()
+    public void RenderAndSave_UnitsOnBoard_RendersUnits()
     {
 
         var units = new List<MilitaryUnit>
@@ -63,3 +63,4 @@ public class VisualiseTests
         GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: units);
     }
 }
+

@@ -53,7 +53,7 @@ public class HexTests
 
 
     [TestMethod]
-    public void TestHexArithmetic()
+    public void Hex_AddAndSubtract_ReturnsExpectedCoordinates()
     {
         HexTests.EqualHex("hex_add", new Hex(4, -10), Hex.Add(new Hex(1, -3), new Hex(3, -7)));
         HexTests.EqualHex("hex_subtract", new Hex(-2, 4), Hex.Subtract(new Hex(1, -3), new Hex(3, -7)));
@@ -61,35 +61,35 @@ public class HexTests
 
 
     [TestMethod]
-    public void TestHexDirection()
+    public void Hex_Direction_ReturnsExpectedNeighborVector()
     {
         HexTests.EqualHex("hex_direction", new Hex(0, -1), Hex.Direction(2));
     }
 
 
     [TestMethod]
-    public void TestHexNeighbor()
+    public void Hex_Neighbor_ReturnsAdjacentHex()
     {
         HexTests.EqualHex("hex_neighbor", new Hex(1, -3), Hex.Neighbor(new Hex(1, -2), 2));
     }
 
 
     [TestMethod]
-    public void TestHexDiagonal()
+    public void Hex_DiagonalNeighbor_ReturnsDiagonalHex()
     {
         HexTests.EqualHex("hex_diagonal", new Hex(-1, -1), Hex.DiagonalNeighbor(new Hex(1, -2), 3));
     }
 
 
     [TestMethod]
-    public void TestHexDistance()
+    public void Hex_Distance_ReturnsExpectedDistance()
     {
         HexTests.EqualInt("hex_distance", 7, Hex.Distance(new Hex(3, -7), new Hex(0, 0)));
     }
 
 
     [TestMethod]
-    public void TestHexRound()
+    public void FractionalHex_HexRound_ReturnsNearestHex()
     {
         Hex a = new(0, 0);
         Hex b = new(1, -1);
@@ -103,14 +103,14 @@ public class HexTests
 
 
     [TestMethod]
-    public void TestHexLinedraw()
+    public void FractionalHex_HexLinedraw_ReturnsLineHexes()
     {
         HexTests.EqualHexArray("hex_linedraw", [new(0, 0), new(0, -1), new(0, -2), new(1, -3), new(1, -4), new(1, -5)], FractionalHex.HexLinedraw(new Hex(0, 0), new Hex(1, -5)));
     }
 
 
     [TestMethod]
-    public void TestLayout()
+    public void Layout_PixelRoundTrip_ReturnsOriginalHex()
     {
         Hex h = new(3, 4);
         Layout flat = new(Layout.flat, new PointD(10, 15), new PointD(35, 71));
@@ -120,7 +120,7 @@ public class HexTests
     }
 
     [TestMethod]
-    public void HexRing()
+    public void HexRing_RadiusOne_ReturnsExpectedNeighbors()
     {
         var hex = new Hex(5, 0);
         var results = Hex.HexRing(hex, 1, 20, 20);
@@ -158,7 +158,7 @@ public class HexTests
     }
 
     [TestMethod]
-    public void HexesWithinArea()
+    public void HexesWithinArea_RadiusTwo_ReturnsExpectedTiles()
     {
         var board = new GameState(new Board(GameBoard));
 
@@ -252,3 +252,6 @@ public class HexTests
     }
 
 }
+
+
+

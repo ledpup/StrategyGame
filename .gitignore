@@ -175,3 +175,4 @@ pip-log.txt
 /.vs/VSWorkspaceState.json
 /.vs/slnx.sqlite
 /.vs/config/applicationhost.config
+*.lscache

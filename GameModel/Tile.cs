@@ -15,7 +15,7 @@ public class Tile
     public TerrainType TerrainType;
     public Weather Weather;
 
-    public int ContiguousRegionId { get; set; }
+    public int ConnectedRegionId { get; set; }
 
     public int X, Y;
 

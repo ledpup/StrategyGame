@@ -143,28 +143,10 @@ public class CommandResolver(GameState gameState)
 
     public static IEnumerable<MilitaryUnit> DetectConflictedUnits(List<MilitaryUnit> setOfUnits, IEnumerable<MilitaryUnit> allUnits)
     {
-        var conflictedUnits = new List<MilitaryUnit>();
-        var conflictedLocations = new HashSet<(Guid OwnerId, Tile Location)>();
-        setOfUnits.ForEach(x =>
-        {
-            if (conflictedUnits.Contains(x))
-            {
-                return;
-            }
-
-            if (conflictedLocations.Any(y => y.OwnerId != x.Owner.Id && y.Location == x.Location))
-            {
-                return;
-            }
-
-            if (allUnits.Any(u => MilitaryUnit.IsInConflictDuringMovement(u, x)))
-            {
-                conflictedUnits.Add(x);
-                conflictedLocations.Add((x.Owner.Id, x.Location));
-            }
-        });
-
-        return conflictedUnits;
+        return setOfUnits
+            .Where(unit => allUnits.Any(otherUnit => MilitaryUnit.IsInConflictDuringMovement(otherUnit, unit)))
+            .Distinct()
+            .ToList();
     }
 
     private static Dictionary<MilitaryUnit, Move> MoveUnitsOneStep(List<MoveCommand> moveCommands, Dictionary<MilitaryUnit, int> unitStepRate, int step)

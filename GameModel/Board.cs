@@ -30,8 +30,6 @@ public class Board
         CalculateTileDistanceFromTheSea();
         Settlements = ParseSettlements(settlements, []);
         InitialiseSupply();
-        CalculateContiguousRegions();
-
         this.logger = logger ?? LogManager.GetCurrentClassLogger();
 
         TerrainTemperatureModifiers = [];
@@ -76,43 +74,6 @@ public class Board
         Settlements = settlements;
         return settlements;
     }
-
-    private void CalculateContiguousRegions()
-    {
-        var id = 0;
-        foreach (var tile in TileArray)
-        {
-            if (tile.ContiguousRegionId == 0)
-            {
-                id++;
-                tile.ContiguousRegionId = id;
-                AssignContiguousTilesToRegion(tile, id, tile.TerrainType == TerrainType.Mountain);
-            }
-        }
-    }
-
-    private static void AssignContiguousTilesToRegion(Tile start, int id, bool isMountainRange)
-    {
-        var stack = new Stack<Tile>();
-        stack.Push(start);
-        while (stack.Count > 0)
-        {
-            var tile = stack.Pop();
-            foreach (var x in tile.Neighbours)
-            {
-                if (x.Destination.ContiguousRegionId == 0
-                    && x.Destination.BaseTerrainType == tile.BaseTerrainType
-                    && (x.HasRoad || (tile.TerrainType != TerrainType.Mountain && x.Destination.TerrainType != TerrainType.Mountain)
-                        || (tile.TerrainType == TerrainType.Mountain && x.Destination.TerrainType == TerrainType.Mountain && isMountainRange)))
-                {
-                    x.Destination.ContiguousRegionId = id;
-                    stack.Push(x.Destination);
-                }
-            }
-        }
-    }
-
-    
 
     public void InitialiseSupply()
     {

@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ComputerOpponent;
 using GameModel;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ public class VisualiseTests
     {
         gameState = new GameState(new Board(GameBoard, TileEdges));
         gameState.Board.ParseSettlements(Settlements, gameState.Players);
+        ConnectedRegionCalculator.Calculate(gameState.Board);
     }
 
     [TestMethod]
@@ -42,8 +44,8 @@ public class VisualiseTests
         gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.Hex.ToString());
         GameBoardRenderer.RenderAndSave("Coords - cube.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
 
-        gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
-        GameBoardRenderer.RenderAndSave("ContiguousRegionIds.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
+        gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.ConnectedRegionId.ToString());
+        GameBoardRenderer.RenderAndSave("ConnectedRegionIds.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
     }
 
     [TestMethod]
@@ -60,8 +62,4 @@ public class VisualiseTests
 
         GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: units);
     }
-
-
-
-
 }

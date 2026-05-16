@@ -23,7 +23,7 @@
 1. When all orders are used, the player may not issue any more move commands.
 
 ## Movement rules
-(M1) Units occupy a domain: airborne, land, or waterbound.
+(M1) Units operate in a domain: airborne, land, or waterbound.
 (M2) Land and waterbound units are restricted to land or water tiles on the board.
 (M3) Airborne units can move over land or water, but must end their turn on a land tile.
 (M4) If two opposing units of the same domain step on the same tile simultaneously, a conflict occurs.
@@ -31,6 +31,12 @@
 (M6) A unit may have multiple move commands each turn.
 (M7) If a unit enters a conflict during a move command, all subsequent steps and commands for that unit are cancelled.
 (M8) The first move command for a unit does not affect morale, but subsequent move commands reduce morale, starting at 1 and increasing exponentially with each additional move command.
+
+## Stack movement rules
+(SM1) Units occupying the same hex are considered a stack.
+(SM2) Units within a stack can be moved independantly of each other or as a group.
+(SM3) If a move command is issued for a stack, only one order is used.
+(SM4) A stack may only move to hexes that each unit in the stack could move to individually.
 
 ### Road movement rules
 (RM1) A land unit may move along a road if the road connects the hexes it is moving between.
@@ -71,8 +77,8 @@
 
 ## Definitions
 - Orders: The number of actions a player may take in a turn.
-- Movement Points (MP): The maximum number of hexes a unit may move in a single move command.
-- Move Command: A sequence of steps over hexes, resolved step-by-step.
+- Operational domain: The movement type of a unit (airborne, land, waterbound).
+- Movement points (MP): The maximum number of hexes a unit may move in a single move command.
+- Move command: A sequence of steps over hexes, resolved step-by-step.
 - Conflict: A situation where two opposing units of the same domain occupy the same hex.
 - Siege: A conflict that occurs when a unit is on a tile of a neutral or enemy settlement.
-- Domain: The movement type of a unit (airborne, land, waterbound).

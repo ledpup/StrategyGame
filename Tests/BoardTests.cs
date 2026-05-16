@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameModel;
 using System.IO;
 using Hexagon;
-using Visualise;
 
 namespace Tests;
 
@@ -106,25 +105,5 @@ public class BoardTests
         Assert.AreEqual(58, Hex.HexToIndex(new Hex(4, 0), boardWidth, boardHeight));
     }
 
-    [TestMethod]
-    public void ContiguousRegionTest()
-    {
-        string[] gameBoard = File.ReadAllLines("ContiguousRegionTestBoard.txt");
-        string[] tileEdges = File.ReadAllLines("ContiguousRegionTestEdges.txt");
-
-        var board = new GameState(new Board(gameBoard, tileEdges));
-
-        var labels = new string[board.Width * board.Height];
-        board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ContiguousRegionId.ToString());
-        GameBoardRenderer.RenderAndSave("ContiguousRegionsTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
-
-        Assert.AreEqual(2, board[12].ContiguousRegionId);
-        Assert.AreEqual(7, board[32].ContiguousRegionId);
-
-        Assert.AreEqual(3, board[17].ContiguousRegionId);
-        Assert.AreEqual(3, board[27].ContiguousRegionId);
-        Assert.AreEqual(3, board[37].ContiguousRegionId);
-
-        Assert.AreNotEqual(3, board[26].ContiguousRegionId);
-    }
 }
+

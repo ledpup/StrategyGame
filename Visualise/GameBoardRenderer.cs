@@ -57,7 +57,7 @@ public class GameBoardRenderer
                         centrelines.Add(new Centreline(x.Origin.Hex, x.Destination.Hex, Colours.SaddleBrown, x.EdgeType == EdgeType.River));
                     }
 
-                    if (!x.HasRoad || (x.HasRoad && x.EdgeType == EdgeType.River))
+                    if (x.EdgeType != EdgeType.None)
                     {
                         edgesToRender.Add(new Edge(x.Origin.Hex, x.Destination.Hex, EdgeToColour(x.EdgeType), x.EdgeType == EdgeType.Port));
                     }

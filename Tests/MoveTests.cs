@@ -762,6 +762,9 @@ public class MoveTests
 
         var conflictedUnits = CommandResolver.DetectConflictedUnits(movingUnits, units);
 
-        Assert.HasCount(1, conflictedUnits);
+        Assert.HasCount(2, conflictedUnits);
+        Assert.Contains(units[0], conflictedUnits);
+        Assert.Contains(units[2], conflictedUnits);
+        Assert.DoesNotContain(units[1], conflictedUnits);
     }
 }

@@ -161,6 +161,8 @@ public class ComputerPlayer
     }
     public void SetStrategicAction(GameState board)
     {
+        EnsureConnectedRegions(board);
+
         foreach (var unitState in UnitStates)
         {
             unitState.Value.OperationalAction = OperationalAction.None;
@@ -195,8 +197,8 @@ public class ComputerPlayer
                     // and there are no enemy settlements or units nearby
                     if (unit.TransportedBy == null &&
                                 unitState.Value.Role != Role.Defensive &&
-                                !board.Settlements.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.Owner.Id != unit.Owner.Id) &&
-                                !board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId && x.Owner.Id != unit.Owner.Id)
+                                !board.Settlements.Any(x => x.Location.ConnectedRegionId == unit.Location.ConnectedRegionId && x.Owner.Id != unit.Owner.Id) &&
+                                !board.Units.Any(x => x.Location.ConnectedRegionId == unit.Location.ConnectedRegionId && x.Owner.Id != unit.Owner.Id)
                                 )
                     {
                         unitState.Value.OperationalAction = OperationalAction.Embark;
@@ -208,7 +210,7 @@ public class ComputerPlayer
                     break;
                 case OperationalDomain.Waterbound:
                     // If there are any enemy units nearby, don't dock or transport to destination
-                    if (board.Units.Any(x => x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId
+                    if (board.Units.Any(x => x.Location.ConnectedRegionId == unit.Location.ConnectedRegionId
                                         && x.Owner.Id != unit.Owner.Id
                                         && ShortestPathDistance(unit.Location, x.Location, unit) < unit.MovementPoints * 1.5))
                     {
@@ -229,6 +231,8 @@ public class ComputerPlayer
 
     public List<IUnitCommand> CreateOrders(GameState board, List<MilitaryUnit> units)
     {
+        EnsureConnectedRegions(board);
+
         if (units.Any(x => !x.IsAlive))
             throw new Exception("Cannot assign orders to units that have been destroyed");
 
@@ -318,7 +322,7 @@ public class ComputerPlayer
             case OperationalAction.Disembark:
                 if (unit.TransportedBy.MovementType == OperationalDomain.Airborne)
                 {
-                    if (board.Settlements.Any(x => x.Owner.Id != unit.Owner.Id && x.Location.ContiguousRegionId == unit.Location.ContiguousRegionId))
+                    if (board.Settlements.Any(x => x.Owner.Id != unit.Owner.Id && x.Location.ConnectedRegionId == unit.Location.ConnectedRegionId))
                     {
                         unitOrders.Add(new UnloadCommand(unit));
                     }
@@ -328,7 +332,7 @@ public class ComputerPlayer
                     var tileEdges = Edge.GetEdges(board.Edges, unit.Location);
                     if (board.Settlements.Any(y => tileEdges.Any(z =>
                                                                     z.EdgeType == EdgeType.Port
-                                                                    && (z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) || (z.Origin.ContiguousRegionId == y.Location.ContiguousRegionId))
+                                                                    && (z.Destination.ConnectedRegionId == y.Location.ConnectedRegionId) || (z.Origin.ConnectedRegionId == y.Location.ConnectedRegionId))
                                                                     && y.Owner.Id != unit.Owner.Id))
                     {
                         unitOrders.Add(unit.PossibleMoves().First().GetMoveOrder(unit));
@@ -340,7 +344,7 @@ public class ComputerPlayer
 
             case OperationalAction.Dock:
                 {
-                    if (!unit.Location.HasPort || !units.Any(x => x.Location.ContiguousRegionId == unit.Location.PortDestination.ContiguousRegionId && GetUnitState(x).OperationalAction == OperationalAction.Embark))
+                    if (!unit.Location.HasPort || !units.Any(x => x.Location.ConnectedRegionId == unit.Location.PortDestination.ConnectedRegionId && GetUnitState(x).OperationalAction == OperationalAction.Embark))
                     {
                         closestPortPath = ClosestPortPath(board, unit);
 
@@ -405,7 +409,7 @@ public class ComputerPlayer
                         if (moveOrder != null)
                             unitOrders.Add(moveOrder);
 
-                        if (board.Settlements.Any(x => x.Owner.Id != unit.Owner.Id && x.Location.ContiguousRegionId == moveOrder.Moves.Last().Edge.Destination.ContiguousRegionId))
+                        if (board.Settlements.Any(x => x.Owner.Id != unit.Owner.Id && x.Location.ConnectedRegionId == moveOrder.Moves.Last().Edge.Destination.ConnectedRegionId))
                         {
                             unit.Transporting.ForEach(x => unitOrders.Add(new UnloadCommand(x, moveOrder.Moves.Last().Edge.Destination)));
                         }
@@ -484,31 +488,33 @@ public class ComputerPlayer
     }
     public IEnumerable<PathFindTile> ClosestPortPath(GameState board, MilitaryUnit unit)
     {
+        EnsureConnectedRegions(board);
+
         var unitState = GetUnitState(unit);
         var closestPortDistance = int.MaxValue;
         IEnumerable<PathFindTile> closestPort = null;
         board.Tiles.ToList().ForEach(x =>
             {
-                if (x.ContiguousRegionId == unit.Location.ContiguousRegionId && x.HasPort)
+                if (x.ConnectedRegionId == unit.Location.ConnectedRegionId && x.HasPort)
                 {
                     switch (unitState.OperationalAction)
                     {
                         case OperationalAction.Dock:
                             // Only go to a port that has units that want to embark
-                            if (!board.Units.Any(y => IsTracked(y) && x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ContiguousRegionId == y.Location.ContiguousRegionId) && GetUnitState(y).OperationalAction == OperationalAction.Embark))
+                            if (!board.Units.Any(y => IsTracked(y) && x.Neighbours.Any(z => z.EdgeType == EdgeType.Port && z.Destination.ConnectedRegionId == y.Location.ConnectedRegionId) && GetUnitState(y).OperationalAction == OperationalAction.Embark))
                                 return;
                             break;
                         case OperationalAction.TransportToDestination:
                             // Only go to a port that has enemy settlement(s)
                             var portDestinationRegionIds = x.Neighbours
                                 .Where(z => z.EdgeType == EdgeType.Port)
-                                .Select(z => z.Destination.ContiguousRegionId)
+                                .Select(z => z.Destination.ConnectedRegionId)
                                 .ToList();
 
-                            if (!board.Settlements.Any(y => portDestinationRegionIds.Contains(y.Location.ContiguousRegionId) && y.Owner.Id != unit.Owner.Id))
+                            if (!board.Settlements.Any(y => portDestinationRegionIds.Contains(y.Location.ConnectedRegionId) && y.Owner.Id != unit.Owner.Id))
                                 return;
 
-                            if (board.Units.Any(y => y.Owner.Id == unit.Owner.Id && portDestinationRegionIds.Contains(y.Location.ContiguousRegionId)))
+                            if (board.Units.Any(y => y.Owner.Id == unit.Owner.Id && portDestinationRegionIds.Contains(y.Location.ConnectedRegionId)))
                                 return;
                             break;
                     }
@@ -534,6 +540,8 @@ public class ComputerPlayer
 
     public void GenerateInfluenceMaps(GameState gameState, int numberOfPlayers)
     {
+        EnsureConnectedRegions(gameState);
+
         var aliveUnits = gameState.Units.Where(x => x.IsAlive).ToList();
         var playerIds = gameState.Players
             .Select(x => x.Id)
@@ -628,10 +636,10 @@ public class ComputerPlayer
                     var isFriendlyForPlayer = settlement.Owner.Id == playerId;
                     var movementMapSet = isFriendlyForPlayer ? friendlySettlementMapsByPlayer[playerId] : enemySettlementMapsByPlayer[playerId];
 
-                    // Air influence is always relevant, while land and water require same contiguous region.
+                    // Air influence is always relevant, while land and water require same connected region.
                     movementMapSet[OperationalDomain.Airborne].AddValue(index, influence);
 
-                    if (settlement.Location.ContiguousRegionId == gameState[index].ContiguousRegionId)
+                    if (settlement.Location.ConnectedRegionId == gameState[index].ConnectedRegionId)
                     {
                         movementMapSet[OperationalDomain.Land].AddValue(index, influence);
                         movementMapSet[OperationalDomain.Waterbound].AddValue(index, influence);
@@ -701,6 +709,8 @@ public class ComputerPlayer
 
     public MoveCommand FindBestMoveOrderForUnit(MilitaryUnit unit, GameState board)
     {
+        EnsureConnectedRegions(board);
+
         var unitState = GetUnitState(unit);
 
         var distance = 4;
@@ -742,6 +752,11 @@ public class ComputerPlayer
             return moveOrder;
         }
         return null;
+    }
+
+    private static void EnsureConnectedRegions(GameState gameState)
+    {
+        ConnectedRegionCalculator.Calculate(gameState.Board);
     }
 
 

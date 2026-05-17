@@ -36,16 +36,16 @@ public class VisualiseTests
 
         var labels = new string[gameState.Width * gameState.Height];
         gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.Index.ToString());
-        GameBoardRenderer.RenderAndSave("Coords - index.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
+        GameBoardRenderer.RenderAndSave("Visualise/Coords - index.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
 
         gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.ToOffsetCoordsString());
-        GameBoardRenderer.RenderAndSave("Coords - offset.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
+        GameBoardRenderer.RenderAndSave("Visualise/Coords - offset.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
 
         gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.Hex.ToString());
-        GameBoardRenderer.RenderAndSave("Coords - cube.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
+        GameBoardRenderer.RenderAndSave("Visualise/Coords - cube.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
 
         gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.ConnectedRegionId.ToString());
-        GameBoardRenderer.RenderAndSave("ConnectedRegionIds.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
+        GameBoardRenderer.RenderAndSave("Visualise/ConnectedRegionIds.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels);
     }
 
     [TestMethod]
@@ -60,7 +60,7 @@ public class VisualiseTests
             new(new UnitTemplate(), gameState.Players[2], gameState[1, 1])
         };
 
-        GameBoardRenderer.RenderAndSave("BasicBoardWithUnits.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: units);
+        GameBoardRenderer.RenderAndSave("Visualise/BasicBoardWithUnits.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: units);
     }
 }
 

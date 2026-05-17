@@ -33,7 +33,7 @@ public class ConnectedRegionTests
 
         var labels = new string[board.Width * board.Height];
         board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ConnectedRegionId.ToString());
-        GameBoardRenderer.RenderAndSave("ConnectedRegionMountainEdgesTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
+        GameBoardRenderer.RenderAndSave("ConnectedRegions/ConnectedRegionMountainEdgesTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
 
         var regionCount = board.Tiles.Select(x => x.ConnectedRegionId).Distinct().Count();
 
@@ -63,7 +63,7 @@ public class ConnectedRegionTests
 
         var labels = new string[board.Width * board.Height];
         board.Tiles.ToList().ForEach(x => labels[x.Index] = x.ConnectedRegionId.ToString());
-        GameBoardRenderer.RenderAndSave("ConnectedRegionRoadAcrossMountainRangeTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
+        GameBoardRenderer.RenderAndSave("ConnectedRegions/ConnectedRegionRoadAcrossMountainRangeTestBoard.png", board.Width, board.Height, board.Tiles, board.Edges, board.Settlements, labels);
 
         var regionCount = board.Tiles.Select(x => x.ConnectedRegionId).Distinct().Count();
 

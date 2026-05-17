@@ -27,7 +27,7 @@ public class SupplyTests
         var labels = new string[gameState.Width * gameState.Height];
         gameState.Tiles.ToList().ForEach(x => labels[x.Index] = x.Supply.ToString());
 
-        Visualise.GameBoardRenderer.RenderAndSave("BasicBoardWithSettlementsAndSupply.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels, null, gameState.Units);
+        Visualise.GameBoardRenderer.RenderAndSave("Supply/BasicBoardWithSettlementsAndSupply.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, labels, null, gameState.Units);
     }
 }
 

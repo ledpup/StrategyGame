@@ -154,7 +154,7 @@ public class HexTests
         results = Hex.HexRing(hex, 1, 27, 19);
         results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
-        Visualise.GameBoardRenderer.RenderAndSave("HexRingCorners.png", board.Width, board.Height, board.Tiles);
+        Visualise.GameBoardRenderer.RenderAndSave("RedBlob/HexRingCorners.png", board.Width, board.Height, board.Tiles);
     }
 
     [TestMethod]
@@ -166,7 +166,7 @@ public class HexTests
         var results = Hex.HexesWithinArea(hex, 2, board.Width, board.Height);
 
         results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
-        Visualise.GameBoardRenderer.RenderAndSave("HexesInArea.png", board.Width, board.Height, board.Tiles);
+        Visualise.GameBoardRenderer.RenderAndSave("RedBlob/HexesInArea.png", board.Width, board.Height, board.Tiles);
         board.Tiles.ToList().ForEach(x => x.IsSelected = false);
 
         Assert.HasCount(19, results);
@@ -211,7 +211,7 @@ public class HexTests
         results.ToList().ForEach(x => board[Hex.HexToIndex(x, board.Width, board.Height)].IsSelected = true);
 
 
-        Visualise.GameBoardRenderer.RenderAndSave("HexesInAreaEdges.png", board.Width, board.Height, board.Tiles);
+        Visualise.GameBoardRenderer.RenderAndSave("RedBlob/HexesInAreaEdges.png", board.Width, board.Height, board.Tiles);
     }
 
     //[TestMethod]

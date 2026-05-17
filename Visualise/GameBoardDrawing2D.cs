@@ -206,6 +206,12 @@ public class GameBoardDrawing2D
 
     internal void Save(string fileName)
     {
+        var directory = Path.GetDirectoryName(fileName);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
         _bitmap.Save(fileName);
     }
 

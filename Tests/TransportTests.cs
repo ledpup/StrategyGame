@@ -69,7 +69,7 @@ public class TransportTests
             var lines = new List<Centreline>();
             moveOrders.ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
-            GameBoardRenderer.RenderAndSave($"PortsTurn{gameState.Turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, lines, gameState.Units);
+            GameBoardRenderer.RenderAndSave($"Transport/PortsTurn{gameState.Turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, lines, gameState.Units);
 
             gameState.ResolveOrders(moveOrders);
             gameState.ChangeSettlementOwners();
@@ -239,7 +239,7 @@ public class TransportTests
             var lines = new List<Centreline>();
             unitOrders.OfType<MoveCommand>().ToList().ForEach(x => lines.AddRange(Centreline.MoveOrderToCentrelines(x)));
 
-            GameBoardRenderer.RenderAndSave($"CreateOrders_AirborneAirliftScenario_FollowsExpectedAirliftRoute{turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: gameState.Units, lines: lines);
+            GameBoardRenderer.RenderAndSave($"Transport/CreateOrders_AirborneAirliftScenario_FollowsExpectedAirliftRoute{turn}.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, units: gameState.Units, lines: lines);
 
             gameState.ResolveOrders(unitOrders);
             gameState.ChangeSettlementOwners();

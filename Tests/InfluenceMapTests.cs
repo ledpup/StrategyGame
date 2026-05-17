@@ -66,11 +66,11 @@ public class InfluenceMapTests
         var vectors = new List<Centreline>();
         moveOrders.ForEach(x => vectors.AddRange(Centreline.MoveOrderToCentrelines((MoveCommand)x)));
 
-        GameBoardRenderer.RenderAndSave("AggregateInfluenceMoveOrders.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors, gameState.Units);
+        GameBoardRenderer.RenderAndSave("InfluenceMaps/AggregateInfluenceMoveOrders.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, vectors, gameState.Units);
 
         gameState.ResolveOrders(moveOrders);
 
-        GameBoardRenderer.RenderAndSave("AggregateInfluenceMovesResolved.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
+        GameBoardRenderer.RenderAndSave("InfluenceMaps/AggregateInfluenceMovesResolved.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
     }
 
     [TestMethod]
@@ -98,7 +98,7 @@ public class InfluenceMapTests
         var results = Hex.HexesWithinArea(gameState.Units[1].Location.Hex, 4, gameState.Width, gameState.Height);
         results.ToList().ForEach(x => gameState[Hex.HexToIndex(x, gameState.Width, gameState.Height)].IsSelected = true);
 
-        GameBoardRenderer.RenderAndSave("HexesConsideredForHighestInfluence.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
+        GameBoardRenderer.RenderAndSave("InfluenceMaps/HexesConsideredForHighestInfluence.png", gameState.Width, gameState.Height, gameState.Tiles, gameState.Edges, gameState.Settlements, null, null, gameState.Units);
 
         var roleMovementType = computerPlayer.GetUnitState(gameState.Units[1]).GetRoleMovementType(gameState.Units[1]);
         var tilesOrderedInfluence = gameState.Tiles

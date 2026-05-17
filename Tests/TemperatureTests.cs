@@ -31,7 +31,7 @@ public class TemperatureTests
                 labels[j] = Math.Round(board[j].Temperature, 1).ToString();
             }
 
-            Visualise.GameBoardRenderer.RenderAndSave("BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
+            Visualise.GameBoardRenderer.RenderAndSave("Temperature/BasicBoardTemp" + i + ".png", board.Width, board.Height, tiles, board.Edges, null, labels);
         }
     }
 }

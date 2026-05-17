@@ -51,81 +51,113 @@ public record UnitTemplate(OperationalDomain MovementDomain = OperationalDomain.
 
     public double Morale { get; set; } = 5;
 
-    public Dictionary<TerrainType, int> TerrainMovementCosts => OperationalDomain switch
-    {
-        OperationalDomain.Land => new Dictionary<TerrainType, int>
-        {
-            { TerrainType.Grassland, 1 },
-            { TerrainType.Desert,    2 },
-            { TerrainType.Forest,    2 },
-            { TerrainType.Hill,      2 },
-            { TerrainType.Mountain,  Terrain.Impassable },
-            { TerrainType.Water,     Terrain.Impassable },
-            { TerrainType.Swamp,     2 },
-            { TerrainType.Reef,      Terrain.Impassable },
-        },
-        OperationalDomain.Airborne => new Dictionary<TerrainType, int>
-        {
-            { TerrainType.Grassland, 1 },
-            { TerrainType.Desert,    1 },
-            { TerrainType.Forest,    1 },
-            { TerrainType.Hill,      1 },
-            { TerrainType.Mountain,  1 },
-            { TerrainType.Water,     1 },
-            { TerrainType.Swamp,     1 },
-            { TerrainType.Reef,      1 },
-        },
-        OperationalDomain.Waterbound => new Dictionary<TerrainType, int>
-        {
-            { TerrainType.Grassland, Terrain.Impassable },
-            { TerrainType.Desert,    Terrain.Impassable },
-            { TerrainType.Forest,    Terrain.Impassable },
-            { TerrainType.Hill,      Terrain.Impassable },
-            { TerrainType.Mountain,  Terrain.Impassable },
-            { TerrainType.Water,     1 },
-            { TerrainType.Swamp,     Terrain.Impassable },
-            { TerrainType.Reef,      2 },
-        },
-        _ => [],
-    };
+    public Dictionary<TerrainType, int> TerrainMovementCostOverrides { get; set; } = [];
 
-    public Dictionary<EdgeType, int> EdgeMovementCosts => OperationalDomain switch
+    public Dictionary<EdgeType, int> EdgeMovementCostOverrides { get; set; } = [];
+
+    public TerrainType AdditionalCanStopOn { get; set; } = default;
+
+    public Dictionary<TerrainType, int> TerrainMovementCosts
     {
-        OperationalDomain.Land => new Dictionary<EdgeType, int>
+        get
         {
-            { EdgeType.None,     0 },
-            { EdgeType.River,    Terrain.Impassable },
-            { EdgeType.Forest,   1 },
-            { EdgeType.Hill,     1 },
-            { EdgeType.Mountain, Terrain.Impassable },
-            { EdgeType.Reef,     Terrain.Impassable },
-            { EdgeType.Wall,     Terrain.Impassable },
-            { EdgeType.Port,     1 },
-        },
-        OperationalDomain.Airborne => new Dictionary<EdgeType, int>
+            var movementCosts = OperationalDomain switch
+            {
+                OperationalDomain.Land => new Dictionary<TerrainType, int>
+                {
+                    { TerrainType.Grassland, 1 },
+                    { TerrainType.Desert,    2 },
+                    { TerrainType.Forest,    2 },
+                    { TerrainType.Hill,      2 },
+                    { TerrainType.Mountain,  Terrain.Impassable },
+                    { TerrainType.Water,     Terrain.Impassable },
+                    { TerrainType.Swamp,     2 },
+                    { TerrainType.Reef,      Terrain.Impassable },
+                },
+                OperationalDomain.Airborne => new Dictionary<TerrainType, int>
+                {
+                    { TerrainType.Grassland, 1 },
+                    { TerrainType.Desert,    1 },
+                    { TerrainType.Forest,    1 },
+                    { TerrainType.Hill,      1 },
+                    { TerrainType.Mountain,  1 },
+                    { TerrainType.Water,     1 },
+                    { TerrainType.Swamp,     1 },
+                    { TerrainType.Reef,      1 },
+                },
+                OperationalDomain.Waterbound => new Dictionary<TerrainType, int>
+                {
+                    { TerrainType.Grassland, Terrain.Impassable },
+                    { TerrainType.Desert,    Terrain.Impassable },
+                    { TerrainType.Forest,    Terrain.Impassable },
+                    { TerrainType.Hill,      Terrain.Impassable },
+                    { TerrainType.Mountain,  Terrain.Impassable },
+                    { TerrainType.Water,     1 },
+                    { TerrainType.Swamp,     Terrain.Impassable },
+                    { TerrainType.Reef,      2 },
+                },
+                _ => [],
+            };
+
+            foreach (var movementCostOverride in TerrainMovementCostOverrides)
+            {
+                movementCosts[movementCostOverride.Key] = movementCostOverride.Value;
+            }
+
+            return movementCosts;
+        }
+    }
+
+    public Dictionary<EdgeType, int> EdgeMovementCosts
+    {
+        get
         {
-            { EdgeType.None,     0 },
-            { EdgeType.River,    0 },
-            { EdgeType.Forest,   0 },
-            { EdgeType.Hill,     0 },
-            { EdgeType.Mountain, 0 },
-            { EdgeType.Reef,     0 },
-            { EdgeType.Wall,     0 },
-            { EdgeType.Port,     0 },
-        },
-        OperationalDomain.Waterbound => new Dictionary<EdgeType, int>
-        {
-            { EdgeType.None,     0 },
-            { EdgeType.River,    Terrain.Impassable },
-            { EdgeType.Forest,   Terrain.Impassable },
-            { EdgeType.Hill,     Terrain.Impassable },
-            { EdgeType.Mountain, Terrain.Impassable },
-            { EdgeType.Reef,     1 },
-            { EdgeType.Wall,     Terrain.Impassable },
-            { EdgeType.Port,     Terrain.Impassable },
-        },
-        _ => [],
-    };
+            var movementCosts = OperationalDomain switch
+            {
+                OperationalDomain.Land => new Dictionary<EdgeType, int>
+                {
+                    { EdgeType.None,     0 },
+                    { EdgeType.River,    Terrain.Impassable },
+                    { EdgeType.Forest,   1 },
+                    { EdgeType.Hill,     1 },
+                    { EdgeType.Mountain, Terrain.Impassable },
+                    { EdgeType.Reef,     Terrain.Impassable },
+                    { EdgeType.Wall,     Terrain.Impassable },
+                    { EdgeType.Port,     1 },
+                },
+                OperationalDomain.Airborne => new Dictionary<EdgeType, int>
+                {
+                    { EdgeType.None,     0 },
+                    { EdgeType.River,    0 },
+                    { EdgeType.Forest,   0 },
+                    { EdgeType.Hill,     0 },
+                    { EdgeType.Mountain, 0 },
+                    { EdgeType.Reef,     0 },
+                    { EdgeType.Wall,     0 },
+                    { EdgeType.Port,     0 },
+                },
+                OperationalDomain.Waterbound => new Dictionary<EdgeType, int>
+                {
+                    { EdgeType.None,     0 },
+                    { EdgeType.River,    Terrain.Impassable },
+                    { EdgeType.Forest,   Terrain.Impassable },
+                    { EdgeType.Hill,     Terrain.Impassable },
+                    { EdgeType.Mountain, Terrain.Impassable },
+                    { EdgeType.Reef,     1 },
+                    { EdgeType.Wall,     Terrain.Impassable },
+                    { EdgeType.Port,     Terrain.Impassable },
+                },
+                _ => [],
+            };
+
+            foreach (var movementCostOverride in EdgeMovementCostOverrides)
+            {
+                movementCosts[movementCostOverride.Key] = movementCostOverride.Value;
+            }
+
+            return movementCosts;
+        }
+    }
 
     public bool UsesRoads => OperationalDomain == OperationalDomain.Land;
 
@@ -135,5 +167,5 @@ public record UnitTemplate(OperationalDomain MovementDomain = OperationalDomain.
         OperationalDomain.Airborne => Terrain.NonMountainousLand,
         OperationalDomain.Waterbound => Terrain.AllWater,
         _ => default,
-    };
+    } | AdditionalCanStopOn;
 }

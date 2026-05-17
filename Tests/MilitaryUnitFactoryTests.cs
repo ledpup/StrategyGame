@@ -111,6 +111,28 @@ public class MilitaryUnitFactoryTests
         Assert.AreEqual("Dwarven Infantry", UnitTemplateName.DwarvenInfantry.ToDisplayName());
         Assert.AreEqual("Dwarven Dragoons", UnitTemplateName.DwarvenDragoons.ToDisplayName());
         Assert.AreEqual("Dwarven Crossbowmen", UnitTemplateName.DwarvenCrossbowmen.ToDisplayName());
+        Assert.AreEqual("Mountain Folk", UnitTemplateName.MountainFolk.ToDisplayName());
+        Assert.AreEqual("Marsh Folk", UnitTemplateName.MarshFolk.ToDisplayName());
+        Assert.AreEqual("Desert Folk", UnitTemplateName.DesertFolk.ToDisplayName());
+    }
+
+    [TestMethod]
+    public void UnitTemplateFactory_TerrainFolk_ReturnsMovementBonuses()
+    {
+        var templateFactory = new UnitTemplateFactory();
+
+        var mountainFolk = templateFactory.Get(UnitTemplateName.MountainFolk);
+        var marshFolk = templateFactory.Get(UnitTemplateName.MarshFolk);
+        var desertFolk = templateFactory.Get(UnitTemplateName.DesertFolk);
+
+        Assert.IsTrue(mountainFolk.CanStopOn.HasFlag(TerrainType.Mountain));
+        Assert.AreEqual(1, mountainFolk.TerrainMovementCosts[TerrainType.Mountain]);
+        Assert.AreEqual(1, mountainFolk.EdgeMovementCosts[EdgeType.Mountain]);
+
+        Assert.AreEqual(1, marshFolk.TerrainMovementCosts[TerrainType.Swamp]);
+        Assert.AreEqual(1, marshFolk.EdgeMovementCosts[EdgeType.River]);
+
+        Assert.AreEqual(1, desertFolk.TerrainMovementCosts[TerrainType.Desert]);
     }
 }
 
